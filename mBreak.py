@@ -12,7 +12,6 @@ import intromenu
 
 TODO List
 
-* Find out how to best handle switching between game states/scenes.
 * Add main menu.
 * Implement Ball and Paddle classes.
 

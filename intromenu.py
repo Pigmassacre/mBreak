@@ -7,6 +7,7 @@ import pygame
 from pygame.locals import *
 from libs import pyganim
 import useful
+import debug
 from settings import *
 
 # Import any needed game screens here.
@@ -81,7 +82,8 @@ def main(window_surface, main_clock, debug_font):
 		window_surface.blit(title_message_surface, (title_message.x, title_message.y))
 		
 		if DEBUG_MODE:
-			window_surface.blit(debug_font.render(str(time_passed), False, (255, 255, 255)), (25, 25))
+			# Display various debug information.
+			debug.display(window_surface, main_clock, debug_font)
 		
 		pygame.display.update()
 		

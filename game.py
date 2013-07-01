@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
+import debug
 from settings import *
 
 def main(window_surface, main_clock, debug_font):
@@ -20,7 +21,8 @@ def main(window_surface, main_clock, debug_font):
 				# do stuff
 		
 		if DEBUG_MODE:
-			window_surface.blit(debug_font.render(str(int(main_clock.get_fps())), False, (255, 255, 255)), (25, 25))
+			# Display various debug information.
+			debug.display(window_surface, main_clock, debug_font)
 		
 		pygame.display.update()
 		
