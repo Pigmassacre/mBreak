@@ -1,2 +1,5 @@
 # Ignore the libraries
 ./libs
+
+# Ignore compiled python files.
+*.pyc
