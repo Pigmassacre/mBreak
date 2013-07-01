@@ -13,7 +13,6 @@ class Ball(pygame.sprite.Sprite):
 		
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(x, y, width, height)
-		print(str(self.rect.x) + " " + str(self.rect.y))
 
 		# Set the velocity variables.
 		self.velocity_x = velocity_x
@@ -22,6 +21,8 @@ class Ball(pygame.sprite.Sprite):
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
 
+		if DEBUG_MODE:
+			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+
 	def update(self):
 		self.rect.move_ip(self.velocity_x, self.velocity_y)
-		print("(x, y): (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
