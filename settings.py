@@ -6,5 +6,5 @@ BACKGROUND_COLOR = (0, 0, 0)
 MAX_FPS = 60
 
 # Enables various debug information.
-DEBUG_MODE = False
+DEBUG_MODE = True
 DEBUG_FONT = "fonts/8-BIT WONDER.TTF"

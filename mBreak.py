@@ -33,9 +33,11 @@ def main():
 	# Set the window caption.
 	pygame.display.set_caption(WINDOW_CAPTION)
 
-	""" The parts below should probably go to a introscreen class/method/module? """
+	# Setup the debug font, used for all debug messages.
+	debug_font = pygame.font.Font(DEBUG_FONT, 9)
 
-	intromenu.main(window_surface, main_clock)
+	# Start the intro menu.
+	intromenu.main(window_surface, main_clock, debug_font)
 
 # Start the game!
 main()

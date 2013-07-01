@@ -2,11 +2,15 @@ __author__ = "Olof Karlsson"
 __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
+# Various needed imports.
 import pygame
 from pygame.locals import *
 from libs import pyganim
 import useful
 from settings import *
+
+# Import any needed game screens here.
+import game
 
 def setup_logo():
 	# Create the logo
@@ -37,7 +41,7 @@ def setup_message(logo_x, logo_y):
 
 	return message
 
-def main(window_surface, main_clock):
+def main(window_surface, main_clock, debug_font):
 	# Setup the logo and store the surface of the logo.
 	title_logo = setup_logo()
 	title_logo.play()
@@ -48,17 +52,11 @@ def main(window_surface, main_clock):
 	title_message_surface = title_message.surface
 	# Sets the blink rate of the message.
 	title_message_blink_rate = 750
-
-	# Setup the debug font, used for all debug messages.
-	debug_font = pygame.font.Font(DEBUG_FONT, 9)
 		
 	# Keeps track of how much time has passed.
 	time_passed = 0
 
-	# Keeps the gameloop going.
-	done = False
-
-	while not done:
+	while True:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(BACKGROUND_COLOR)
 		
@@ -67,8 +65,10 @@ def main(window_surface, main_clock):
 				# If the ESCAPE key is pressed or the window is closed, the game is shut down.
 				pygame.quit()
 				sys.exit()
-			# elif event.type == KEYDOWN and event.key == K_ENTER:
-				# do stuff
+			elif event.type == KEYDOWN and event.key == K_RETURN:
+				# If ENTER is pressed, proceed to the next screen, and end this loop.
+				game.main(window_surface, main_clock, debug_font)
+				break
 		
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
