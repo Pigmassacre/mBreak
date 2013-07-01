@@ -3,7 +3,7 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 # Various needed imports.
-import pygame
+import pygame, sys
 from pygame.locals import *
 from libs import pyganim
 import useful
