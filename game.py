@@ -25,7 +25,7 @@ def create_ball():
 def create_paddle():
 	width = 16
 	height = 64
-	x = 100
+	x = (SCREEN_WIDTH - width) / 2
 	y = (SCREEN_HEIGHT - height) / 2
 	image_path = ("res/paddle/paddle.png")
 
@@ -39,7 +39,7 @@ def main(window_surface, main_clock, debug_font):
 	paddle_group = pygame.sprite.Group()
 
 	# Spawn a paddle and add it to paddle_group.
-	#paddle_group.add(create_paddle())
+	paddle_group.add(create_paddle())
 
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
