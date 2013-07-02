@@ -14,8 +14,8 @@ from settings import *
 def create_ball():
 	width = 16
 	height = 16
-	x = random.uniform(SCREEN_WIDTH / 2 - 100, SCREEN_WIDTH / 2 + 100)
-	y = random.uniform(SCREEN_HEIGHT / 2 - 100, SCREEN_HEIGHT / 2 + 100)
+	x = random.uniform(0, SCREEN_WIDTH)
+	y = random.uniform(0, SCREEN_HEIGHT)
 	# speed = random.randint(2, 6)
 	speed = 6
 	angle = random.uniform(0, 2*math.pi)
@@ -40,7 +40,7 @@ def main(window_surface, main_clock, debug_font):
 	paddle_group = pygame.sprite.Group()
 
 	# Spawn a paddle and add it to paddle_group.
-	paddle_group.add(create_paddle())
+	#paddle_group.add(create_paddle())
 
 	while True:
 		# Every frame begins by filling the whole screen with the background color.

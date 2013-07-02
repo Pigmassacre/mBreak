@@ -149,11 +149,12 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = self.rect.centerx - ball.rect.centerx
 			delta_y = self.rect.centery - ball.rect.centery
 			self.angle = math.atan2(delta_x, delta_y)
-
+			print("Self delta: " + str(delta_x) + ", " + str(delta_y) + ")")
 			# Handle other ball.
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_x, delta_y)
+			print("Ball delta: " + str(delta_x) + ", " + str(delta_y) + ")")
 		ball_group.add(self)
 
 		# Check collision with x-edges.
