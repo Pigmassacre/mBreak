@@ -101,67 +101,59 @@ class Ball(pygame.sprite.Sprite):
 		ball_group.remove(self)
 		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, False)
 		for ball in ball_collide_list:
-			if self.rect.right >= ball.rect.left and self.rect.left < ball.rect.left:
+			if self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
+				# Top side of ball collided with. Compare with edges:
+				if ball.rect.left - self.rect.left > ball.rect.top - self.rect.top:
+					# The ball collides more with the left side than top side.
+					# Place ball to the left of the ball.
+					self.x = ball.rect.left - self.rect.width - 1
+					self.rect.x = self.x
+				elif self.rect.right - ball.rect.right > ball.rect.top - self.rect.top:
+					# The ball collides more with the right side than top side.
+					# Place ball to the right of the ball.
+					self.x = ball.rect.right + 1
+					self.rect.x = self.x
+				else:
+					# Place ball on top of the ball.
+					self.y = ball.rect.top - self.rect.height - 1
+					self.rect.y = self.y
+			elif self.rect.top <= ball.rect.bottom and self.rect.bottom > ball.rect.bottom:
+				# Bottom side of ball collided with.
+				if ball.rect.left - self.rect.left > self.rect.bottom - ball.rect.bottom:
+					# The ball collides more with the left side than top side.
+					# Place ball to the left of the ball.
+					self.x = ball.rect.left - self.rect.width - 1
+					self.rect.x = self.x
+				elif self.rect.right - ball.rect.right > self.rect.bottom - ball.rect.bottom:
+					# The ball collides more with the right side than top side.
+					# Place ball to the right of the ball.
+					self.x = ball.rect.right + 1
+					self.rect.x = self.x
+				else:
+					# The ball collides more with the bottom side than any other side.
+					# Place ball beneath the ball.
+					self.y = ball.rect.bottom + 1
+					self.rect.y = self.y
+			elif self.rect.right >= ball.rect.left and self.rect.left < ball.rect.left:
 				# Left side of ball collided with.
-				#self.angle = math.pi - self.angle
-				delta_x = self.rect.centerx - ball.rect.centerx
-				delta_y = self.rect.centery - ball.rect.centery
-				self.angle = math.atan2(delta_x, delta_y)
-				#ball.angle = math.pi - ball.angle
-				delta_x = ball.rect.centerx - self.rect.centerx
-				delta_y = ball.rect.centery - self.rect.centery
-				ball.angle = math.atan2(delta_x, delta_y)
-
-
 				# Place ball to the left of the ball.
 				self.x = ball.rect.left - self.rect.width - 1
 				self.rect.x = self.x
 			elif self.rect.left <= ball.rect.right and self.rect.right > ball.rect.right:
 				# Right side of ball collided with.
-				#self.angle = math.pi - self.angle
-				delta_x = self.rect.centerx - ball.rect.centerx
-				delta_y = self.rect.centery - ball.rect.centery
-				self.angle = math.atan2(delta_x, delta_y)
-				#ball.angle = math.pi - ball.angle
-				delta_x = ball.rect.centerx - self.rect.centerx
-				delta_y = ball.rect.centery - self.rect.centery
-				ball.angle = math.atan2(delta_x, delta_y)
-
 				# Place ball to the right of the ball.
 				self.x = ball.rect.right + 1
 				self.rect.x = self.x
-			elif self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
-				# Top side of ball collided with.
-				self.angle = -self.angle
-				ball.angle = -ball.angle
-				#self.angle = math.pi - self.angle
-				delta_x = self.rect.centerx - ball.rect.centerx
-				delta_y = self.rect.centery - ball.rect.centery
-				self.angle = math.atan2(delta_x, delta_y)
-				#ball.angle = math.pi - ball.angle
-				delta_x = ball.rect.centerx - self.rect.centerx
-				delta_y = ball.rect.centery - self.rect.centery
-				ball.angle = math.atan2(delta_x, delta_y)
 
-				# Place ball on top of the ball.
-				self.y = ball.rect.top - self.rect.height - 1
-				self.rect.y = self.y
-			elif self.rect.top <= ball.rect.bottom and self.rect.bottom > ball.rect.bottom:
-				# Bottom side of ball collided with.
-				self.angle = -self.angle
-				ball.angle = -ball.angle
-				#self.angle = math.pi - self.angle
-				delta_x = self.rect.centerx - ball.rect.centerx
-				delta_y = self.rect.centery - ball.rect.centery
-				self.angle = math.atan2(delta_x, delta_y)
-				#ball.angle = math.pi - ball.angle
-				delta_x = ball.rect.centerx - self.rect.centerx
-				delta_y = ball.rect.centery - self.rect.centery
-				ball.angle = math.atan2(delta_x, delta_y)
+			# Handle self.
+			delta_x = self.rect.centerx - ball.rect.centerx
+			delta_y = self.rect.centery - ball.rect.centery
+			self.angle = math.atan2(delta_x, delta_y)
 
-				# Place ball beneath the ball.
-				self.y = ball.rect.bottom + 1
-				self.rect.y = self.y
+			# Handle other ball.
+			delta_x = ball.rect.centerx - self.rect.centerx
+			delta_y = ball.rect.centery - self.rect.centery
+			ball.angle = math.atan2(delta_x, delta_y)
 		ball_group.add(self)
 
 		# Check collision with x-edges.
