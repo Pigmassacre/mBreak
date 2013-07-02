@@ -36,7 +36,53 @@ class Ball(pygame.sprite.Sprite):
 		# Check collision with paddles.
 		for paddle in paddle_group:
 			if self.rect.colliderect(paddle.rect):
-				if self.rect.right >= paddle.rect.left and self.rect.left < paddle.rect.left:
+				if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
+					# Top side of paddle collided with. Compare with edges:
+					if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
+						# The ball collides more with the left side than top side.
+						self.angle = math.pi - self.angle
+
+						# Place ball to the left of the paddle.
+						self.x = paddle.rect.left - self.rect.width - 1
+						self.rect.x = self.x
+					elif self.rect.right - paddle.rect.right > paddle.rect.top - self.rect.top:
+						# The ball collides more with the right side than top side.
+						self.angle = math.pi - self.angle
+
+						# Place ball to the right of the paddle.
+						self.x = paddle.rect.right + 1
+						self.rect.x = self.x
+					else:
+						# The ball collides more with the top side than any other side.
+						self.angle = -self.angle
+
+						# Place ball on top of the paddle.
+						self.y = paddle.rect.top - self.rect.height - 1
+						self.rect.y = self.y
+				elif self.rect.top <= paddle.rect.bottom and self.rect.bottom > paddle.rect.bottom:
+					# Bottom side of paddle collided with. Compare with edges:
+					if paddle.rect.left - self.rect.left > self.rect.bottom - paddle.rect.bottom:
+						# The ball collides more with the left side than top side.
+						self.angle = math.pi - self.angle
+
+						# Place ball to the left of the paddle.
+						self.x = paddle.rect.left - self.rect.width - 1
+						self.rect.x = self.x
+					elif self.rect.right - paddle.rect.right > self.rect.bottom - paddle.rect.bottom:
+						# The ball collides more with the right side than top side.
+						self.angle = math.pi - self.angle
+
+						# Place ball to the right of the paddle.
+						self.x = paddle.rect.right + 1
+						self.rect.x = self.x
+					else:
+						# The ball collides more with the bottom side than any other side.
+						self.angle = -self.angle
+
+						# Place ball beneath the paddle.
+						self.y = paddle.rect.bottom + 1
+						self.rect.y = self.y
+				elif self.rect.right >= paddle.rect.left and self.rect.left < paddle.rect.left:
 					# Left side of paddle collided with.
 					self.angle = math.pi - self.angle
 
@@ -50,21 +96,7 @@ class Ball(pygame.sprite.Sprite):
 					# Place ball to the right of the paddle.
 					self.x = paddle.rect.right + 1
 					self.rect.x = self.x
-				elif self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
-					# Top side of paddle collided with.
-					self.angle = -self.angle
-
-					# Place ball on top of the paddle.
-					self.y = paddle.rect.top - self.rect.height - 1
-					self.rect.y = self.y
-				elif self.rect.top <= paddle.rect.bottom and self.rect.bottom > paddle.rect.bottom:
-					# Bottom side of paddle collided with.
-					self.angle = -self.angle
-
-					# Place ball beneath the paddle.
-					self.y = paddle.rect.bottom + 1
-					self.rect.y = self.y
-
+				
 		# Check collision with other balls.
 		ball_group.remove(self)
 		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, False)
@@ -131,22 +163,6 @@ class Ball(pygame.sprite.Sprite):
 				self.y = ball.rect.bottom + 1
 				self.rect.y = self.y
 		ball_group.add(self)
-
-		"""
-		# Handle self collision response.
-		delta_x = self.rect.centerx - ball.rect.centerx
-		delta_y = self.rect.centery - ball.rect.centery
-		self.angle = math.atan2(delta_x, delta_y)
-
-		self.x = self.x + math.cos(self.angle)
-		self.y = self.y + math.sin(self.angle)
-		self.rect.x = self.x
-		self.rect.y = self.y
-			
-		# Handle other ball collision response.
-		delta_x = ball.rect.centerx - self.rect.centerx
-		delta_y = ball.rect.centery - self.rect.centery
-		ball.angle = math.atan2(delta_x, delta_y)"""
 
 		# Check collision with x-edges.
 		if self.rect.x < 0:
