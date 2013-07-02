@@ -16,7 +16,7 @@ def create_ball():
 	height = 16
 	x = random.uniform(SCREEN_WIDTH / 2 - 100, SCREEN_WIDTH / 2 + 100)
 	y = random.uniform(SCREEN_HEIGHT / 2 - 100, SCREEN_HEIGHT / 2 + 100)
-	speed = random.randint(4, 8)
+	speed = random.randint(2, 6)
 	angle = random.uniform(0, 2*math.pi)
 	image_path = ("res/ball/ball.png")
 
