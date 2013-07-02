@@ -39,7 +39,28 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with other balls.
 		ball_group.remove(self)
-		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, True)
+		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, False)
+		for ball in ball_collide_list:
+			temp_velocity_x = self.velocity_x
+			temp_velocity_y = self.velocity_y
+
+			# Handle self collision response.
+			self.velocity_x = ball.velocity_x
+			self.velocity_y = ball.velocity_y
+
+			self.x = self.x + self.velocity_x
+			self.y = self.y + self.velocity_y
+			self.rect.x = self.x
+			self.rect.y = self.y
+
+			# Handle other ball collision response
+			ball.velocity_x = temp_velocity_x
+			ball.velocity_y = temp_velocity_y
+
+			ball.x = ball.x + ball.velocity_x
+			ball.y = ball.y + ball.velocity_y
+			ball.rect.x = ball.x
+			ball.rect.y = ball.y
 		ball_group.add(self)
 
 		# Check collision with x-edges.
