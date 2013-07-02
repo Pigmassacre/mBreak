@@ -14,11 +14,12 @@ def create_ball():
 	y = random.uniform(SCREEN_HEIGHT / 2 - 100, SCREEN_HEIGHT / 2 + 100)
 	width = 5
 	height = 5
-	velocity_x = random.uniform(-5, 5)
-	velocity_y = random.uniform(-5, 5)
+	speed = 5
+	velocity_x = random.uniform(-1, 1)
+	velocity_y = random.uniform(-1, 1)
 	image_path = ("res/ball/ball.png")
 
-	return ball.Ball(x, y, width, height, velocity_x, velocity_y, image_path)
+	return ball.Ball(x, y, width, height, velocity_x, velocity_y, speed, image_path)
 
 def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the balls!
@@ -35,6 +36,9 @@ def main(window_surface, main_clock, debug_font):
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				ball_group.add(create_ball())
+
+		if pygame.key.get_pressed()[K_SPACE]:
+			ball_group.add(create_ball())
 
 		# Update the balls!
 		ball_group.update()
