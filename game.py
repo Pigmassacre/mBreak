@@ -16,18 +16,15 @@ def create_ball():
 	height = 16
 	x = random.uniform(0, SCREEN_WIDTH)
 	y = random.uniform(0, SCREEN_HEIGHT)
-	# speed = random.randint(2, 6)
-	speed = 6
+	speed = random.randint(2, 6)
 	angle = random.uniform(0, 2*math.pi)
 	image_path = ("res/ball/ball.png")
 
 	return ball.Ball(x, y, width, height, angle, speed, image_path)
 
-def create_paddle():
+def create_paddle(x, y):
 	width = 16
 	height = 64
-	x = (SCREEN_WIDTH - width) / 2
-	y = (SCREEN_HEIGHT - height) / 2
 	image_path = ("res/paddle/paddle.png")
 
 	return paddle.Paddle(x, y, width, height, image_path)
@@ -40,7 +37,11 @@ def main(window_surface, main_clock, debug_font):
 	paddle_group = pygame.sprite.Group()
 
 	# Spawn a paddle and add it to paddle_group.
-	#paddle_group.add(create_paddle())
+	paddle_group.add(create_paddle(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
+	# Spawn some more!
+	paddle_group.add(create_paddle(SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2))
+	paddle_group.add(create_paddle(SCREEN_WIDTH / 2 + 150, SCREEN_HEIGHT / 2))
 
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
