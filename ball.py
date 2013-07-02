@@ -43,11 +43,11 @@ class Ball(pygame.sprite.Sprite):
 		ball_group.add(self)
 
 		# Check collision with x-edges.
-		if self.rect.x < 0 or self.rect.x > SCREEN_WIDTH:
+		if self.rect.x < 0 or self.rect.x + self.rect.width > SCREEN_WIDTH:
 			self.velocity_x = -self.velocity_x
 		
 		# Check collision with y-edges.
-		if self.rect.y < 0 or self.rect.y > SCREEN_HEIGHT:
+		if self.rect.y < 0 or self.rect.y + self.rect.height > SCREEN_HEIGHT:
 			self.velocity_y = -self.velocity_y
 
 		if DEBUG_MODE:
