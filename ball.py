@@ -9,7 +9,7 @@ from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, image_path):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, image_path):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -23,8 +23,14 @@ class Ball(pygame.sprite.Sprite):
 		# Set the angle variable.
 		self.angle = angle
 
+		# Set maximum speed of the ball.
+		self.max_speed = max_speed
+
 		# Set the speed variable.
-		self.speed = speed
+		if speed <= self.max_speed:
+			self.speed = speed
+		else:
+			self.speed = self.max_speed
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)

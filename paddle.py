@@ -3,12 +3,13 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import math
 from settings import *
 
 class Paddle(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, image_path):
+	def __init__(self, x, y, width, height, acceleration, retardation, max_speed, image_path):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -19,8 +20,37 @@ class Paddle(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 
+		self.velocity_y = 0
+
+		self.retardation = retardation
+
+		self.acceleration = acceleration
+
+		self.max_speed = max_speed
+
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
 
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+
+	def update(self):
+		if pygame.key.get_pressed()[K_UP]:
+			self.velocity_y = self.velocity_y - self.acceleration
+			if self.velocity_y < -self.max_speed:
+				self.velocity_y = -self.max_speed
+		elif pygame.key.get_pressed()[K_DOWN]:
+			self.velocity_y = self.velocity_y + self.acceleration
+			if self.velocity_y > self.max_speed:
+				self.velocity_y = self.max_speed
+		elif self.velocity_y > 0:
+			self.velocity_y = self.velocity_y - self.retardation
+			if self.velocity_y < 0:
+				self.velocity_y = 0
+		elif self.velocity_y < 0:
+			self.velocity_y = self.velocity_y + self.retardation
+			if self.velocity_y > 0:
+				self.velocity_y = 0
+
+		self.y = self.y + self.velocity_y
+		self.rect.y = self.y

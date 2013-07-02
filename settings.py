@@ -1,6 +1,6 @@
 # Various game constants, like the width and height of the screen.
 SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 576
+SCREEN_HEIGHT = 480
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (0, 0, 0)
 MAX_FPS = 60
