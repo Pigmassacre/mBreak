@@ -12,8 +12,8 @@ from settings import *
 def create_ball():
 	x = random.uniform(SCREEN_WIDTH / 2 - 100, SCREEN_WIDTH / 2 + 100)
 	y = random.uniform(SCREEN_HEIGHT / 2 - 100, SCREEN_HEIGHT / 2 + 100)
-	width = 5
-	height = 5
+	width = 16
+	height = 16
 	speed = 5
 	velocity_x = random.uniform(-1, 1)
 	velocity_y = random.uniform(-1, 1)
@@ -41,7 +41,7 @@ def main(window_surface, main_clock, debug_font):
 			ball_group.add(create_ball())
 
 		# Update the balls!
-		ball_group.update()
+		ball_group.update(ball_group)
 
 		# Draw the balls!
 		ball_group.draw(window_surface)
