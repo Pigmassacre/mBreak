@@ -9,6 +9,7 @@ import random
 import debug
 import ball
 import paddle
+import player
 from settings import *
 
 def create_ball():
@@ -33,16 +34,48 @@ def create_paddle(x, y):
 
 	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path)
 
+def create_player_left(paddle):
+	name = PLAYER_LEFT_NAME
+	key_up = PLAYER_LEFT_KEY_UP
+	key_down = PLAYER_LEFT_KEY_DOWN
+
+	player_left = player.Player(name, key_up, key_down)
+
+	player_left.add_paddle(paddle)
+
+	return player_left
+
+def create_player_right(paddle):
+	name = PLAYER_RIGHT_NAME
+	key_up = PLAYER_RIGHT_KEY_UP
+	key_down = PLAYER_RIGHT_KEY_DOWN
+
+	player_right = player.Player(name, key_up, key_down)
+	
+	player_right.add_paddle(paddle)
+
+	return player_right
+
 def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the balls.
 	ball_group = pygame.sprite.Group()
 
-	# Define the group that contains all the paddles.
+	# Define the paddle group.
 	paddle_group = pygame.sprite.Group()
 
-	# Spawn some paddles.
-	paddle_group.add(create_paddle(100, SCREEN_HEIGHT / 2))
-	paddle_group.add(create_paddle(SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2))
+	# Define the player group.
+	player_group = pygame.sprite.Group()
+
+	# Create the players.
+	paddle_left = create_paddle(100, SCREEN_HEIGHT / 2)
+	paddle_group.add(paddle_left)
+	player_left = create_player_left(paddle_left)
+	player_group.add(player_left)
+
+	paddle_right = create_paddle(SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2)
+	paddle_group.add(paddle_right)
+	player_right = create_player_right(paddle_right)
+	player_group.add(player_right)
 
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
@@ -62,10 +95,11 @@ def main(window_surface, main_clock, debug_font):
 		# Update the balls.
 		ball_group.update(ball_group, paddle_group)
 
+		# Update the players.
+		player_group.update()
+
 		# Draw the balls.
 		ball_group.draw(window_surface)
-
-		paddle_group.update()
 
 		# Draw the paddles.
 		paddle_group.draw(window_surface)

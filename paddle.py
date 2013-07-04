@@ -22,9 +22,9 @@ class Paddle(pygame.sprite.Sprite):
 
 		self.velocity_y = 0
 
-		self.retardation = retardation
-
 		self.acceleration = acceleration
+
+		self.retardation = retardation
 
 		self.max_speed = max_speed
 
@@ -34,12 +34,12 @@ class Paddle(pygame.sprite.Sprite):
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
-	def update(self):
-		if pygame.key.get_pressed()[K_UP]:
+	def update(self, key_up, key_down):
+		if pygame.key.get_pressed()[key_up]:
 			self.velocity_y = self.velocity_y - self.acceleration
 			if self.velocity_y < -self.max_speed:
 				self.velocity_y = -self.max_speed
-		elif pygame.key.get_pressed()[K_DOWN]:
+		elif pygame.key.get_pressed()[key_down]:
 			self.velocity_y = self.velocity_y + self.acceleration
 			if self.velocity_y > self.max_speed:
 				self.velocity_y = self.max_speed
