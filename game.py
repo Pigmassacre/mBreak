@@ -60,10 +60,10 @@ def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the balls.
 	ball_group = pygame.sprite.Group()
 
-	# Define the paddle group.
+	# Define the group that contains all the paddles.
 	paddle_group = pygame.sprite.Group()
 
-	# Define the player group.
+	# Define the group that contains all the players.
 	player_group = pygame.sprite.Group()
 
 	# Create the players.
@@ -90,7 +90,16 @@ def main(window_surface, main_clock, debug_font):
 				ball_group.add(create_ball())
 
 		if pygame.key.get_pressed()[K_SPACE]:
-			ball_group.add(create_ball())
+			temp_ball = create_ball()
+			ball_group.add(temp_ball)
+			if random.random() > 0.5:
+				player_left.add_ball(temp_ball)
+				if DEBUG_MODE:
+					print("Ball added to Player Left.")
+			else:
+				player_right.add_ball(temp_ball)
+				if DEBUG_MODE:
+					print("Ball added to Player Right.")
 
 		# Update the balls.
 		ball_group.update(ball_group, paddle_group)
@@ -103,6 +112,9 @@ def main(window_surface, main_clock, debug_font):
 
 		# Draw the paddles.
 		paddle_group.draw(window_surface)
+
+		# Draw the players.
+		# player_group.draw(window_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.
