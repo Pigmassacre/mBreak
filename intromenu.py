@@ -43,9 +43,8 @@ def setup_message(logo_x, logo_y):
 	return message
 
 def setup_music():
-	music = pygame.mixer.music.load("res/music/main.ogg")
-	music.play()
-	return music
+	pygame.mixer.music.load(INTRO_MUSIC)
+	pygame.mixer.music.play()
 
 def main(window_surface, main_clock, debug_font):
 	# Setup the logo and store the surface of the logo.
@@ -60,7 +59,7 @@ def main(window_surface, main_clock, debug_font):
 	title_message_blink_rate = 750
 
 	# Setup and play music.
-	music = setup_music()
+	setup_music()
 		
 	# Keeps track of how much time has passed.
 	time_passed = 0
@@ -77,7 +76,7 @@ def main(window_surface, main_clock, debug_font):
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				# If ENTER is pressed, proceed to the next screen, and end this loop.
 				game.main(window_surface, main_clock, debug_font)
-				music.stop()
+				pygame.mixer.music.pause()
 				break
 		
 		# Increment the time passed.

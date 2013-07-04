@@ -7,6 +7,9 @@ WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (0, 0, 0)
 MAX_FPS = 60
 
+# Music settings
+INTRO_MUSIC = "res/music/main.ogg"
+
 # Player Left settings.
 PLAYER_LEFT_NAME = "Player Left"
 PLAYER_LEFT_KEY_UP = K_w
