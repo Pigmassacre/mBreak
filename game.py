@@ -60,6 +60,9 @@ def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the balls.
 	ball_group = pygame.sprite.Group()
 
+	# Define the group that contains all the blocks.
+	block_group = pygame.sprite.Group()
+
 	# Define the group that contains all the paddles.
 	paddle_group = pygame.sprite.Group()
 
@@ -117,7 +120,7 @@ def main(window_surface, main_clock, debug_font):
 			ball_group.add(temp_ball)
 
 		# Update the balls.
-		ball_group.update(ball_group, paddle_group)
+		ball_group.update(ball_group, paddle_group, block_group)
 
 		# Update the players.
 		player_group.update()

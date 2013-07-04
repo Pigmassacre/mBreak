@@ -83,8 +83,7 @@ class Ball(pygame.sprite.Sprite):
 		# Place ball to the right of the paddle.
 		self.place_right_of(paddle)
 
-	def update(self, ball_group, paddle_group):
-		# Check collision with paddles.
+	def check_collision_paddles(self, paddle_group):
 		for paddle in paddle_group:
 			if self.rect.colliderect(paddle.rect):
 				if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
@@ -123,8 +122,8 @@ class Ball(pygame.sprite.Sprite):
 				elif self.rect.left <= paddle.rect.right and self.rect.right > paddle.rect.right:
 					# Right side of paddle collided with.
 					self.hit_right_side_of_paddle(paddle)
-				
-		# Check collision with other balls.
+
+	def check_collision_balls(self, ball_group):
 		ball_group.remove(self)
 		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, False)
 		for ball in ball_collide_list:
@@ -174,6 +173,59 @@ class Ball(pygame.sprite.Sprite):
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_y, delta_x)
 		ball_group.add(self)
+
+	def check_collision_blocks(self, block_group):
+		block_collide_list = pygame.sprite.spritecollide(self, block_group, False)
+		for block in block_collide_list:
+			# Destroy the block.
+			block.kill()
+
+			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
+				# Top side of block collided with. Compare with edges:
+				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
+					# The ball collides more with the left side than top side.
+					# Place ball to the left of the block.
+					self.place_left_of(block)
+				elif self.rect.right - block.rect.right > block.rect.top - self.rect.top:
+					# The ball collides more with the right side than top side.
+					# Place ball to the right of the block.
+					self.place_right_of(block)
+				else:
+					# Place ball on top of the block.
+					self.place_over(block)
+			elif self.rect.top <= block.rect.bottom and self.rect.bottom > block.rect.bottom:
+				# Bottom side of block collided with.
+				if block.rect.left - self.rect.left > self.rect.bottom - block.rect.bottom:
+					# The ball collides more with the left side than top side.
+					# Place ball to the left of the block.
+					self.place_left_of(block)
+				elif self.rect.right - block.rect.right > self.rect.bottom - block.rect.bottom:
+					# The ball collides more with the right side than top side.
+					# Place ball to the right of the block.
+					self.place_right_of(block)
+				else:
+					# The ball collides more with the bottom side than any other side.
+					# Place ball beneath the block.
+					self.place_below(block)
+			elif self.rect.right >= block.rect.left and self.rect.left < block.rect.left:
+				# Left side of block collided with.
+				# Place ball to the left of the block.
+				self.place_left_of(block)
+			elif self.rect.left <= block.rect.right and self.rect.right > block.rect.right:
+				# Right side of block collided with.
+				# Place ball to the right of the block.
+				self.place_right_of(block)
+
+
+	def update(self, ball_group, paddle_group, block_group):
+		# Check collision with paddles.
+		self.check_collision_paddles(paddle_group)
+				
+		# Check collision with other balls.
+		self.check_collision_balls(ball_group)
+
+		# Check collision with blocks.
+		self.check_collision_blocks(block_group)
 
 		# Check collision with x-edges.
 		if self.rect.x < 0:
