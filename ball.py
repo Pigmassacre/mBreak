@@ -49,6 +49,38 @@ class Ball(pygame.sprite.Sprite):
 			# If angle is between 270 and 359 degrees.
 			self.angle = self.angle + (paddle.velocity_y * 0.05)
 
+	def place_left_of(self, other):
+		self.x = other.rect.left - self.rect.width - 1
+		self.rect.x = self.x
+
+	def place_right_of(self, other):
+		self.x = other.rect.right + 1
+		self.rect.x = self.x
+
+	def place_over(self, other):
+		self.y = other.rect.top - self.rect.height - 1
+		self.rect.y = self.y
+
+	def place_below(self, other):
+		self.y = other.rect.bottom + 1
+		self.rect.y = self.y
+
+	def hit_left_side_of_paddle(self, paddle):
+		# Calculate spin, and then reverse angle.
+		self.calculate_spin(paddle)
+		self.angle = math.pi - self.angle
+
+		# Place ball to the left of the paddle.
+		self.place_left_of(paddle)
+
+	def hit_right_side_of_paddle(self, paddle):
+		# Calculate spin, and then reverse angle.
+		self.calculate_spin(paddle)
+		self.angle = math.pi - self.angle
+
+		# Place ball to the right of the paddle.
+		self.place_right_of(paddle)
+
 	def update(self, ball_group, paddle_group):
 		# Check collision with paddles.
 		for paddle in paddle_group:
@@ -57,70 +89,38 @@ class Ball(pygame.sprite.Sprite):
 					# Top side of paddle collided with. Compare with edges:
 					if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
 						# The ball collides more with the left side than top side.
-						self.calculate_spin(paddle)
-						self.angle = math.pi - self.angle
-
-						# Place ball to the left of the paddle.
-						self.x = paddle.rect.left - self.rect.width - 1
-						self.rect.x = self.x
+						self.hit_left_side_of_paddle(paddle)
 					elif self.rect.right - paddle.rect.right > paddle.rect.top - self.rect.top:
 						# The ball collides more with the right side than top side.
-						self.calculate_spin(paddle)
-						self.angle = math.pi - self.angle
-
-						# Place ball to the right of the paddle.
-						self.x = paddle.rect.right + 1
-						self.rect.x = self.x
+						self.hit_right_side_of_paddle(paddle)
 					else:
 						# The ball collides more with the top side than any other side.
 						if self.angle < math.pi:
 							self.angle = -self.angle
 
 						# Place ball on top of the paddle.
-						self.y = paddle.rect.top - self.rect.height - 1
-						self.rect.y = self.y
+						self.place_over(paddle)
 				elif self.rect.top <= paddle.rect.bottom and self.rect.bottom > paddle.rect.bottom:
 					# Bottom side of paddle collided with. Compare with edges:
 					if paddle.rect.left - self.rect.left > self.rect.bottom - paddle.rect.bottom:
 						# The ball collides more with the left side than top side.
-						self.calculate_spin(paddle)
-						self.angle = math.pi - self.angle
-
-						# Place ball to the left of the paddle.
-						self.x = paddle.rect.left - self.rect.width - 1
-						self.rect.x = self.x
+						self.hit_left_side_of_paddle(paddle)
 					elif self.rect.right - paddle.rect.right > self.rect.bottom - paddle.rect.bottom:
 						# The ball collides more with the right side than top side.
-						self.calculate_spin(paddle)
-						self.angle = math.pi - self.angle
-
-						# Place ball to the right of the paddle.
-						self.x = paddle.rect.right + 1
-						self.rect.x = self.x
+						self.hit_right_side_of_paddle(paddle)
 					else:
 						# The ball collides more with the bottom side than any other side.
 						if self.angle > math.pi:
 							self.angle = -self.angle
 
 						# Place ball beneath the paddle.
-						self.y = paddle.rect.bottom + 1
-						self.rect.y = self.y
+						self.place_below(paddle)
 				elif self.rect.right >= paddle.rect.left and self.rect.left < paddle.rect.left:
 					# Left side of paddle collided with.
-					self.calculate_spin(paddle)
-					self.angle = math.pi - self.angle
-
-					# Place ball to the left of the paddle.
-					self.x = paddle.rect.left - self.rect.width - 1
-					self.rect.x = self.x
+					self.hit_left_side_of_paddle(paddle)
 				elif self.rect.left <= paddle.rect.right and self.rect.right > paddle.rect.right:
 					# Right side of paddle collided with.
-					self.calculate_spin(paddle)
-					self.angle = math.pi - self.angle
-
-					# Place ball to the right of the paddle.
-					self.x = paddle.rect.right + 1
-					self.rect.x = self.x
+					self.hit_right_side_of_paddle(paddle)
 				
 		# Check collision with other balls.
 		ball_group.remove(self)
@@ -131,44 +131,36 @@ class Ball(pygame.sprite.Sprite):
 				if ball.rect.left - self.rect.left > ball.rect.top - self.rect.top:
 					# The ball collides more with the left side than top side.
 					# Place ball to the left of the ball.
-					self.x = ball.rect.left - self.rect.width - 1
-					self.rect.x = self.x
+					self.place_left_of(ball)
 				elif self.rect.right - ball.rect.right > ball.rect.top - self.rect.top:
 					# The ball collides more with the right side than top side.
 					# Place ball to the right of the ball.
-					self.x = ball.rect.right + 1
-					self.rect.x = self.x
+					self.place_right_of(ball)
 				else:
 					# Place ball on top of the ball.
-					self.y = ball.rect.top - self.rect.height - 1
-					self.rect.y = self.y
+					self.place_over(ball)
 			elif self.rect.top <= ball.rect.bottom and self.rect.bottom > ball.rect.bottom:
 				# Bottom side of ball collided with.
 				if ball.rect.left - self.rect.left > self.rect.bottom - ball.rect.bottom:
 					# The ball collides more with the left side than top side.
 					# Place ball to the left of the ball.
-					self.x = ball.rect.left - self.rect.width - 1
-					self.rect.x = self.x
+					self.place_left_of(ball)
 				elif self.rect.right - ball.rect.right > self.rect.bottom - ball.rect.bottom:
 					# The ball collides more with the right side than top side.
 					# Place ball to the right of the ball.
-					self.x = ball.rect.right + 1
-					self.rect.x = self.x
+					self.place_right_of(ball)
 				else:
 					# The ball collides more with the bottom side than any other side.
 					# Place ball beneath the ball.
-					self.y = ball.rect.bottom + 1
-					self.rect.y = self.y
+					self.place_below(ball)
 			elif self.rect.right >= ball.rect.left and self.rect.left < ball.rect.left:
 				# Left side of ball collided with.
 				# Place ball to the left of the ball.
-				self.x = ball.rect.left - self.rect.width - 1
-				self.rect.x = self.x
+				self.place_left_of(ball)
 			elif self.rect.left <= ball.rect.right and self.rect.right > ball.rect.right:
 				# Right side of ball collided with.
 				# Place ball to the right of the ball.
-				self.x = ball.rect.right + 1
-				self.rect.x = self.x
+				self.place_right_of(ball)
 
 			# Handle self.
 			delta_x = self.rect.centerx - ball.rect.centerx
@@ -183,12 +175,14 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with x-edges.
 		if self.rect.x < 0:
+			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
 			self.x = 0
 			self.rect.x = self.x
 		elif self.rect.x + self.rect.width > SCREEN_WIDTH:
+			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
@@ -197,12 +191,14 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with y-edges.
 		if self.rect.y < 0:
+			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
 			self.y = 0
 			self.rect.y = self.y
 		elif self.rect.y + self.rect.height > SCREEN_HEIGHT:
+			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
