@@ -48,7 +48,6 @@ class Ball(pygame.sprite.Sprite):
 		elif self.angle > ((3 * math.pi) / 2) and self.angle < 2 * math.pi:
 			# If angle is between 270 and 359 degrees.
 			self.angle = self.angle + (paddle.velocity_y * 0.05)
-		print("New angle is: " + str(self.angle))
 
 	def update(self, ball_group, paddle_group):
 		# Check collision with paddles.
@@ -74,10 +73,8 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					else:
 						# The ball collides more with the top side than any other side.
-						print("TOP: My angle is first: " + str(self.angle))
 						if self.angle < math.pi:
 							self.angle = -self.angle
-							print("TOP: My angle is then: " + str(self.angle))
 
 						# Place ball on top of the paddle.
 						self.y = paddle.rect.top - self.rect.height - 1
@@ -102,10 +99,8 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					else:
 						# The ball collides more with the bottom side than any other side.
-						print("BOTTOM: My angle is first: " + str(self.angle))
 						if self.angle > math.pi:
 							self.angle = -self.angle
-							print("BOTTOM: My angle is then: " + str(self.angle))
 
 						# Place ball beneath the paddle.
 						self.y = paddle.rect.bottom + 1
