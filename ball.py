@@ -68,7 +68,8 @@ class Ball(pygame.sprite.Sprite):
 	def hit_left_side_of_paddle(self, paddle):
 		# Calculate spin, and then reverse angle.
 		self.calculate_spin(paddle)
-		self.angle = math.pi - self.angle
+		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
+			self.angle = math.pi - self.angle
 
 		# Place ball to the left of the paddle.
 		self.place_left_of(paddle)
@@ -76,7 +77,8 @@ class Ball(pygame.sprite.Sprite):
 	def hit_right_side_of_paddle(self, paddle):
 		# Calculate spin, and then reverse angle.
 		self.calculate_spin(paddle)
-		self.angle = math.pi - self.angle
+		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
+			self.angle = math.pi - self.angle
 
 		# Place ball to the right of the paddle.
 		self.place_right_of(paddle)

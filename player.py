@@ -22,6 +22,9 @@ class Player(pygame.sprite.Sprite):
 		# Create a group to store balls in.
 		self.ball_group = pygame.sprite.Group()
 
+		# Create a group to store powerups in.
+		self.powerup_group = pygame.sprite.Group()
+
 	def add_paddle(self, paddle):
 		self.paddle_group.add(paddle)
 
