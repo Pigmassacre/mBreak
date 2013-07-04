@@ -8,15 +8,6 @@ import useful
 from settings import *
 import intromenu
 
-'''
-
-TODO List
-
-* Add main menu.
-* Implement Ball and Paddle classes.
-
-'''
-
 def main():
 	""" The following parts are the ones that should run first when booting up the game. """
 
