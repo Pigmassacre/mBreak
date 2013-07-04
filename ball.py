@@ -216,7 +216,6 @@ class Ball(pygame.sprite.Sprite):
 				# Place ball to the right of the block.
 				self.place_right_of(block)
 
-
 	def update(self, ball_group, paddle_group, block_group):
 		# Check collision with paddles.
 		self.check_collision_paddles(paddle_group)
@@ -226,6 +225,18 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with blocks.
 		self.check_collision_blocks(block_group)
+
+		# Constrain angle to 0 <= angle <= 2pi.
+		if self.angle > (2 * math.pi):
+			self.angle = self.angle - (2 * math.pi)
+		elif self.angle < 0:
+			self.angle = (2 * math.pi) + self.angle
+			
+		# Finally, move the ball with speed in consideration.
+		self.x = self.x + (math.cos(self.angle) * self.speed)
+		self.y = self.y + (math.sin(self.angle) * self.speed)
+		self.rect.x = self.x
+		self.rect.y = self.y
 
 		# Check collision with x-edges.
 		if self.rect.x < 0:
@@ -258,15 +269,3 @@ class Ball(pygame.sprite.Sprite):
 			# Constrain ball to screen size.
 			self.y = SCREEN_HEIGHT - self.rect.height
 			self.rect.y = self.y
-
-		# Constrain angle to 0 <= angle <= 2pi.
-		if self.angle > (2 * math.pi):
-			self.angle = self.angle - (2 * math.pi)
-		elif self.angle < 0:
-			self.angle = (2 * math.pi) + self.angle
-			
-		# Finally, move the ball with speed in consideration.
-		self.x = self.x + (math.cos(self.angle) * self.speed)
-		self.y = self.y + (math.sin(self.angle) * self.speed)
-		self.rect.x = self.x
-		self.rect.y = self.y

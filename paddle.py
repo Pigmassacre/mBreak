@@ -52,3 +52,13 @@ class Paddle(pygame.sprite.Sprite):
 
 		self.y = self.y + self.velocity_y
 		self.rect.y = self.y
+
+		# Check collision with y-edges.
+		if self.rect.y < 0:
+			# Constrain paddle to screen size.
+			self.y = 0
+			self.rect.y = self.y
+		elif self.rect.y + self.rect.height > SCREEN_HEIGHT:
+			# Constrain paddle to screen size.
+			self.y = SCREEN_HEIGHT - self.rect.height
+			self.rect.y = self.y
