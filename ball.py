@@ -41,6 +41,15 @@ class Ball(pygame.sprite.Sprite):
 		if DEBUG_MODE:
 			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ") with angle " + str(self.angle) + " and speed " + str(self.speed))
 
+	def calculate_spin(self, paddle):
+		if self.angle < (math.pi / 2):
+			# If angle is between 0 and 90 degrees.
+			self.angle = self.angle - (paddle.velocity_y * 0.05)
+		elif self.angle > ((3 * math.pi) / 2) and self.angle < 2 * math.pi:
+			# If angle is between 270 and 359 degrees.
+			self.angle = self.angle + (paddle.velocity_y * 0.05)
+		print("New angle is: " + str(self.angle))
+
 	def update(self, ball_group, paddle_group):
 		# Check collision with paddles.
 		for paddle in paddle_group:
@@ -49,6 +58,7 @@ class Ball(pygame.sprite.Sprite):
 					# Top side of paddle collided with. Compare with edges:
 					if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
 						# The ball collides more with the left side than top side.
+						self.calculate_spin(paddle)
 						self.angle = math.pi - self.angle
 
 						# Place ball to the left of the paddle.
@@ -56,6 +66,7 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					elif self.rect.right - paddle.rect.right > paddle.rect.top - self.rect.top:
 						# The ball collides more with the right side than top side.
+						self.calculate_spin(paddle)
 						self.angle = math.pi - self.angle
 
 						# Place ball to the right of the paddle.
@@ -63,7 +74,10 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					else:
 						# The ball collides more with the top side than any other side.
-						self.angle = -self.angle
+						print("TOP: My angle is first: " + str(self.angle))
+						if self.angle < math.pi:
+							self.angle = -self.angle
+							print("TOP: My angle is then: " + str(self.angle))
 
 						# Place ball on top of the paddle.
 						self.y = paddle.rect.top - self.rect.height - 1
@@ -72,6 +86,7 @@ class Ball(pygame.sprite.Sprite):
 					# Bottom side of paddle collided with. Compare with edges:
 					if paddle.rect.left - self.rect.left > self.rect.bottom - paddle.rect.bottom:
 						# The ball collides more with the left side than top side.
+						self.calculate_spin(paddle)
 						self.angle = math.pi - self.angle
 
 						# Place ball to the left of the paddle.
@@ -79,6 +94,7 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					elif self.rect.right - paddle.rect.right > self.rect.bottom - paddle.rect.bottom:
 						# The ball collides more with the right side than top side.
+						self.calculate_spin(paddle)
 						self.angle = math.pi - self.angle
 
 						# Place ball to the right of the paddle.
@@ -86,13 +102,17 @@ class Ball(pygame.sprite.Sprite):
 						self.rect.x = self.x
 					else:
 						# The ball collides more with the bottom side than any other side.
-						self.angle = -self.angle
+						print("BOTTOM: My angle is first: " + str(self.angle))
+						if self.angle > math.pi:
+							self.angle = -self.angle
+							print("BOTTOM: My angle is then: " + str(self.angle))
 
 						# Place ball beneath the paddle.
 						self.y = paddle.rect.bottom + 1
 						self.rect.y = self.y
 				elif self.rect.right >= paddle.rect.left and self.rect.left < paddle.rect.left:
 					# Left side of paddle collided with.
+					self.calculate_spin(paddle)
 					self.angle = math.pi - self.angle
 
 					# Place ball to the left of the paddle.
@@ -100,6 +120,7 @@ class Ball(pygame.sprite.Sprite):
 					self.rect.x = self.x
 				elif self.rect.left <= paddle.rect.right and self.rect.right > paddle.rect.right:
 					# Right side of paddle collided with.
+					self.calculate_spin(paddle)
 					self.angle = math.pi - self.angle
 
 					# Place ball to the right of the paddle.
@@ -192,6 +213,12 @@ class Ball(pygame.sprite.Sprite):
 			# Constrain ball to screen size.
 			self.y = SCREEN_HEIGHT - self.rect.height
 			self.rect.y = self.y
+
+		# Constrain angle to 0 <= angle <= 2pi.
+		if self.angle > (math.pi * 2):
+			self.angle = self.angle - (math.pi * 2)
+		elif self.angle < 0:
+			self.angle = (math.pi * 2) + self.angle
 			
 		# Finally, move the ball with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)
