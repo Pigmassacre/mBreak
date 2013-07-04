@@ -3,8 +3,6 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-from pygame.locals import *
-import math
 from settings import *
 
 class Paddle(pygame.sprite.Sprite):

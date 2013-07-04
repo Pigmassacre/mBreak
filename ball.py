@@ -45,7 +45,7 @@ class Ball(pygame.sprite.Sprite):
 		if self.angle < (math.pi / 2):
 			# If angle is between 0 and 90 degrees.
 			self.angle = self.angle - (paddle.velocity_y * 0.05)
-		elif self.angle > ((3 * math.pi) / 2) and self.angle < 2 * math.pi:
+		elif self.angle > ((3 * math.pi) / 2) and self.angle < (2 * math.pi):
 			# If angle is between 270 and 359 degrees.
 			self.angle = self.angle + (paddle.velocity_y * 0.05)
 
@@ -208,16 +208,13 @@ class Ball(pygame.sprite.Sprite):
 			self.rect.y = self.y
 
 		# Constrain angle to 0 <= angle <= 2pi.
-		if self.angle > (math.pi * 2):
-			self.angle = self.angle - (math.pi * 2)
+		if self.angle > (2 * math.pi):
+			self.angle = self.angle - (2 * math.pi)
 		elif self.angle < 0:
-			self.angle = (math.pi * 2) + self.angle
+			self.angle = (2 * math.pi) + self.angle
 			
 		# Finally, move the ball with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)
 		self.y = self.y + (math.sin(self.angle) * self.speed)
 		self.rect.x = self.x
 		self.rect.y = self.y
-
-		#if DEBUG_MODE:
-		#	print("New pos @ (" + str(self.x) + ", " + str(self.y) + ")")

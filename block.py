@@ -5,12 +5,12 @@ __license__ = "All Rights Reserved"
 import pygame
 from settings import *
 
-class Powerup(pygame.sprite.Sprite)
+class Block(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height):
+	def __init__(self, x, y, width, height, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
-
+		
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(x, y, width, height)
 
@@ -18,5 +18,8 @@ class Powerup(pygame.sprite.Sprite)
 		self.x = x
 		self.y = y
 
-		if DEBUG_MODE:
-			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+		# Create the image attribute that is drawn to the surface.
+		self.image = pygame.image.load(image_path)
+
+		# Set the owner.
+		self.owner = owner

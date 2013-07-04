@@ -9,7 +9,7 @@ from settings import *
 import intromenu
 
 def main():
-	""" The following parts are the ones that should run first when booting up the game. """
+	""" The following parts are the ones that run first when booting up the game. """
 
 	# Initiates the PyGame module.
 	pygame.init()
