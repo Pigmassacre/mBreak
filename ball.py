@@ -9,7 +9,7 @@ from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, image_path):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -34,6 +34,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
+
+		# Set the owner.
+		self.owner = owner
 
 		if DEBUG_MODE:
 			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ") with angle " + str(self.angle) + " and speed " + str(self.speed))
@@ -155,7 +158,7 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = self.rect.centerx - ball.rect.centerx
 			delta_y = self.rect.centery - ball.rect.centery
 			self.angle = math.atan2(delta_y, delta_x)
-			
+
 			# Handle other ball.
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery

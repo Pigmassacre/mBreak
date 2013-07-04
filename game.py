@@ -12,7 +12,7 @@ import paddle
 import player
 from settings import *
 
-def create_ball():
+def create_ball(owner):
 	width = 16
 	height = 16
 	x = random.uniform(0, SCREEN_WIDTH)
@@ -22,7 +22,7 @@ def create_ball():
 	angle = random.uniform(0, 2*math.pi)
 	image_path = ("res/ball/ball.png")
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, image_path)
+	return ball.Ball(x, y, width, height, angle, speed, max_speed, image_path, owner)
 
 def create_paddle(x, y):
 	width = 16
@@ -87,19 +87,34 @@ def main(window_surface, main_clock, debug_font):
 				pygame.quit()
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
-				ball_group.add(create_ball())
+				if random.randint(0, 1) == 0:
+					temp_ball = create_ball(player_left)
+					player_left.add_ball(temp_ball)
+					temp_ball.owner = player_left
+					if DEBUG_MODE:
+						print("Ball added to Player Left.")
+				else:
+					temp_ball = create_ball(player_right)
+					player_right.add_ball(temp_ball)
+					temp_ball.owner = player_right
+					if DEBUG_MODE:
+						print("Ball added to Player Right.")
+				ball_group.add(temp_ball)
 
 		if pygame.key.get_pressed()[K_SPACE]:
-			temp_ball = create_ball()
-			ball_group.add(temp_ball)
-			if random.random() > 0.5:
+			if random.randint(0, 1) == 0:
+				temp_ball = create_ball(player_left)
 				player_left.add_ball(temp_ball)
+				temp_ball.owner = player_left
 				if DEBUG_MODE:
 					print("Ball added to Player Left.")
 			else:
+				temp_ball = create_ball(player_right)
 				player_right.add_ball(temp_ball)
+				temp_ball.owner = player_right
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
+			ball_group.add(temp_ball)
 
 		# Update the balls.
 		ball_group.update(ball_group, paddle_group)
