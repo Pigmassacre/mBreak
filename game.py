@@ -22,10 +22,10 @@ def create_ball(owner):
 	speed = random.uniform(3, 8)
 	max_speed = 8
 	angle = random.uniform(0, 2*math.pi)
-	alpha_step = 150
+	damage = 1
 	image_path = ("res/ball/ball.png")
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, alpha_step, image_path, owner)
+	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner)
 
 def create_powerup():
 	width = 16
@@ -39,9 +39,10 @@ def create_powerup():
 def create_block(x, y, owner):
 	width = 16
 	height = 32
+	health = 2
 	image_path = ("res/block/block.png")
 
-	return block.Block(x, y, width, height, image_path, owner)
+	return block.Block(x, y, width, height, health, image_path, owner)
 
 def create_paddle(x, y):
 	width = 16

@@ -7,7 +7,7 @@ from settings import *
 
 class Block(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, image_path, owner):
+	def __init__(self, x, y, width, height, health, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -18,8 +18,15 @@ class Block(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 
+		self.health = health
+
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
 
 		# Set the owner.
 		self.owner = owner
+
+	def damage(self, damage):
+		self.health = self.health - damage
+		if self.health <= 0:
+			self.kill()

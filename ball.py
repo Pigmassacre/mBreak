@@ -11,7 +11,7 @@ from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, alpha_step, image_path, owner):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -33,6 +33,8 @@ class Ball(pygame.sprite.Sprite):
 			self.speed = speed
 		else:
 			self.speed = self.max_speed
+
+		self.damage = damage
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
@@ -193,8 +195,11 @@ class Ball(pygame.sprite.Sprite):
 		ball_group.add(self)
 
 	def check_collision_blocks(self, block_group):
-		block_collide_list = pygame.sprite.spritecollide(self, block_group, True)
+		block_collide_list = pygame.sprite.spritecollide(self, block_group, False)
 		for block in block_collide_list:
+			# Deal damage to the hit block.
+			block.damage(self.damage)
+
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
 				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
