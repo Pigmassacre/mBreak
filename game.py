@@ -10,6 +10,8 @@ import debug
 import ball
 import paddle
 import player
+import multiball
+import block
 from settings import *
 
 def create_ball(owner):
@@ -20,9 +22,26 @@ def create_ball(owner):
 	speed = random.uniform(3, 8)
 	max_speed = 8
 	angle = random.uniform(0, 2*math.pi)
+	alpha_step = 150
 	image_path = ("res/ball/ball.png")
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, image_path, owner)
+	return ball.Ball(x, y, width, height, angle, speed, max_speed, alpha_step, image_path, owner)
+
+def create_powerup():
+	width = 16
+	height = 16
+	x = random.uniform(0, SCREEN_WIDTH)
+	y = random.uniform(0, SCREEN_HEIGHT)
+	image_path = ("res/ball/ball.png")
+
+	return multiball.Multiball(x, y, width, height)
+
+def create_block(x, y, owner):
+	width = 16
+	height = 32
+	image_path = ("res/block/block.png")
+
+	return block.Block(x, y, width, height, image_path, owner)
 
 def create_paddle(x, y):
 	width = 16
@@ -57,7 +76,7 @@ def create_player_right(paddle):
 	return player_right
 
 def main(window_surface, main_clock, debug_font):
-	# Variable to keep the gameloop going.
+	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
 
 	# Define the group that contains all the balls.
@@ -66,6 +85,9 @@ def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the blocks.
 	block_group = pygame.sprite.Group()
 
+	# Define the group that contains all the powerups.
+	powerup_group = pygame.sprite.Group()
+
 	# Define the group that contains all the paddles.
 	paddle_group = pygame.sprite.Group()
 
@@ -73,15 +95,21 @@ def main(window_surface, main_clock, debug_font):
 	player_group = pygame.sprite.Group()
 
 	# Create the players.
-	paddle_left = create_paddle(100, SCREEN_HEIGHT / 2)
+	paddle_left = create_paddle(16 * 5, (SCREEN_HEIGHT - 64) / 2)
 	paddle_group.add(paddle_left)
 	player_left = create_player_left(paddle_left)
 	player_group.add(player_left)
 
-	paddle_right = create_paddle(SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2)
+	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 6, (SCREEN_HEIGHT - 64) / 2)
 	paddle_group.add(paddle_right)
 	player_right = create_player_right(paddle_right)
 	player_group.add(player_right)
+
+	# Spawn some blocks.
+	for i in range(0, 3):
+		for j in range(0, 13):
+			block_group.add(create_block(32 + (16 * i), 32 + (32 * j), player_left))
+			block_group.add(create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right))
 
 	while not done:
 		# Every frame begins by filling the whole screen with the background color.
@@ -105,6 +133,8 @@ def main(window_surface, main_clock, debug_font):
 					if DEBUG_MODE:
 						print("Ball added to Player Right.")
 				ball_group.add(temp_ball)
+			elif event.type == KEYDOWN and event.key == K_p:
+				powerup_group.add(create_powerup())
 
 		if pygame.key.get_pressed()[K_SPACE]:
 			if random.randint(0, 1) == 0:
@@ -129,6 +159,12 @@ def main(window_surface, main_clock, debug_font):
 
 		# Draw the balls.
 		ball_group.draw(window_surface)
+
+		# Draw the powerups.
+		powerup_group.draw(window_surface)
+
+		# Draw the blocks.
+		block_group.draw(window_surface)
 
 		# Draw the paddles.
 		paddle_group.draw(window_surface)

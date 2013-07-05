@@ -5,12 +5,12 @@ __license__ = "All Rights Reserved"
 import pygame
 from settings import *
 
-class Powerup(pygame.sprite.Sprite):
+class Trail(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height):
+	def __init__(self, x, y, width, height, alpha_step, image_path):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
-
+		
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(x, y, width, height)
 
@@ -18,5 +18,15 @@ class Powerup(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 
-		if DEBUG_MODE:
-			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+		self.alpha_step = alpha_step
+
+		# Create the image attribute that is drawn to the surface.
+		self.image = pygame.image.load(image_path)
+
+		self.image.set_alpha(255)
+
+	def update(self):
+		if self.image.get_alpha() > 0:
+			self.image.set_alpha(self.image.get_alpha() - self.alpha_step)
+		else:
+			self.kill()

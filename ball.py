@@ -5,11 +5,12 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import paddle
+import trail
 from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, image_path, owner):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, alpha_step, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -215,6 +216,11 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				# Place ball to the right of the block.
 				self.place_right_of(block)
+
+			# Handle self.
+			delta_x = self.rect.centerx - block.rect.centerx
+			delta_y = self.rect.centery - block.rect.centery
+			self.angle = math.atan2(delta_y, delta_x)
 
 	def update(self, ball_group, paddle_group, block_group):
 		# Check collision with paddles.
