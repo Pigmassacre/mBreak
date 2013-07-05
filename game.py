@@ -57,6 +57,9 @@ def create_player_right(paddle):
 	return player_right
 
 def main(window_surface, main_clock, debug_font):
+	# Variable to keep the gameloop going.
+	done = False
+
 	# Define the group that contains all the balls.
 	ball_group = pygame.sprite.Group()
 
@@ -80,15 +83,14 @@ def main(window_surface, main_clock, debug_font):
 	player_right = create_player_right(paddle_right)
 	player_group.add(player_right)
 
-	while True:
+	while not done:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(BACKGROUND_COLOR)
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-				# If the ESCAPE key is pressed or the window is closed, the game is shut down.
-				pygame.quit()
-				sys.exit()
+				# Return to intromenu.
+				done = True
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				if random.randint(0, 1) == 0:
 					temp_ball = create_ball(player_left)

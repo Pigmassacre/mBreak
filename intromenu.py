@@ -75,10 +75,13 @@ def main(window_surface, main_clock, debug_font):
 				sys.exit()
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				# If ENTER is pressed, proceed to the next screen, and end this loop.
+				pygame.mixer.music.stop()
 				game.main(window_surface, main_clock, debug_font)
-				pygame.mixer.music.pause()
-				break
 		
+		# If the music isn't playing, start it.
+		if not pygame.mixer.music.get_busy():
+			pygame.mixer.music.play()
+
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
 		
