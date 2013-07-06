@@ -24,7 +24,7 @@ def create_ball(owner):
 	angle = random.uniform(0, 2*math.pi)
 	damage = 1
 	image_path = ("res/ball/ball.png")
-	color = pygame.Color(255, 0, 0, 255)
+	color = pygame.Color(0, 255, 0, 255)
 
 	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner)
 
@@ -41,9 +41,10 @@ def create_block(x, y, owner):
 	width = 16
 	height = 32
 	health = 2
+	color = pygame.Color(255, 0, 255, 255)
 	image_path = ("res/block/block.png")
 
-	return block.Block(x, y, width, height, health, image_path, owner)
+	return block.Block(x, y, width, height, health, image_path, color, owner)
 
 def create_paddle(x, y):
 	width = 16

@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 # Store various useful classes in here, for now atleast.
 import pygame
+import math
 from libs import pyganim
 
 class TextItem:
@@ -67,3 +68,52 @@ class Logo:
 
 	def get_height(self):
 		return self.logo.getMaxSize()[1]
+
+def colorize_image(image, new_color):
+	# Unlock the surface so we can colorize it.
+	image.lock()
+
+	# Work through the pixelarray.
+	pixelarray = pygame.PixelArray(image)
+	for x in range(0, image.get_size()[0]):
+		for y in range(0, image.get_size()[1]):
+			# Get the current color.
+			current_color = image.unmap_rgb(pixelarray[x, y])
+
+			#print("\nOld color: " + str(current_color))
+			#print("New color: " + str(new_color))
+
+			# Colorize R
+			color_weight = new_color.r / 255
+			if current_color.r * color_weight > 255:
+				current_color.r = 255
+			elif current_color.r * color_weight < 0:
+				current_color.r = 0
+			else:
+				current_color.r = current_color.r * color_weight
+
+			# Colorize G
+			color_weight = new_color.g / 255
+			if current_color.g * color_weight > 255:
+				current_color.g = 255
+			elif current_color.g * color_weight < 0:
+				current_color.g = 0
+			else:
+				current_color.g = current_color.g * color_weight
+
+			# Colorize B
+			color_weight = new_color.b / 255
+			if current_color.b * color_weight > 255:
+				current_color.b = 255
+			elif current_color.b * color_weight < 0:
+				current_color.b = 0
+			else:
+				current_color.b = current_color.b * color_weight
+
+			#print("After color: " + str(current_color))
+
+			# Map the new color the the pixelarray.
+			pixelarray[x, y] = current_color
+
+	# We're done, so lock the surface again.
+	image.unlock()

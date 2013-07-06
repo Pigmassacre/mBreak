@@ -3,11 +3,12 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+import useful
 from settings import *
 
 class Block(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, health, image_path, owner):
+	def __init__(self, x, y, width, height, health, image_path, color, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -22,6 +23,12 @@ class Block(pygame.sprite.Sprite):
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
+
+		# Set the color value, the image is colorized to this value.
+		self.color = color
+
+		# Colorize the block.
+		useful.colorize_image(self.image, self.color)
 
 		# Set the owner.
 		self.owner = owner

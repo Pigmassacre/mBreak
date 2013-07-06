@@ -8,6 +8,7 @@ import paddle
 import trail
 import random
 import particle
+import useful
 from settings import *
 
 class Ball(pygame.sprite.Sprite):
@@ -43,6 +44,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Set the color value, the image is colorized to this value and it is used to colorize the particles spawned by this ball.
 		self.color = color
+
+		# Colorize the image.
+		useful.colorize_image(self.image, self.color)
 
 		# Set the owner.
 		self.owner = owner
@@ -112,30 +116,8 @@ class Ball(pygame.sprite.Sprite):
 		for i in range(0, 2):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24
-			"""
-			color = pygame.Color(self.color.r, self.color.g, self.color.b, self.color.a)
-			
-			color_r = self.color.r + random.randrange(0, 150)
-			if color_r > 255:
-				color.r = 255
-			else:
-				color.r = color_r
-
-			color_g = self.color.g + random.randrange(0, 150)
-			if color.g > 255:
-				color.g = 255
-			else:
-				color.g = color_g
-
-			color_b = self.color.b + random.randrange(0, 150)
-			if color.b > 255:
-				color.b = 255
-			else:
-				color.b = color_b
-
-			color.a = self.color.a
-			"""
-			particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color))
+			color = self.image.get_at((0, 0))
+			particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color))
 
 	def check_collision_paddles(self, paddle_group, particle_group):
 		paddle_collide_list = pygame.sprite.spritecollide(self, paddle_group, False)
