@@ -80,40 +80,19 @@ def colorize_image(image, new_color):
 			# Get the current color.
 			current_color = image.unmap_rgb(pixelarray[x, y])
 
-			#print("\nOld color: " + str(current_color))
-			#print("New color: " + str(new_color))
-
 			# Colorize R
-			color_weight = new_color.r / 255
-			if current_color.r * color_weight > 255:
-				current_color.r = 255
-			elif current_color.r * color_weight < 0:
-				current_color.r = 0
-			else:
-				current_color.r = current_color.r * color_weight
+			current_color.r = current_color.r * (new_color.r / 255)
 
 			# Colorize G
-			color_weight = new_color.g / 255
-			if current_color.g * color_weight > 255:
-				current_color.g = 255
-			elif current_color.g * color_weight < 0:
-				current_color.g = 0
-			else:
-				current_color.g = current_color.g * color_weight
+			current_color.g = current_color.g * (new_color.g / 255)
 
 			# Colorize B
-			color_weight = new_color.b / 255
-			if current_color.b * color_weight > 255:
-				current_color.b = 255
-			elif current_color.b * color_weight < 0:
-				current_color.b = 0
-			else:
-				current_color.b = current_color.b * color_weight
+			current_color.b = current_color.b * (new_color.b / 255)
 
-			#print("After color: " + str(current_color))
-
-			# Map the new color the the pixelarray.
-			pixelarray[x, y] = current_color
+			# Map the new color the the pixelarray. For some reason, pixelarray apparently reverses the color after colorizing.
+			# So we reverse the color order before adding it to the current pixel.
+			final_color = pygame.Color(current_color.b, current_color.g, current_color.r, current_color.a)
+			pixelarray[x, y] = final_color
 
 	# We're done, so lock the surface again.
 	image.unlock()

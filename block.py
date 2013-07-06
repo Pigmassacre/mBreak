@@ -33,6 +33,9 @@ class Block(pygame.sprite.Sprite):
 		# Set the owner.
 		self.owner = owner
 
+		# Store the ball in the owners ball_group.
+		self.owner.add_block(self)
+
 	def damage(self, damage):
 		self.health = self.health - damage
 		if self.health <= 0:

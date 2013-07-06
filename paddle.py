@@ -7,7 +7,7 @@ from settings import *
 
 class Paddle(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, acceleration, retardation, max_speed, image_path):
+	def __init__(self, x, y, width, height, acceleration, retardation, max_speed, image_path, color, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -29,8 +29,18 @@ class Paddle(pygame.sprite.Sprite):
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
 
+		# Store the owner.
+		self.owner = owner
+
+		# Store the paddle in the owners paddle_group.
+		self.owner.add_paddle(self)
+
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+
+	def colorize(self, color):
+		self.pixelarray = pygame.PixelArray(self.image)
+		
 
 	def update(self, key_up, key_down):
 		if pygame.key.get_pressed()[key_up]:

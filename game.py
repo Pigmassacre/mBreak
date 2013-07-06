@@ -14,17 +14,15 @@ import multiball
 import block
 from settings import *
 
-def create_ball(owner):
+def create_ball(x, y, owner):
 	width = 16
 	height = 16
-	x = random.uniform(0, SCREEN_WIDTH)
-	y = random.uniform(0, SCREEN_HEIGHT)
 	speed = random.uniform(3, 8)
 	max_speed = 8
 	angle = random.uniform(0, 2*math.pi)
 	damage = 1
 	image_path = ("res/ball/ball.png")
-	color = pygame.Color(0, 255, 0, 255)
+	color = owner.color
 
 	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner)
 
@@ -41,41 +39,40 @@ def create_block(x, y, owner):
 	width = 16
 	height = 32
 	health = 2
-	color = pygame.Color(255, 0, 255, 255)
+	color = owner.color
 	image_path = ("res/block/block.png")
 
 	return block.Block(x, y, width, height, health, image_path, color, owner)
 
-def create_paddle(x, y):
+def create_paddle(x, y, owner):
 	width = 16
 	height = 64
 	acceleration = 2
 	retardation = 4
 	max_speed = 8
 	image_path = ("res/paddle/paddle.png")
+	color = owner.color
 
-	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path)
+	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path, color, owner)
 
-def create_player_left(paddle):
+def create_player_left():
 	name = PLAYER_LEFT_NAME
 	key_up = PLAYER_LEFT_KEY_UP
 	key_down = PLAYER_LEFT_KEY_DOWN
+	color = pygame.Color(255, 0, 0, 255)
 
-	player_left = player.Player(name, key_up, key_down)
-
-	player_left.add_paddle(paddle)
+	player_left = player.Player(name, key_up, key_down, color)
 
 	return player_left
 
-def create_player_right(paddle):
+def create_player_right():
 	name = PLAYER_RIGHT_NAME
 	key_up = PLAYER_RIGHT_KEY_UP
 	key_down = PLAYER_RIGHT_KEY_DOWN
+	color = pygame.Color(0, 0, 255, 255)
 
-	player_right = player.Player(name, key_up, key_down)
+	player_right = player.Player(name, key_up, key_down, color)
 	
-	player_right.add_paddle(paddle)
-
 	return player_right
 
 def main(window_surface, main_clock, debug_font):
@@ -100,16 +97,23 @@ def main(window_surface, main_clock, debug_font):
 	# Define the group that contains all the players.
 	player_group = pygame.sprite.Group()
 
-	# Create the players.
-	paddle_left = create_paddle(16 * 5, (SCREEN_HEIGHT - 64) / 2)
-	paddle_group.add(paddle_left)
-	player_left = create_player_left(paddle_left)
+	# Create the left player.
+	# Create and store the player.
+	player_left = create_player_left()
 	player_group.add(player_left)
 
-	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 6, (SCREEN_HEIGHT - 64) / 2)
-	paddle_group.add(paddle_right)
-	player_right = create_player_right(paddle_right)
+	# Create and store the players paddle.
+	paddle_left = create_paddle(16 * 6, (SCREEN_HEIGHT - 64) / 2, player_left)
+	paddle_group.add(paddle_left)
+	
+	# Create the right player.
+	# Create and store the player.
+	player_right = create_player_right()
 	player_group.add(player_right)
+
+	# Create and store the players paddle.
+	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 7, (SCREEN_HEIGHT - 64) / 2, player_right)
+	paddle_group.add(paddle_right)
 
 	# Spawn some blocks.
 	for i in range(0, 3):
@@ -127,14 +131,12 @@ def main(window_surface, main_clock, debug_font):
 				done = True
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				if random.randint(0, 1) == 0:
-					temp_ball = create_ball(player_left)
-					player_left.add_ball(temp_ball)
+					temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
 					temp_ball.owner = player_left
 					if DEBUG_MODE:
 						print("Ball added to Player Left.")
 				else:
-					temp_ball = create_ball(player_right)
-					player_right.add_ball(temp_ball)
+					temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
 					temp_ball.owner = player_right
 					if DEBUG_MODE:
 						print("Ball added to Player Right.")
@@ -144,14 +146,12 @@ def main(window_surface, main_clock, debug_font):
 
 		if pygame.key.get_pressed()[K_SPACE]:
 			if random.randint(0, 1) == 0:
-				temp_ball = create_ball(player_left)
-				player_left.add_ball(temp_ball)
+				temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
 				temp_ball.owner = player_left
 				if DEBUG_MODE:
 					print("Ball added to Player Left.")
 			else:
-				temp_ball = create_ball(player_right)
-				player_right.add_ball(temp_ball)
+				temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
 				temp_ball.owner = player_right
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
@@ -166,21 +166,21 @@ def main(window_surface, main_clock, debug_font):
 		# Update the players.
 		player_group.update()
 
+		# Draw the blocks.
+		block_group.draw(window_surface)
+
+		# Draw the paddles.
+		paddle_group.draw(window_surface)
+
+		# Draw the powerups.
+		powerup_group.draw(window_surface)
+
 		# Draw the particles.
 		for particle in particle_group:
 			window_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
 		ball_group.draw(window_surface)
-
-		# Draw the powerups.
-		powerup_group.draw(window_surface)
-
-		# Draw the blocks.
-		block_group.draw(window_surface)
-
-		# Draw the paddles.
-		paddle_group.draw(window_surface)
 
 		# Draw the players.
 		# player_group.draw(window_surface)
