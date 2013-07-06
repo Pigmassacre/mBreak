@@ -8,6 +8,7 @@ from pygame.locals import *
 from libs import pyganim
 import useful
 import debug
+import math
 from settings import *
 
 # Import any needed game screens here.
@@ -64,6 +65,17 @@ def main(window_surface, main_clock, debug_font):
 	# Keeps track of how much time has passed.
 	time_passed = 0
 
+	current_angle = 0
+	max_angle = 15
+	min_angle = -15
+	rotate_step = 0.40
+	rotate_up = True
+	current_scale = 1
+	max_scale = 1.25
+	min_scale = 0.75
+	scale_by = 0.01
+	scale_up = True
+
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(BACKGROUND_COLOR)
@@ -89,7 +101,36 @@ def main(window_surface, main_clock, debug_font):
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 		
 		# Pyganim blits object to the given argument, pygame blits the given argument to object...
-		title_logo_surface.blit(window_surface, (title_logo.x, title_logo.y))
+		temp_logo = pygame.transform.rotozoom(title_logo_surface.getCurrentFrame(), current_angle, current_scale)
+		temp_logo_x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
+		temp_logo_y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
+		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))
+		
+		if rotate_up:
+			current_angle = current_angle + rotate_step
+		else:
+			current_angle = current_angle - rotate_step
+
+		if current_angle > max_angle:
+			current_angle = max_angle
+			rotate_up = False
+		elif current_angle < min_angle:
+			current_angle = min_angle
+			rotate_up = True
+
+		if scale_up:
+			current_scale = current_scale + scale_by
+		else:
+			current_scale = current_scale - scale_by
+
+		if current_scale > max_scale:
+			current_scale = max_scale
+			scale_up = False
+		elif current_scale < min_scale:
+			current_scale = min_scale
+			scale_up = True
+
+		#title_logo_surface.blit(window_surface, (title_logo.x, title_logo.y))
 		window_surface.blit(title_message_surface, (title_message.x, title_message.y))
 		
 		if DEBUG_MODE:

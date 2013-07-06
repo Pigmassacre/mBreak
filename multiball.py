@@ -44,5 +44,10 @@ class Multiball(powerup.Powerup):
 		image_path = ("res/ball/ball.png")
 		owner = entity.owner
 
-		for i in range(0, 4):
+		amount_to_spawn = 3
+
+		for i in range(0, amount_to_spawn):
+			#angle = angle + ((2 * math.pi) / amount_to_spawn)
+			#x = x + math.cos(angle)
+			#y = y + math.cos(angle)
 			groupholder.ball_group.add(ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner))
