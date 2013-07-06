@@ -7,11 +7,12 @@ import math
 import paddle
 import trail
 import random
+import particle
 from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, owner):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -34,10 +35,14 @@ class Ball(pygame.sprite.Sprite):
 		else:
 			self.speed = self.max_speed
 
+		# Set the damage value, this is the damage the ball does to a block when it collides with it.
 		self.damage = damage
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
+
+		# Set the color value, the image is colorized to this value and it is used to colorize the particles spawned by this ball.
+		self.color = color
 
 		# Set the owner.
 		self.owner = owner
@@ -103,9 +108,39 @@ class Ball(pygame.sprite.Sprite):
 		# Place ball to the right of the block.
 		self.place_right_of(block)
 
-	def check_collision_paddles(self, paddle_group):
+	def spawn_particle(self, particle_group, other):
+		for i in range(0, 2):
+			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
+			retardation = self.speed / 24
+			"""
+			color = pygame.Color(self.color.r, self.color.g, self.color.b, self.color.a)
+			
+			color_r = self.color.r + random.randrange(0, 150)
+			if color_r > 255:
+				color.r = 255
+			else:
+				color.r = color_r
+
+			color_g = self.color.g + random.randrange(0, 150)
+			if color.g > 255:
+				color.g = 255
+			else:
+				color.g = color_g
+
+			color_b = self.color.b + random.randrange(0, 150)
+			if color.b > 255:
+				color.b = 255
+			else:
+				color.b = color_b
+
+			color.a = self.color.a
+			"""
+			particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color))
+
+	def check_collision_paddles(self, paddle_group, particle_group):
 		paddle_collide_list = pygame.sprite.spritecollide(self, paddle_group, False)
 		for paddle in paddle_collide_list:
+			self.spawn_particle(particle_group, paddle)
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
 				if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
@@ -237,9 +272,9 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
 
-	def update(self, ball_group, paddle_group, block_group):
+	def update(self, ball_group, paddle_group, block_group, particle_group):
 		# Check collision with paddles.
-		self.check_collision_paddles(paddle_group)
+		self.check_collision_paddles(paddle_group, particle_group)
 				
 		# Check collision with other balls.
 		self.check_collision_balls(ball_group)

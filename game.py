@@ -24,8 +24,9 @@ def create_ball(owner):
 	angle = random.uniform(0, 2*math.pi)
 	damage = 1
 	image_path = ("res/ball/ball.png")
+	color = pygame.Color(255, 0, 0, 255)
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner)
+	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner)
 
 def create_powerup():
 	width = 16
@@ -82,6 +83,9 @@ def main(window_surface, main_clock, debug_font):
 
 	# Define the group that contains all the balls.
 	ball_group = pygame.sprite.Group()
+
+	# Define the group that contains all the particles.
+	particle_group = pygame.sprite.Group()
 
 	# Define the group that contains all the blocks.
 	block_group = pygame.sprite.Group()
@@ -153,10 +157,17 @@ def main(window_surface, main_clock, debug_font):
 			ball_group.add(temp_ball)
 
 		# Update the balls.
-		ball_group.update(ball_group, paddle_group, block_group)
+		ball_group.update(ball_group, paddle_group, block_group, particle_group)
+
+		# Update the particles.
+		particle_group.update()
 
 		# Update the players.
 		player_group.update()
+
+		# Draw the particles.
+		for particle in particle_group:
+			window_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
 		ball_group.draw(window_surface)
