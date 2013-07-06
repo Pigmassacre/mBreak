@@ -22,27 +22,25 @@ def create_ball(x, y, owner):
 	angle = random.uniform(0, 2*math.pi)
 	damage = 1
 	image_path = ("res/ball/ball.png")
-	color = owner.color
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner)
+	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner)
 
 def create_powerup():
-	width = 16
-	height = 16
-	x = random.uniform(0, SCREEN_WIDTH)
-	y = random.uniform(0, SCREEN_HEIGHT)
-	image_path = ("res/ball/ball.png")
+	width = 32
+	height = 32
+	x = random.uniform((SCREEN_WIDTH / 2) - 200, (SCREEN_WIDTH / 2) + 200)
+	y = random.uniform((SCREEN_HEIGHT / 2) - 200, (SCREEN_HEIGHT / 2) + 200)
+	color = pygame.Color(255, 128, 255, 255)
 
-	return multiball.Multiball(x, y, width, height)
+	return multiball.Multiball(x, y, width, height, color)
 
 def create_block(x, y, owner):
 	width = 16
 	height = 32
 	health = 2
-	color = owner.color
 	image_path = ("res/block/block.png")
 
-	return block.Block(x, y, width, height, health, image_path, color, owner)
+	return block.Block(x, y, width, height, health, image_path, owner)
 
 def create_paddle(x, y, owner):
 	width = 16
@@ -51,9 +49,8 @@ def create_paddle(x, y, owner):
 	retardation = 4
 	max_speed = 8
 	image_path = ("res/paddle/paddle.png")
-	color = owner.color
 
-	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path, color, owner)
+	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path, owner)
 
 def create_player_left():
 	name = PLAYER_LEFT_NAME
@@ -115,6 +112,9 @@ def main(window_surface, main_clock, debug_font):
 	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 7, (SCREEN_HEIGHT - 64) / 2, player_right)
 	paddle_group.add(paddle_right)
 
+	# Alternate adding stuff to left och right player. When True, add to left, otherwise add to right.
+	order = True
+
 	# Spawn some blocks.
 	for i in range(0, 3):
 		for j in range(0, 13):
@@ -129,36 +129,38 @@ def main(window_surface, main_clock, debug_font):
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 				# Return to intromenu.
 				done = True
-			elif event.type == KEYDOWN and event.key == K_RETURN:
-				if random.randint(0, 1) == 0:
-					temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
-					temp_ball.owner = player_left
-					if DEBUG_MODE:
-						print("Ball added to Player Left.")
-				else:
-					temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
-					temp_ball.owner = player_right
-					if DEBUG_MODE:
-						print("Ball added to Player Right.")
+			elif event.type == KEYDOWN and event.key == K_l:
+				temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
+				temp_ball.owner = player_left
 				ball_group.add(temp_ball)
+				if DEBUG_MODE:
+					print("Ball added to Player Left.")
+			elif event.type == KEYDOWN and event.key == K_r:
+				temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
+				temp_ball.owner = player_right
+				ball_group.add(temp_ball)
+				if DEBUG_MODE:
+					print("Ball added to Player Right.")
 			elif event.type == KEYDOWN and event.key == K_p:
 				powerup_group.add(create_powerup())
 
 		if pygame.key.get_pressed()[K_SPACE]:
-			if random.randint(0, 1) == 0:
+			if order:
 				temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
 				temp_ball.owner = player_left
+				order = not order
 				if DEBUG_MODE:
 					print("Ball added to Player Left.")
 			else:
 				temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
 				temp_ball.owner = player_right
+				order = not order
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
 			ball_group.add(temp_ball)
 
 		# Update the balls.
-		ball_group.update(ball_group, paddle_group, block_group, particle_group)
+		ball_group.update(ball_group, paddle_group, block_group, particle_group, powerup_group)
 
 		# Update the particles.
 		particle_group.update()

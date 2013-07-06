@@ -13,7 +13,7 @@ from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, color, owner):
+	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -38,22 +38,19 @@ class Ball(pygame.sprite.Sprite):
 
 		# Set the damage value, this is the damage the ball does to a block when it collides with it.
 		self.damage = damage
-
-		# Create the image attribute that is drawn to the surface.
-		self.image = pygame.image.load(image_path)
-
-		# Set the color value, the image is colorized to this value and it is used to colorize the particles spawned by this ball.
-		self.color = color
-
-		# Colorize the image.
-		useful.colorize_image(self.image, self.color)
-
+		
 		# Set the owner.
 		self.owner = owner
 
 		# Store the ball in the owners ball_group.
 		self.owner.add_ball(self)
 
+		# Create the image attribute that is drawn to the surface.
+		self.image = pygame.image.load(image_path)
+
+		# Colorize the image.
+		useful.colorize_image(self.image, self.owner.color)
+		
 		if DEBUG_MODE:
 			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ") with angle " + str(self.angle) + " and speed " + str(self.speed))
 
@@ -259,7 +256,12 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
 
-	def update(self, ball_group, paddle_group, block_group, particle_group):
+	def check_collision_powerups(self, powerup_group):
+		powerup_collide_list = pygame.sprite.spritecollide(self, powerup_group, False)
+		for powerup in powerup_collide_list:
+			powerup.hit(self)
+
+	def update(self, ball_group, paddle_group, block_group, particle_group, powerup_group):
 		# Check collision with paddles.
 		self.check_collision_paddles(paddle_group, particle_group)
 				
@@ -268,6 +270,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with blocks.
 		self.check_collision_blocks(block_group, particle_group)
+
+		# Check collision with powerups.
+		self.check_collision_powerups(powerup_group)
 
 		""" Should I constrain angle only when it hits paddle / wall, or keep it like it is? """
 

@@ -20,3 +20,9 @@ class Powerup(pygame.sprite.Sprite):
 
 		if DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+
+	def hit(self, entity):
+		# Do stuff
+		self.kill()
+		if DEBUG_MODE:
+			print("Powerup hit!")

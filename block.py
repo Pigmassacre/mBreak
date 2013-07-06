@@ -8,7 +8,7 @@ from settings import *
 
 class Block(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, health, image_path, color, owner):
+	def __init__(self, x, y, width, height, health, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -19,7 +19,14 @@ class Block(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 
+		# Set the health. This is the amount of damage the block can take before it breaks.
 		self.health = health
+
+		# Set the owner.
+		self.owner = owner
+
+		# Store the ball in the owners ball_group.
+		self.owner.add_block(self)
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
@@ -28,13 +35,7 @@ class Block(pygame.sprite.Sprite):
 		self.color = color
 
 		# Colorize the block.
-		useful.colorize_image(self.image, self.color)
-
-		# Set the owner.
-		self.owner = owner
-
-		# Store the ball in the owners ball_group.
-		self.owner.add_block(self)
+		useful.colorize_image(self.image, self.owner.color)
 
 	def damage(self, damage):
 		self.health = self.health - damage
