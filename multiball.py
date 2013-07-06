@@ -6,6 +6,9 @@ import pygame
 import powerup
 import useful
 import ball
+import random
+import math
+import groupholder
 from settings import *
 
 class Multiball(powerup.Powerup):
@@ -30,3 +33,16 @@ class Multiball(powerup.Powerup):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
 
+		x = entity.x
+		y = entity.y
+		width = entity.rect.width
+		height = entity.rect.height
+		speed = entity.speed
+		max_speed = entity.max_speed
+		angle = entity.angle
+		damage = entity.damage
+		image_path = ("res/ball/ball.png")
+		owner = entity.owner
+
+		for i in range(0, 4):
+			groupholder.ball_group.add(ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner))

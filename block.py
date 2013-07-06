@@ -26,7 +26,7 @@ class Block(pygame.sprite.Sprite):
 		self.owner = owner
 
 		# Store the ball in the owners ball_group.
-		self.owner.add_block(self)
+		self.owner.block_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)

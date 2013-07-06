@@ -31,7 +31,7 @@ class Paddle(pygame.sprite.Sprite):
 		self.owner = owner
 
 		# Store the paddle in the owners paddle_group.
-		self.owner.add_paddle(self)
+		self.owner.paddle_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)

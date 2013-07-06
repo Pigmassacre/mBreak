@@ -12,6 +12,7 @@ import paddle
 import player
 import multiball
 import block
+import groupholder
 from settings import *
 
 def create_ball(x, y, owner):
@@ -72,45 +73,40 @@ def create_player_right():
 	
 	return player_right
 
+"""
+I should come up with a good way to handle the sprite groups and stick to it.
+I can either pass the groups to each method/class as they are needed, or I can have 
+a global groupholder module that holds all the groups.
+"""
+def destroy_groups():
+	groupholder.ball_group.empty()
+	groupholder.particle_group.empty()
+	groupholder.block_group.empty()
+	groupholder.powerup_group.empty()
+	groupholder.paddle_group.empty()
+	groupholder.player_group.empty()
+
 def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
 
-	# Define the group that contains all the balls.
-	ball_group = pygame.sprite.Group()
-
-	# Define the group that contains all the particles.
-	particle_group = pygame.sprite.Group()
-
-	# Define the group that contains all the blocks.
-	block_group = pygame.sprite.Group()
-
-	# Define the group that contains all the powerups.
-	powerup_group = pygame.sprite.Group()
-
-	# Define the group that contains all the paddles.
-	paddle_group = pygame.sprite.Group()
-
-	# Define the group that contains all the players.
-	player_group = pygame.sprite.Group()
-
 	# Create the left player.
 	# Create and store the player.
 	player_left = create_player_left()
-	player_group.add(player_left)
+	groupholder.player_group.add(player_left)
 
 	# Create and store the players paddle.
 	paddle_left = create_paddle(16 * 6, (SCREEN_HEIGHT - 64) / 2, player_left)
-	paddle_group.add(paddle_left)
+	groupholder.paddle_group.add(paddle_left)
 	
 	# Create the right player.
 	# Create and store the player.
 	player_right = create_player_right()
-	player_group.add(player_right)
+	groupholder.player_group.add(player_right)
 
 	# Create and store the players paddle.
 	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 7, (SCREEN_HEIGHT - 64) / 2, player_right)
-	paddle_group.add(paddle_right)
+	groupholder.paddle_group.add(paddle_right)
 
 	# Alternate adding stuff to left och right player. When True, add to left, otherwise add to right.
 	order = True
@@ -118,8 +114,8 @@ def main(window_surface, main_clock, debug_font):
 	# Spawn some blocks.
 	for i in range(0, 3):
 		for j in range(0, 13):
-			block_group.add(create_block(32 + (16 * i), 32 + (32 * j), player_left))
-			block_group.add(create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right))
+			groupholder.block_group.add(create_block(32 + (16 * i), 32 + (32 * j), player_left))
+			groupholder.block_group.add(create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right))
 
 	while not done:
 		# Every frame begins by filling the whole screen with the background color.
@@ -128,21 +124,22 @@ def main(window_surface, main_clock, debug_font):
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 				# Return to intromenu.
+				destroy_groups()
 				done = True
 			elif event.type == KEYDOWN and event.key == K_l:
 				temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
 				temp_ball.owner = player_left
-				ball_group.add(temp_ball)
+				groupholder.ball_group.add(temp_ball)
 				if DEBUG_MODE:
 					print("Ball added to Player Left.")
 			elif event.type == KEYDOWN and event.key == K_r:
 				temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
 				temp_ball.owner = player_right
-				ball_group.add(temp_ball)
+				groupholder.ball_group.add(temp_ball)
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
 			elif event.type == KEYDOWN and event.key == K_p:
-				powerup_group.add(create_powerup())
+				groupholder.powerup_group.add(create_powerup())
 
 		if pygame.key.get_pressed()[K_SPACE]:
 			if order:
@@ -157,35 +154,35 @@ def main(window_surface, main_clock, debug_font):
 				order = not order
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
-			ball_group.add(temp_ball)
+			groupholder.ball_group.add(temp_ball)
 
 		# Update the balls.
-		ball_group.update(ball_group, paddle_group, block_group, particle_group, powerup_group)
+		groupholder.ball_group.update()
 
 		# Update the particles.
-		particle_group.update()
+		groupholder.particle_group.update()
 
 		# Update the players.
-		player_group.update()
+		groupholder.player_group.update()
 
 		# Draw the blocks.
-		block_group.draw(window_surface)
+		groupholder.block_group.draw(window_surface)
 
 		# Draw the paddles.
-		paddle_group.draw(window_surface)
+		groupholder.paddle_group.draw(window_surface)
 
 		# Draw the powerups.
-		powerup_group.draw(window_surface)
+		groupholder.powerup_group.draw(window_surface)
 
 		# Draw the particles.
-		for particle in particle_group:
+		for particle in groupholder.particle_group:
 			window_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
-		ball_group.draw(window_surface)
+		groupholder.ball_group.draw(window_surface)
 
 		# Draw the players.
-		# player_group.draw(window_surface)
+		# groupholder.player_group.draw(window_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.

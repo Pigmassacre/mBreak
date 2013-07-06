@@ -9,6 +9,7 @@ import trail
 import random
 import particle
 import useful
+import groupholder
 from settings import *
 
 class Ball(pygame.sprite.Sprite):
@@ -43,7 +44,7 @@ class Ball(pygame.sprite.Sprite):
 		self.owner = owner
 
 		# Store the ball in the owners ball_group.
-		self.owner.add_ball(self)
+		self.owner.ball_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
@@ -112,17 +113,17 @@ class Ball(pygame.sprite.Sprite):
 		# Place ball to the right of the block.
 		self.place_right_of(block)
 
-	def spawn_particle(self, particle_group):
+	def spawn_particle(self):
 		for i in range(0, 2):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24
 			color = self.image.get_at((0, 0))
-			particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color))
+			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color))
 
-	def check_collision_paddles(self, paddle_group, particle_group):
-		paddle_collide_list = pygame.sprite.spritecollide(self, paddle_group, False)
+	def check_collision_paddles(self):
+		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
 		for paddle in paddle_collide_list:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
 				if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
@@ -160,11 +161,11 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of paddle collided with.
 				self.hit_right_side_of_paddle(paddle)
 
-	def check_collision_balls(self, ball_group, particle_group):
-		ball_group.remove(self)
-		ball_collide_list = pygame.sprite.spritecollide(self, ball_group, False)
+	def check_collision_balls(self):
+		groupholder.ball_group.remove(self)
+		ball_collide_list = pygame.sprite.spritecollide(self, groupholder.ball_group, False)
 		for ball in ball_collide_list:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			if self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
 				# Top side of ball collided with. Compare with edges:
 				if ball.rect.left - self.rect.left > ball.rect.top - self.rect.top:
@@ -210,15 +211,15 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_y, delta_x)
-		ball_group.add(self)
+		groupholder.ball_group.add(self)
 
-	def check_collision_blocks(self, block_group, particle_group):
-		block_collide_list = pygame.sprite.spritecollide(self, block_group, False)
+	def check_collision_blocks(self):
+		block_collide_list = pygame.sprite.spritecollide(self, groupholder.block_group, False)
 		for block in block_collide_list:
 			# Deal damage to the hit block.
 			block.damage(self.damage)
 
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
 				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
@@ -256,23 +257,23 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
 
-	def check_collision_powerups(self, powerup_group):
-		powerup_collide_list = pygame.sprite.spritecollide(self, powerup_group, False)
+	def check_collision_powerups(self):
+		powerup_collide_list = pygame.sprite.spritecollide(self, groupholder.powerup_group, False)
 		for powerup in powerup_collide_list:
 			powerup.hit(self)
 
-	def update(self, ball_group, paddle_group, block_group, particle_group, powerup_group):
+	def update(self):
 		# Check collision with paddles.
-		self.check_collision_paddles(paddle_group, particle_group)
+		self.check_collision_paddles()
 				
 		# Check collision with other balls.
-		self.check_collision_balls(ball_group, particle_group)
+		self.check_collision_balls()
 
 		# Check collision with blocks.
-		self.check_collision_blocks(block_group, particle_group)
+		self.check_collision_blocks()
 
 		# Check collision with powerups.
-		self.check_collision_powerups(powerup_group)
+		self.check_collision_powerups()
 
 		""" Should I constrain angle only when it hits paddle / wall, or keep it like it is? """
 
@@ -301,7 +302,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with x-edges.
 		if self.rect.x < 0:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -309,7 +310,7 @@ class Ball(pygame.sprite.Sprite):
 			self.x = 0
 			self.rect.x = self.x
 		elif self.rect.x + self.rect.width > SCREEN_WIDTH:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -319,7 +320,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with y-edges.
 		if self.rect.y < 0:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
@@ -327,7 +328,7 @@ class Ball(pygame.sprite.Sprite):
 			self.y = 0
 			self.rect.y = self.y
 		elif self.rect.y + self.rect.height > SCREEN_HEIGHT:
-			self.spawn_particle(particle_group)
+			self.spawn_particle()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
