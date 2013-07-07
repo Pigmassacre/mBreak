@@ -123,7 +123,7 @@ class Ball(pygame.sprite.Sprite):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24
 			color = self.image.get_at((0, 0))
-			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color))
+			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color, 5))
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
@@ -285,12 +285,10 @@ class Ball(pygame.sprite.Sprite):
 		# Constrain angle to angle != pi and angle != 0
 		if self.angle == 0  or self.angle == (2 * math.pi) or self.angle == math.pi:
 			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.15
-			print("Angle was 0 or pi or 2pi, corrected to " + str(self.angle))
 
 		# Constrain angle to angle != pi/2 and angle != 3pi/2
 		if self.angle == (math.pi / 2)  or self.angle == ((3 * math.pi) / 2):
 			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.15
-			print("Angle was pi/2 or 3pi/2, corrected to " + str(self.angle))
 
 		# Constrain angle to 0 < angle < 2pi
 		if self.angle > (2 * math.pi):

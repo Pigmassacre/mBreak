@@ -164,10 +164,12 @@ def main(window_surface, main_clock, debug_font):
 		groupholder.player_group.update()
 
 		# Update the shadows.
-		groupholder.shadow_group.update()
+		groupholder.shadow_group.update(main_clock)
 
 		# Draw the shadows.
-		groupholder.shadow_group.draw(window_surface)
+		#groupholder.shadow_group.draw(window_surface)
+		for shadow in groupholder.shadow_group:
+			shadow.blit_to(window_surface)
 
 		# Draw the blocks.
 		groupholder.block_group.draw(window_surface)

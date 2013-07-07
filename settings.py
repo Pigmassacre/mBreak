@@ -8,11 +8,17 @@ WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (128, 128, 128)
 MAX_FPS = 60
 
-# Graphical settings
+""" Graphical settings """
+# Ball settings
 BALL_TRAILS = False
+
+# Shadow settings
 SHADOWS = True
 SHADOW_OFFSET = 4
 SHADOW_COLOR = pygame.Color(0, 0, 0, 255)
+SHADOW_LINGER = True
+SHADOW_LINGER_TIME = 2000
+SHADOW_ALPHA_STEP = 25
 
 # Music settings
 INTRO_MUSIC = "res/music/main.ogg"

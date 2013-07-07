@@ -70,9 +70,9 @@ def main(window_surface, main_clock, debug_font):
 	min_angle = -15
 	rotate_step = 0.40
 	rotate_up = True
-	current_scale = 1
-	max_scale = 1.25
-	min_scale = 0.75
+	current_scale = 8
+	max_scale = 8.25
+	min_scale = 7.75
 	scale_by = 0.01
 	scale_up = True
 
@@ -101,7 +101,10 @@ def main(window_surface, main_clock, debug_font):
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 		
 		# Pyganim blits object to the given argument, pygame blits the given argument to object...
-		temp_logo = pygame.transform.rotozoom(title_logo_surface.getCurrentFrame(), current_angle, current_scale)
+		temp_logo_width = int(title_logo_surface.getRect().width * current_scale)
+		temp_logo_height = int(title_logo_surface.getRect().height * current_scale)
+		temp_logo = pygame.transform.scale(title_logo_surface.getCurrentFrame(), (temp_logo_width, temp_logo_height))
+		temp_logo = pygame.transform.rotate(temp_logo, current_angle)
 		temp_logo_x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
 		temp_logo_y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
 		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))

@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import useful
+import shadow
 from settings import *
 
 class Paddle(pygame.sprite.Sprite):
@@ -38,6 +39,9 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
+
+		# Create a shadow.
+		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
 
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")

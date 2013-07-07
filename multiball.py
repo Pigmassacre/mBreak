@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import powerup
 import useful
+import shadow
 import ball
 import random
 import math
@@ -25,6 +26,9 @@ class Multiball(powerup.Powerup):
 
 		# Colorize.
 		useful.colorize_image(self.image, self.color)
+
+		# Create a shadow.
+		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
 
 		if DEBUG_MODE:
 			print("Multiball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")

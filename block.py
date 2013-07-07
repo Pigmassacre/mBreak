@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import useful
+import shadow
 from settings import *
 
 class Block(pygame.sprite.Sprite):
@@ -37,7 +38,11 @@ class Block(pygame.sprite.Sprite):
 		# Colorize the block.
 		useful.colorize_image(self.image, self.owner.color)
 
+		# Create a shadow.
+		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
+
 	def damage(self, damage):
 		self.health = self.health - damage
 		if self.health <= 0:
 			self.kill()
+			self.shadow.kill()

@@ -90,7 +90,7 @@ def colorize_image(image, new_color):
 			current_color.b = current_color.b * (new_color.b / 255)
 
 			# Map the new color the the pixelarray. For some reason, pixelarray apparently reverses the color after colorizing.
-			# So we reverse the color order before adding it to the current pixel.
+			# So we reverse the color order before adding it to the current pixel. (BGRA, instead of RGBA as it should be...)
 			final_color = pygame.Color(current_color.b, current_color.g, current_color.r, current_color.a)
 			pixelarray[x, y] = final_color
 
