@@ -54,11 +54,11 @@ def create_player_right():
 	return player_right
 
 def create_background():
-	width = 64
-	height = 64
+	width = 16
+	height = 16
 	tile_width = SCREEN_WIDTH / width
 	tile_height = SCREEN_HEIGHT / height
-	image_path = "res/background/background_3.png"
+	image_path = "res/background/background.png"
 	image_surface = pygame.image.load(image_path)
 	image_surface = pygame.transform.scale(image_surface, (width, height))
 
