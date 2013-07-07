@@ -18,7 +18,7 @@ def main():
 	main_clock = pygame.time.Clock()
 
 	# Setup the window surface to be used.
-	window_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+	window_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), SRCALPHA)
 
 	# Set the window caption.
 	pygame.display.set_caption(WINDOW_CAPTION)

@@ -36,19 +36,23 @@ class Shadow(pygame.sprite.Sprite):
 		self.fill = fill
 
 		# Store the color.
-		self.color = SHADOW_COLOR
+		self.color = pygame.Color(SHADOW_COLOR[0], SHADOW_COLOR[1], SHADOW_COLOR[2], SHADOW_COLOR[3])
 
 		# Copy the parents image, and then colorize it to the shadow color.
 		if not self.fill:
 			self.image = self.parent.image.copy()
 			useful.colorize_image(self.image, self.color)
+		else:
+			# If using fill instead of image, create a new surface to handle alpha.
+			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
 
 		# Add self to the main shadow_group.
 		groupholder.shadow_group.add(self)
 
 	def blit_to(self, window_surface):
 		if self.fill:
-			window_surface.fill(self.color, self.rect)
+			self.surface.fill(self.color)
+			window_surface.blit(self.surface, self.rect)
 		else:
 			window_surface.blit(self.image, self.rect)
 
@@ -56,12 +60,10 @@ class Shadow(pygame.sprite.Sprite):
 		if self.time_out:
 			self.time_left = self.time_left - main_clock.get_time()
 			if self.time_left <= 0:
-				self.color.a = self.color.a - self.alpha_step
-
-			if self.color.a - self.alpha_step < 0:
-				self.kill()
-			else:
-				self.color.a = self.color.a - self.alpha_step
+				if self.color.a - self.alpha_step < 0:
+					self.kill()
+				else:
+					self.color.a = self.color.a - self.alpha_step
 
 		# Move the shadow so it's under whatever object it's supposed to shadow.
 		self.x = self.parent.x + self.offset

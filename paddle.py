@@ -46,10 +46,6 @@ class Paddle(pygame.sprite.Sprite):
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
-	def colorize(self, color):
-		self.pixelarray = pygame.PixelArray(self.image)
-		
-
 	def update(self, key_up, key_down):
 		if pygame.key.get_pressed()[key_up]:
 			self.velocity_y = self.velocity_y - self.acceleration

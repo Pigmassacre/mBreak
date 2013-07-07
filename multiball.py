@@ -36,6 +36,7 @@ class Multiball(powerup.Powerup):
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
+		self.shadow.kill()
 
 		x = entity.x
 		y = entity.y

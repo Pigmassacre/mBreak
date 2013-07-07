@@ -1,4 +1,3 @@
-import pygame
 from pygame.locals import *
 
 # Various game constants, like the width and height of the screen.
@@ -15,7 +14,7 @@ BALL_TRAILS = False
 # Shadow settings
 SHADOWS = True
 SHADOW_OFFSET = 4
-SHADOW_COLOR = pygame.Color(0, 0, 0, 255)
+SHADOW_COLOR = (0, 0, 0, 255)
 SHADOW_LINGER = True
 SHADOW_LINGER_TIME = 2000
 SHADOW_ALPHA_STEP = 25
