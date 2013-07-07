@@ -33,7 +33,7 @@ class Particle(pygame.sprite.Sprite):
 		self.color = pygame.Color(color.r, color.g, color.b, color.a)
 
 		# Create a shadow.
-		self.shadow = shadow.Shadow(self, SHADOW_OFFSET, True, True)
+		self.shadow = shadow.Shadow(self, SHADOW_OFFSET_X, SHADOW_OFFSET_Y, True, True)
 
 	def update(self):
 		# Update speed, and kill self if speed gets to or under 0.

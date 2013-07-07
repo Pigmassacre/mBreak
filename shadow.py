@@ -10,7 +10,7 @@ from settings import *
 
 class Shadow(pygame.sprite.Sprite):
 
-	def __init__(self, parent, offset=SHADOW_OFFSET, time_out=False, fill=False):
+	def __init__(self, parent, offset_x=SHADOW_OFFSET_X, offset_y=SHADOW_OFFSET_Y, time_out=False, fill=False):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -21,7 +21,8 @@ class Shadow(pygame.sprite.Sprite):
 		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
 
 		# Store the offset, the distance from the parent the shadow is drawn from.
-		self.offset = offset
+		self.offset_x = offset_x
+		self.offset_y = offset_y
 
 		# Store the variables used when timing out the shadow.
 		self.time_out = time_out
@@ -42,6 +43,9 @@ class Shadow(pygame.sprite.Sprite):
 			# If using fill instead of image, create a new surface to handle alpha.
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
 
+		#self.go_right = True
+		#self.go_up = True
+
 		# Add self to the main shadow_group.
 		groupholder.shadow_group.add(self)
 
@@ -60,9 +64,34 @@ class Shadow(pygame.sprite.Sprite):
 					self.kill()
 				else:
 					self.color.a = self.color.a - self.alpha_step
+					"""
+		if self.go_right:
+			self.offset_x = self.offset_x + 0.25
+		else:
+			self.offset_x = self.offset_x - 0.25
+
+		if self.offset_x < -6:
+			self.offset_x = -6
+			self.go_right = True
+		elif self.offset_x > 6:
+			self.offset_x = 6
+			self.go_right = False
+
+		if self.go_up:
+			self.offset_y = self.offset_y + 0.25
+		else:
+			self.offset_y = self.offset_y - 0.25
+
+		if self.offset_y < -6:
+			self.offset_y = -6
+			self.go_up = True
+		elif self.offset_y > 6:
+			self.offset_y = 6
+			self.go_up = False
+			"""
 
 		# Move the shadow so it's under whatever object it's supposed to shadow.
-		self.x = self.parent.x + self.offset
-		self.y = self.parent.y + self.offset
+		self.x = self.parent.x + self.offset_x
+		self.y = self.parent.y + self.offset_y
 		self.rect.x = self.x
 		self.rect.y = self.y
