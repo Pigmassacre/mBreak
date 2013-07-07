@@ -1,7 +1,7 @@
 from pygame.locals import *
 
 # Various game constants, like the width and height of the screen.
-SCREEN_WIDTH = 640
+SCREEN_WIDTH = 720
 SCREEN_HEIGHT = 480
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (128, 128, 128)

@@ -86,6 +86,7 @@ def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
 
+	# Create the background image and store it.
 	background = create_background()
 
 	# Create the left player.
@@ -108,8 +109,7 @@ def main(window_surface, main_clock, debug_font):
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 	while not done:
-		# Every frame begins by filling the whole screen with the background color.
-		#window_surface.fill(BACKGROUND_COLOR)
+		# Begin a frame by blitting the background to the window_surface.
 		window_surface.blit(background, (0, 0))
 		
 		for event in pygame.event.get():
