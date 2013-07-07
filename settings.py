@@ -19,6 +19,11 @@ SHADOW_LINGER = True
 SHADOW_LINGER_TIME = 2000
 SHADOW_ALPHA_STEP = 25
 
+# Text shadow settings
+TEXT_SHADOWS = True
+TEXT_SHADOW_OFFSET = 6
+TEXT_SHADOW_COLOR = (0, 0, 0, 255)
+
 # Music settings
 INTRO_MUSIC = "res/music/main.ogg"
 
