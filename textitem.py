@@ -47,3 +47,8 @@ class TextItem:
 				return 0
 		else:
 			return time_passed
+
+	def draw(self, window_surface):
+		# First blit shadow, then self. Keeps shadow UNDER the text.
+		window_surface.blit(self.shadow_surface, (self.x + self.shadow_offset, self.y + self.shadow_offset))
+		window_surface.blit(self.surface, (self.x, self.y))

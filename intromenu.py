@@ -90,8 +90,7 @@ def main(window_surface, main_clock, debug_font):
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 
 		# Draw the title message.
-		window_surface.blit(title_message.shadow_surface, (title_message.x + title_message.shadow_offset, title_message.y + title_message.shadow_offset))
-		window_surface.blit(title_message.surface, (title_message.x, title_message.y))
+		title_message.draw(window_surface)
 		
 		if DEBUG_MODE:
 			# Display various debug information.

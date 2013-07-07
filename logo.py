@@ -3,7 +3,6 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import shadow
 from libs import pyganim
 from settings import *
 
@@ -55,12 +54,15 @@ class Logo:
 		return self.logo.getMaxSize()[1]
 
 	def draw(self, window_surface):
+		# Position the logo.
 		temp_logo_width = int(self.logo.getRect().width * self.current_scale)
 		temp_logo_height = int(self.logo.getRect().height * self.current_scale)
 		temp_logo = pygame.transform.scale(self.logo.getCurrentFrame(), (temp_logo_width, temp_logo_height))
 		temp_logo = pygame.transform.rotate(temp_logo, self.current_angle)
 		temp_logo_x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
 		temp_logo_y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
+
+		# Draw the logo.
 		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))
 		
 		if self.rotate_up:
