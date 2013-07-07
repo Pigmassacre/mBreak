@@ -12,8 +12,6 @@ WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (64, 64, 64)
 MAX_FPS = 60
 
-SPLASH_TIME = 2000
-
 """ Graphical settings """
 # Ball settings
 BALL_TRAILS = False
