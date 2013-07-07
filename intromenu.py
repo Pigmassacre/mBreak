@@ -7,6 +7,8 @@ import pygame, sys
 from pygame.locals import *
 from libs import pyganim
 import useful
+import textitem
+import logo
 import debug
 import math
 from settings import *
@@ -16,16 +18,16 @@ import game
 
 def setup_logo():
 	# Create the logo
-	logo = useful.Logo()
+	temp_logo = logo.Logo()
 
 	# Set the logo so it displays in the middle of the screen.
-	logo_x = (SCREEN_WIDTH - logo.get_width()) // 2
-	logo_y = ((SCREEN_HEIGHT - logo.get_height()) // 2) - 30
-	logo.x = logo_x
-	logo.y = logo_y
+	x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
+	y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
+	temp_logo.x = x
+	temp_logo.y = y
 
 	# At last, return the surface so we can blit it to the window_surface.
-	return logo
+	return temp_logo
 
 def setup_message(logo_x, logo_y):
 	message_text = "Press ENTER to start"
@@ -34,7 +36,7 @@ def setup_message(logo_x, logo_y):
 	message_font_color = (255, 255, 255)
 	message_alpha_value = 255
 
-	message = useful.TextItem(message_text, message_font_path, message_font_size, message_font_color, message_alpha_value)
+	message = textitem.TextItem(message_text, message_font_path, message_font_size, message_font_color, message_alpha_value)
 
 	message_x = (SCREEN_WIDTH - message.get_width()) // 2
 	message_y = logo_y + 150

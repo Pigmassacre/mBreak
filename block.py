@@ -39,7 +39,7 @@ class Block(pygame.sprite.Sprite):
 		useful.colorize_image(self.image, self.owner.color)
 
 		# Create a shadow.
-		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
+		self.shadow = shadow.Shadow(self)
 
 	def damage(self, damage):
 		self.health = self.health - damage

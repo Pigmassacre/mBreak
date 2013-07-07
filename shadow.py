@@ -10,16 +10,15 @@ from settings import *
 
 class Shadow(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, offset, parent, time_out=False, fill=False):
+	def __init__(self, parent, offset=SHADOW_OFFSET, time_out=False, fill=False):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
-		# Create the rect used for drawing the shadow.
-		self.rect = pygame.rect.Rect(x, y, width, height)
+		# Keep track of the parent, used to position the shadow.
+		self.parent = parent
 
-		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
-		self.x = x
-		self.y = y
+		# Create the rect used for drawing the shadow.
+		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
 
 		# Store the offset, the distance from the parent the shadow is drawn from.
 		self.offset = offset
@@ -28,9 +27,6 @@ class Shadow(pygame.sprite.Sprite):
 		self.time_out = time_out
 		self.time_left = SHADOW_LINGER_TIME
 		self.alpha_step = SHADOW_ALPHA_STEP
-
-		# Keep track of the parent, used to position the shadow.
-		self.parent = parent
 
 		# Store whether or not to use image resource or fill blitting.
 		self.fill = fill

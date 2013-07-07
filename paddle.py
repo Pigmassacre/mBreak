@@ -41,7 +41,7 @@ class Paddle(pygame.sprite.Sprite):
 		useful.colorize_image(self.image, self.owner.color)
 
 		# Create a shadow.
-		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
+		self.shadow = shadow.Shadow(self)
 
 		if DEBUG_MODE:
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
