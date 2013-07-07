@@ -6,7 +6,7 @@ import pygame, sys
 from pygame.locals import *
 import useful
 from settings import *
-import intromenu
+import splash
 
 def main():
 	""" The following parts are the ones that run first when booting up the game. """
@@ -28,7 +28,7 @@ def main():
 	debug_font = pygame.font.Font(DEBUG_FONT, 9)
 
 	# Start the intro menu.
-	intromenu.main(window_surface, game_surface, main_clock, debug_font)
+	splash.main(window_surface, game_surface, main_clock, debug_font)
 
 # Start the game!
 main()

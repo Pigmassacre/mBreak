@@ -20,8 +20,8 @@ def setup_logo():
 	temp_logo = logo.Logo()
 
 	# Set the logo so it displays in the middle of the screen.
-	x = (BASE_WIDTH - temp_logo.get_width()) // 2
-	y = ((BASE_HEIGHT - temp_logo.get_height()) // 2) - 30
+	x = (BASE_WIDTH - temp_logo.get_width()) / 2
+	y = ((BASE_HEIGHT - temp_logo.get_height()) / 2) - 30
 	temp_logo.x = x
 	temp_logo.y = y
 
