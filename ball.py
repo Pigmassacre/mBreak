@@ -311,13 +311,13 @@ class Ball(pygame.sprite.Sprite):
 			# Constrain ball to screen size.
 			self.x = 0
 			self.rect.x = self.x
-		elif self.rect.x + self.rect.width > SCREEN_WIDTH:
+		elif self.rect.x + self.rect.width > BASE_WIDTH:
 			self.spawn_particle()
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
-			self.x = SCREEN_WIDTH - self.rect.width			
+			self.x = BASE_WIDTH - self.rect.width			
 			self.rect.x = self.x
 
 		# Check collision with y-edges.
@@ -329,11 +329,11 @@ class Ball(pygame.sprite.Sprite):
 			# Constrain ball to screen size.
 			self.y = 0
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > SCREEN_HEIGHT:
+		elif self.rect.y + self.rect.height > BASE_HEIGHT:
 			self.spawn_particle()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
-			self.y = SCREEN_HEIGHT - self.rect.height
+			self.y = BASE_HEIGHT - self.rect.height
 			self.rect.y = self.y

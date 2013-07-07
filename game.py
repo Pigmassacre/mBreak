@@ -54,11 +54,11 @@ def create_player_right():
 	return player_right
 
 def create_background():
-	width = 16
-	height = 16
-	tile_width = SCREEN_WIDTH / width
-	tile_height = SCREEN_HEIGHT / height
-	image_path = "res/background/background.png"
+	width = 64
+	height = 64
+	tile_width = BASE_WIDTH / width + 1
+	tile_height = BASE_HEIGHT / height + 1
+	image_path = "res/background/background_3.png"
 	image_surface = pygame.image.load(image_path)
 	image_surface = pygame.transform.scale(image_surface, (width, height))
 
@@ -83,7 +83,7 @@ def destroy_groups():
 	groupholder.player_group.empty()
 	groupholder.shadow_group.empty()
 
-def main(window_surface, main_clock, debug_font):
+def main(window_surface, game_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
 
@@ -93,12 +93,12 @@ def main(window_surface, main_clock, debug_font):
 	# Create the left player.
 	player_left = create_player_left()
 	# Create and store the players paddle.
-	paddle_left = create_paddle(16 * 6, (SCREEN_HEIGHT - 64) / 2, player_left)
+	paddle_left = create_paddle(16 * 6, (BASE_HEIGHT - 64) / 2, player_left)
 	
 	# Create the right player.
 	player_right = create_player_right()
 	# Create and store the players paddle. Flipped.
-	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 7, (SCREEN_HEIGHT - 64) / 2, player_right)
+	paddle_right = create_paddle(BASE_WIDTH - 16 * 7, (BASE_HEIGHT - 64) / 2, player_right)
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 
 	# Spawn some blocks.
@@ -106,7 +106,7 @@ def main(window_surface, main_clock, debug_font):
 		for j in range(0, 13):
 			create_block(32 + (16 * i), 32 + (32 * j), player_left)
 			# Create a flipped right block.
-			temp_block_right = create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right)
+			temp_block_right = create_block((BASE_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right)
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 	while not done:

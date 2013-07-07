@@ -1,8 +1,13 @@
 from pygame.locals import *
 
-# Various game constants, like the width and height of the screen.
-SCREEN_WIDTH = 720
-SCREEN_HEIGHT = 480
+# Base width and height is the actual game area width and height.
+BASE_WIDTH = 854
+BASE_HEIGHT = 480
+
+# Screen width and height is the game window width and height.
+SCREEN_WIDTH = 854#1024
+SCREEN_HEIGHT = 480#576
+
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (128, 128, 128)
 MAX_FPS = 60
@@ -26,7 +31,7 @@ TEXT_SHADOW_OFFSET = 6
 TEXT_SHADOW_COLOR = (0, 0, 0, 255)
 
 # Music settings
-INTRO_MUSIC = "res/music/main.ogg"
+TITLE_MUSIC = "res/music/title_screen.ogg"
 
 # Player Left settings.
 PLAYER_LEFT_NAME = "Player Left"

@@ -27,8 +27,8 @@ def create_ball(x, y, owner):
 def create_powerup():
 	width = 32
 	height = 32
-	x = random.uniform((SCREEN_WIDTH / 2) - 200, (SCREEN_WIDTH / 2) + 200)
-	y = random.uniform((SCREEN_HEIGHT / 2) - 200, (SCREEN_HEIGHT / 2) + 200)
+	x = random.uniform((BASE_WIDTH / 2) - 200, (BASE_WIDTH / 2) + 200)
+	y = random.uniform((BASE_HEIGHT / 2) - 200, (BASE_HEIGHT / 2) + 200)
 	color = pygame.Color(255, 128, 255, 255)
 
 	return multiball.Multiball(x, y, width, height, color)

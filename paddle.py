@@ -77,7 +77,7 @@ class Paddle(pygame.sprite.Sprite):
 			# Constrain paddle to screen size.
 			self.y = 0
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > SCREEN_HEIGHT:
+		elif self.rect.y + self.rect.height > BASE_HEIGHT:
 			# Constrain paddle to screen size.
-			self.y = SCREEN_HEIGHT - self.rect.height
+			self.y = BASE_HEIGHT - self.rect.height
 			self.rect.y = self.y

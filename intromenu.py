@@ -20,8 +20,8 @@ def setup_logo():
 	temp_logo = logo.Logo()
 
 	# Set the logo so it displays in the middle of the screen.
-	x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
-	y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
+	x = (BASE_WIDTH - temp_logo.get_width()) // 2
+	y = ((BASE_HEIGHT - temp_logo.get_height()) // 2) - 30
 	temp_logo.x = x
 	temp_logo.y = y
 
@@ -37,16 +37,16 @@ def setup_message(x, y):
 
 	text = textitem.TextItem(text, font_path, font_size, font_color, alpha_value)
 
-	text.x = (SCREEN_WIDTH - text.get_width()) // 2
+	text.x = (BASE_WIDTH - text.get_width()) // 2
 	text.y = y + 150
 
 	return text
 
 def setup_music():
-	pygame.mixer.music.load(INTRO_MUSIC)
+	pygame.mixer.music.load(TITLE_MUSIC)
 	pygame.mixer.music.play()
 
-def main(window_surface, main_clock, debug_font):
+def main(window_surface, game_surface, main_clock, debug_font):
 	# Setup the logo and store the surface of the logo.
 	title_logo = setup_logo()
 	title_logo.play()
@@ -65,6 +65,7 @@ def main(window_surface, main_clock, debug_font):
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(BACKGROUND_COLOR)
+		game_surface.fill(BACKGROUND_COLOR)
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -74,28 +75,31 @@ def main(window_surface, main_clock, debug_font):
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				# If ENTER is pressed, proceed to the next screen, and end this loop.
 				pygame.mixer.music.stop()
-				game.main(window_surface, main_clock, debug_font)
+				game.main(window_surface, game_surface, main_clock, debug_font)
 		
 		# If the music isn't playing, start it.
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.play()
 
 		# Draw the logo.
-		title_logo.draw(window_surface)
+		title_logo.draw(game_surface)
 
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
-		
 		# Blinks the title message.
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 
 		# Draw the title message.
-		title_message.draw(window_surface)
+		title_message.draw(game_surface)
 		
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(window_surface, main_clock, debug_font)
-		
+			debug.display(game_surface, main_clock, debug_font)
+
+		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
+		temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
+		window_surface.blit(temp_surface, (0, 0))
+
 		pygame.display.update()
 		
 		# Finally, constrain the game to a set maximum amount of FPS.
