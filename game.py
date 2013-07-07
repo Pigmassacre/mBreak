@@ -54,8 +54,8 @@ def create_player_right():
 	return player_right
 
 def create_background():
-	width = 32
-	height = 32
+	width = 64
+	height = 64
 	tile_width = SCREEN_WIDTH / width
 	tile_height = SCREEN_HEIGHT / height
 	image_path = "res/background/background_3.png"

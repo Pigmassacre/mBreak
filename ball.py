@@ -221,9 +221,6 @@ class Ball(pygame.sprite.Sprite):
 	def check_collision_blocks(self):
 		block_collide_list = pygame.sprite.spritecollide(self, groupholder.block_group, False)
 		for block in block_collide_list:
-			# Deal damage to the hit block.
-			block.damage(self.damage)
-
 			self.spawn_particle()
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
@@ -261,6 +258,8 @@ class Ball(pygame.sprite.Sprite):
 			elif self.rect.left <= block.rect.right and self.rect.right > block.rect.right:
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
+			# Deal damage to the hit block.
+			block.damage(self.damage)
 
 	def check_collision_powerups(self):
 		powerup_collide_list = pygame.sprite.spritecollide(self, groupholder.powerup_group, False)
