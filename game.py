@@ -105,8 +105,9 @@ def main(window_surface, main_clock, debug_font):
 	player_right = create_player_right()
 	groupholder.player_group.add(player_right)
 
-	# Create and store the players paddle.
+	# Create and store the players paddle. Flipped, because right.
 	paddle_right = create_paddle(SCREEN_WIDTH - 16 * 7, (SCREEN_HEIGHT - 64) / 2, player_right)
+	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 	groupholder.paddle_group.add(paddle_right)
 
 	# Alternate adding stuff to left och right player. When True, add to left, otherwise add to right.
@@ -116,7 +117,10 @@ def main(window_surface, main_clock, debug_font):
 	for i in range(0, 3):
 		for j in range(0, 13):
 			groupholder.block_group.add(create_block(32 + (16 * i), 32 + (32 * j), player_left))
-			groupholder.block_group.add(create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right))
+			# Create a flipped right block.
+			temp_block_right = create_block((SCREEN_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right)
+			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
+			groupholder.block_group.add(temp_block_right)
 
 	while not done:
 		# Every frame begins by filling the whole screen with the background color.
