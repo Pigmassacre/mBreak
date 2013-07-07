@@ -80,15 +80,16 @@ def main(window_surface, main_clock, debug_font):
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.play()
 
+		# Draw the logo.
+		title_logo.draw(window_surface)
+
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
 		
 		# Blinks the title message. Sets the time_passed value to either blink_rate // 3 or 0.
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
-		
-		title_logo.draw(window_surface)
 
-		#title_logo_surface.blit(window_surface, (title_logo.x, title_logo.y))
+		# Draw the title message.
 		window_surface.blit(title_message.shadow_surface, (title_message.x + title_message.shadow_offset, title_message.y + title_message.shadow_offset))
 		window_surface.blit(title_message.surface, (title_message.x, title_message.y))
 		

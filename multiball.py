@@ -28,7 +28,7 @@ class Multiball(powerup.Powerup):
 		useful.colorize_image(self.image, self.color)
 
 		# Create a shadow.
-		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
+		self.shadow = shadow.Shadow(self)
 
 		if DEBUG_MODE:
 			print("Multiball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
