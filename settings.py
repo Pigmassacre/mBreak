@@ -1,14 +1,18 @@
+import pygame
 from pygame.locals import *
 
 # Various game constants, like the width and height of the screen.
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
 WINDOW_CAPTION = "mBreak"
-BACKGROUND_COLOR = (0, 0, 0)
+BACKGROUND_COLOR = (128, 128, 128)
 MAX_FPS = 60
 
 # Graphical settings
 BALL_TRAILS = False
+SHADOWS = True
+SHADOW_OFFSET = 4
+SHADOW_COLOR = pygame.Color(0, 0, 0, 255)
 
 # Music settings
 INTRO_MUSIC = "res/music/main.ogg"

@@ -8,6 +8,7 @@ import paddle
 import trail
 import random
 import particle
+import shadow
 import useful
 import groupholder
 from settings import *
@@ -37,20 +38,24 @@ class Ball(pygame.sprite.Sprite):
 		else:
 			self.speed = self.max_speed
 
-		# Set the damage value, this is the damage the ball does to a block when it collides with it.
+		# Store the damage value, this is the damage the ball does to a block when it collides with it.
 		self.damage = damage
 		
-		# Set the owner.
+		# Store the owner.
 		self.owner = owner
 
-		# Store the ball in the owners ball_group.
+		# Store the ball in the owners ball_group and the main ball_group.
 		self.owner.ball_group.add(self)
+		groupholder.ball_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
 		self.image = pygame.image.load(image_path)
 
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
+
+		# Create a shadow.
+		self.shadow = shadow.Shadow(self.x, self.y, self.rect.width, self.rect.height, SHADOW_OFFSET, self)
 		
 		if DEBUG_MODE:
 			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ") with angle " + str(self.angle) + " and speed " + str(self.speed))

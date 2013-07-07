@@ -44,7 +44,7 @@ class Particle(pygame.sprite.Sprite):
 			else:
 				self.color.a = self.color.a - self.alpha_step
 
-		# Finally, move the ball with speed in consideration.
+		# Finally, move the particle with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)
 		self.y = self.y + (math.sin(self.angle) * self.speed)
 		self.rect.x = self.x

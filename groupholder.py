@@ -22,3 +22,6 @@ paddle_group = pygame.sprite.Group()
 
 # Define the group that contains all the players.
 player_group = pygame.sprite.Group()
+
+# Define the group that contains all the shadows.
+shadow_group = pygame.sprite.Group()

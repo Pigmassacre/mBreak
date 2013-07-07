@@ -85,6 +85,7 @@ def destroy_groups():
 	groupholder.powerup_group.empty()
 	groupholder.paddle_group.empty()
 	groupholder.player_group.empty()
+	groupholder.shadow_group.empty()
 
 def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
@@ -129,13 +130,11 @@ def main(window_surface, main_clock, debug_font):
 			elif event.type == KEYDOWN and event.key == K_l:
 				temp_ball = create_ball(paddle_left.x + 16, paddle_left.y, player_left)
 				temp_ball.owner = player_left
-				groupholder.ball_group.add(temp_ball)
 				if DEBUG_MODE:
 					print("Ball added to Player Left.")
 			elif event.type == KEYDOWN and event.key == K_r:
 				temp_ball = create_ball(paddle_right.x - 32, paddle_right.y, player_right)
 				temp_ball.owner = player_right
-				groupholder.ball_group.add(temp_ball)
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
 			elif event.type == KEYDOWN and event.key == K_p:
@@ -154,7 +153,6 @@ def main(window_surface, main_clock, debug_font):
 				order = not order
 				if DEBUG_MODE:
 					print("Ball added to Player Right.")
-			groupholder.ball_group.add(temp_ball)
 
 		# Update the balls.
 		groupholder.ball_group.update()
@@ -164,6 +162,12 @@ def main(window_surface, main_clock, debug_font):
 
 		# Update the players.
 		groupholder.player_group.update()
+
+		# Update the shadows.
+		groupholder.shadow_group.update()
+
+		# Draw the shadows.
+		groupholder.shadow_group.draw(window_surface)
 
 		# Draw the blocks.
 		groupholder.block_group.draw(window_surface)
