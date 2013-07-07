@@ -86,7 +86,7 @@ def main(window_surface, main_clock, debug_font):
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
 		
-		# Blinks the title message. Sets the time_passed value to either blink_rate // 3 or 0.
+		# Blinks the title message.
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 
 		# Draw the title message.

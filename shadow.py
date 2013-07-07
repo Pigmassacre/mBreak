@@ -64,31 +64,6 @@ class Shadow(pygame.sprite.Sprite):
 					self.kill()
 				else:
 					self.color.a = self.color.a - self.alpha_step
-					"""
-		if self.go_right:
-			self.offset_x = self.offset_x + 0.25
-		else:
-			self.offset_x = self.offset_x - 0.25
-
-		if self.offset_x < -6:
-			self.offset_x = -6
-			self.go_right = True
-		elif self.offset_x > 6:
-			self.offset_x = 6
-			self.go_right = False
-
-		if self.go_up:
-			self.offset_y = self.offset_y + 0.25
-		else:
-			self.offset_y = self.offset_y - 0.25
-
-		if self.offset_y < -6:
-			self.offset_y = -6
-			self.go_up = True
-		elif self.offset_y > 6:
-			self.offset_y = 6
-			self.go_up = False
-			"""
 
 		# Move the shadow so it's under whatever object it's supposed to shadow.
 		self.x = self.parent.x + self.offset_x

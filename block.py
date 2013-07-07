@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import useful
 import shadow
+import groupholder
 from settings import *
 
 class Block(pygame.sprite.Sprite):
@@ -37,6 +38,10 @@ class Block(pygame.sprite.Sprite):
 
 		# Colorize the block.
 		useful.colorize_image(self.image, self.owner.color)
+
+		# Add self to owners block_group and main block_group.
+		self.owner.block_group.add(self)
+		groupholder.block_group.add(self)
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)

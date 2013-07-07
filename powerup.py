@@ -18,6 +18,9 @@ class Powerup(pygame.sprite.Sprite):
 		self.x = x
 		self.y = y
 
+		# Store self in the main powerup_group.
+		groupholder.powerup_group.add(self)
+
 		if DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 

@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import useful
 import shadow
+import groupholder
 from settings import *
 
 class Paddle(pygame.sprite.Sprite):
@@ -39,6 +40,10 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
+
+		# Add self to to owners paddle_group and main paddle_group.
+		self.owner.paddle_group.add(self)
+		groupholder.paddle_group.add(self)
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)

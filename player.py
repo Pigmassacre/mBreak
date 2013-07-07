@@ -3,6 +3,7 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+import groupholder
 from pygame.locals import *
 from settings import *
 
@@ -28,8 +29,12 @@ class Player(pygame.sprite.Sprite):
 		# Create a group to store powerups in.
 		self.powerup_group = pygame.sprite.Group()
 
+		# Store the player in the main player_group.
+		groupholder.player_group.add(self)
+
 		# Store the selected color, used to colorize objects that belong to the player.
 		self.color = color
 
 	def update(self):
+		# Update paddles.
 		self.paddle_group.update(self.key_up, self.key_down)

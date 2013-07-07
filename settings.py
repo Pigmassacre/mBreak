@@ -19,8 +19,6 @@ SHADOW_COLOR = (0, 0, 0, 255)
 SHADOW_LINGER = True
 SHADOW_LINGER_TIME = 2000
 SHADOW_ALPHA_STEP = 25
-GO_UP = True
-GO_RIGHT = True
 
 # Text shadow settings
 TEXT_SHADOWS = True
