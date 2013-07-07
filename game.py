@@ -19,7 +19,7 @@ def create_block(x, y, owner):
 	width = 16
 	height = 32
 	health = 2
-	image_path = ("res/block/block.png")
+	image_path = "res/block/block.png"
 
 	return block.Block(x, y, width, height, health, image_path, owner)
 
@@ -29,7 +29,7 @@ def create_paddle(x, y, owner):
 	acceleration = 2
 	retardation = 4
 	max_speed = 8
-	image_path = ("res/paddle/paddle.png")
+	image_path = "res/paddle/paddle.png"
 
 	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path, owner)
 
@@ -53,6 +53,21 @@ def create_player_right():
 	
 	return player_right
 
+def create_background():
+	width = 16
+	height = 16
+	tile_width = SCREEN_WIDTH / width
+	tile_height = SCREEN_HEIGHT / height
+	image_path = "res/background/background.png"
+	image_surface = pygame.image.load(image_path)
+
+	surface = pygame.Surface((width * tile_width, height * tile_height))
+	for x in range(0, tile_width):
+		for y in range(0, tile_height):
+			surface.blit(image_surface, (x * width, y * height))
+
+	return surface
+
 """
 I should come up with a good way to handle the sprite groups and stick to it.
 I can either pass the groups to each method/class as they are needed, or I can have 
@@ -70,6 +85,8 @@ def destroy_groups():
 def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
+
+	background = create_background()
 
 	# Create the left player.
 	player_left = create_player_left()
@@ -92,7 +109,8 @@ def main(window_surface, main_clock, debug_font):
 
 	while not done:
 		# Every frame begins by filling the whole screen with the background color.
-		window_surface.fill(BACKGROUND_COLOR)
+		#window_surface.fill(BACKGROUND_COLOR)
+		window_surface.blit(background, (0, 0))
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
