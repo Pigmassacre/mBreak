@@ -10,7 +10,7 @@ from settings import *
 
 class Shadow(pygame.sprite.Sprite):
 
-	def __init__(self, parent, offset_x=SHADOW_OFFSET_X, offset_y=SHADOW_OFFSET_Y, time_out=False, fill=False):
+	def __init__(self, parent, offset_x=SHADOW_OFFSET_X, offset_y=SHADOW_OFFSET_Y, time_out=False, fill=False, color=SHADOW_COLOR):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -33,7 +33,7 @@ class Shadow(pygame.sprite.Sprite):
 		self.fill = fill
 
 		# Store the color.
-		self.color = pygame.Color(SHADOW_COLOR[0], SHADOW_COLOR[1], SHADOW_COLOR[2], SHADOW_COLOR[3])
+		self.color = pygame.Color(color[0], color[1], color[2], color[3])
 
 		# Copy the parents image, and then colorize it to the shadow color.
 		if not self.fill:

@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import shadow
+import useful
 from settings import *
 
 class Particle(pygame.sprite.Sprite):
@@ -32,8 +33,12 @@ class Particle(pygame.sprite.Sprite):
 		# Setup the color values, used for drawing the particle.
 		self.color = pygame.Color(color.r, color.g, color.b, color.a)
 
+		# Setup shadow color value, used for coloring the shadow.
+		self.shadow_blend_color = pygame.Color(100, 100, 100, 255)
+		self.shadow_color = useful.blend_colors(self.color, self.shadow_blend_color)
+
 		# Create a shadow.
-		self.shadow = shadow.Shadow(self, SHADOW_OFFSET_X, SHADOW_OFFSET_Y, True, True)
+		self.shadow = shadow.Shadow(self, SHADOW_OFFSET_X, SHADOW_OFFSET_Y, True, True, self.shadow_color)
 
 	def update(self):
 		# Update speed, and kill self if speed gets to or under 0.
