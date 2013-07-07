@@ -33,9 +33,9 @@ class Logo:
 		self.rotate_step = 0.40
 		self.rotate_up = True
 		self.current_scale = 8
-		self.max_scale = 8.25
-		self.min_scale = 7.75
-		self.scale_by = 0.01
+		self.max_scale = 8.5
+		self.min_scale = 7.5
+		self.scale_by = 0.02
 		self.scale_up = True
 
 	def play(self):
@@ -64,7 +64,7 @@ class Logo:
 
 		# Draw the logo.
 		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))
-		
+		"""
 		if self.rotate_up:
 			self.current_angle = self.current_angle + self.rotate_step
 		else:
@@ -76,7 +76,7 @@ class Logo:
 		elif self.current_angle < self.min_angle:
 			self.current_angle = self.min_angle
 			self.rotate_up = True
-
+			"""
 		if self.scale_up:
 			self.current_scale = self.current_scale + self.scale_by
 		else:
