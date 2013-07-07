@@ -39,20 +39,20 @@ class TextItem:
 class Logo:
 
 	def __init__(self):
-		self.logo = pyganim.PygAnimation([("res/mBreakTitle_01.png", 1.00),
-											("res/mBreakTitle_02.png", 0.075),
-											("res/mBreakTitle_03.png", 0.075),
-											("res/mBreakTitle_04.png", 0.075),
-											("res/mBreakTitle_05.png", 0.075),
-											("res/mBreakTitle_06.png", 0.075),
-											("res/mBreakTitle_07.png", 0.075),
-											("res/mBreakTitle_01.png", 1.00),
-											("res/mBreakTitle_07.png", 0.075),
-											("res/mBreakTitle_06.png", 0.075),
-											("res/mBreakTitle_05.png", 0.075),
-											("res/mBreakTitle_04.png", 0.075),
-											("res/mBreakTitle_03.png", 0.075),
-											("res/mBreakTitle_02.png", 0.075)])
+		self.logo = pyganim.PygAnimation([("res/logo/mBreakTitle_01.png", 1.00),
+											("res/logo/mBreakTitle_02.png", 0.075),
+											("res/logo/mBreakTitle_03.png", 0.075),
+											("res/logo/mBreakTitle_04.png", 0.075),
+											("res/logo/mBreakTitle_05.png", 0.075),
+											("res/logo/mBreakTitle_06.png", 0.075),
+											("res/logo/mBreakTitle_07.png", 0.075),
+											("res/logo/mBreakTitle_01.png", 1.00),
+											("res/logo/mBreakTitle_07.png", 0.075),
+											("res/logo/mBreakTitle_06.png", 0.075),
+											("res/logo/mBreakTitle_05.png", 0.075),
+											("res/logo/mBreakTitle_04.png", 0.075),
+											("res/logo/mBreakTitle_03.png", 0.075),
+											("res/logo/mBreakTitle_02.png", 0.075)])
 
 	def play(self):
 		self.logo.play()
