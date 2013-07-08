@@ -12,13 +12,13 @@ def blend_colors(old_color, blend_color, blend_alpha=False):
 	new_b = int(old_color.b * (blend_color.b / 255.0))
 
 	if blend_alpha:
-		new_a = old_color.a * (blend_color.a / 255.0)
+		new_a = int(old_color.a * (blend_color.a / 255.0))
 	else:
 		new_a = old_color.a
 
 	return pygame.Color(new_r, new_g, new_b, new_a)
 
-def colorize_image(image, new_color):
+def colorize_image(image, new_color, blend_alpha=False):
 	# Unlock the surface so we can colorize it.
 	image.lock()
 
@@ -30,7 +30,7 @@ def colorize_image(image, new_color):
 			current_color = image.unmap_rgb(pixelarray[x, y])
 
 			# Blend the colors.
-			after_blend_color = blend_colors(current_color, new_color)
+			after_blend_color = blend_colors(current_color, new_color, blend_alpha)
 
 			# Map the new color the the pixelarray. For some reason, pixelarray apparently reverses the color after colorizing.
 			# So we reverse the color order before adding it to the current pixel. (BGRA, instead of RGBA as it should be...)

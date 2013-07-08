@@ -38,7 +38,13 @@ class Shadow(pygame.sprite.Sprite):
 		# Copy the parents image, and then colorize it to the shadow color.
 		if not self.fill:
 			self.image = self.parent.image.copy()
+			
+			# Colorize the image.
 			useful.colorize_image(self.image, self.color)
+
+			# Convert to alpha and apply the alpha value.
+			self.image.convert_alpha()
+			self.image.set_alpha(self.color.a)
 		else:
 			# If using fill instead of image, create a new surface to handle alpha.
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)

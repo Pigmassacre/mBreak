@@ -58,7 +58,7 @@ def create_background():
 	height = 64
 	tile_width = BASE_WIDTH / width + 1
 	tile_height = BASE_HEIGHT / height + 1
-	image_path = "res/background/background_3.png"
+	image_path = "res/background/background_2.png"
 	image_surface = pygame.image.load(image_path)
 	image_surface = pygame.transform.scale(image_surface, (width, height))
 

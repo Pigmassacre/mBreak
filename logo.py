@@ -32,9 +32,9 @@ class Logo:
 		self.min_angle = -15
 		self.rotate_step = 0.40
 		self.rotate_up = True
-		self.current_scale = 8
-		self.max_scale = 8.5
-		self.min_scale = 7.5
+		self.current_scale = 2
+		self.max_scale = 2.5
+		self.min_scale = 1.5
 		self.scale_by = 0.02
 		self.scale_up = True
 
@@ -77,6 +77,7 @@ class Logo:
 			self.current_angle = self.min_angle
 			self.rotate_up = True
 			"""
+		"""
 		if self.scale_up:
 			self.current_scale = self.current_scale + self.scale_by
 		else:
@@ -87,4 +88,4 @@ class Logo:
 			self.scale_up = False
 		elif self.current_scale < self.min_scale:
 			self.current_scale = self.min_scale
-			self.scale_up = True
+			self.scale_up = True"""

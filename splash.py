@@ -20,7 +20,7 @@ def main(window_surface, game_surface, main_clock, debug_font):
 	splash_image_path = "res/splash/splash_color.png"
 	splash = pygame.image.load(splash_image_path)
 
-	splash = pygame.transform.scale(splash, (splash.get_width() * 2, splash.get_height() * 2))
+	splash = pygame.transform.scale(splash, (BASE_HEIGHT, BASE_HEIGHT))
 
 	splash_x = (BASE_WIDTH - splash.get_width()) / 2
 	splash_y = (BASE_HEIGHT - splash.get_height()) / 2

@@ -1,12 +1,12 @@
 from pygame.locals import *
 
 # Base width and height is the actual game area width and height.
-BASE_WIDTH = 854
-BASE_HEIGHT = 480
+BASE_WIDTH = 240
+BASE_HEIGHT = 135
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = 854#1024
-SCREEN_HEIGHT = 480#576
+SCREEN_WIDTH = 848
+SCREEN_HEIGHT = 477
 
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (64, 64, 64)
@@ -20,14 +20,14 @@ BALL_TRAILS = False
 SHADOWS = True
 SHADOW_OFFSET_X = 3
 SHADOW_OFFSET_Y = 4
-SHADOW_COLOR = (0, 0, 0, 255)
+SHADOW_COLOR = (0, 0, 0, 128)
 SHADOW_LINGER = True
 SHADOW_LINGER_TIME = 2000
 SHADOW_ALPHA_STEP = 25
 
 # Text shadow settings
 TEXT_SHADOWS = True
-TEXT_SHADOW_OFFSET = 6
+TEXT_SHADOW_OFFSET = 3
 TEXT_SHADOW_COLOR = (0, 0, 0, 255)
 
 # Music settings
