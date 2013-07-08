@@ -48,10 +48,7 @@ class Shadow(pygame.sprite.Sprite):
 		else:
 			# If using fill instead of image, create a new surface to handle alpha.
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
-
-		#self.go_right = True
-		#self.go_up = True
-
+		
 		# Add self to the main shadow_group.
 		groupholder.shadow_group.add(self)
 

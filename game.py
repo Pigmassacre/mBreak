@@ -16,22 +16,21 @@ import groupholder
 from settings import *
 
 def create_block(x, y, owner):
-	width = 16
-	height = 32
+	width = 4 * GAME_SCALE
+	height = 8 * GAME_SCALE
 	health = 2
 	image_path = "res/block/block.png"
 
 	return block.Block(x, y, width, height, health, image_path, owner)
 
 def create_paddle(x, y, owner):
-	width = 16
-	height = 64
-	acceleration = 2
-	retardation = 4
-	max_speed = 8
-	image_path = "res/paddle/paddle.png"
+	width = 4 * GAME_SCALE
+	height = 16 * GAME_SCALE
+	acceleration = 1 * GAME_SCALE
+	retardation = 2 * GAME_SCALE
+	max_speed = 4 * GAME_SCALE
 
-	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, image_path, owner)
+	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, owner)
 
 def create_player_left():
 	name = PLAYER_LEFT_NAME
@@ -53,22 +52,6 @@ def create_player_right():
 	
 	return player_right
 
-def create_background():
-	width = 64
-	height = 64
-	tile_width = BASE_WIDTH / width + 1
-	tile_height = BASE_HEIGHT / height + 1
-	image_path = "res/background/background_2.png"
-	image_surface = pygame.image.load(image_path)
-	image_surface = pygame.transform.scale(image_surface, (width, height))
-
-	surface = pygame.Surface((width * tile_width, height * tile_height))
-	for x in range(0, tile_width):
-		for y in range(0, tile_height):
-			surface.blit(image_surface, (x * width, y * height))
-
-	return surface
-
 """
 I should come up with a good way to handle the sprite groups and stick to it.
 I can either pass the groups to each method/class as they are needed, or I can have 
@@ -88,30 +71,35 @@ def main(window_surface, game_surface, main_clock, debug_font):
 	done = False
 
 	# Create the background image and store it.
-	background = create_background()
+	floor_surface = pygame.image.load("res/background/planks_floor.png").convert()
+	floor_surface = pygame.transform.scale(floor_surface, (floor_surface.get_width() * GAME_SCALE, floor_surface.get_height() * GAME_SCALE))
+
+	wall_surface = pygame.image.load("res/background/planks_wall.png")
+	wall_surface = pygame.transform.scale(wall_surface, (wall_surface.get_width() * GAME_SCALE, wall_surface.get_height() * GAME_SCALE))
 
 	# Create the left player.
 	player_left = create_player_left()
 	# Create and store the players paddle.
-	paddle_left = create_paddle(16 * 6, (BASE_HEIGHT - 64) / 2, player_left)
+	paddle_left = create_paddle(LEVEL_X + (4 * 6), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_left)
 	
 	# Create the right player.
 	player_right = create_player_right()
 	# Create and store the players paddle. Flipped.
-	paddle_right = create_paddle(BASE_WIDTH - 16 * 7, (BASE_HEIGHT - 64) / 2, player_right)
+	paddle_right = create_paddle(LEVEL_MAX_X - (4 * 7), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_right)
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 
 	# Spawn some blocks.
 	for i in range(0, 3):
 		for j in range(0, 13):
-			create_block(32 + (16 * i), 32 + (32 * j), player_left)
+			create_block(LEVEL_X + 8 + (4 * i), LEVEL_Y + 8 + (8 * j), player_left)
 			# Create a flipped right block.
-			temp_block_right = create_block((BASE_WIDTH - 48) - (16 * i), 32 + (32 * j), player_right)
+			temp_block_right = create_block((LEVEL_MAX_X - 48) - (4 * i), LEVEL_Y + 8 + (8 * j), player_right)
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 	while not done:
-		# Begin a frame by blitting the background to the window_surface.
-		window_surface.blit(background, (0, 0))
+		# Begin a frame by blitting the background to the game_surface.
+		#game_surface.fill(BACKGROUND_COLOR)
+		game_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -131,42 +119,48 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 		# Update the balls.
 		groupholder.ball_group.update()
-
+		
 		# Update the particles.
 		groupholder.particle_group.update()
-
+		
 		# Update the players.
 		groupholder.player_group.update()
-
+		
 		# Update the shadows.
 		groupholder.shadow_group.update(main_clock)
 
 		# Draw the shadows.
 		for shadow in groupholder.shadow_group:
-			shadow.blit_to(window_surface)
+			shadow.blit_to(game_surface)
 
 		# Draw the blocks.
-		groupholder.block_group.draw(window_surface)
+		groupholder.block_group.draw(game_surface)
 
 		# Draw the paddles.
-		groupholder.paddle_group.draw(window_surface)
+		groupholder.paddle_group.draw(game_surface)
 
 		# Draw the powerups.
-		groupholder.powerup_group.draw(window_surface)
+		groupholder.powerup_group.draw(game_surface)
 
 		# Draw the particles.
 		for particle in groupholder.particle_group:
-			window_surface.fill(particle.color, particle.rect)
+			game_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
-		groupholder.ball_group.draw(window_surface)
+		groupholder.ball_group.draw(game_surface)
+
+		# Draw the background walls and overlying area.
+		game_surface.blit(wall_surface, (0, 0))
 
 		# Draw the players.
-		# groupholder.player_group.draw(window_surface)
+		# groupholder.player_group.draw(game_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(window_surface, main_clock, debug_font)
+			debug.display(game_surface, main_clock, debug_font)
+
+		pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT), window_surface)
+		#window_surface.blit(temp_surface, (0, 0))
 		
 		pygame.display.update()
 		

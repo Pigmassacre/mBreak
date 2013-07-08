@@ -14,18 +14,15 @@ from settings import *
 
 class Multiball(powerup.Powerup):
 
-	def __init__(self, x, y, width, height, color):
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	image = pygame.image.load("res/powerup/multiball.png")
+
+	def __init__(self, x, y, width, height):
 		# We start by calling the superconstructor.
 		powerup.Powerup.__init__(self, x, y, width, height)
 
 		# Load the image file.
-		self.image = pygame.image.load("res/powerup/multiball.png")
-
-		# Store the color.
-		self.color = color
-
-		# Colorize.
-		useful.colorize_image(self.image, self.color)
+		self.image = Multiball.image.copy()
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -46,7 +43,6 @@ class Multiball(powerup.Powerup):
 		max_speed = entity.max_speed
 		angle = entity.angle
 		damage = entity.damage
-		image_path = ("res/ball/ball.png")
 		owner = entity.owner
 
 		amount_to_spawn = 3
@@ -55,4 +51,4 @@ class Multiball(powerup.Powerup):
 			#angle = angle + ((2 * math.pi) / amount_to_spawn)
 			#x = x + math.cos(angle)
 			#y = y + math.cos(angle)
-			groupholder.ball_group.add(ball.Ball(x, y, width, height, angle, speed, max_speed, damage, image_path, owner))
+			groupholder.ball_group.add(ball.Ball(x, y, width, height, angle, speed, max_speed, damage, owner))

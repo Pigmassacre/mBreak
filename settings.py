@@ -1,12 +1,23 @@
 from pygame.locals import *
 
-# Base width and height is the actual game area width and height.
-BASE_WIDTH = 240
-BASE_HEIGHT = 135
+# Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
+GAME_SCALE = 2
+
+# Base width and height is the actual game width and height.
+BASE_WIDTH = 244 * GAME_SCALE
+BASE_HEIGHT = 140 * GAME_SCALE
+
+# Level width and height is the actual level width and height. Level x and y is the position in the base area that the level is placed in.
+LEVEL_WIDTH = 176 * GAME_SCALE
+LEVEL_HEIGHT = 120 * GAME_SCALE
+LEVEL_X = 34 * GAME_SCALE
+LEVEL_Y = 10 * GAME_SCALE
+LEVEL_MAX_X = LEVEL_X + LEVEL_WIDTH
+LEVEL_MAX_Y = LEVEL_Y + LEVEL_HEIGHT
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = 848
-SCREEN_HEIGHT = 477
+SCREEN_WIDTH = 976
+SCREEN_HEIGHT = 560
 
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (64, 64, 64)

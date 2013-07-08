@@ -15,10 +15,15 @@ from settings import *
 
 class Ball(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, image_path, owner):
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	image = pygame.image.load("res/ball/ball.png")
+	# Scale it to game_scale.
+	image = pygame.transform.scale(image, (image.get_width() * GAME_SCALE, image.get_height() * GAME_SCALE))
+
+	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
-		
+
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(x, y, width, height)
 
@@ -49,11 +54,11 @@ class Ball(pygame.sprite.Sprite):
 		groupholder.ball_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = pygame.image.load(image_path)
+		self.image = Ball.image.copy()
 
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
-
+		
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 		
@@ -123,7 +128,7 @@ class Ball(pygame.sprite.Sprite):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24
 			color = self.image.get_at((0, 0))
-			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color, 5))
+			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 2, self.rect.height / 2, angle, self.speed, retardation, color, 5))
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
@@ -303,37 +308,37 @@ class Ball(pygame.sprite.Sprite):
 		self.rect.y = self.y
 
 		# Check collision with x-edges.
-		if self.rect.x < 0:
+		if self.rect.x < LEVEL_X:
 			self.spawn_particle()
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
-			self.x = 0
+			self.x = LEVEL_X
 			self.rect.x = self.x
-		elif self.rect.x + self.rect.width > BASE_WIDTH:
+		elif self.rect.x + self.rect.width > LEVEL_MAX_X:
 			self.spawn_particle()
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
-			self.x = BASE_WIDTH - self.rect.width			
+			self.x = LEVEL_MAX_X - self.rect.width			
 			self.rect.x = self.x
 
 		# Check collision with y-edges.
-		if self.rect.y < 0:
+		if self.rect.y < LEVEL_Y:
 			self.spawn_particle()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
-			self.y = 0
+			self.y = LEVEL_Y
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > BASE_HEIGHT:
+		elif self.rect.y + self.rect.height > LEVEL_MAX_Y:
 			self.spawn_particle()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
-			self.y = BASE_HEIGHT - self.rect.height
+			self.y = LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y

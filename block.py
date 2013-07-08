@@ -10,6 +10,9 @@ from settings import *
 
 class Block(pygame.sprite.Sprite):
 
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	image = pygame.image.load("res/block/block.png")
+
 	def __init__(self, x, y, width, height, health, image_path, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
@@ -31,7 +34,7 @@ class Block(pygame.sprite.Sprite):
 		self.owner.block_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = pygame.image.load(image_path)
+		self.image = Block.image.copy()
 
 		# Set the color value, the image is colorized to this value.
 		self.color = color

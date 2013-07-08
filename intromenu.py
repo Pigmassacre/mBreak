@@ -96,9 +96,10 @@ def main(window_surface, game_surface, main_clock, debug_font):
 			# Display various debug information.
 			debug.display(game_surface, main_clock, debug_font)
 
+		window_surface.blit(game_surface, (0, 0))
 		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
-		temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
-		window_surface.blit(temp_surface, (0, 0))
+		#temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
+		#window_surface.blit(temp_surface, (0, 0))
 
 		pygame.display.update()
 		
