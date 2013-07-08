@@ -16,8 +16,8 @@ class Player(pygame.sprite.Sprite):
 		self.name = name
 		self.key_up = key_up
 		self.key_down = key_down
-		
-		# Create a group to store paddles in.
+
+		# Create and store the paddle.
 		self.paddle_group = pygame.sprite.Group()
 
 		# Create a group to store balls in.

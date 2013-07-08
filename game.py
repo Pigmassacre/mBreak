@@ -20,6 +20,28 @@ def create_block(x, y, owner):
 
 	return block.Block(x, y, health, owner)
 
+def setup_gamefield(player_left, player_right):
+	x_amount = 4
+	y_amount = (LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
+
+	for i in range(0, x_amount):
+		for j in range(0, y_amount):
+			create_block(LEVEL_X + (block.Block.width * 2) + (block.Block.width * i), LEVEL_Y + block.Block.height + (block.Block.height * j), player_left)
+			# Create a flipped right block.Block.
+			temp_block_right = create_block(LEVEL_MAX_X - (block.Block.width * 3) - (block.Block.width * i), LEVEL_Y + block.Block.height + (block.Block.height * j), player_right)
+			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
+
+	# Create and store the paddle.
+	left_paddle_x = LEVEL_X + (x_amount * block.Block.width) + (block.Block.width * 3)
+	left_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - 16) / 2
+	player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
+
+	right_paddle_x = LEVEL_MAX_X - (x_amount * block.Block.width) - (block.Block.width * 4)
+	right_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - 16) / 2
+	paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_right)
+	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
+	player_right.paddle_group.add(paddle_right)
+
 def create_player_left():
 	name = PLAYER_LEFT_NAME
 	key_up = PLAYER_LEFT_KEY_UP
@@ -67,22 +89,12 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 	# Create the left player.
 	player_left = create_player_left()
-	# Create and store the players paddle.
-	paddle_left = paddle.Paddle(LEVEL_X + (4 * 6), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_left)
 	
 	# Create the right player.
 	player_right = create_player_right()
-	# Create and store the players paddle. Flipped.
-	paddle_right = paddle.Paddle(LEVEL_MAX_X - (4 * 7), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_right)
-	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 
-	# Spawn some blocks.
-	for i in range(0, 3):
-		for j in range(0, 13):
-			create_block(LEVEL_X + 8 + (4 * i), LEVEL_Y + 8 + (8 * j), player_left)
-			# Create a flipped right block.
-			temp_block_right = create_block((LEVEL_MAX_X - 48) - (4 * i), LEVEL_Y + 8 + (8 * j), player_right)
-			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
+	# Setup the game world.
+	setup_gamefield(player_left, player_right)
 
 	while not done:
 		# Begin a frame by blitting the background to the game_surface.
@@ -95,15 +107,15 @@ def main(window_surface, game_surface, main_clock, debug_font):
 				destroy_groups()
 				done = True
 			elif event.type == KEYDOWN and event.key == K_l:
-				debug.create_ball_left(player_left, paddle_left)
+				debug.create_ball_left(player_left)
 			elif event.type == KEYDOWN and event.key == K_r:
-				debug.create_ball_right(player_right, paddle_right)
+				debug.create_ball_right(player_right)
 			elif event.type == KEYDOWN and event.key == K_p:
 				debug.create_powerup()
 		
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
 		if DEBUG_MODE:
-			debug.update(player_left, player_right, paddle_left, paddle_right)
+			debug.update(player_left, player_right)
 
 		# Update the balls.
 		groupholder.ball_group.update()

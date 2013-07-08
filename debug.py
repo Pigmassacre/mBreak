@@ -26,18 +26,18 @@ def create_powerup():
 
 	return multiball.Multiball(x, y)
 
-def create_ball_left(player_left, paddle_left):
-	temp_ball = create_ball(paddle_left.x + 8, paddle_left.y, player_left)
-	temp_ball.owner = player_left
 
-def create_ball_right(player_right, paddle_right):
-	temp_ball = create_ball(paddle_right.x - 16, paddle_right.y, player_right)
-	temp_ball.owner = player_right
-
-def update(player_left, player_right, paddle_left, paddle_right):
-	if pygame.key.get_pressed()[K_SPACE]:
-		temp_ball = create_ball(paddle_left.x + 8, paddle_left.y, player_left)
+def create_ball_left(player_left):
+	for paddle in player_left.paddle_group:
+		temp_ball = create_ball(paddle.x + 8, paddle.y, player_left)
 		temp_ball.owner = player_left
 
-		temp_ball = create_ball(paddle_right.x - 16, paddle_right.y, player_right)
+def create_ball_right(player_right):
+	for paddle in player_right.paddle_group:
+		temp_ball = create_ball(paddle.x - 16, paddle.y, player_right)
 		temp_ball.owner = player_right
+
+def update(player_left, player_right):
+	if pygame.key.get_pressed()[K_SPACE]:
+		create_ball_left(player_left)
+		create_ball_left(player_right,)
