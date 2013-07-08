@@ -6,11 +6,12 @@ import pygame
 import math
 import shadow
 import useful
+import groupholder
 from settings import *
 
 class Particle(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, width, height, angle, speed, retardation, color, alpha_step = 0):
+	def __init__(self, x, y, width, height, angle, speed, retardation, color, alpha_step=0):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -40,6 +41,13 @@ class Particle(pygame.sprite.Sprite):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self, self.shadow_color, True, True)
 
+		# Add self to the main particle_group.
+		groupholder.particle_group.add(self)
+
+	def destroy(self):
+		self.kill()
+		self.shadow.kill()
+
 	def update(self):
 		# Update speed, and kill self if speed gets to or under 0.
 		self.speed = self.speed - self.retardation
@@ -58,3 +66,13 @@ class Particle(pygame.sprite.Sprite):
 		self.y = self.y + (math.sin(self.angle) * self.speed)
 		self.rect.x = self.x
 		self.rect.y = self.y
+
+		# Kill the particle if it is no longer in the visible game area.
+		if self.rect.x + self.rect.width <= LEVEL_X:
+			self.destroy()
+		elif self.rect.x >= LEVEL_MAX_X:
+			self.destroy()
+		if self.rect.y + self.rect.height <= LEVEL_Y:
+			self.destroy()
+		elif self.rect.y >= LEVEL_MAX_Y:
+			self.destroy()

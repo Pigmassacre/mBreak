@@ -53,15 +53,12 @@ class Paddle(pygame.sprite.Sprite):
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
 
-		# Add self to to owners paddle_group and main paddle_group.
-		self.owner.paddle_group.add(self)
-		groupholder.paddle_group.add(self)
-
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
-		if DEBUG_MODE:
-			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
+		# Add self to to owners paddle_group and main paddle_group.
+		self.owner.paddle_group.add(self)
+		groupholder.paddle_group.add(self)
 
 	def update(self, key_up, key_down):
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.

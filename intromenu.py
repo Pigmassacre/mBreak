@@ -30,12 +30,10 @@ def setup_logo():
 
 def setup_message(x, y):
 	text = "Press ENTER to start"
-	font_path = "fonts/8-BIT WONDER.TTF"
-	font_size = 9
 	font_color = (255, 255, 255)
 	alpha_value = 255
 
-	text = textitem.TextItem(text, font_path, font_size, font_color, alpha_value)
+	text = textitem.TextItem(text, font_color, alpha_value)
 
 	text.x = (BASE_WIDTH - text.get_width()) // 2
 	text.y = (BASE_HEIGHT / 2)

@@ -29,18 +29,15 @@ def create_powerup():
 def create_ball_left(player_left, paddle_left):
 	temp_ball = create_ball(paddle_left.x + 8, paddle_left.y, player_left)
 	temp_ball.owner = player_left
-	print("Ball added to Player Left.")
 
 def create_ball_right(player_right, paddle_right):
 	temp_ball = create_ball(paddle_right.x - 16, paddle_right.y, player_right)
 	temp_ball.owner = player_right
-	print("Ball added to Player Right.")
 
 def update(player_left, player_right, paddle_left, paddle_right):
 	if pygame.key.get_pressed()[K_SPACE]:
 		temp_ball = create_ball(paddle_left.x + 8, paddle_left.y, player_left)
 		temp_ball.owner = player_left
-		print("Ball added to Player Left.")
+
 		temp_ball = create_ball(paddle_right.x - 16, paddle_right.y, player_right)
 		temp_ball.owner = player_right
-		print("Ball added to Player Right.")

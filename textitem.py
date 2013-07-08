@@ -8,22 +8,51 @@ from settings import *
 
 class TextItem:
 
-	def __init__(self, text_value, font_path, font_size, font_color, alpha_value):
-		self.x = 0
-		self.y = 0
+	# Initialize the font module.
+	pygame.font.init()
+
+	# The standard text values are store here, such as standard font, font size and so on.
+	font_path = "fonts/8-BIT WONDER.TTF"
+	font_size = 9 * GAME_SCALE
+	font = pygame.font.Font(font_path, font_size)
+	x = 0
+	y = 0
+	shadow_offset = 3
+	shadow_color = pygame.Color(0, 0, 0, 255)
+
+	def __init__(self, text_value, font_color, alpha_value):
+		# Load default values.
+		self.x = TextItem.x
+		self.y = TextItem.y
+		self.font = TextItem.font
+
+		# Set the given values.
 		self.text_value = text_value
 		self.font_color = font_color
-		self.font = pygame.font.Font(font_path, font_size)
+
+		# Render the font surface.
 		self.surface = self.font.render(self.text_value, False, self.font_color)
 		self.surface.set_alpha(alpha_value)
 
-		# Store the color.
-		self.shadow_color = pygame.Color(TEXT_SHADOW_COLOR[0], TEXT_SHADOW_COLOR[1], TEXT_SHADOW_COLOR[2], TEXT_SHADOW_COLOR[3])
+		# Setup the shadow.
+		self.shadow_color = TextItem.shadow_color
+		self.shadow_offset = TextItem.shadow_offset
+
 		# Create the surface used for drawing the shadow.
 		self.shadow_surface = self.font.render(self.text_value, False, self.shadow_color)
 		self.shadow_surface.set_alpha(alpha_value)
-		# Store the offset, the distance from the parent the shadow is drawn from.
-		self.shadow_offset = TEXT_SHADOW_OFFSET
+
+	def set_font(self, font_path):
+		if not self.font_path == font_path:
+			self.font = pygame.font.Font(font_path, self.font_size)
+
+	def set_size(self, font_size):
+		if not self.font_size == font_size:
+			temp_alpha = self.surface.get_alpha()
+			self.font_size = font_size
+			self.font = pygame.font.Font(self.font_path, self.font_size)
+			self.surface = self.font.render(self.text_value, False, self.font_color)
+			self.surface.set_alpha(temp_alpha)
 
 	def get_width(self):
 		return self.font.size(self.text_value)[0]

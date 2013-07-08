@@ -13,8 +13,8 @@ class Shadow(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	offset_x = 3
 	offset_y = 4
-	linger_time = 2000
-	alpha_step = 25
+	linger_time = 1000
+	alpha_step = 50
 
 	def __init__(self, parent, color=pygame.Color(0, 0, 0, 128), linger=False, fill=False):
 		# We start by calling the superconstructor.

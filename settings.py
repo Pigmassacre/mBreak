@@ -1,6 +1,7 @@
 from pygame.locals import *
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
+# The higher the game scale, the larger the actual area of the game, and a much larger CPU-demand.
 GAME_SCALE = 2
 
 # Base width and height is the actual game width and height.
@@ -24,16 +25,11 @@ BACKGROUND_COLOR = (64, 64, 64)
 MAX_FPS = 60
 
 """ Graphical settings """
-# Ball settings
-BALL_TRAILS = False
-
 # Shadow settings
 SHADOWS = True
 
 # Text shadow settings
 TEXT_SHADOWS = True
-TEXT_SHADOW_OFFSET = 3
-TEXT_SHADOW_COLOR = (0, 0, 0, 255)
 
 # Music settings
 TITLE_MUSIC = "res/music/title_screen.ogg"

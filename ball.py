@@ -53,10 +53,6 @@ class Ball(pygame.sprite.Sprite):
 		# Store the owner.
 		self.owner = owner
 
-		# Store the ball in the owners ball_group and the main ball_group.
-		self.owner.ball_group.add(self)
-		groupholder.ball_group.add(self)
-
 		# Create the image attribute that is drawn to the surface.
 		self.image = Ball.image.copy()
 
@@ -65,10 +61,11 @@ class Ball(pygame.sprite.Sprite):
 		
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
-		
-		if DEBUG_MODE:
-			print("Ball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ") with angle " + str(self.angle) + " and speed " + str(self.speed))
 
+		# Store the ball in the owners ball_group and the main ball_group.
+		self.owner.ball_group.add(self)
+		groupholder.ball_group.add(self)
+		
 	def calculate_spin(self, paddle):
 		if self.angle < (math.pi / 2):
 			# If angle is between 0 and 90 degrees.
@@ -131,8 +128,9 @@ class Ball(pygame.sprite.Sprite):
 		for i in range(0, 2):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24
+			# Takes the top-left color value of self as the color of the particle.
 			color = self.image.get_at((0, 0))
-			groupholder.particle_group.add(particle.Particle(self.x, self.y, self.rect.width / 2, self.rect.height / 2, angle, self.speed, retardation, color, 5))
+			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color, 5)
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
@@ -303,9 +301,8 @@ class Ball(pygame.sprite.Sprite):
 			self.angle = self.angle - (2 * math.pi)
 		elif self.angle < 0:
 			self.angle = (2 * math.pi) + self.angle
-
 			
-		# Finally, move the ball with speed in consideration.
+		# Move the ball with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)
 		self.y = self.y + (math.sin(self.angle) * self.speed)
 		self.rect.x = self.x

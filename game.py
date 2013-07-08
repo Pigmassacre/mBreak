@@ -86,6 +86,7 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 	while not done:
 		# Begin a frame by blitting the background to the game_surface.
+		game_surface.fill(BACKGROUND_COLOR)
 		game_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
 		
 		for event in pygame.event.get():
@@ -137,7 +138,7 @@ def main(window_surface, game_surface, main_clock, debug_font):
 		groupholder.ball_group.draw(game_surface)
 
 		# Draw the background walls and overlying area.
-		game_surface.blit(wall_surface, (0, 0))
+		game_surface.blit(wall_surface, (LEVEL_X - 8, LEVEL_Y - 8))
 
 		# Draw the players.
 		# groupholder.player_group.draw(game_surface)
