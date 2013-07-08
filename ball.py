@@ -46,7 +46,7 @@ class Ball(pygame.sprite.Sprite):
 			self.speed = speed
 		else:
 			self.speed = self.max_speed
-
+		
 		# Store the damage value, this is the damage the ball does to a block when it collides with it.
 		self.damage = damage
 		
@@ -127,7 +127,7 @@ class Ball(pygame.sprite.Sprite):
 	def spawn_particle(self):
 		for i in range(0, 2):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
-			retardation = self.speed / 24
+			retardation = self.speed / 24.0
 			# Takes the top-left color value of self as the color of the particle.
 			color = self.image.get_at((0, 0))
 			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color, 5)

@@ -26,7 +26,7 @@ class Particle(pygame.sprite.Sprite):
 		self.angle = angle
 		self.speed = speed
 		self.retardation = retardation
-
+		
 		# Setup alpha values.
 		self.alpha_step = alpha_step
 		self.alpha = 255
@@ -53,8 +53,8 @@ class Particle(pygame.sprite.Sprite):
 		self.speed = self.speed - self.retardation
 		if self.speed <= 0:
 			self.kill()
-
-		# Update the alpha in the RGBA color value.
+		
+		# Update the alpha in the RGBA color value. If it gets to or under 0, kill self.
 		if self.alpha_step > 0:
 			if self.color.a - self.alpha_step < 0:
 				self.kill()
