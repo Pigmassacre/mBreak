@@ -150,7 +150,7 @@ def main(window_surface, game_surface, main_clock, debug_font):
 		groupholder.ball_group.draw(game_surface)
 
 		# Draw the background walls and overlying area.
-		game_surface.blit(wall_surface, (LEVEL_X - 8, LEVEL_Y - 8))
+		game_surface.blit(wall_surface, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y - (4 * GAME_SCALE)))
 
 		# Draw the players.
 		# groupholder.player_group.draw(game_surface)

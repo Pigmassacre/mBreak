@@ -22,7 +22,7 @@ class Ball(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = 4 * GAME_SCALE
 	height = 4 * GAME_SCALE
-	max_speed = 3 * GAME_SCALE
+	max_speed = 2 * GAME_SCALE
 
 	def __init__(self, x, y, angle, speed, damage, owner):
 		# We start by calling the superconstructor.
