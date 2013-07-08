@@ -10,7 +10,13 @@ from settings import *
 
 class Shadow(pygame.sprite.Sprite):
 
-	def __init__(self, parent, offset_x=SHADOW_OFFSET_X, offset_y=SHADOW_OFFSET_Y, time_out=False, fill=False, color=SHADOW_COLOR):
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	offset_x = 3
+	offset_y = 4
+	linger_time = 2000
+	alpha_step = 25
+
+	def __init__(self, parent, color=pygame.Color(0, 0, 0, 128), linger=False, fill=False):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -21,19 +27,19 @@ class Shadow(pygame.sprite.Sprite):
 		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
 
 		# Store the offset, the distance from the parent the shadow is drawn from.
-		self.offset_x = offset_x
-		self.offset_y = offset_y
+		self.offset_x = Shadow.offset_x
+		self.offset_y = Shadow.offset_y
 
 		# Store the variables used when timing out the shadow.
-		self.time_out = time_out
-		self.time_left = SHADOW_LINGER_TIME
-		self.alpha_step = SHADOW_ALPHA_STEP
+		self.linger = linger
+		self.linger_time_left = Shadow.linger_time
+		self.alpha_step = Shadow.alpha_step
 
 		# Store whether or not to use image resource or fill blitting.
 		self.fill = fill
 
 		# Store the color.
-		self.color = pygame.Color(color[0], color[1], color[2], color[3])
+		self.color = color
 
 		# Copy the parents image, and then colorize it to the shadow color.
 		if not self.fill:
@@ -48,7 +54,7 @@ class Shadow(pygame.sprite.Sprite):
 		else:
 			# If using fill instead of image, create a new surface to handle alpha.
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
-		
+
 		# Add self to the main shadow_group.
 		groupholder.shadow_group.add(self)
 
@@ -60,15 +66,15 @@ class Shadow(pygame.sprite.Sprite):
 			window_surface.blit(self.image, self.rect)
 
 	def update(self, main_clock):
-		if self.time_out:
-			self.time_left = self.time_left - main_clock.get_time()
-			if self.time_left <= 0:
+		if self.linger:
+			self.linger_time_left = self.linger_time_left - main_clock.get_time()
+			if self.linger_time_left <= 0:
 				if self.color.a - self.alpha_step < 0:
 					self.kill()
 				else:
 					self.color.a = self.color.a - self.alpha_step
 
-		# Move the shadow so it's under whatever object it's supposed to shadow.
+		# Move the shadow so it's under its parent.
 		self.x = self.parent.x + self.offset_x
 		self.y = self.parent.y + self.offset_y
 		self.rect.x = self.x

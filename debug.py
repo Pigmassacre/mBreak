@@ -14,22 +14,17 @@ def display(window_surface, main_clock, debug_font):
 	window_surface.blit(debug_font.render(str(int(main_clock.get_fps())), False, (255, 255, 255)), (25, 25))
 
 def create_ball(x, y, owner):
-	width = 4 * GAME_SCALE
-	height = 4 * GAME_SCALE
 	speed = random.uniform(1, 3) * GAME_SCALE
-	max_speed = 3 * GAME_SCALE
 	angle = random.uniform(0, 2*math.pi)
 	damage = 1
 
-	return ball.Ball(x, y, width, height, angle, speed, max_speed, damage, owner)
+	return ball.Ball(x, y, angle, speed, damage, owner)
 
 def create_powerup():
-	width = 8 * GAME_SCALE
-	height = 8 * GAME_SCALE
-	x = random.uniform((LEVEL_MAX_X / 2) - 20, (LEVEL_MAX_X / 2) + 20)
-	y = random.uniform((LEVEL_MAX_Y / 2) - 20, (LEVEL_MAX_Y / 2) + 20)
+	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - 20, LEVEL_X + (LEVEL_WIDTH / 2) + 20)
+	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - 20, LEVEL_Y + (LEVEL_HEIGHT / 2) + 20)
 
-	return multiball.Multiball(x, y, width, height)
+	return multiball.Multiball(x, y)
 
 def create_ball_left(player_left, paddle_left):
 	temp_ball = create_ball(paddle_left.x + 8, paddle_left.y, player_left)

@@ -5,7 +5,6 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import paddle
-import trail
 import random
 import particle
 import shadow
@@ -20,12 +19,17 @@ class Ball(pygame.sprite.Sprite):
 	# Scale it to game_scale.
 	image = pygame.transform.scale(image, (image.get_width() * GAME_SCALE, image.get_height() * GAME_SCALE))
 
-	def __init__(self, x, y, width, height, angle, speed, max_speed, damage, owner):
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = 4 * GAME_SCALE
+	height = 4 * GAME_SCALE
+	max_speed = 3 * GAME_SCALE
+
+	def __init__(self, x, y, angle, speed, damage, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
 		# Create the rect used for collision detection, position etc.
-		self.rect = pygame.rect.Rect(x, y, width, height)
+		self.rect = pygame.rect.Rect(x, y, Ball.width, Ball.height)
 
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
@@ -35,7 +39,7 @@ class Ball(pygame.sprite.Sprite):
 		self.angle = angle
 
 		# Set maximum speed of the ball.
-		self.max_speed = max_speed
+		self.max_speed = Ball.max_speed
 
 		# Set the speed variable.
 		if speed <= self.max_speed:

@@ -15,26 +15,33 @@ class Paddle(pygame.sprite.Sprite):
 	# Scale it to game_scale.
 	image = pygame.transform.scale(image, (image.get_width() * GAME_SCALE, image.get_height() * GAME_SCALE))
 
-	def __init__(self, x, y, width, height, acceleration, retardation, max_speed, owner):
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = 4 * GAME_SCALE
+	height = 16 * GAME_SCALE
+	acceleration = 1 * GAME_SCALE
+	retardation = 2 * GAME_SCALE
+	max_speed = 4 * GAME_SCALE
+
+	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
 		# Create the rect used for collision detection, position etc.
-		self.rect = pygame.rect.Rect(x, y, width, height)
+		self.rect = pygame.rect.Rect(x, y, Paddle.width, Paddle.height)
 
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
 		self.y = y
 
+		# The velocity at which the Paddle will be moved when it is updated.
 		self.velocity_y = 0
 
-		self.acceleration = acceleration
+		# These values affect the velocity of the paddle.
+		self.acceleration = Paddle.acceleration
+		self.retardation = Paddle.retardation
+		self.max_speed = Paddle.max_speed
 
-		self.retardation = retardation
-
-		self.max_speed = max_speed
-
-		# Store the owner.
+		# The owner is the player that owns the paddle.
 		self.owner = owner
 
 		# Store the paddle in the owners paddle_group.
@@ -57,6 +64,7 @@ class Paddle(pygame.sprite.Sprite):
 			print("Paddle spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def update(self, key_up, key_down):
+		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		if pygame.key.get_pressed()[key_up]:
 			self.velocity_y = self.velocity_y - self.acceleration
 			if self.velocity_y < -self.max_speed:
@@ -74,6 +82,7 @@ class Paddle(pygame.sprite.Sprite):
 			if self.velocity_y > 0:
 				self.velocity_y = 0
 
+		# Move the paddle according to its velocity.
 		self.y = self.y + self.velocity_y
 		self.rect.y = self.y
 

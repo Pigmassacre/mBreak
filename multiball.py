@@ -17,9 +17,13 @@ class Multiball(powerup.Powerup):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/powerup/multiball.png")
 
-	def __init__(self, x, y, width, height):
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = 8 * GAME_SCALE
+	height = 8 * GAME_SCALE
+
+	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, width, height)
+		powerup.Powerup.__init__(self, x, y, Multiball.width, Multiball.height)
 
 		# Load the image file.
 		self.image = Multiball.image.copy()

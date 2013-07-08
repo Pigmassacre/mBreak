@@ -16,21 +16,9 @@ import groupholder
 from settings import *
 
 def create_block(x, y, owner):
-	width = 4 * GAME_SCALE
-	height = 8 * GAME_SCALE
 	health = 2
-	image_path = "res/block/block.png"
 
-	return block.Block(x, y, width, height, health, image_path, owner)
-
-def create_paddle(x, y, owner):
-	width = 4 * GAME_SCALE
-	height = 16 * GAME_SCALE
-	acceleration = 1 * GAME_SCALE
-	retardation = 2 * GAME_SCALE
-	max_speed = 4 * GAME_SCALE
-
-	return paddle.Paddle(x, y, width, height, acceleration, retardation, max_speed, owner)
+	return block.Block(x, y, health, owner)
 
 def create_player_left():
 	name = PLAYER_LEFT_NAME
@@ -80,12 +68,12 @@ def main(window_surface, game_surface, main_clock, debug_font):
 	# Create the left player.
 	player_left = create_player_left()
 	# Create and store the players paddle.
-	paddle_left = create_paddle(LEVEL_X + (4 * 6), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_left)
+	paddle_left = paddle.Paddle(LEVEL_X + (4 * 6), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_left)
 	
 	# Create the right player.
 	player_right = create_player_right()
 	# Create and store the players paddle. Flipped.
-	paddle_right = create_paddle(LEVEL_MAX_X - (4 * 7), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_right)
+	paddle_right = paddle.Paddle(LEVEL_MAX_X - (4 * 7), (LEVEL_Y + LEVEL_HEIGHT - 16) / 2, player_right)
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 
 	# Spawn some blocks.
@@ -98,7 +86,6 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 	while not done:
 		# Begin a frame by blitting the background to the game_surface.
-		#game_surface.fill(BACKGROUND_COLOR)
 		game_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
 		
 		for event in pygame.event.get():
