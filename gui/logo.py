@@ -8,6 +8,9 @@ from settings.settings import *
 
 class Logo:
 
+	# TODO: Make a spritesheet, load each sprite in the spritesheet to a surface and then scale those images with game_scale.
+	# Then create the pyganim from those surfaces (pyganim takes either a filepath or a surface as an argument).
+
 	logo = pyganim.PygAnimation([("res/logo/mBreakTitle_01.png", 1.55),
 								("res/logo/mBreakTitle_02.png", 0.075),
 								("res/logo/mBreakTitle_03.png", 0.075),
