@@ -34,15 +34,17 @@ def setup_gamefield(player_left, player_right):
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 	# Create and store the paddle.
-	left_paddle_x = LEVEL_X + (x_amount * block.Block.width) + (block.Block.width * 3)
-	left_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - block.Block.height) / 2
+	left_paddle_x = LEVEL_X + (x_amount * paddle.Paddle.width) + (paddle.Paddle.width * 3)
+	left_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 	player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
 
-	right_paddle_x = LEVEL_MAX_X - (x_amount * block.Block.width) - (block.Block.width * 4)
-	right_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - block.Block.height) / 2
+	right_paddle_x = LEVEL_MAX_X - (x_amount * paddle.Paddle.width) - (paddle.Paddle.width * 4)
+	right_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 	paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_right)
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 	player_right.paddle_group.add(paddle_right)
+
+	print("paddle y's: " + str(left_paddle_y) + " " + str(right_paddle_y))
 
 def create_player_left():
 	name = PLAYER_LEFT_NAME

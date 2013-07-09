@@ -45,8 +45,11 @@ class Shadow(pygame.sprite.Sprite):
 		if not self.fill:
 			self.image = self.parent.image.copy()
 			
-			# Colorize the image.
-			useful.colorize_image(self.image, self.color)
+			# Colorize the image. If the image doesn't have any alpha values, don't blend alphas. If it does, do blend alphas.
+			if self.image.get_alpha() == None:
+				useful.colorize_image(self.image, self.color)
+			else:
+				useful.colorize_image(self.image, self.color, True)
 
 			# Convert to alpha and apply the alpha value.
 			self.image.convert_alpha()
