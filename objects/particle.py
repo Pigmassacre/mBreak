@@ -4,11 +4,11 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import math
-import shadow
-import useful
-import groups
 import copy
-from settings import *
+import other.useful as useful
+import objects.shadow as shadow
+import objects.groups as groups
+from settings.settings import *
 
 class Particle(pygame.sprite.Sprite):
 

@@ -4,11 +4,11 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
-from settings import *
-import useful
+import other.useful as useful
+from settings.settings import *
 
 # Import any needed game screens here.
-import splash
+import screens.splash as splash
 
 def main():
 	""" The following parts are the ones that run first when booting up the game. """

@@ -5,15 +5,15 @@ __license__ = "All Rights Reserved"
 import pygame, sys
 from pygame.locals import *
 from libs import pyganim
-from settings import *
-import useful
-import textitem
-import logo
-import debug
 import math
+import other.debug as debug
+import other.useful as useful
+import gui.textitem as texitem
+import gui.logo as logo
+from settings.settings import *
 
 # Import any needed game screens here.
-import intromenu
+import screens.intromenu as intromenu
 
 def main(window_surface, main_clock, debug_font):
 	# Setup the splash image.

@@ -3,11 +3,11 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import multiball
 import random
 import math
-import ball
-from settings import *
+import objects.multiball as multiball
+import objects.ball as ball
+from settings.settings import *
 
 def display(window_surface, main_clock, debug_font):
 	# Display the current FPS.

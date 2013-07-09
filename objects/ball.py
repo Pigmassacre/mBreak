@@ -4,13 +4,13 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import math
-import paddle
 import random
-import particle
-import shadow
-import useful
-import groups
-from settings import *
+import other.useful as useful
+import objects.paddle as paddle
+import objects.particle as particle
+import objects.shadow as shadow
+import objects.groups as groups
+from settings.settings import *
 
 def convert():
 	Ball.image.convert()

@@ -4,9 +4,9 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import math
-import useful
-import groups
-from settings import *
+import other.useful as useful
+import objects.groups as groups
+from settings.settings import *
 
 class Shadow(pygame.sprite.Sprite):
 

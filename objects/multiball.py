@@ -3,14 +3,14 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import powerup
-import useful
-import shadow
-import ball
 import random
 import math
-import groups
-from settings import *
+import other.useful as useful
+import objects.powerup as powerup
+import objects.shadow as shadow
+import objects.ball as ball
+import objects.groups as groups
+from settings.settings import *
 
 def convert():
 	Multiball.image.convert_alpha()

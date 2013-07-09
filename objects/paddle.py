@@ -3,10 +3,10 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import useful
-import shadow
-import groups
-from settings import *
+import other.useful as useful
+import objects.shadow as shadow
+import objects.groups as groups
+from settings.settings import *
 
 def convert():
 	Paddle.image.convert()

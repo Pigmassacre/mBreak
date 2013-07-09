@@ -3,9 +3,9 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import groups
+import objects.groups as groups
 from pygame.locals import *
-from settings import *
+from settings.settings import *
 
 class Player(pygame.sprite.Sprite):
 

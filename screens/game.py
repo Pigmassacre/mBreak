@@ -6,14 +6,14 @@ import pygame, sys
 from pygame.locals import *
 import math
 import random
-import debug
-import ball
-import paddle
-import player
-import multiball
-import block
-import groups
-from settings import *
+import other.debug as debug
+import objects.ball as ball
+import objects.paddle as paddle
+import objects.player as player
+import objects.multiball as multiball
+import objects.block as block
+import objects.groups as groups
+from settings.settings import *
 
 # Import any needed game screens here.
 

@@ -4,7 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from libs import pyganim
-from settings import *
+from settings.settings import *
 
 class Logo:
 

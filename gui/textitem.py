@@ -4,7 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import math
-from settings import *
+from settings.settings import *
 
 class TextItem:
 

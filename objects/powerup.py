@@ -3,8 +3,8 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import groups
-from settings import *
+import objects.groups as groups
+from settings.settings import *
 
 class Powerup(pygame.sprite.Sprite):
 
