@@ -6,10 +6,14 @@ import pygame
 import math
 import shadow
 import useful
-import groupholder
+import groups
+import copy
 from settings import *
 
 class Particle(pygame.sprite.Sprite):
+
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	shadow_blend_color = pygame.Color(100, 100, 100, 255)
 
 	def __init__(self, x, y, width, height, angle, speed, retardation, color, alpha_step=0):
 		# We start by calling the superconstructor.
@@ -32,17 +36,16 @@ class Particle(pygame.sprite.Sprite):
 		self.alpha = 255
 
 		# Setup the color values, used for drawing the particle.
-		self.color = pygame.Color(color.r, color.g, color.b, color.a)
+		self.color = copy.copy(color)
 
 		# Setup shadow color value, used for coloring the shadow.
-		self.shadow_blend_color = pygame.Color(100, 100, 100, 255)
-		self.shadow_color = useful.blend_colors(self.color, self.shadow_blend_color)
+		self.shadow_color = useful.blend_colors(self.color, Particle.shadow_blend_color)
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self, self.shadow_color, True, True)
 
 		# Add self to the main particle_group.
-		groupholder.particle_group.add(self)
+		groups.Groups.particle_group.add(self)
 
 	def destroy(self):
 		self.kill()

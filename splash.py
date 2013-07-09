@@ -5,12 +5,12 @@ __license__ = "All Rights Reserved"
 import pygame, sys
 from pygame.locals import *
 from libs import pyganim
+from settings import *
 import useful
 import textitem
 import logo
 import debug
 import math
-from settings import *
 
 # Import any needed game screens here.
 import intromenu

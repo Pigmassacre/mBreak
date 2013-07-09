@@ -2,10 +2,12 @@ __author__ = "Olof Karlsson"
 __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 from pygame.locals import *
-import useful
 from settings import *
+import useful
+
+# Import any needed game screens here.
 import splash
 
 def main():

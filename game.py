@@ -12,8 +12,10 @@ import paddle
 import player
 import multiball
 import block
-import groupholder
+import groups
 from settings import *
+
+# Import any needed game screens here.
 
 def create_block(x, y, owner):
 	health = 2
@@ -62,20 +64,6 @@ def create_player_right():
 	
 	return player_right
 
-"""
-I should come up with a good way to handle the sprite groups and stick to it.
-I can either pass the groups to each method/class as they are needed, or I can have 
-a global groupholder module that holds all the groups.
-"""
-def destroy_groups():
-	groupholder.ball_group.empty()
-	groupholder.particle_group.empty()
-	groupholder.block_group.empty()
-	groupholder.powerup_group.empty()
-	groupholder.paddle_group.empty()
-	groupholder.player_group.empty()
-	groupholder.shadow_group.empty()
-
 def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
@@ -116,7 +104,7 @@ def main(window_surface, main_clock, debug_font):
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 				# Return to intromenu.
-				destroy_groups()
+				groups.empty()
 				done = True
 			elif event.type == KEYDOWN and event.key == K_l:
 				debug.create_ball_left(player_left)
@@ -130,36 +118,36 @@ def main(window_surface, main_clock, debug_font):
 			debug.update(player_left, player_right)
 
 		# Update the balls.
-		groupholder.ball_group.update()
+		groups.Groups.ball_group.update()
 		
 		# Update the particles.
-		groupholder.particle_group.update()
+		groups.Groups.particle_group.update()
 		
 		# Update the players.
-		groupholder.player_group.update()
+		groups.Groups.player_group.update()
 		
 		# Update the shadows.
-		groupholder.shadow_group.update(main_clock)
+		groups.Groups.shadow_group.update(main_clock)
 
 		# Draw the shadows.
-		for shadow in groupholder.shadow_group:
+		for shadow in groups.Groups.shadow_group:
 			shadow.blit_to(window_surface)
 
 		# Draw the blocks.
-		groupholder.block_group.draw(window_surface)
+		groups.Groups.block_group.draw(window_surface)
 
 		# Draw the paddles.
-		groupholder.paddle_group.draw(window_surface)
+		groups.Groups.paddle_group.draw(window_surface)
 
 		# Draw the powerups.
-		groupholder.powerup_group.draw(window_surface)
+		groups.Groups.powerup_group.draw(window_surface)
 
 		# Draw the particles.
-		for particle in groupholder.particle_group:
+		for particle in groups.Groups.particle_group:
 			window_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
-		groupholder.ball_group.draw(window_surface)
+		groups.Groups.ball_group.draw(window_surface)
 
 		# Draw the background walls and overlying area.
 		window_surface.blit(wall_horizontal, (LEVEL_X, LEVEL_Y - (4 * GAME_SCALE)))
@@ -172,7 +160,7 @@ def main(window_surface, main_clock, debug_font):
 		window_surface.blit(corner_top_right, (LEVEL_X - (4 * GAME_SCALE), LEVEL_MAX_Y))
 
 		# Draw the players.
-		# groupholder.player_group.draw(window_surface)
+		# groups.Groups.player_group.draw(window_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.

@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import useful
 import shadow
-import groupholder
+import groups
 from settings import *
 
 def convert():
@@ -62,7 +62,7 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Add self to to owners paddle_group and main paddle_group.
 		self.owner.paddle_group.add(self)
-		groupholder.paddle_group.add(self)
+		groups.Groups.paddle_group.add(self)
 
 	def update(self, key_up, key_down):
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.

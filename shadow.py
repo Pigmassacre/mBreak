@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import useful
-import groupholder
+import groups
 from settings import *
 
 class Shadow(pygame.sprite.Sprite):
@@ -56,7 +56,7 @@ class Shadow(pygame.sprite.Sprite):
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
 
 		# Add self to the main shadow_group.
-		groupholder.shadow_group.add(self)
+		groups.Groups.shadow_group.add(self)
 
 	def blit_to(self, window_surface):
 		if self.fill:

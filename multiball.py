@@ -9,7 +9,7 @@ import shadow
 import ball
 import random
 import math
-import groupholder
+import groups
 from settings import *
 
 def convert():
@@ -60,4 +60,4 @@ class Multiball(powerup.Powerup):
 			#angle = angle + ((2 * math.pi) / amount_to_spawn)
 			#x = x + math.cos(angle)
 			#y = y + math.cos(angle)
-			groupholder.ball_group.add(ball.Ball(x, y, angle, speed, damage, owner))
+			groups.Groups.ball_group.add(ball.Ball(x, y, angle, speed, damage, owner))

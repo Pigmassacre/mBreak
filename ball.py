@@ -9,7 +9,7 @@ import random
 import particle
 import shadow
 import useful
-import groupholder
+import groups
 from settings import *
 
 def convert():
@@ -68,7 +68,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Store the ball in the owners ball_group and the main ball_group.
 		self.owner.ball_group.add(self)
-		groupholder.ball_group.add(self)
+		groups.Groups.ball_group.add(self)
 
 	def calculate_spin(self, paddle):
 		if self.angle < (math.pi / 2):
@@ -135,7 +135,7 @@ class Ball(pygame.sprite.Sprite):
 			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.owner.color, 5)
 
 	def check_collision_paddles(self):
-		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
+		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
 		for paddle in paddle_collide_list:
 			self.spawn_particle()
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
@@ -176,8 +176,8 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_right_side_of_paddle(paddle)
 
 	def check_collision_balls(self):
-		groupholder.ball_group.remove(self)
-		ball_collide_list = pygame.sprite.spritecollide(self, groupholder.ball_group, False)
+		groups.Groups.ball_group.remove(self)
+		ball_collide_list = pygame.sprite.spritecollide(self, groups.Groups.ball_group, False)
 		for ball in ball_collide_list:
 			self.spawn_particle()
 			if self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
@@ -225,10 +225,10 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_y, delta_x)
-		groupholder.ball_group.add(self)
+		groups.Groups.ball_group.add(self)
 
 	def check_collision_blocks(self):
-		block_collide_list = pygame.sprite.spritecollide(self, groupholder.block_group, False)
+		block_collide_list = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
 		for block in block_collide_list:
 			self.spawn_particle()
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
@@ -271,7 +271,7 @@ class Ball(pygame.sprite.Sprite):
 			block.damage(self.damage)
 
 	def check_collision_powerups(self):
-		powerup_collide_list = pygame.sprite.spritecollide(self, groupholder.powerup_group, False)
+		powerup_collide_list = pygame.sprite.spritecollide(self, groups.Groups.powerup_group, False)
 		for powerup in powerup_collide_list:
 			powerup.hit(self)
 

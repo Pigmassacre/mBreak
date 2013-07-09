@@ -3,7 +3,7 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
-import groupholder
+import groups
 from settings import *
 
 class Powerup(pygame.sprite.Sprite):
@@ -20,7 +20,7 @@ class Powerup(pygame.sprite.Sprite):
 		self.y = y
 
 		# Store self in the main powerup_group.
-		groupholder.powerup_group.add(self)
+		groups.Groups.powerup_group.add(self)
 
 		if DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")

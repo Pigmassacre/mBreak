@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import useful
 import shadow
-import groupholder
+import groups
 from settings import *
 
 def convert():
@@ -15,7 +15,7 @@ class Block(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/block/block.png")
-	
+
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
@@ -55,7 +55,7 @@ class Block(pygame.sprite.Sprite):
 
 		# Add self to owners block_group and main block_group.
 		self.owner.block_group.add(self)
-		groupholder.block_group.add(self)
+		groups.Groups.block_group.add(self)
 
 	def damage(self, damage):
 		self.health = self.health - damage
