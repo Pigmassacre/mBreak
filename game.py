@@ -81,10 +81,17 @@ def main(window_surface, main_clock, debug_font):
 	done = False
 
 	# Setup the background images.
-	floor_surface = pygame.image.load("res/background/planks_floor.png")
-	wall_surface = pygame.image.load("res/background/planks_wall.png")
+	floor_surface = pygame.image.load("res/background/planks/planks_floor.png")
 	floor_surface = pygame.transform.scale(floor_surface, (floor_surface.get_width() * GAME_SCALE, floor_surface.get_height() * GAME_SCALE)).convert()
-	wall_surface = pygame.transform.scale(wall_surface, (wall_surface.get_width() * GAME_SCALE, wall_surface.get_height() * GAME_SCALE)).convert_alpha()
+
+	wall_vertical = pygame.image.load("res/background/planks/planks_wall_vertical.png")
+	wall_vertical = pygame.transform.scale(wall_vertical, (wall_vertical.get_width() * GAME_SCALE, wall_vertical.get_height() * GAME_SCALE)).convert()
+	wall_horizontal = pygame.image.load("res/background/planks/planks_wall_horizontal.png")
+	wall_horizontal = pygame.transform.scale(wall_horizontal, (wall_horizontal.get_width() * GAME_SCALE, wall_horizontal.get_height() * GAME_SCALE)).convert()
+	corner_top_left = pygame.image.load("res/background/planks/planks_corner_top_left.png")
+	corner_top_left = pygame.transform.scale(corner_top_left, (corner_top_left.get_width() * GAME_SCALE, corner_top_left.get_height() * GAME_SCALE)).convert()
+	corner_top_right = pygame.image.load("res/background/planks/planks_corner_top_right.png")
+	corner_top_right = pygame.transform.scale(corner_top_right, (corner_top_right.get_width() * GAME_SCALE, corner_top_right.get_height() * GAME_SCALE)).convert()
 
 	# Setup the objects.
 	block.convert()
@@ -155,7 +162,14 @@ def main(window_surface, main_clock, debug_font):
 		groupholder.ball_group.draw(window_surface)
 
 		# Draw the background walls and overlying area.
-		window_surface.blit(wall_surface, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y - (4 * GAME_SCALE)))
+		window_surface.blit(wall_horizontal, (LEVEL_X, LEVEL_Y - (4 * GAME_SCALE)))
+		window_surface.blit(wall_horizontal, (LEVEL_X, LEVEL_MAX_Y))
+		window_surface.blit(wall_vertical, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y))
+		window_surface.blit(wall_vertical, (LEVEL_MAX_X, LEVEL_Y))
+		window_surface.blit(corner_top_left, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y - (4 * GAME_SCALE)))
+		window_surface.blit(corner_top_left, (LEVEL_MAX_X, LEVEL_MAX_Y))
+		window_surface.blit(corner_top_right, (LEVEL_MAX_X, LEVEL_Y - (4 * GAME_SCALE)))
+		window_surface.blit(corner_top_right, (LEVEL_X - (4 * GAME_SCALE), LEVEL_MAX_Y))
 
 		# Draw the players.
 		# groupholder.player_group.draw(window_surface)

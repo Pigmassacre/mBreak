@@ -11,8 +11,8 @@ from settings import *
 class Shadow(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	offset_x = 3 * GAME_SCALE
-	offset_y = 4 * GAME_SCALE
+	offset_x = 1 * GAME_SCALE
+	offset_y = 2 * GAME_SCALE
 	linger_time = 1500
 	alpha_step = 50
 
