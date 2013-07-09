@@ -17,16 +17,16 @@ import screens.game as game
 
 def setup_logo():
 	# Create the logo
-	temp_logo = logo.Logo()
+	title_logo = logo.Logo()
 
 	# Set the logo so it displays in the middle of the screen.
-	x = (SCREEN_WIDTH - temp_logo.get_width()) / 2
-	y = ((SCREEN_HEIGHT - temp_logo.get_height()) / 2) - 30
-	temp_logo.x = x
-	temp_logo.y = y
+	x = (SCREEN_WIDTH - title_logo.get_width()) / 2
+	y = ((SCREEN_HEIGHT - title_logo.get_height()) / 2) - 30
+	title_logo.x = x
+	title_logo.y = y
 
 	# At last, return the surface so we can blit it to the window_surface.
-	return temp_logo
+	return title_logo
 
 def setup_message(x, y):
 	text = "Press ENTER to start"

@@ -8,25 +8,28 @@ from settings.settings import *
 
 class Logo:
 
+	logo = pyganim.PygAnimation([("res/logo/mBreakTitle_01.png", 1.55),
+								("res/logo/mBreakTitle_02.png", 0.075),
+								("res/logo/mBreakTitle_03.png", 0.075),
+								("res/logo/mBreakTitle_04.png", 0.075),
+								("res/logo/mBreakTitle_05.png", 0.075),
+								("res/logo/mBreakTitle_06.png", 0.075),
+								("res/logo/mBreakTitle_07.png", 0.075),
+								("res/logo/mBreakTitle_01.png", 1.55),
+								("res/logo/mBreakTitle_07.png", 0.075),
+								("res/logo/mBreakTitle_06.png", 0.075),
+								("res/logo/mBreakTitle_05.png", 0.075),
+								("res/logo/mBreakTitle_04.png", 0.075),
+								("res/logo/mBreakTitle_03.png", 0.075),
+								("res/logo/mBreakTitle_02.png", 0.075)])
+
 	def __init__(self):
-		self.logo = pyganim.PygAnimation([("res/logo/mBreakTitle_01.png", 1.55),
-											("res/logo/mBreakTitle_02.png", 0.075),
-											("res/logo/mBreakTitle_03.png", 0.075),
-											("res/logo/mBreakTitle_04.png", 0.075),
-											("res/logo/mBreakTitle_05.png", 0.075),
-											("res/logo/mBreakTitle_06.png", 0.075),
-											("res/logo/mBreakTitle_07.png", 0.075),
-											("res/logo/mBreakTitle_01.png", 1.55),
-											("res/logo/mBreakTitle_07.png", 0.075),
-											("res/logo/mBreakTitle_06.png", 0.075),
-											("res/logo/mBreakTitle_05.png", 0.075),
-											("res/logo/mBreakTitle_04.png", 0.075),
-											("res/logo/mBreakTitle_03.png", 0.075),
-											("res/logo/mBreakTitle_02.png", 0.075)])
+		self.logo = Logo.logo.getCopy()
+
 		self.x = 0
 		self.y = 0
 
-		# These are used for rotation the logo.
+		# These are used for rotating and scaling the logo.
 		self.current_angle = 0
 		self.max_angle = 15
 		self.min_angle = -15

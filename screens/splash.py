@@ -52,7 +52,6 @@ def main(window_surface, main_clock, debug_font):
 	# Keeps track of how much time has passed.
 	time_passed = 0
 
-
 	background_color = (0, 0, 0)
 
 	while True:
@@ -95,10 +94,6 @@ def main(window_surface, main_clock, debug_font):
 		else:
 			window_surface.blit(splash_top_half, (top_half_x, top_half_y))
 			window_surface.blit(splash_bottom_half, (bottom_half_x, bottom_half_y))
-
-		#window_surface.blit(window_surface, ((SCREEN_WIDTH - SCREEN_WIDTH) / 2, (SCREEN_HEIGHT - SCREEN_HEIGHT) / 2))
-		#temp_surface = pygame.transform.scale(window_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
-		#window_surface.blit(temp_surface, (0, 0))
 
 		pygame.display.update()
 		
