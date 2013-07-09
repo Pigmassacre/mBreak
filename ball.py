@@ -12,6 +12,9 @@ import useful
 import groupholder
 from settings import *
 
+def convert():
+	Ball.image.convert()
+
 class Ball(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
@@ -65,7 +68,7 @@ class Ball(pygame.sprite.Sprite):
 		# Store the ball in the owners ball_group and the main ball_group.
 		self.owner.ball_group.add(self)
 		groupholder.ball_group.add(self)
-		
+
 	def calculate_spin(self, paddle):
 		if self.angle < (math.pi / 2):
 			# If angle is between 0 and 90 degrees.
@@ -128,9 +131,7 @@ class Ball(pygame.sprite.Sprite):
 		for i in range(0, 2):
 			angle = math.pi + self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
-			# Takes the top-left color value of self as the color of the particle.
-			color = self.image.get_at((0, 0))
-			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, color, 5)
+			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.owner.color, 5)
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groupholder.paddle_group, False)
@@ -290,11 +291,11 @@ class Ball(pygame.sprite.Sprite):
 
 		# Constrain angle to angle != pi and angle != 0
 		if self.angle == 0  or self.angle == (2 * math.pi) or self.angle == math.pi:
-			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.15
+			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.25
 
 		# Constrain angle to angle != pi/2 and angle != 3pi/2
 		if self.angle == (math.pi / 2)  or self.angle == ((3 * math.pi) / 2):
-			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.15
+			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.25
 
 		# Constrain angle to 0 < angle < 2pi
 		if self.angle > (2 * math.pi):

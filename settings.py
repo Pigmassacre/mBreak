@@ -2,7 +2,7 @@ from pygame.locals import *
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # The higher the game scale, the larger the actual area of the game, and a much larger CPU-demand.
-GAME_SCALE = 2
+GAME_SCALE = 4
 
 # Base width and height is the actual game width and height.
 BASE_WIDTH = 244 * GAME_SCALE
@@ -17,8 +17,8 @@ LEVEL_MAX_X = LEVEL_X + LEVEL_WIDTH
 LEVEL_MAX_Y = LEVEL_Y + LEVEL_HEIGHT
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = 976
-SCREEN_HEIGHT = 560
+SCREEN_WIDTH = 1366#976
+SCREEN_HEIGHT = 768#560
 
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (64, 64, 64)

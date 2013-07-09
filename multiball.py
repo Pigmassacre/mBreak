@@ -12,6 +12,9 @@ import math
 import groupholder
 from settings import *
 
+def convert():
+	Multiball.image.convert_alpha()
+
 class Multiball(powerup.Powerup):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.

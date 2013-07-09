@@ -15,7 +15,7 @@ from settings import *
 # Import any needed game screens here.
 import intromenu
 
-def main(window_surface, game_surface, main_clock, debug_font):
+def main(window_surface, main_clock, debug_font):
 	# Setup the splash image.
 	splash_image_path = "res/splash/splash_color.png"
 	splash = pygame.image.load(splash_image_path)
@@ -58,15 +58,14 @@ def main(window_surface, game_surface, main_clock, debug_font):
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(background_color)
-		game_surface.fill(background_color)
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
 				# If ENTER is pressed, proceed to the next screen, and end this loop.
-				intromenu.main(window_surface, game_surface, main_clock, debug_font)
+				intromenu.main(window_surface, main_clock, debug_font)
 
 		if time_passed >= splash_time:
-			intromenu.main(window_surface, game_surface, main_clock, debug_font)
+			intromenu.main(window_surface, main_clock, debug_font)
 
 		if top_go_right:
 			top_half_x += top_half_speed
@@ -92,14 +91,14 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 		if top_done and bottom_done:
 			time_passed += main_clock.get_time()
-			game_surface.blit(splash, (splash_x, splash_y))
+			window_surface.blit(splash, (splash_x, splash_y))
 		else:
-			game_surface.blit(splash_top_half, (top_half_x, top_half_y))
-			game_surface.blit(splash_bottom_half, (bottom_half_x, bottom_half_y))
+			window_surface.blit(splash_top_half, (top_half_x, top_half_y))
+			window_surface.blit(splash_bottom_half, (bottom_half_x, bottom_half_y))
 
-		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
-		temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
-		window_surface.blit(temp_surface, (0, 0))
+		#window_surface.blit(window_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
+		#temp_surface = pygame.transform.scale(window_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
+		#window_surface.blit(temp_surface, (0, 0))
 
 		pygame.display.update()
 		

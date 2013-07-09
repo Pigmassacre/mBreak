@@ -8,6 +8,9 @@ import shadow
 import groupholder
 from settings import *
 
+def convert():
+	Block.image.convert()
+
 class Block(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.

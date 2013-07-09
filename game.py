@@ -76,16 +76,21 @@ def destroy_groups():
 	groupholder.player_group.empty()
 	groupholder.shadow_group.empty()
 
-def main(window_surface, game_surface, main_clock, debug_font):
+def main(window_surface, main_clock, debug_font):
 	# Variable to keep the gameloop going. Setting this to True will end the gameloop and return to the screen that started this gameloop.
 	done = False
 
-	# Create the background image and store it.
-	floor_surface = pygame.image.load("res/background/planks_floor.png").convert()
-	floor_surface = pygame.transform.scale(floor_surface, (floor_surface.get_width() * GAME_SCALE, floor_surface.get_height() * GAME_SCALE))
-
+	# Setup the background images.
+	floor_surface = pygame.image.load("res/background/planks_floor.png")
 	wall_surface = pygame.image.load("res/background/planks_wall.png")
-	wall_surface = pygame.transform.scale(wall_surface, (wall_surface.get_width() * GAME_SCALE, wall_surface.get_height() * GAME_SCALE))
+	floor_surface = pygame.transform.scale(floor_surface, (floor_surface.get_width() * GAME_SCALE, floor_surface.get_height() * GAME_SCALE)).convert()
+	wall_surface = pygame.transform.scale(wall_surface, (wall_surface.get_width() * GAME_SCALE, wall_surface.get_height() * GAME_SCALE)).convert_alpha()
+
+	# Setup the objects.
+	block.convert()
+	paddle.convert()
+	ball.convert()
+	multiball.convert()
 
 	# Create the left player.
 	player_left = create_player_left()
@@ -98,8 +103,8 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 	while not done:
 		# Begin a frame by blitting the background to the game_surface.
-		game_surface.fill(BACKGROUND_COLOR)
-		game_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
+		window_surface.fill(BACKGROUND_COLOR)
+		window_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -131,36 +136,37 @@ def main(window_surface, game_surface, main_clock, debug_font):
 
 		# Draw the shadows.
 		for shadow in groupholder.shadow_group:
-			shadow.blit_to(game_surface)
+			shadow.blit_to(window_surface)
 
 		# Draw the blocks.
-		groupholder.block_group.draw(game_surface)
+		groupholder.block_group.draw(window_surface)
 
 		# Draw the paddles.
-		groupholder.paddle_group.draw(game_surface)
+		groupholder.paddle_group.draw(window_surface)
 
 		# Draw the powerups.
-		groupholder.powerup_group.draw(game_surface)
+		groupholder.powerup_group.draw(window_surface)
 
 		# Draw the particles.
 		for particle in groupholder.particle_group:
-			game_surface.fill(particle.color, particle.rect)
+			window_surface.fill(particle.color, particle.rect)
 
 		# Draw the balls.
-		groupholder.ball_group.draw(game_surface)
+		groupholder.ball_group.draw(window_surface)
 
 		# Draw the background walls and overlying area.
-		game_surface.blit(wall_surface, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y - (4 * GAME_SCALE)))
+		window_surface.blit(wall_surface, (LEVEL_X - (4 * GAME_SCALE), LEVEL_Y - (4 * GAME_SCALE)))
 
 		# Draw the players.
-		# groupholder.player_group.draw(game_surface)
+		# groupholder.player_group.draw(window_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(game_surface, main_clock, debug_font)
+			debug.display(window_surface, main_clock, debug_font)
 
-		pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT), window_surface)
+		#pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT), window_surface)
 		#window_surface.blit(temp_surface, (0, 0))
+		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
 		
 		pygame.display.update()
 		

@@ -44,7 +44,7 @@ def setup_music():
 	pygame.mixer.music.load(TITLE_MUSIC)
 	pygame.mixer.music.play()
 
-def main(window_surface, game_surface, main_clock, debug_font):
+def main(window_surface, main_clock, debug_font):
 	# Setup the logo and store the surface of the logo.
 	title_logo = setup_logo()
 	title_logo.play()
@@ -63,7 +63,6 @@ def main(window_surface, game_surface, main_clock, debug_font):
 	while True:
 		# Every frame begins by filling the whole screen with the background color.
 		window_surface.fill(BACKGROUND_COLOR)
-		game_surface.fill(BACKGROUND_COLOR)
 		
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -73,14 +72,14 @@ def main(window_surface, game_surface, main_clock, debug_font):
 			elif event.type == KEYDOWN and event.key == K_RETURN:
 				# If ENTER is pressed, proceed to the next screen, and end this loop.
 				pygame.mixer.music.stop()
-				game.main(window_surface, game_surface, main_clock, debug_font)
+				game.main(window_surface, main_clock, debug_font)
 		
 		# If the music isn't playing, start it.
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.play()
 
 		# Draw the logo.
-		title_logo.draw(game_surface)
+		title_logo.draw(window_surface)
 
 		# Increment the time passed.
 		time_passed += main_clock.get_time()
@@ -88,13 +87,13 @@ def main(window_surface, game_surface, main_clock, debug_font):
 		time_passed = title_message.blink(time_passed, title_message_blink_rate)
 
 		# Draw the title message.
-		title_message.draw(game_surface)
+		title_message.draw(window_surface)
 		
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(game_surface, main_clock, debug_font)
+			debug.display(window_surface, main_clock, debug_font)
 
-		window_surface.blit(game_surface, (0, 0))
+		#window_surface.blit(window_surface, (0, 0))
 		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
 		#temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
 		#window_surface.blit(temp_surface, (0, 0))
