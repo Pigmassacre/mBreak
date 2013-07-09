@@ -15,15 +15,16 @@ class Paddle(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/paddle/paddle.png")
-	# Scale it to game_scale.
-	image = pygame.transform.scale(image, (image.get_width() * GAME_SCALE, image.get_height() * GAME_SCALE))
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = 4 * GAME_SCALE
-	height = 16 * GAME_SCALE
+	width = image.get_width() * GAME_SCALE
+	height = image.get_height() * GAME_SCALE
 	acceleration = 1 * GAME_SCALE
 	retardation = 2 * GAME_SCALE
 	max_speed = 4 * GAME_SCALE
+
+	# Scale image to game_scale.
+	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.

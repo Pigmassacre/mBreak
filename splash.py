@@ -20,14 +20,14 @@ def main(window_surface, main_clock, debug_font):
 	splash_image_path = "res/splash/splash_color.png"
 	splash = pygame.image.load(splash_image_path)
 
-	splash = pygame.transform.scale(splash, (BASE_HEIGHT, BASE_HEIGHT))
+	splash = pygame.transform.scale(splash, (SCREEN_HEIGHT, SCREEN_HEIGHT))
 
-	splash_x = (BASE_WIDTH - splash.get_width()) / 2
-	splash_y = (BASE_HEIGHT - splash.get_height()) / 2
+	splash_x = (SCREEN_WIDTH - splash.get_width()) / 2
+	splash_y = (SCREEN_HEIGHT - splash.get_height()) / 2
 
 	splash_time = 1750
 
-	scaled_splash = pygame.transform.scale(splash, (BASE_HEIGHT, BASE_HEIGHT))
+	scaled_splash = pygame.transform.scale(splash, (SCREEN_HEIGHT, SCREEN_HEIGHT))
 	
 	top_half = pygame.Rect((0, 0), (scaled_splash.get_width(), scaled_splash.get_height() / 2))
 	bottom_half = pygame.Rect((0, (scaled_splash.get_height()) / 2), (scaled_splash.get_width(), scaled_splash.get_height() / 2))
@@ -40,8 +40,8 @@ def main(window_surface, main_clock, debug_font):
 
 	top_half_x = -splash_top_half.get_width()
 	top_half_y = 0
-	bottom_half_x = BASE_WIDTH
-	bottom_half_y = (BASE_HEIGHT / 2)
+	bottom_half_x = SCREEN_WIDTH
+	bottom_half_y = (SCREEN_HEIGHT / 2)
 
 	top_go_right = True
 	bottom_go_left = True
@@ -72,10 +72,10 @@ def main(window_surface, main_clock, debug_font):
 		else:
 			top_half_x -= top_half_speed
 
-		if top_half_x > (2 * BASE_WIDTH) - splash_top_half.get_width():
+		if top_half_x > (2 * SCREEN_WIDTH) - splash_top_half.get_width():
 			top_go_right = False
-		elif top_half_x <= (BASE_WIDTH - splash_top_half.get_width()) / 2 and not top_go_right:
-			top_half_x = (BASE_WIDTH - splash_top_half.get_width()) / 2
+		elif top_half_x <= (SCREEN_WIDTH - splash_top_half.get_width()) / 2 and not top_go_right:
+			top_half_x = (SCREEN_WIDTH - splash_top_half.get_width()) / 2
 			top_done = True
 
 		if bottom_go_left:
@@ -83,10 +83,10 @@ def main(window_surface, main_clock, debug_font):
 		else:
 			bottom_half_x -= bottom_half_speed
 
-		if bottom_half_x < -BASE_WIDTH:
+		if bottom_half_x < -SCREEN_WIDTH:
 			bottom_go_left = False
-		elif bottom_half_x >= (BASE_WIDTH - splash_bottom_half.get_width()) / 2 and not bottom_go_left:
-			bottom_half_x = (BASE_WIDTH - splash_bottom_half.get_width()) / 2
+		elif bottom_half_x >= (SCREEN_WIDTH - splash_bottom_half.get_width()) / 2 and not bottom_go_left:
+			bottom_half_x = (SCREEN_WIDTH - splash_bottom_half.get_width()) / 2
 			bottom_done = True
 
 		if top_done and bottom_done:
@@ -96,7 +96,7 @@ def main(window_surface, main_clock, debug_font):
 			window_surface.blit(splash_top_half, (top_half_x, top_half_y))
 			window_surface.blit(splash_bottom_half, (bottom_half_x, bottom_half_y))
 
-		#window_surface.blit(window_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
+		#window_surface.blit(window_surface, ((SCREEN_WIDTH - SCREEN_WIDTH) / 2, (SCREEN_HEIGHT - SCREEN_HEIGHT) / 2))
 		#temp_surface = pygame.transform.scale(window_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
 		#window_surface.blit(temp_surface, (0, 0))
 

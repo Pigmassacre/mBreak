@@ -59,8 +59,8 @@ class Logo:
 		temp_logo_height = int(self.logo.getRect().height * self.current_scale)
 		temp_logo = pygame.transform.scale(self.logo.getCurrentFrame(), (temp_logo_width, temp_logo_height))
 		temp_logo = pygame.transform.rotate(temp_logo, self.current_angle)
-		temp_logo_x = (BASE_WIDTH - temp_logo.get_width()) // 2
-		temp_logo_y = ((BASE_HEIGHT - temp_logo.get_height()) // 2) - 30
+		temp_logo_x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
+		temp_logo_y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
 
 		# Draw the logo.
 		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))

@@ -33,11 +33,11 @@ def setup_gamefield(player_left, player_right):
 
 	# Create and store the paddle.
 	left_paddle_x = LEVEL_X + (x_amount * block.Block.width) + (block.Block.width * 3)
-	left_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - 16) / 2
+	left_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - block.Block.height) / 2
 	player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
 
 	right_paddle_x = LEVEL_MAX_X - (x_amount * block.Block.width) - (block.Block.width * 4)
-	right_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - 16) / 2
+	right_paddle_y = (LEVEL_Y + LEVEL_HEIGHT - block.Block.height) / 2
 	paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_right)
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 	player_right.paddle_group.add(paddle_right)
@@ -177,10 +177,6 @@ def main(window_surface, main_clock, debug_font):
 		if DEBUG_MODE:
 			# Display various debug information.
 			debug.display(window_surface, main_clock, debug_font)
-
-		#pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT), window_surface)
-		#window_surface.blit(temp_surface, (0, 0))
-		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
 		
 		pygame.display.update()
 		

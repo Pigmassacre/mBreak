@@ -20,8 +20,8 @@ def setup_logo():
 	temp_logo = logo.Logo()
 
 	# Set the logo so it displays in the middle of the screen.
-	x = (BASE_WIDTH - temp_logo.get_width()) / 2
-	y = ((BASE_HEIGHT - temp_logo.get_height()) / 2) - 30
+	x = (SCREEN_WIDTH - temp_logo.get_width()) / 2
+	y = ((SCREEN_HEIGHT - temp_logo.get_height()) / 2) - 30
 	temp_logo.x = x
 	temp_logo.y = y
 
@@ -35,8 +35,8 @@ def setup_message(x, y):
 
 	text = textitem.TextItem(text, font_color, alpha_value)
 
-	text.x = (BASE_WIDTH - text.get_width()) // 2
-	text.y = (BASE_HEIGHT / 2)
+	text.x = (SCREEN_WIDTH - text.get_width()) // 2
+	text.y = (SCREEN_HEIGHT / 2)
 
 	return text
 
@@ -94,7 +94,7 @@ def main(window_surface, main_clock, debug_font):
 			debug.display(window_surface, main_clock, debug_font)
 
 		#window_surface.blit(window_surface, (0, 0))
-		#window_surface.blit(game_surface, ((SCREEN_WIDTH - BASE_WIDTH) / 2, (SCREEN_HEIGHT - BASE_HEIGHT) / 2))
+		#window_surface.blit(game_surface, ((SCREEN_WIDTH - SCREEN_WIDTH) / 2, (SCREEN_HEIGHT - SCREEN_HEIGHT) / 2))
 		#temp_surface = pygame.transform.scale(game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
 		#window_surface.blit(temp_surface, (0, 0))
 

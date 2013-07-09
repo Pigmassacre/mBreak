@@ -21,8 +21,13 @@ class Multiball(powerup.Powerup):
 	image = pygame.image.load("res/powerup/multiball.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = image.get_width() * GAME_SCALE
+	height = image.get_height() * GAME_SCALE
 	width = 8 * GAME_SCALE
 	height = 8 * GAME_SCALE
+
+	# Scale image to game_scale.
+	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
@@ -44,10 +49,7 @@ class Multiball(powerup.Powerup):
 
 		x = entity.x
 		y = entity.y
-		width = entity.rect.width
-		height = entity.rect.height
 		speed = entity.speed
-		max_speed = entity.max_speed
 		angle = entity.angle
 		damage = entity.damage
 		owner = entity.owner
@@ -58,4 +60,4 @@ class Multiball(powerup.Powerup):
 			#angle = angle + ((2 * math.pi) / amount_to_spawn)
 			#x = x + math.cos(angle)
 			#y = y + math.cos(angle)
-			groupholder.ball_group.add(ball.Ball(x, y, width, height, angle, speed, max_speed, damage, owner))
+			groupholder.ball_group.add(ball.Ball(x, y, angle, speed, damage, owner))
