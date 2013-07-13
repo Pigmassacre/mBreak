@@ -136,7 +136,7 @@ class Ball(pygame.sprite.Sprite):
 
 	def spawn_particle(self):
 		for i in range(0, 2):
-			angle = self.angle + random.uniform(-0.20, 0.20) #math.pi + self.angle + random.uniform(-0.20, 0.20)
+			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
 			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.owner.color, 5)
 
@@ -293,12 +293,6 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with powerups.
 		self.check_collision_powerups()
-
-		""" Should I constrain angle only when it hits paddle / wall, or keep it like it is? """
-
-		# Constrain angle to angle != pi and angle != 0
-		#if self.angle == 0  or self.angle == (2 * math.pi) or self.angle == math.pi:
-		#	self.angle = self.angle + random.randrange(-1, 2, 2) * 0.25
 
 		# Constrain angle to angle != pi/2 and angle != 3pi/2
 		if self.angle == (math.pi / 2)  or self.angle == ((3 * math.pi) / 2):

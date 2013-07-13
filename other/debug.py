@@ -22,19 +22,19 @@ def create_ball(x, y, angle, owner):
 def create_powerup():
 	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - 20, LEVEL_X + (LEVEL_WIDTH / 2) + 20)
 	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - 20, LEVEL_Y + (LEVEL_HEIGHT / 2) + 20)
-
 	return multiball.Multiball(x, y)
-
 
 def create_ball_left(player_left):
 	for paddle in player_left.paddle_group:
-		angle = 0
+		angle = random.uniform((3 * math.pi) / 2, (5* math.pi) / 2)
+		print("left angle: " + str(angle))
 		temp_ball = create_ball(paddle.x + (paddle.width * 2), paddle.y + (paddle.height / 2), angle, player_left)
 		temp_ball.owner = player_left
 
 def create_ball_right(player_right):
 	for paddle in player_right.paddle_group:
-		angle = math.pi
+		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
+		print("right angle: " + str(angle))
 		temp_ball = create_ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
 		temp_ball.owner = player_right
 
