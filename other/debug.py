@@ -14,7 +14,7 @@ def display(window_surface, main_clock, debug_font):
 	window_surface.blit(debug_font.render(str(int(main_clock.get_fps())), False, (255, 255, 255)), (25, 25))
 
 def create_ball(x, y, angle, owner):
-	speed = 2.75 * GAME_SCALE
+	speed = 1.0 * GAME_SCALE
 	damage = 1
 
 	return ball.Ball(x, y, angle, speed, damage, owner)
@@ -27,14 +27,12 @@ def create_powerup():
 def create_ball_left(player_left):
 	for paddle in player_left.paddle_group:
 		angle = random.uniform((3 * math.pi) / 2, (5* math.pi) / 2)
-		print("left angle: " + str(angle))
 		temp_ball = create_ball(paddle.x + (paddle.width * 2), paddle.y + (paddle.height / 2), angle, player_left)
 		temp_ball.owner = player_left
 
 def create_ball_right(player_right):
 	for paddle in player_right.paddle_group:
 		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
-		print("right angle: " + str(angle))
 		temp_ball = create_ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
 		temp_ball.owner = player_right
 
