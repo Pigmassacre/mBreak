@@ -23,7 +23,9 @@ class Ball(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
-	max_speed = 2 * GAME_SCALE
+	max_speed = 1.5 * GAME_SCALE
+	spin_speed_strength = 0.05
+	spin_angle_strength = 0.125
 
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -71,12 +73,16 @@ class Ball(pygame.sprite.Sprite):
 		groups.Groups.ball_group.add(self)
 
 	def calculate_spin(self, paddle):
+		# TODO: Look over this, it feels wrong but I'm kinda drunk now and cannot think.
+		# I think it should be something like: If ball is in pi and 2pi degrees angle and velocity
+		# is positive, increase speed for a short while and increase angle. Vice versa.
 		if self.angle < (math.pi / 2):
 			# If angle is between 0 and 90 degrees.
-			self.angle = self.angle - (paddle.velocity_y * 0.05)
+			self.angle = self.angle - (paddle.velocity_y * Ball.spin_angle_strength)
 		elif self.angle > ((3 * math.pi) / 2) and self.angle < (2 * math.pi):
 			# If angle is between 270 and 359 degrees.
-			self.angle = self.angle + (paddle.velocity_y * 0.05)
+			self.angle = self.angle + (paddle.velocity_y * Ball.spin_angle_strength)
+		#self.speed = self.speed + (self.speed * Ball.spin_speed_strength)
 
 	def place_left_of(self, other):
 		self.x = other.rect.left - self.rect.width - 1
