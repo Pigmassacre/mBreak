@@ -9,19 +9,22 @@ import objects.groups as groups
 from settings.settings import *
 
 def convert():
-	Block.image.convert()
+	Block.image_normal.convert()
+	Block.image_strong.convert()
 
 class Block(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/block/block.png")
+	image_normal = pygame.image.load("res/block/block.png")
+	image_strong = pygame.image.load("res/block/block_strong.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
+	width = image_normal.get_width() * GAME_SCALE
+	height = image_normal.get_height() * GAME_SCALE
 
 	# Scale image to game_scale.
-	image = pygame.transform.scale(image, (width, height))
+	image_normal = pygame.transform.scale(image_normal, (width, height))
+	image_strong = pygame.transform.scale(image_strong, (width, height))
 
 	def __init__(self, x, y, health, owner):
 		# We start by calling the superconstructor.
@@ -44,7 +47,10 @@ class Block(pygame.sprite.Sprite):
 		self.owner.block_group.add(self)
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = Block.image.copy()
+		if self.health <= 2:
+			self.image = Block.image_normal.copy()
+		else:
+			self.image = Block.image_strong.copy()
 
 		# Colorize the block.
 		self.color = color
