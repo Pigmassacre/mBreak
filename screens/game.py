@@ -11,19 +11,14 @@ import objects.ball as ball
 import objects.paddle as paddle
 import objects.player as player
 import objects.multiball as multiball
-import objects.block as block
+import objects.blocks.block as block
+import objects.blocks.normal as block_normal
+import objects.blocks.strong as block_strong
 import objects.groups as groups
 from settings.settings import *
 
 # Import any needed game screens here.
 
-def create_block(x, y, owner):
-	health = 2
-	return block.Block(x, y, health, owner)
-
-def create_strong_block(x, y, owner):
-	health = 4
-	return block.Block(x, y, health, owner)
 
 def setup_gamefield(player_left, player_right):
 	x_amount = 2
@@ -31,13 +26,13 @@ def setup_gamefield(player_left, player_right):
 
 	for x in range(0, 2):
 		for y in range(0, y_amount):
-			create_strong_block(LEVEL_X + (block.Block.width * 2) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_left)
-			temp_block_right = create_strong_block(LEVEL_MAX_X - (block.Block.width * 3) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_right)
+			block_strong.StrongBlock(LEVEL_X + (block.Block.width * 2) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_left)
+			temp_block_right = block_strong.StrongBlock(LEVEL_MAX_X - (block.Block.width * 3) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_right)
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 	for x in range(0, x_amount):
 		for y in range(0, y_amount):
-			create_block(LEVEL_X + (block.Block.width * 4) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_left)
-			temp_block_right = create_block(LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_right)
+			block_normal.NormalBlock(LEVEL_X + (block.Block.width * 4) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_left)
+			temp_block_right = block_normal.NormalBlock(LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), player_right)
 			temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 	# Create and store the paddle.
@@ -91,7 +86,8 @@ def main(window_surface, main_clock, debug_font):
 	corner_top_right = pygame.transform.scale(corner_top_right, (corner_top_right.get_width() * GAME_SCALE, corner_top_right.get_height() * GAME_SCALE)).convert()
 
 	# Setup the objects.
-	block.convert()
+	block_normal.convert()
+	block_strong.convert()
 	paddle.convert()
 	ball.convert()
 	multiball.convert()

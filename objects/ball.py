@@ -236,6 +236,13 @@ class Ball(pygame.sprite.Sprite):
 		groups.Groups.ball_group.add(self)
 
 	def check_collision_blocks(self):
+		# TODO: Work out the last collision bugs with blocks. Possibly check how many units we are colliding with, and
+		# 		use that to work out which of the possible cases to handle?
+		#
+		#		For example: (block = #, ball = o)
+		#		
+		#		#o	##	#o 	o#	# 	 #
+		#		##	o#	 #	#	o#	#o
 		block_collide_list = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
 		for block in block_collide_list:
 			self.spawn_particle()
@@ -276,7 +283,7 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
 			# Deal damage to the hit block.
-			block.damage(self.damage)
+			block.on_hit(self.damage)
 
 	def check_collision_powerups(self):
 		powerup_collide_list = pygame.sprite.spritecollide(self, groups.Groups.powerup_group, False)

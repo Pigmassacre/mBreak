@@ -28,15 +28,16 @@ def setup_logo():
 	# At last, return the surface so we can blit it to the window_surface.
 	return title_logo
 
-def setup_message(x, y):
+def setup_message(title_logo):
 	text = "Press ENTER to start"
 	font_color = (255, 255, 255)
 	alpha_value = 255
+	offset = 50
 
 	text = textitem.TextItem(text, font_color, alpha_value)
 
-	text.x = (SCREEN_WIDTH - text.get_width()) // 2
-	text.y = (SCREEN_HEIGHT / 2)
+	text.x = (SCREEN_WIDTH - text.get_width()) / 2
+	text.y = title_logo.y + title_logo.get_height() + offset
 
 	return text
 
@@ -50,7 +51,7 @@ def main(window_surface, main_clock, debug_font):
 	title_logo.play()
 
 	# Setup the message beneath the logo and store the surface of the message.
-	title_message = setup_message(title_logo.x, title_logo.y)
+	title_message = setup_message(title_logo)
 	# Sets the blink rate of the message.
 	title_message_blink_rate = 750
 

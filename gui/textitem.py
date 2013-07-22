@@ -18,7 +18,7 @@ class TextItem:
 	x = 0
 	y = 0
 	shadow_offset = 3
-	shadow_color = pygame.Color(0, 0, 0, 255)
+	shadow_color = pygame.Color(50, 50, 50, 255)#pygame.Color(0, 0, 0, 255)
 
 	def __init__(self, text_value, font_color, alpha_value):
 		# Load default values.

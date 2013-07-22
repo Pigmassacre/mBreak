@@ -38,7 +38,7 @@ class Logo:
 		self.min_angle = -15
 		self.rotate_step = 0.40
 		self.rotate_up = True
-		self.current_scale = 2
+		self.current_scale = 2 * GAME_SCALE
 		self.max_scale = 2.5
 		self.min_scale = 1.5
 		self.scale_by = 0.02
