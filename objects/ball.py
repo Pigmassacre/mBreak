@@ -8,6 +8,7 @@ import random
 import other.useful as useful
 import objects.paddle as paddle
 import objects.particle as particle
+import objects.trace as trace
 import objects.shadow as shadow
 import objects.groups as groups
 from settings.settings import *
@@ -20,12 +21,16 @@ class Ball(pygame.sprite.Sprite):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/ball/ball.png")
 
+	pygame.mixer.init(44100, -16, 2, 512)
+	sound_effect = pygame.mixer.Sound("res/sounds/ball_hit_wall.wav")
+
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
 	max_speed = 3 * GAME_SCALE
 	spin_speed_strength = 0.05
 	spin_angle_strength = 0.05
+	trace_spawn_rate = 32
 
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -62,8 +67,17 @@ class Ball(pygame.sprite.Sprite):
 		# Create the image attribute that is drawn to the surface.
 		self.image = Ball.image.copy()
 
-		# Colorize the image.
-		useful.colorize_image(self.image, self.owner.color)
+		# Colorize the image. We save a reference to the parents color in our own variable, so  that 
+		# classes and modules that want to use our color do not have to call us.owner.color
+		self.color = self.owner.color
+		useful.colorize_image(self.image, self.color)
+
+		# Load the sound effect.
+		# self.sound_effect = Ball.sound_effect.
+		self.collided = False
+
+		# Setup the trace time keeping variable.
+		self.trace_spawn_time = 0
 		
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -140,12 +154,14 @@ class Ball(pygame.sprite.Sprite):
 		for i in range(0, 2):
 			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
-			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.owner.color, 5)
+			alpha_step = 5
+			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
 		for paddle in paddle_collide_list:
 			self.spawn_particle()
+			self.collided = True
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
 				if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
@@ -233,6 +249,8 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_y, delta_x)
+
+			self.collided = True
 		groups.Groups.ball_group.add(self)
 
 	def check_collision_blocks(self):
@@ -241,23 +259,26 @@ class Ball(pygame.sprite.Sprite):
 		#
 		#		For example: (block = #, ball = o)
 		#		
-		#		#o	##	#o 	o#	# 	 #
-		#		##	o#	 #	#	o#	#o
-		block_collide_list = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
-		for block in block_collide_list:
-			self.spawn_particle()
+		#		#o	##	#o 	o#	# 	 #	o
+		#		##	o#	 #	#	o#	#o 	##
+		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
+		block_information = {}
+		for block in blocks_collided_with:
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
 				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
 					# The ball collides more with the left side than top side.
 					self.hit_left_side_of_block(block)
+					block_information[block] = "left"
 				elif self.rect.right - block.rect.right > block.rect.top - self.rect.top:
 					# The ball collides more with the right side than top side.
 					self.hit_right_side_of_block(block)
+					block_information[block] = "right"
 				else:
 					# The ball collides more with the top side than any other side.
 					if self.angle < math.pi:
 						self.angle = -self.angle
+					block_information[block] = "top"
 
 					# Place ball on top of the block.
 					self.place_over(block)
@@ -266,31 +287,44 @@ class Ball(pygame.sprite.Sprite):
 				if block.rect.left - self.rect.left > self.rect.bottom - block.rect.bottom:
 					# The ball collides more with the left side than top side.
 					self.hit_left_side_of_block(block)
+					block_information[block] = "left"
 				elif self.rect.right - block.rect.right > self.rect.bottom - block.rect.bottom:
 					# The ball collides more with the right side than top side.
 					self.hit_right_side_of_block(block)
+					block_information[block] = "right"
 				else:
 					# The ball collides more with the bottom side than any other side.
 					if self.angle > math.pi:
 						self.angle = -self.angle
+					block_information[block] = "bottom"
 
 					# Place ball beneath the block.
 					self.place_below(block)
 			elif self.rect.right >= block.rect.left and self.rect.left < block.rect.left:
 				# Left side of block collided with.
 				self.hit_left_side_of_block(block)
+				block_information[block] = "left"
 			elif self.rect.left <= block.rect.right and self.rect.right > block.rect.right:
 				# Right side of block collided with.
 				self.hit_right_side_of_block(block)
-			# Deal damage to the hit block.
-			block.on_hit(self.damage)
+				block_information[block] = "right"
+
+		print("dict contains: " + str(block_information))
+
+		# Deal damage to the hit blocks.
+		#block.on_hit(self.damage)
+
+		# Spawn particles and confirm that we've collided with an object.
+		#self.collided = True
 
 	def check_collision_powerups(self):
 		powerup_collide_list = pygame.sprite.spritecollide(self, groups.Groups.powerup_group, False)
 		for powerup in powerup_collide_list:
 			powerup.hit(self)
 
-	def update(self):
+	def update(self, main_clock):
+		self.collided = False
+
 		# Check collision with paddles.
 		self.check_collision_paddles()
 				
@@ -322,6 +356,7 @@ class Ball(pygame.sprite.Sprite):
 		# Check collision with x-edges.
 		if self.rect.x < LEVEL_X:
 			self.spawn_particle()
+			self.collided = True
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -330,6 +365,7 @@ class Ball(pygame.sprite.Sprite):
 			self.rect.x = self.x
 		elif self.rect.x + self.rect.width > LEVEL_MAX_X:
 			self.spawn_particle()
+			self.collided = True
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -340,6 +376,7 @@ class Ball(pygame.sprite.Sprite):
 		# Check collision with y-edges.
 		if self.rect.y < LEVEL_Y:
 			self.spawn_particle()
+			self.collided = True
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
@@ -348,9 +385,20 @@ class Ball(pygame.sprite.Sprite):
 			self.rect.y = self.y
 		elif self.rect.y + self.rect.height > LEVEL_MAX_Y:
 			self.spawn_particle()
+			self.collided = True
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
 			self.y = LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y
+
+		# If it's time, spawn a trace.
+		self.trace_spawn_time = self.trace_spawn_time + main_clock.get_time()
+		if self.trace_spawn_time >= Ball.trace_spawn_rate:
+			trace.Trace(self)
+			self.trace_spawn_time = 0
+
+		# If we have collided with anything, play the sound effect.
+		if self.collided:
+			Ball.sound_effect.play()

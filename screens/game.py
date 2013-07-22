@@ -123,10 +123,13 @@ def main(window_surface, main_clock, debug_font):
 			debug.update(player_left, player_right)
 
 		# Update the balls.
-		groups.Groups.ball_group.update()
+		groups.Groups.ball_group.update(main_clock)
 		
 		# Update the particles.
 		groups.Groups.particle_group.update()
+
+		# Update the traces.
+		groups.Groups.trace_group.update()
 		
 		# Update the players.
 		groups.Groups.player_group.update()
@@ -150,6 +153,10 @@ def main(window_surface, main_clock, debug_font):
 		# Draw the particles.
 		for particle in groups.Groups.particle_group:
 			window_surface.fill(particle.color, particle.rect)
+
+		# Draw the traces.
+		for trace in groups.Groups.trace_group:
+			trace.blit_to(window_surface)
 
 		# Draw the balls.
 		groups.Groups.ball_group.draw(window_surface)

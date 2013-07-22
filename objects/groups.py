@@ -12,6 +12,7 @@ def empty():
 	Groups.paddle_group.empty()
 	Groups.player_group.empty()
 	Groups.shadow_group.empty()
+	Groups.trace_group.empty()
 
 class Groups:
 
@@ -20,6 +21,9 @@ class Groups:
 
 	# Define the group that contains all the particles.
 	particle_group = pygame.sprite.Group()
+
+	# Define the group that contains all the traces.
+	trace_group = pygame.sprite.Group()
 
 	# Define the group that contains all the blocks.
 	block_group = pygame.sprite.Group()
