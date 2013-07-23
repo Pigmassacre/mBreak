@@ -46,8 +46,6 @@ def setup_gamefield(player_left, player_right):
 	paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
 	player_right.paddle_group.add(paddle_right)
 
-	print("paddle y's: " + str(left_paddle_y) + " " + str(right_paddle_y))
-
 def create_player_left():
 	name = PLAYER_LEFT_NAME
 	key_up = PLAYER_LEFT_KEY_UP

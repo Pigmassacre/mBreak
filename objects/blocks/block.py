@@ -3,9 +3,13 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+import math
+import random
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
+import objects.particle as particle
+import gui.textitem as textitem
 from settings.settings import *
 
 class Block(pygame.sprite.Sprite):
@@ -41,8 +45,8 @@ class Block(pygame.sprite.Sprite):
 		self.image = Block.image.copy()
 
 		# Colorize the block.
-		self.color = color
-		useful.colorize_image(self.image, self.owner.color)
+		self.color = self.owner.color
+		useful.colorize_image(self.image, self.color)
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -52,6 +56,13 @@ class Block(pygame.sprite.Sprite):
 		groups.Groups.block_group.add(self)
 
 	def on_hit(self, damage):
+		for _ in range(0, 4):
+			angle = random.uniform(0, math.pi)
+			speed = 5
+			retardation = 0.25
+			alpha_step = 5
+			particle.Particle(self.x, self.y, 2, 2, angle, speed, retardation, self.color, alpha_step)
+
 		self.health = self.health - damage
 		if self.health <= 0:
 			self.kill()

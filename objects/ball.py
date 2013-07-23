@@ -101,7 +101,6 @@ class Ball(pygame.sprite.Sprite):
 			self.angle = self.angle + (paddle.velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= (2 * math.pi):
 			self.angle = self.angle - (paddle.velocity_y * Ball.spin_angle_strength)
-		#self.speed = self.speed + (self.speed * Ball.spin_speed_strength)
 
 	def place_left_of(self, other):
 		self.x = other.rect.left - self.rect.width - 1
@@ -119,26 +118,8 @@ class Ball(pygame.sprite.Sprite):
 		self.y = other.rect.bottom + 1
 		self.rect.y = self.y
 
-	def hit_left_side_of_paddle(self, paddle):
-		# Calculate spin, and then reverse angle.
-		self.calculate_spin(paddle)
-		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
-			self.angle = math.pi - self.angle
-
-		# Place ball to the left of the paddle.
-		self.place_left_of(paddle)
-
-	def hit_right_side_of_paddle(self, paddle):
-		# Calculate spin, and then reverse angle.
-		self.calculate_spin(paddle)
-		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
-			self.angle = math.pi - self.angle
-
-		# Place ball to the right of the paddle.
-		self.place_right_of(paddle)
-
 	def spawn_particle(self):
-		for i in range(0, 2):
+		for _ in range(0, 2):
 			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
 			alpha_step = 5
@@ -185,6 +166,24 @@ class Ball(pygame.sprite.Sprite):
 			elif self.rect.left <= paddle.rect.right and self.rect.right > paddle.rect.right:
 				# Right side of paddle collided with.
 				self.hit_right_side_of_paddle(paddle)
+
+	def hit_left_side_of_paddle(self, paddle):
+		# Calculate spin, and then reverse angle.
+		self.calculate_spin(paddle)
+		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
+			self.angle = math.pi - self.angle
+
+		# Place ball to the left of the paddle.
+		self.place_left_of(paddle)
+
+	def hit_right_side_of_paddle(self, paddle):
+		# Calculate spin, and then reverse angle.
+		self.calculate_spin(paddle)
+		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
+			self.angle = math.pi - self.angle
+
+		# Place ball to the right of the paddle.
+		self.place_right_of(paddle)
 
 	def check_collision_balls(self):
 		groups.Groups.ball_group.remove(self)
