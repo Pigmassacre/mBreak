@@ -104,10 +104,15 @@ def main(window_surface, main_clock, debug_font):
 		window_surface.fill(BACKGROUND_COLOR)
 		window_surface.blit(floor_surface, (LEVEL_X, LEVEL_Y))
 		
+		# Win detection: for now just go back to previous screen if the game is over.
+		if len(player_left.block_group) == 0:
+			done = True
+		elif len(player_right.block_group) == 0:
+			done = True
+
 		for event in pygame.event.get():
 			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 				# Return to intromenu.
-				groups.empty()
 				done = True
 			elif event.type == KEYDOWN and event.key == K_l:
 				debug.create_ball_left(player_left)
@@ -180,3 +185,6 @@ def main(window_surface, main_clock, debug_font):
 		
 		# Finally, constrain the game to a set maximum amount of FPS.
 		main_clock.tick(MAX_FPS)
+
+	# Gameloop is over, so we clear all the groups of their contents.
+	groups.empty()
