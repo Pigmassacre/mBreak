@@ -19,13 +19,6 @@ WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (0, 0, 0)
 MAX_FPS = 60
 
-""" Graphical settings """
-# Shadow settings
-SHADOWS = True
-
-# Text shadow settings
-TEXT_SHADOWS = True
-
 # Music settings
 TITLE_MUSIC = "res/music/title_screen.ogg"
 

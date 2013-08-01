@@ -20,6 +20,7 @@ class Block(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
+	particle_spawn_amount = 4
 	
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -56,14 +57,17 @@ class Block(pygame.sprite.Sprite):
 		groups.Groups.block_group.add(self)
 
 	def on_hit(self, damage):
-		for _ in range(0, 4):
-			angle = random.uniform(0, math.pi)
-			speed = 5
-			retardation = 0.25
-			alpha_step = 5
-			particle.Particle(self.x, self.y, 2, 2, angle, speed, retardation, self.color, alpha_step)
+		self.spawn_particles()
 
 		self.health = self.health - damage
 		if self.health <= 0:
 			self.kill()
 			self.shadow.kill()
+
+	def spawn_particles(self):
+		for _ in range(0, Block.particle_spawn_amount):
+			angle = random.uniform(0, math.pi)
+			speed = 5
+			retardation = 0.25
+			alpha_step = 5
+			particle.Particle(self.x, self.y, 2, 2, angle, speed, retardation, self.color, alpha_step)
