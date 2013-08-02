@@ -6,6 +6,7 @@ import pygame
 from libs import pyganim
 from settings.settings import *
 
+# TODO: Rework this class.
 class Logo:
 
 	# TODO: Make a spritesheet, load each sprite in the spritesheet to a surface and then scale those images with game_scale.
@@ -28,10 +29,7 @@ class Logo:
 
 	def __init__(self):
 		self.logo = Logo.logo.getCopy()
-
-		self.x = 0
-		self.y = 0
-
+		
 		# These are used for rotating and scaling the logo.
 		self.current_angle = 0
 		self.max_angle = 15
@@ -43,6 +41,9 @@ class Logo:
 		self.min_scale = 1.5
 		self.scale_by = 0.02
 		self.scale_up = True
+		
+		self.x = 0
+		self.y = 0
 
 	def play(self):
 		self.logo.play()
@@ -54,19 +55,17 @@ class Logo:
 		self.logo.stop()
 
 	def get_width(self):
-		return self.logo.getMaxSize()[0]
+		return self.logo.getMaxSize()[0] * self.current_scale
 
 	def get_height(self):
-		return self.logo.getMaxSize()[1]
+		return self.logo.getMaxSize()[1] * self.current_scale
 
 	def draw(self, window_surface):
 		# Position the logo.
-		temp_logo_width = int(self.logo.getRect().width * self.current_scale)
-		temp_logo_height = int(self.logo.getRect().height * self.current_scale)
-		temp_logo = pygame.transform.scale(self.logo.getCurrentFrame(), (temp_logo_width, temp_logo_height))
-		temp_logo = pygame.transform.rotate(temp_logo, self.current_angle)
-		temp_logo_x = (SCREEN_WIDTH - temp_logo.get_width()) // 2
-		temp_logo_y = ((SCREEN_HEIGHT - temp_logo.get_height()) // 2) - 30
+		temp_logo = pygame.transform.scale(self.logo.getCurrentFrame(), (self.get_width(), self.get_height()))
+		#temp_logo = pygame.transform.rotate(temp_logo, self.current_angle)
+		temp_logo_x = self.x
+		temp_logo_y = self.y
 
 		# Draw the logo.
 		window_surface.blit(temp_logo, (temp_logo_x, temp_logo_y))
