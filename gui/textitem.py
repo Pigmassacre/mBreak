@@ -21,7 +21,7 @@ class TextItem:
 	shadow_color = pygame.Color(50, 50, 50, 255)
 	selected_color = pygame.Color(128, 128, 128, 255)
 
-	def __init__(self, text_value, font_color, alpha_value):
+	def __init__(self, text_value, font_color, alpha_value = 255):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y

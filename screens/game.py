@@ -15,6 +15,7 @@ import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
 import objects.groups as groups
+import gui.textitem as textitem
 from settings.settings import *
 import settings.graphics as graphics
 
@@ -62,6 +63,19 @@ class Game:
 
 		# Setup the game world.
 		self.setup_gamefield(self.player_left, self.player_right)
+
+		self.time_passed = 0
+		self.time_to_countdown = 1500
+		self.countdown_ready_time = 1000
+		#self.countdown_ready_transition_time = 250
+		self.countdown_go_time = 600
+		self.countdown_go_transition_time = 250
+		self.countdown_ready = textitem.TextItem("Ready", (255, 255, 255))
+		self.countdown_ready.x = (SCREEN_WIDTH - self.countdown_ready.get_width()) / 2
+		self.countdown_ready.y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
+		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
+		self.countdown_go.x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
+		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
 
 		self.gameloop()
 
@@ -141,7 +155,19 @@ class Game:
 					debug.create_ball_right(self.player_right)
 				elif event.type == KEYDOWN and event.key == K_p:
 					debug.create_powerup()
-			
+
+			self.time_passed += self.main_clock.get_time()
+			if self.time_passed < self.time_to_countdown:
+				print("soon countdown")
+			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time:
+				print("displaying ready")
+				self.countdown_ready.draw(self.window_surface)
+			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
+				print("displaying go")
+				self.countdown_go.draw(self.window_surface)
+			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time + self.countdown_go_transition_time:
+				print("game has started")
+
 			# If debug mode is enabled, allow certain commands. This is all done in the debug module.
 			if DEBUG_MODE:
 				debug.update(self.player_left, self.player_right)
