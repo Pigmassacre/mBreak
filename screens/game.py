@@ -21,6 +21,7 @@ import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens
+import screens.countdown
 
 class Game:
 
@@ -63,19 +64,6 @@ class Game:
 
 		# Setup the game world.
 		self.setup_gamefield(self.player_left, self.player_right)
-
-		self.time_passed = 0
-		self.time_to_countdown = 1500
-		self.countdown_ready_time = 1000
-		#self.countdown_ready_transition_time = 250
-		self.countdown_go_time = 600
-		self.countdown_go_transition_time = 250
-		self.countdown_ready = textitem.TextItem("Ready", (255, 255, 255))
-		self.countdown_ready.x = (SCREEN_WIDTH - self.countdown_ready.get_width()) / 2
-		self.countdown_ready.y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
-		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
-		self.countdown_go.x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
-		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
 
 		self.gameloop()
 
@@ -121,7 +109,6 @@ class Game:
 				temp_block_right = block_normal.NormalBlock(LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_right)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
-		# Create and store the paddle.
 		left_paddle_x = LEVEL_X + (x_amount * paddle.Paddle.width) + (2 * paddle.Paddle.width) + (paddle.Paddle.width * 3)
 		left_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
@@ -133,18 +120,13 @@ class Game:
 		player_right.paddle_group.add(paddle_right)
 
 	def gameloop(self):
+		# Draw all the objects, then start the countdown. We do this before the main game loop so we don't have to answer to any events.
+		self.update()
+		self.draw()
+		screens.countdown.Countdown(self.window_surface, self.main_clock, self.debug_font)
+
 		self.done = False
 		while not self.done:
-			# Begin a frame by blitting the background to the game_surface.
-			self.window_surface.fill(BACKGROUND_COLOR)
-			self.window_surface.blit(Game.floor_surface, (LEVEL_X, LEVEL_Y))
-			
-			# Win detection: for now just go back to previous screen if the game is over.
-			if len(self.player_left.block_group) == 0:
-				self.done = True
-			elif len(self.player_right.block_group) == 0:
-				self.done = True
-
 			for event in pygame.event.get():
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 					# Return to intromenu.
@@ -156,76 +138,15 @@ class Game:
 				elif event.type == KEYDOWN and event.key == K_p:
 					debug.create_powerup()
 
-			self.time_passed += self.main_clock.get_time()
-			if self.time_passed < self.time_to_countdown:
-				print("soon countdown")
-			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time:
-				print("displaying ready")
-				self.countdown_ready.draw(self.window_surface)
-			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
-				print("displaying go")
-				self.countdown_go.draw(self.window_surface)
-			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time + self.countdown_go_transition_time:
-				print("game has started")
+			# Win detection: for now just go back to previous screen if the game is over.
+			if len(self.player_left.block_group) == 0:
+				self.done = True
+			elif len(self.player_right.block_group) == 0:
+				self.done = True
 
-			# If debug mode is enabled, allow certain commands. This is all done in the debug module.
-			if DEBUG_MODE:
-				debug.update(self.player_left, self.player_right)
+			self.update()
 
-			# Update the balls.
-			groups.Groups.ball_group.update(self.main_clock)
-			
-			# Update the particles.
-			if graphics.PARTICLES:
-				groups.Groups.particle_group.update()
-
-			# Update the traces.
-			if graphics.TRACES:
-				groups.Groups.trace_group.update()
-			
-			# Update the players.
-			groups.Groups.player_group.update()
-			
-			# Update the shadows.
-			if graphics.SHADOWS:
-				groups.Groups.shadow_group.update(self.main_clock)
-
-			# Draw the shadows.
-			if graphics.SHADOWS:
-				for shadow in groups.Groups.shadow_group:
-					shadow.blit_to(self.window_surface)
-
-			# Draw the blocks.
-			groups.Groups.block_group.draw(self.window_surface)
-
-			# Draw the paddles.
-			groups.Groups.paddle_group.draw(self.window_surface)
-
-			# Draw the powerups.
-			groups.Groups.powerup_group.draw(self.window_surface)
-
-			# Draw the particles.
-			if graphics.PARTICLES:
-				for particle in groups.Groups.particle_group:
-					self.window_surface.fill(particle.color, particle.rect)
-
-			# Draw the traces.
-			if graphics.TRACES:
-				for trace in groups.Groups.trace_group:
-					trace.blit_to(self.window_surface)
-
-			# Draw the balls.
-			groups.Groups.ball_group.draw(self.window_surface)
-
-			# Draw the background walls and overlying area.
-			self.draw_background(self.window_surface)
-
-			# Draw the players.
-			# groups.Groups.player_group.draw(self.window_surface)
-
-			if DEBUG_MODE:
-				# Display various debug information.
-				debug.display(self.window_surface, self.main_clock, self.debug_font)
+			self.draw()
 			
 			pygame.display.update()
 			
@@ -240,6 +161,71 @@ class Game:
 		else:
 			pygame.quit()
 			sys.exit()
+
+	def update(self):
+		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
+		if DEBUG_MODE:
+			debug.update(self.player_left, self.player_right)
+
+		# Update the balls.
+		groups.Groups.ball_group.update(self.main_clock)
+		
+		# Update the particles.
+		if graphics.PARTICLES:
+			groups.Groups.particle_group.update()
+
+		# Update the traces.
+		if graphics.TRACES:
+			groups.Groups.trace_group.update()
+		
+		# Update the players.
+		groups.Groups.player_group.update()
+		
+		# Update the shadows.
+		if graphics.SHADOWS:
+			groups.Groups.shadow_group.update(self.main_clock)
+
+	def draw(self):
+		# Begin a frame by blitting the background to the game_surface.
+		self.window_surface.fill(BACKGROUND_COLOR)
+		self.window_surface.blit(Game.floor_surface, (LEVEL_X, LEVEL_Y))
+
+		# Draw the shadows.
+		if graphics.SHADOWS:
+			for shadow in groups.Groups.shadow_group:
+				shadow.blit_to(self.window_surface)
+
+		# Draw the blocks.
+		groups.Groups.block_group.draw(self.window_surface)
+
+		# Draw the paddles.
+		groups.Groups.paddle_group.draw(self.window_surface)
+
+		# Draw the powerups.
+		groups.Groups.powerup_group.draw(self.window_surface)
+
+		# Draw the particles.
+		if graphics.PARTICLES:
+			for particle in groups.Groups.particle_group:
+				self.window_surface.fill(particle.color, particle.rect)
+
+		# Draw the traces.
+		if graphics.TRACES:
+			for trace in groups.Groups.trace_group:
+				trace.blit_to(self.window_surface)
+
+		# Draw the balls.
+		groups.Groups.ball_group.draw(self.window_surface)
+
+		# Draw the background walls and overlying area.
+		self.draw_background(self.window_surface)
+
+		# Draw the players.
+		# groups.Groups.player_group.draw(self.window_surface)
+
+		if DEBUG_MODE:
+			# Display various debug information.
+			debug.display(self.window_surface, self.main_clock, self.debug_font)
 
 	def draw_background(self, surface):
 		surface.blit(Game.wall_horizontal, (LEVEL_X, LEVEL_Y - (4 * GAME_SCALE)))
