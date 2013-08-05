@@ -34,7 +34,7 @@ class Ball(pygame.sprite.Sprite):
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
 
-	# Scale image to game_scale.
+	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, angle, speed, owner):

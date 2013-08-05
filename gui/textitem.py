@@ -11,7 +11,7 @@ class TextItem:
 	# Initialize the font module.
 	pygame.font.init()
 
-	# The standard text values are store here, such as standard font, font size and so on.
+	# The standard text values are stored here, such as standard font, font size and so on.
 	font_path = "fonts/8-BIT WONDER.TTF"
 	font_size = 9 * GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
@@ -77,7 +77,7 @@ class TextItem:
 		else:
 			return time_passed
 
-	def draw(self, window_surface):
+	def draw(self, surface):
 		# First blit shadow, then self. Keeps shadow UNDER the text.
-		window_surface.blit(self.shadow_surface, (self.x + self.shadow_offset, self.y + self.shadow_offset))
-		window_surface.blit(self.surface, (self.x, self.y))
+		surface.blit(self.shadow_surface, (self.x + self.shadow_offset, self.y + self.shadow_offset))
+		surface.blit(self.surface, (self.x, self.y))

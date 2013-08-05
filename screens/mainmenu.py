@@ -10,43 +10,34 @@ import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
+import gui.menu as menu
 from settings.settings import *
 
 # Import any needed game screens here.
 import screens.game as game
 
 def setup_logo(title_logo):
-
 	# Set the logo so it displays in the middle of the screen.
 	x = (SCREEN_WIDTH - title_logo.get_width()) / 2
 	y = ((SCREEN_HEIGHT - title_logo.get_height()) / 4)
 	title_logo.x = x
 	title_logo.y = y
 
-	# At last, return the surface so we can blit it to the window_surface.
 	return title_logo
 
-def setup_start_button():
-	text = "Start"
+def setup_menu():
+	x = SCREEN_WIDTH / 2
+	y = SCREEN_HEIGHT / 2
+
+	main_menu = menu.Menu(x, y)
+
+	return main_menu
+
+def setup_button(text):
 	font_color = (255, 255, 255)
 	alpha_value = 255
 
 	text = textitem.TextItem(text, font_color, alpha_value)
-
-	text.x = (SCREEN_WIDTH - text.get_width()) / 2
-	text.y = ((SCREEN_HEIGHT - text.get_height()) / 2)
-
-	return text
-	
-def setup_quit_button(parent_button):
-	text = "Quit"
-	font_color = (255, 255, 255)
-	alpha_value = 255
-
-	text = textitem.TextItem(text, font_color, alpha_value)
-
-	text.x = (SCREEN_WIDTH - text.get_width()) / 2
-	text.y = ((SCREEN_HEIGHT - text.get_height()) / 2) + (parent_button.get_height() * 2)
 
 	return text
 
@@ -60,8 +51,10 @@ def main(window_surface, main_clock, debug_font, title_logo):
 	setup_logo(title_logo)
 	title_logo.play()
 
-	start_button = setup_start_button()
-	quit_button = setup_quit_button(start_button)
+	# Setup the menu and add the buttons to it.
+	main_menu = setup_menu()
+	main_menu.add(setup_button("Start"))
+	main_menu.add(setup_button("Quit"))
 
 	# Setup and play music.
 	setup_music()
@@ -87,13 +80,10 @@ def main(window_surface, main_clock, debug_font, title_logo):
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.play()
 
-		# Draw the logo.
 		title_logo.draw(window_surface)
 
-		start_button.draw(window_surface)
-		
-		quit_button.draw(window_surface)
-		
+		main_menu.draw(window_surface)
+
 		if DEBUG_MODE:
 			# Display various debug information.
 			debug.display(window_surface, main_clock, debug_font)
