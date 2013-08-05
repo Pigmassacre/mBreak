@@ -28,6 +28,7 @@ class Ball(pygame.sprite.Sprite):
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
 	max_speed = 3 * GAME_SCALE
+	damage = 10
 	spin_speed_strength = 0.05
 	spin_angle_strength = 0.05
 	trace_spawn_rate = 32
@@ -36,7 +37,7 @@ class Ball(pygame.sprite.Sprite):
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, x, y, angle, speed, damage, owner):
+	def __init__(self, x, y, angle, speed, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -62,9 +63,6 @@ class Ball(pygame.sprite.Sprite):
 		else:
 			self.speed = self.max_speed
 		
-		# Store the damage value, this is the damage the ball does to a block when it collides with it.
-		self.damage = damage
-		
 		# Store the owner.
 		self.owner = owner
 
@@ -76,8 +74,7 @@ class Ball(pygame.sprite.Sprite):
 		self.color = self.owner.color
 		useful.colorize_image(self.image, self.color)
 
-		# Load the sound effect.
-		# self.sound_effect = Ball.sound_effect.
+		# If collided is True, the ball sound is played.
 		self.collided = False
 
 		# Setup the trace time keeping variable.
@@ -176,9 +173,6 @@ class Ball(pygame.sprite.Sprite):
 			Ball.sound_effect.play()
 
 	def calculate_spin(self, paddle):
-		# TODO: Look over this, it feels wrong.
-		# I think it should be something like: If ball is in pi and 2pi degrees angle and velocity
-		# is positive, increase speed for a short while and increase angle. Vice versa.
 		if self.angle <= (math.pi / 2):
 			self.angle = self.angle - (paddle.velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= math.pi:
@@ -329,8 +323,8 @@ class Ball(pygame.sprite.Sprite):
 		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
 		block_information = {}
 		for block in blocks_collided_with:
-			# Determine what side of the block we've collided with. We use the previous position of the ball in order
-			# to more more correctly determine the side.
+			# TODO: Test with self.previous instead of self.rect?
+			# Determine what side of the block we've collided with.
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
 				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
@@ -441,7 +435,7 @@ class Ball(pygame.sprite.Sprite):
 	def hit_block(self, block):
 		# We've hit a block, so spawn a particle, damage that block and set collision to True.
 		self.spawn_particles()
-		block.on_hit(self.damage)
+		block.on_hit(Ball.damage)
 		self.collided = True
 
 	def hit_top_side_of_block(self, block):

@@ -15,13 +15,12 @@ def display(window_surface, main_clock, debug_font):
 
 def create_ball(x, y, angle, owner):
 	speed = 1.0 * GAME_SCALE
-	damage = 1
-
-	return ball.Ball(x, y, angle, speed, damage, owner)
+	return ball.Ball(x, y, angle, speed, owner)
 
 def create_powerup():
-	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - 20, LEVEL_X + (LEVEL_WIDTH / 2) + 20)
-	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - 20, LEVEL_Y + (LEVEL_HEIGHT / 2) + 20)
+	size = 150
+	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - size, LEVEL_X + (LEVEL_WIDTH / 2) + size)
+	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - size, LEVEL_Y + (LEVEL_HEIGHT / 2) + size)
 	return multiball.Multiball(x, y)
 
 def create_ball_left(player_left):

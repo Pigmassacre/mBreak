@@ -20,7 +20,7 @@ class NormalBlock(block.Block):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
-	health = 1
+	health = 10
 
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))

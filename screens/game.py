@@ -16,6 +16,7 @@ import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
 import objects.groups as groups
 from settings.settings import *
+import settings.graphics as graphics
 
 # Import any needed game screens here.
 
@@ -129,20 +130,24 @@ def main(window_surface, main_clock, debug_font):
 		groups.Groups.ball_group.update(main_clock)
 		
 		# Update the particles.
-		groups.Groups.particle_group.update()
+		if graphics.PARTICLES:
+			groups.Groups.particle_group.update()
 
 		# Update the traces.
-		groups.Groups.trace_group.update()
+		if graphics.TRACES:
+			groups.Groups.trace_group.update()
 		
 		# Update the players.
 		groups.Groups.player_group.update()
 		
 		# Update the shadows.
-		groups.Groups.shadow_group.update(main_clock)
+		if graphics.SHADOWS:
+			groups.Groups.shadow_group.update(main_clock)
 
 		# Draw the shadows.
-		for shadow in groups.Groups.shadow_group:
-			shadow.blit_to(window_surface)
+		if graphics.SHADOWS:
+			for shadow in groups.Groups.shadow_group:
+				shadow.blit_to(window_surface)
 
 		# Draw the blocks.
 		groups.Groups.block_group.draw(window_surface)
@@ -154,12 +159,14 @@ def main(window_surface, main_clock, debug_font):
 		groups.Groups.powerup_group.draw(window_surface)
 
 		# Draw the particles.
-		for particle in groups.Groups.particle_group:
-			window_surface.fill(particle.color, particle.rect)
+		if graphics.PARTICLES:
+			for particle in groups.Groups.particle_group:
+				window_surface.fill(particle.color, particle.rect)
 
 		# Draw the traces.
-		for trace in groups.Groups.trace_group:
-			trace.blit_to(window_surface)
+		if graphics.TRACES:
+			for trace in groups.Groups.trace_group:
+				trace.blit_to(window_surface)
 
 		# Draw the balls.
 		groups.Groups.ball_group.draw(window_surface)
