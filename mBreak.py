@@ -21,7 +21,6 @@ def main():
 
 	# Setup the window surface to be used.
 	window_surface = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-	#game_surface = pygame.Surface((BASE_WIDTH, BASE_HEIGHT), SRCALPHA)
 
 	# Set the window caption.
 	pygame.display.set_caption(WINDOW_CAPTION)
@@ -30,7 +29,7 @@ def main():
 	debug_font = pygame.font.Font(DEBUG_FONT, 9)
 
 	# Start the intro menu.
-	splash.main(window_surface, main_clock, debug_font)
+	splash.Splash(window_surface, main_clock, debug_font)
 
 # Start the game!
 main()

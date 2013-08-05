@@ -10,7 +10,10 @@ class Menu:
 
 	def __init__(self, x, y, position = 0):
 		# Setup a list to contain all the menu items.
-		self.menu_list = []
+		self.items = []
+
+		# Setup a dictionary that contains the functions that each item will call when activated.
+		self.functions = {}
 
 		# Store the current position in the menu.
 		self.position = 0
@@ -19,24 +22,38 @@ class Menu:
 		self.x = x
 		self.y = y
 
-	def add(self, item):
-		if len(self.menu_list) > 0:
-			last_item = self.menu_list[len(self.menu_list) - 1]
-			print(str(len(self.menu_list) - 1))
-			self.menu_list.append(item)
+	def add(self, item, function):
+		if len(self.items) > 0:
+			last_item = self.items[len(self.items) - 1]
+
+			self.items.append(item)
 			item.x = self.x - (item.get_width() / 2)
 			item.y = last_item.y + (last_item.get_height() * 2)
 		else:
-			self.menu_list.append(item)
+			self.items.append(item)
 			item.x = self.x - (item.get_width() / 2)
 			item.y = self.y
 
+		self.functions[item] = function
+
 	def remove(self, item):
-		self.menu_list.remove(item)
+		self.items.remove(item)
 
-	#def update(self):
+	def update(self):
+		mouse_pos = pygame.mouse.get_pos()
+		pressed_buttons = pygame.mouse.get_pressed()
 
+		for item in self.items:
+			if self.is_mouse_over_item(item, mouse_pos):
+				if pressed_buttons[0]:
+					self.functions[item]()
+
+	def is_mouse_over_item(self, item, mouse_pos):
+		x = mouse_pos[0]
+		y = mouse_pos[1]
+
+		return x >= item.x and x <= item.x + item.get_width() and y >= item.y and y <= item.y + item.get_height()
 
 	def draw(self, surface):
-		for item in self.menu_list:
+		for item in self.items:
 			item.draw(surface)

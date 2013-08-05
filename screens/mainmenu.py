@@ -16,79 +16,103 @@ from settings.settings import *
 # Import any needed game screens here.
 import screens.game as game
 
-def setup_logo(title_logo):
-	# Set the logo so it displays in the middle of the screen.
-	x = (SCREEN_WIDTH - title_logo.get_width()) / 2
-	y = ((SCREEN_HEIGHT - title_logo.get_height()) / 4)
-	title_logo.x = x
-	title_logo.y = y
+class MainMenu:
 
-	return title_logo
+	def __init__(self, window_surface, main_clock, debug_font, title_logo):
+		self.window_surface = window_surface
+		self.main_clock = main_clock
+		self.debug_font = debug_font
+		self.title_logo = title_logo
 
-def setup_menu():
-	x = SCREEN_WIDTH / 2
-	y = SCREEN_HEIGHT / 2
+		# Setup the logo and store the surface of the logo.
+		self.setup_logo(self.title_logo)
+		self.title_logo.play()
 
-	main_menu = menu.Menu(x, y)
+		# Setup the menu and add the buttons to it.
+		self.main_menu = self.setup_menu()
+		self.main_menu.add(self.setup_button("Start"), self.start)
+		self.main_menu.add(self.setup_button("Options"), self.options)
+		self.main_menu.add(self.setup_button("Quit"), self.quit)
 
-	return main_menu
+		# Setup and play music.
+		self.setup_music()
+			
+		# Keeps track of how much time has passed.
+		self.time_passed = 0
 
-def setup_button(text):
-	font_color = (255, 255, 255)
-	alpha_value = 255
+		self.gameloop()
 
-	text = textitem.TextItem(text, font_color, alpha_value)
+	def setup_logo(self, title_logo):
+		# Set the logo so it displays in the middle of the screen.
+		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
+		y = ((SCREEN_HEIGHT - title_logo.get_height()) / 4)
+		title_logo.x = x
+		title_logo.y = y
 
-	return text
+		return title_logo
 
-def setup_music():
-	pygame.mixer.music.load(TITLE_MUSIC)
-	pygame.mixer.music.play()
+	def setup_menu(self):
+		x = SCREEN_WIDTH / 2
+		y = SCREEN_HEIGHT / 2
 
-# TODO: Remove debug_font
-def main(window_surface, main_clock, debug_font, title_logo):
-	# Setup the logo and store the surface of the logo.
-	setup_logo(title_logo)
-	title_logo.play()
+		main_menu = menu.Menu(x, y)
 
-	# Setup the menu and add the buttons to it.
-	main_menu = setup_menu()
-	main_menu.add(setup_button("Start"))
-	main_menu.add(setup_button("Quit"))
+		return main_menu
 
-	# Setup and play music.
-	setup_music()
-		
-	# Keeps track of how much time has passed.
-	time_passed = 0
+	def setup_button(self, text):
+		font_color = (255, 255, 255)
+		alpha_value = 255
 
-	while True:
-		# Every frame begins by filling the whole screen with the background color.
-		window_surface.fill(BACKGROUND_COLOR)
-		
-		for event in pygame.event.get():
-			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-				# If the ESCAPE key is pressed or the window is closed, the game is shut down.
-				pygame.quit()
-				sys.exit()
-			elif event.type == KEYDOWN and event.key == K_RETURN:
-				# If ENTER is pressed, proceed to the next screen, and end this loop.
-				pygame.mixer.music.stop()
-				game.main(window_surface, main_clock, debug_font)
-		
-		# If the music isn't playing, start it.
+		text = textitem.TextItem(text, font_color, alpha_value)
+
+		return text
+
+	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
+			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-		title_logo.draw(window_surface)
+	def start(self):
+		pygame.mixer.music.stop()
+		game.main(self.window_surface, self.main_clock, self.debug_font)
 
-		main_menu.draw(window_surface)
+	def options(self):
+		print("Options clicked!")
 
-		if DEBUG_MODE:
-			# Display various debug information.
-			debug.display(window_surface, main_clock, debug_font)
+	def quit(self):
+		pygame.quit()
+		sys.exit()
 
-		pygame.display.update()
+	def gameloop(self):
+		done = False
 		
-		# Finally, constrain the game to a set maximum amount of FPS.
-		main_clock.tick(MAX_FPS)
+		while not done:
+			# Every frame begins by filling the whole screen with the background color.
+			self.window_surface.fill(BACKGROUND_COLOR)
+			
+			for event in pygame.event.get():
+				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+					# If the ESCAPE key is pressed or the window is closed, the game is shut down.
+					pygame.quit()
+					sys.exit()
+				elif event.type == KEYDOWN and event.key == K_RETURN:
+					# If ENTER is pressed, proceed to the next screen, and end this loop.
+					self.start()
+			
+			# If the music isn't playing, start it.
+			if not pygame.mixer.music.get_busy():
+				pygame.mixer.music.play()
+
+			self.title_logo.draw(self.window_surface)
+
+			self.main_menu.update()
+			self.main_menu.draw(self.window_surface)
+
+			if DEBUG_MODE:
+				# Display various debug information.
+				debug.display(self.window_surface, self.main_clock, self.debug_font)
+
+			pygame.display.update()
+			
+			# Finally, constrain the game to a set maximum amount of FPS.
+			self.main_clock.tick(MAX_FPS)

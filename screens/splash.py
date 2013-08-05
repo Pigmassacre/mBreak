@@ -15,87 +15,90 @@ from settings.settings import *
 # Import any needed game screens here.
 import screens.intromenu as intromenu
 
-def main(window_surface, main_clock, debug_font):
-	# Setup the splash image.
-	splash_image_path = "res/splash/splash_color.png"
-	splash = pygame.image.load(splash_image_path)
+class Splash:
 
+	splash = pygame.image.load("res/splash/splash_color.png")
 	splash = pygame.transform.scale(splash, (SCREEN_HEIGHT, SCREEN_HEIGHT))
-
-	splash_x = (SCREEN_WIDTH - splash.get_width()) / 2
-	splash_y = (SCREEN_HEIGHT - splash.get_height()) / 2
+	splash_top_half = splash.subsurface(pygame.Rect((0, 0), (splash.get_width(), splash.get_height() / 2)))
+	splash_bottom_half = splash.subsurface(pygame.Rect((0, (splash.get_height()) / 2), (splash.get_width(), splash.get_height() / 2)))
 
 	splash_time = 1750
-
-	scaled_splash = pygame.transform.scale(splash, (SCREEN_HEIGHT, SCREEN_HEIGHT))
-	
-	top_half = pygame.Rect((0, 0), (scaled_splash.get_width(), scaled_splash.get_height() / 2))
-	bottom_half = pygame.Rect((0, (scaled_splash.get_height()) / 2), (scaled_splash.get_width(), scaled_splash.get_height() / 2))
-
-	splash_top_half = scaled_splash.subsurface(top_half)
-	splash_bottom_half = scaled_splash.subsurface(bottom_half)
-
 	top_half_speed = 30
 	bottom_half_speed = -30
 
-	top_half_x = -splash_top_half.get_width()
-	top_half_y = 0
-	bottom_half_x = SCREEN_WIDTH
-	bottom_half_y = (SCREEN_HEIGHT / 2)
+	background_color = pygame.Color(0, 0, 0)
 
-	top_go_right = True
-	bottom_go_left = True
+	def __init__(self, window_surface, main_clock, debug_font):
+		self.window_surface = window_surface
+		self.main_clock = main_clock
+		self.debug_font = debug_font
 
-	top_done = False
-	bottom_done = False
+		self.x = (SCREEN_WIDTH - Splash.splash.get_width()) / 2
+		self.y = (SCREEN_HEIGHT - Splash.splash.get_height()) / 2
 
-	# Keeps track of how much time has passed.
-	time_passed = 0
+		self.top_half_x = -Splash.splash_top_half.get_width()
+		self.top_half_y = 0
+		self.bottom_half_x = SCREEN_WIDTH
+		self.bottom_half_y = (SCREEN_HEIGHT / 2)
 
-	background_color = (0, 0, 0)
+		self.top_go_right = True
+		self.bottom_go_left = True
 
-	while True:
-		# Every frame begins by filling the whole screen with the background color.
-		window_surface.fill(background_color)
-		
-		for event in pygame.event.get():
-			if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
-				# If ENTER is pressed, proceed to the next screen, and end this loop.
-				intromenu.main(window_surface, main_clock, debug_font)
+		self.top_done = False
+		self.bottom_done = False
 
-		if time_passed >= splash_time:
-			intromenu.main(window_surface, main_clock, debug_font)
+		# Keeps track of how much time has passed.
+		self.time_passed = 0
 
-		if top_go_right:
-			top_half_x += top_half_speed
-		else:
-			top_half_x -= top_half_speed
+		self.gameloop()
 
-		if top_half_x > (2 * SCREEN_WIDTH) - splash_top_half.get_width():
-			top_go_right = False
-		elif top_half_x <= (SCREEN_WIDTH - splash_top_half.get_width()) / 2 and not top_go_right:
-			top_half_x = (SCREEN_WIDTH - splash_top_half.get_width()) / 2
-			top_done = True
+	def gameloop(self):
+		done = False
 
-		if bottom_go_left:
-			bottom_half_x += bottom_half_speed
-		else:
-			bottom_half_x -= bottom_half_speed
+		while not done:
+			# Every frame begins by filling the whole screen with the background color.
+			self.window_surface.fill(Splash.background_color)
+			
+			for event in pygame.event.get():
+				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
+					# If ENTER is pressed, proceed to the next screen, and end this loop.
+					done = True
 
-		if bottom_half_x < -SCREEN_WIDTH:
-			bottom_go_left = False
-		elif bottom_half_x >= (SCREEN_WIDTH - splash_bottom_half.get_width()) / 2 and not bottom_go_left:
-			bottom_half_x = (SCREEN_WIDTH - splash_bottom_half.get_width()) / 2
-			bottom_done = True
+			if self.time_passed >= Splash.splash_time:
+				done = True
 
-		if top_done and bottom_done:
-			time_passed += main_clock.get_time()
-			window_surface.blit(splash, (splash_x, splash_y))
-		else:
-			window_surface.blit(splash_top_half, (top_half_x, top_half_y))
-			window_surface.blit(splash_bottom_half, (bottom_half_x, bottom_half_y))
+			if self.top_go_right:
+				self.top_half_x += Splash.top_half_speed
+			else:
+				self.top_half_x -= Splash.top_half_speed
 
-		pygame.display.update()
-		
-		# Finally, constrain the game to a set maximum amount of FPS.
-		main_clock.tick(MAX_FPS)
+			if self.top_half_x > (2 * SCREEN_WIDTH) - Splash.splash_top_half.get_width():
+				self.top_go_right = False
+			elif self.top_half_x <= (SCREEN_WIDTH - Splash.splash_top_half.get_width()) / 2 and not self.top_go_right:
+				self.top_half_x = (SCREEN_WIDTH - Splash.splash_top_half.get_width()) / 2
+				self.top_done = True
+
+			if self.bottom_go_left:
+				self.bottom_half_x += Splash.bottom_half_speed
+			else:
+				self.bottom_half_x -= Splash.bottom_half_speed
+
+			if self.bottom_half_x < -SCREEN_WIDTH:
+				self.bottom_go_left = False
+			elif self.bottom_half_x >= (SCREEN_WIDTH - Splash.splash_bottom_half.get_width()) / 2 and not self.bottom_go_left:
+				self.bottom_half_x = (SCREEN_WIDTH - Splash.splash_bottom_half.get_width()) / 2
+				self.bottom_done = True
+
+			if self.top_done and self.bottom_done:
+				self.time_passed += self.main_clock.get_time()
+				self.window_surface.blit(Splash.splash, (self.x, self.y))
+			else:
+				self.window_surface.blit(Splash.splash_top_half, (self.top_half_x, self.top_half_y))
+				self.window_surface.blit(Splash.splash_bottom_half, (self.bottom_half_x, self.bottom_half_y))
+
+			pygame.display.update()
+			
+			# Finally, constrain the game to a set maximum amount of FPS.
+			self.main_clock.tick(MAX_FPS)
+
+		intromenu.IntroMenu(self.window_surface, self.main_clock, self.debug_font)
