@@ -53,19 +53,19 @@ class Splash:
 		self.gameloop()
 
 	def gameloop(self):
-		done = False
+		self.done = False
 
-		while not done:
+		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(Splash.background_color)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					done = True
+					self.done = True
 
 			if self.time_passed >= Splash.splash_time:
-				done = True
+				self.done = True
 
 			if self.top_go_right:
 				self.top_half_x += Splash.top_half_speed

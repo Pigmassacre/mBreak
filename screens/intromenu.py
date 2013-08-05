@@ -43,7 +43,7 @@ class IntroMenu:
 		title_logo = logo.Logo()
 
 		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
-		y = ((SCREEN_HEIGHT - title_logo.get_height()) / 2) - 30
+		y = (SCREEN_HEIGHT / 2) - title_logo.get_height()
 		title_logo.x = x
 		title_logo.y = y
 
@@ -53,12 +53,12 @@ class IntroMenu:
 		text = "Press ENTER to start"
 		font_color = (255, 255, 255)
 		alpha_value = 255
-		offset = 50
+		offset = 0
 
 		text = textitem.TextItem(text, font_color, alpha_value)
 
 		text.x = (SCREEN_WIDTH - text.get_width()) / 2
-		text.y = title_logo.y + title_logo.get_height() + offset
+		text.y = title_logo.y + title_logo.get_height() + text.get_height()
 
 		return text
 
@@ -67,9 +67,8 @@ class IntroMenu:
 		pygame.mixer.music.play()
 
 	def gameloop(self):
-		done = False
-
-		while not done:
+		self.done = False
+		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(BACKGROUND_COLOR)
 			
@@ -81,7 +80,7 @@ class IntroMenu:
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					# TODO: Add transition effect (logo moves up).
-					done = True
+					self.done = True
 			
 			# If the music isn't playing, start it.
 			if not pygame.mixer.music.get_busy():

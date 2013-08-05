@@ -6,6 +6,7 @@ import pygame, sys
 from pygame.locals import *
 from libs import pyganim
 import math
+import random
 import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
@@ -18,14 +19,23 @@ import screens.game as game
 
 class MainMenu:
 
-	def __init__(self, window_surface, main_clock, debug_font, title_logo):
+	def __init__(self, window_surface, main_clock, debug_font, title_logo = None):
+		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 		self.debug_font = debug_font
-		self.title_logo = title_logo
+
+		# The next screen to be started when gameloop ends.
+		self.next_screen = None
+
+		# Setup the logo and the variables needed to handle the animation of it.
+		if title_logo == None:
+			self.title_logo = self.setup_logo()
+		else:
+			self.title_logo = title_logo
 
 		self.title_logo.play()
-		self.logo_speed = 3
+		self.logo_speed = 5
 		self.logo_desired_x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
 		self.logo_desired_y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
 
@@ -35,13 +45,33 @@ class MainMenu:
 		self.main_menu.add(self.setup_button("Options"), self.options)
 		self.main_menu.add(self.setup_button("Quit"), self.quit)
 
+		# Setup the variables needed to handle the animation of the menu.
+		self.main_menu_speed = 48
+		self.main_menu_start_positions = {}
+		self.odd = random.choice([True, False])
+		for item in self.main_menu.items:
+			self.main_menu_start_positions[item] = item.x
+			if self.odd:
+				item.x = SCREEN_WIDTH
+				self.odd = False
+			else:
+				item. x = -item.get_width()
+				self.odd = True
+
 		# Setup and play music.
 		self.setup_music()
-			
-		# Keeps track of how much time has passed.
-		self.time_passed = 0
 
 		self.gameloop()
+
+	def setup_logo(self):
+		title_logo = logo.Logo()
+
+		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
+		y = ((SCREEN_HEIGHT - title_logo.get_height()) / 4)
+		title_logo.x = x
+		title_logo.y = y
+
+		return title_logo
 
 	def setup_menu(self):
 		x = SCREEN_WIDTH / 2
@@ -66,19 +96,20 @@ class MainMenu:
 
 	def start(self):
 		pygame.mixer.music.stop()
-		game.main(self.window_surface, self.main_clock, self.debug_font)
+		self.done = True
+		self.next_screen = game.Game
 
 	def options(self):
 		print("Options clicked!")
 
 	def quit(self):
-		pygame.quit()
-		sys.exit()
+		self.done = True
+		self.next_screen = None
 
 	def gameloop(self):
-		done = False
+		self.done = False
 
-		while not done:
+		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(BACKGROUND_COLOR)
 			
@@ -122,6 +153,18 @@ class MainMenu:
 
 			#  If the logo is in place, show the menu.
 			if self.title_logo.x == self.logo_desired_x and self.title_logo.y == self.logo_desired_y:
+				for item in self.main_menu.items:
+					if self.main_menu_start_positions[item] < item.x:
+						if (item.x - self.main_menu_speed) < self.main_menu_start_positions[item]:
+							item.x = self.main_menu_start_positions[item]
+						else:
+							item.x -= self.main_menu_speed
+					elif self.main_menu_start_positions[item] > item.x:
+						if (item.x + self.main_menu_speed) > self.main_menu_start_positions[item]:
+							item.x = self.main_menu_start_positions[item]
+						else:
+							item.x += self.main_menu_speed
+
 				self.main_menu.update()
 				self.main_menu.draw(self.window_surface)
 
@@ -133,3 +176,10 @@ class MainMenu:
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(MAX_FPS)
+
+		# The gameloop is over, so we either start the next screen or quit the game.
+		if not self.next_screen == None:
+			self.next_screen(self.window_surface, self.main_clock, self.debug_font)
+		else:
+			pygame.quit()
+			sys.exit()
