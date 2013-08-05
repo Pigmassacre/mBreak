@@ -40,16 +40,13 @@ class IntroMenu:
 		self.gameloop()
 
 	def setup_logo(self):
-		# Create the logo
 		title_logo = logo.Logo()
 
-		# Set the logo so it displays in the middle of the screen.
 		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
 		y = ((SCREEN_HEIGHT - title_logo.get_height()) / 2) - 30
 		title_logo.x = x
 		title_logo.y = y
 
-		# At last, return the surface so we can blit it to the window_surface.
 		return title_logo
 
 	def setup_message(self, title_logo):

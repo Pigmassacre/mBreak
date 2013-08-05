@@ -44,7 +44,9 @@ class Menu:
 		pressed_buttons = pygame.mouse.get_pressed()
 
 		for item in self.items:
+			item.selected = False
 			if self.is_mouse_over_item(item, mouse_pos):
+				item.selected = True
 				if pressed_buttons[0]:
 					self.functions[item]()
 

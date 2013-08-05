@@ -24,9 +24,10 @@ class MainMenu:
 		self.debug_font = debug_font
 		self.title_logo = title_logo
 
-		# Setup the logo and store the surface of the logo.
-		self.setup_logo(self.title_logo)
 		self.title_logo.play()
+		self.logo_speed = 3
+		self.logo_desired_x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
+		self.logo_desired_y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
 
 		# Setup the menu and add the buttons to it.
 		self.main_menu = self.setup_menu()
@@ -41,15 +42,6 @@ class MainMenu:
 		self.time_passed = 0
 
 		self.gameloop()
-
-	def setup_logo(self, title_logo):
-		# Set the logo so it displays in the middle of the screen.
-		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
-		y = ((SCREEN_HEIGHT - title_logo.get_height()) / 4)
-		title_logo.x = x
-		title_logo.y = y
-
-		return title_logo
 
 	def setup_menu(self):
 		x = SCREEN_WIDTH / 2
@@ -85,7 +77,7 @@ class MainMenu:
 
 	def gameloop(self):
 		done = False
-		
+
 		while not done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(BACKGROUND_COLOR)
@@ -93,8 +85,8 @@ class MainMenu:
 			for event in pygame.event.get():
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 					# If the ESCAPE key is pressed or the window is closed, the game is shut down.
-					pygame.quit()
 					sys.exit()
+					pygame.quit()
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					self.start()
@@ -103,10 +95,35 @@ class MainMenu:
 			if not pygame.mixer.music.get_busy():
 				pygame.mixer.music.play()
 
+			# Move the logo to the desired position.
+			if self.logo_desired_x < self.title_logo.x:
+				if (self.title_logo.x - self.logo_speed) < self.logo_desired_x:
+					self.title_logo.x = self.logo_desired_x
+				else:
+					self.title_logo.x -= self.logo_speed
+			elif self.logo_desired_x > self.title_logo.x:
+				if (self.title_logo.x + self.logo_speed) > self.logo_desired_x:
+					self.title_logo.x = self.logo_desired_x
+				else:
+					self.title_logo.x += self.logo_speed
+
+			if self.logo_desired_y < self.title_logo.y:
+				if (self.title_logo.y - self.logo_speed) < self.logo_desired_y:
+					self.title_logo.y = self.logo_desired_y
+				else:
+					self.title_logo.y -= self.logo_speed
+			elif self.logo_desired_y > self.title_logo.y:
+				if (self.title_logo.y + self.logo_speed) > self.logo_desired_y:
+					self.title_logo.y = self.logo_desired_y
+				else:
+					self.title_logo.y += self.logo_speed
+
 			self.title_logo.draw(self.window_surface)
 
-			self.main_menu.update()
-			self.main_menu.draw(self.window_surface)
+			#  If the logo is in place, show the menu.
+			if self.title_logo.x == self.logo_desired_x and self.title_logo.y == self.logo_desired_y:
+				self.main_menu.update()
+				self.main_menu.draw(self.window_surface)
 
 			if DEBUG_MODE:
 				# Display various debug information.

@@ -400,7 +400,7 @@ class Ball(pygame.sprite.Sprite):
 						self.hit_right_side_of_block(block)
 					elif side == "bottom":
 						self.hit_bottom_side_of_block(block)
-		# If we've hit three blocks, it's a little bit more complex. We have a lot of cases to handle
+		# If we've hit three blocks, it's a little bit more complex. We have a lot of cases to handle.
 		elif len(block_information) == 3:
 			# Setup a few help lists to more easily determine how to act.
 			block_list = []
@@ -413,14 +413,18 @@ class Ball(pygame.sprite.Sprite):
 			# We also damage each block separately, since we cannot be sure what block we've "really"
 			# hit until we've checked.
 			if block_list[0].y == block_list[1].y:
-				self.check_block_collisions(block_list[0], block_list[1], block_list[2])
+				self.check_block_collisions(block_list[0], block_list[1], block_list[2], side_list[2])
 			elif block_list[1].y == block_list[2].y:
-				self.check_block_collisions(block_list[1], block_list[2], block_list[0])
+				self.check_block_collisions(block_list[1], block_list[2], block_list[0], side_list[0])
 			elif block_list[2].y == block_list[0].y:
-				self.check_block_collisions(block_list[2], block_list[0], block_list[1])
+				self.check_block_collisions(block_list[2], block_list[0], block_list[1], side_list[1])
 
-	def check_block_collisions(self, block_one, block_two, block_three):
-		self.hit_left_side_of_block(block_three)
+	def check_block_collisions(self, block_one, block_two, block_three, block_three_side):
+		if block_three_side == "left":
+			self.hit_left_side_of_block(block_three)
+		else:
+			self.hit_right_side_of_block(block_three)
+
 		if block_three.y > block_one.y:
 			if block_one.x > block_two.x:
 				self.hit_bottom_side_of_block(block_one)

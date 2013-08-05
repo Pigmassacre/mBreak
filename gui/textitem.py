@@ -19,12 +19,15 @@ class TextItem:
 	y = 0
 	shadow_offset = 3
 	shadow_color = pygame.Color(50, 50, 50, 255)
+	selected_color = pygame.Color(128, 128, 128, 255)
 
 	def __init__(self, text_value, font_color, alpha_value):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y
 		self.font = TextItem.font
+		self.selected_font_color = TextItem.selected_color
+		self.selected = False
 
 		# Set the given values.
 		self.text_value = text_value
@@ -33,6 +36,10 @@ class TextItem:
 		# Render the font surface.
 		self.surface = self.font.render(self.text_value, False, self.font_color)
 		self.surface.set_alpha(alpha_value)
+
+		# Render the selected font surface.
+		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
+		self.selected_surface.set_alpha(alpha_value)
 
 		# Setup the shadow.
 		self.shadow_color = TextItem.shadow_color
@@ -80,4 +87,7 @@ class TextItem:
 	def draw(self, surface):
 		# First blit shadow, then self. Keeps shadow UNDER the text.
 		surface.blit(self.shadow_surface, (self.x + self.shadow_offset, self.y + self.shadow_offset))
-		surface.blit(self.surface, (self.x, self.y))
+		if not self.selected:
+			surface.blit(self.surface, (self.x, self.y))
+		else:
+			surface.blit(self.selected_surface, (self.x, self.y))
