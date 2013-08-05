@@ -65,6 +65,9 @@ class Game:
 		# Setup the game world.
 		self.setup_gamefield(self.player_left, self.player_right)
 
+		# Stop the music (eventually start music)
+		pygame.mixer.music.stop()
+
 		self.gameloop()
 
 	def convert_background(self):

@@ -15,10 +15,9 @@ import gui.menu as menu
 from settings.settings import *
 
 # Import any needed game screens here.
-import screens.game as game
-import screens.optionsmenu as optionsmenu
+import screens
 
-class MainMenu:
+class GraphicsMenu:
 
 	def __init__(self, window_surface, main_clock, debug_font, title_logo = None):
 		# Store the game variables.
@@ -35,23 +34,24 @@ class MainMenu:
 			self.title_logo.play()
 		else:
 			self.title_logo = title_logo
-
+		
 		self.logo_speed = 5
 		self.logo_desired_x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
 		self.logo_desired_y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
 
 		# Setup the menu and add the buttons to it.
-		self.main_menu = self.setup_menu()
-		self.main_menu.add(self.setup_button("Start"), self.start)
-		self.main_menu.add(self.setup_button("Options"), self.options)
-		self.main_menu.add(self.setup_button("Quit"), self.quit)
+		self.graphics_menu = self.setup_menu()
+		self.graphics_menu.add(self.setup_button("Shadows"), self.shadows)
+		self.graphics_menu.add(self.setup_button("Particles"), self.particles)
+		self.graphics_menu.add(self.setup_button("Traces"), self.traces)
+		self.graphics_menu.add(self.setup_button("Back"), self.back)
 
 		# Setup the variables needed to handle the animation of the menu.
-		self.main_menu_speed = 48
-		self.main_menu_start_positions = {}
+		self.graphics_menu_speed = 48
+		self.graphics_menu_start_positions = {}
 		self.odd = random.choice([True, False])
-		for item in self.main_menu.items:
-			self.main_menu_start_positions[item] = item.x
+		for item in self.graphics_menu.items:
+			self.graphics_menu_start_positions[item] = item.x
 			if self.odd:
 				item.x = SCREEN_WIDTH
 				self.odd = False
@@ -78,9 +78,9 @@ class MainMenu:
 		x = SCREEN_WIDTH / 2
 		y = SCREEN_HEIGHT / 2
 
-		main_menu = menu.Menu(x, y)
+		graphics_menu = menu.Menu(x, y)
 
-		return main_menu
+		return graphics_menu
 
 	def setup_button(self, text):
 		font_color = (255, 255, 255)
@@ -95,18 +95,18 @@ class MainMenu:
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-	def start(self):
-		pygame.mixer.music.stop()
-		self.done = True
-		self.next_screen = game.Game
+	def shadows(self):
+		print("Shadows clicked!")
 
-	def options(self):
-		self.done = True
-		self.next_screen = optionsmenu.OptionsMenu
+	def particles(self):
+		print("Particles clicked!")
 
-	def quit(self):
+	def traces(self):
+		print("Traces clicked!")
+
+	def back(self):
 		self.done = True
-		self.next_screen = None
+		self.next_screen = screens.optionsmenu.OptionsMenu
 
 	def gameloop(self):
 		self.done = False
@@ -151,20 +151,20 @@ class MainMenu:
 
 			#  If the logo is in place, show the menu.
 			if self.title_logo.x == self.logo_desired_x and self.title_logo.y == self.logo_desired_y:
-				for item in self.main_menu.items:
-					if self.main_menu_start_positions[item] < item.x:
-						if (item.x - self.main_menu_speed) < self.main_menu_start_positions[item]:
-							item.x = self.main_menu_start_positions[item]
+				for item in self.graphics_menu.items:
+					if self.graphics_menu_start_positions[item] < item.x:
+						if (item.x - self.graphics_menu_speed) < self.graphics_menu_start_positions[item]:
+							item.x = self.graphics_menu_start_positions[item]
 						else:
-							item.x -= self.main_menu_speed
-					elif self.main_menu_start_positions[item] > item.x:
-						if (item.x + self.main_menu_speed) > self.main_menu_start_positions[item]:
-							item.x = self.main_menu_start_positions[item]
+							item.x -= self.graphics_menu_speed
+					elif self.graphics_menu_start_positions[item] > item.x:
+						if (item.x + self.graphics_menu_speed) > self.graphics_menu_start_positions[item]:
+							item.x = self.graphics_menu_start_positions[item]
 						else:
-							item.x += self.main_menu_speed
+							item.x += self.graphics_menu_speed
 
-				self.main_menu.update()
-				self.main_menu.draw(self.window_surface)
+				self.graphics_menu.update()
+				self.graphics_menu.draw(self.window_surface)
 
 			if DEBUG_MODE:
 				# Display various debug information.
@@ -176,10 +176,8 @@ class MainMenu:
 			self.main_clock.tick(MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
-		if self.next_screen == None:
+		if not self.next_screen == None:
+			self.next_screen(self.window_surface, self.main_clock, self.debug_font, self.title_logo)
+		else:
 			pygame.quit()
 			sys.exit()
-		elif self.next_screen == game.Game:
-			self.next_screen(self.window_surface, self.main_clock, self.debug_font)
-		else:
-			self.next_screen(self.window_surface, self.main_clock, self.debug_font, self.title_logo)
