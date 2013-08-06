@@ -17,6 +17,7 @@ class Menu:
 
 		# Store the last clicked button, so if a user clicks a button and then holds down the mouse button it only registers as one click.
 		self.last_clicked_item = None
+		self.clicked_outside = {}
 
 		# Store the current position in the menu.
 		self.position = 0
@@ -37,6 +38,7 @@ class Menu:
 			item.x = self.x - (item.get_width() / 2)
 			item.y = self.y
 
+		self.clicked_outside[item] = False
 		self.functions[item] = function
 
 	def cleanup(self):
@@ -60,9 +62,17 @@ class Menu:
 
 		for item in self.items:
 			item.selected = False
+
+			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
+			if pressed_buttons[0]:
+				if not self.clicked_outside[item]:
+					self.clicked_outside[item] = not self.is_mouse_over_item(item, mouse_pos)
+			else:
+				self.clicked_outside[item] = False
+			
 			if self.is_mouse_over_item(item, mouse_pos):
 				item.selected = True
-				if pressed_buttons[0]:
+				if pressed_buttons[0] and not self.clicked_outside[item]:
 					if not self.last_clicked_item == item:
 						self.functions[item]()
 						self.last_clicked_item = item
