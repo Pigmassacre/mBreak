@@ -128,35 +128,35 @@ class MainMenu:
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-	def start(self):
+	def start(self, item):
 		pygame.mixer.music.stop()
 		self.done = True
 
-	def options(self):
+	def options(self, item):
 		self.active_menu.append(self.options_menu)
 		self.setup_menu_transition(self.active_menu[-1])
 
-	def controls(self):
+	def controls(self, item):
 		print("Controls clicked!")
 
-	def graphics(self):
+	def graphics(self, item):
 		self.active_menu.append(self.graphics_menu)
 		self.setup_menu_transition(self.active_menu[-1])
 
-	def shadows(self):
-		graphics.SHADOWS = self.active_menu[-1].find_item(self.shadows).toggle_on_off()
+	def shadows(self, item):
+		graphics.SHADOWS = item.toggle_on_off()
 
-	def particles(self):
-		graphics.PARTICLES = self.active_menu[-1].find_item(self.particles).toggle_on_off()
+	def particles(self, item):
+		graphics.PARTICLES = item.toggle_on_off()
 
-	def traces(self):
-		graphics.TRACES = self.active_menu[-1].find_item(self.traces).toggle_on_off()
+	def traces(self, item):
+		graphics.TRACES = item.toggle_on_off()
 
-	def back(self):
+	def back(self, item):
 		self.active_menu.pop()
 		self.setup_menu_transition(self.active_menu[-1])
 
-	def quit(self):
+	def quit(self, item):
 		self.done = True
 		self.next_screen = None
 
@@ -193,11 +193,7 @@ class MainMenu:
 			self.main_clock.tick(MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
-		if self.next_screen == None:
-			pygame.quit()
-			sys.exit()
-		else:
-			self.next_screen(self.window_surface, self.main_clock, self.debug_font)
+		self.on_exit()
 
 	def update_logo(self):
 		if self.logo_desired_x < self.title_logo.x:
@@ -239,3 +235,10 @@ class MainMenu:
 
 		self.active_menu[-1].update()
 		self.active_menu[-1].draw(self.window_surface)
+
+	def on_exit(self):
+		if self.next_screen == None:
+			pygame.quit()
+			sys.exit()
+		else:
+			self.next_screen(self.window_surface, self.main_clock, self.debug_font)

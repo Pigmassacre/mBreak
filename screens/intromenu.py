@@ -28,8 +28,6 @@ class IntroMenu:
 
 		# Setup the message beneath the logo and store the surface of the message.
 		self.title_message = self.setup_message(self.title_logo)
-		# Sets the blink rate of the message.
-		self.title_message_blink_rate = 750
 
 		# Setup and play music.
 		self.setup_music()
@@ -92,7 +90,7 @@ class IntroMenu:
 			# Increment the time passed.
 			self.time_passed += self.main_clock.get_time()
 			# Blinks the title message.
-			self.time_passed = self.title_message.blink(self.time_passed, self.title_message_blink_rate)
+			self.time_passed = self.title_message.blink(self.time_passed)
 
 			# Draw the title message.
 			self.title_message.draw(self.window_surface)

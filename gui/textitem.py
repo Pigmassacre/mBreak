@@ -23,6 +23,7 @@ class TextItem:
 	selected_color = pygame.Color(128, 128, 128, 255)
 	on_color = pygame.Color(20, 255, 20, 255)
 	off_color = pygame.Color(255, 20, 20, 255)
+	blink_rate = 750
 
 	def __init__(self, text_value, font_color, alpha_value = 255):
 		# Load default values.
@@ -37,54 +38,59 @@ class TextItem:
 		self.selected_off_font_color = useful.blend_colors(self.off_font_color, self.selected_font_color, True)
 		self.is_on_off = False
 		self.on = False
+		self.blink_rate = TextItem.blink_rate
 
 		# Set the given values.
 		self.text_value = text_value
 		self.font_color = font_color
-
-		# Render the font surface.
-		self.surface = self.font.render(self.text_value, False, self.font_color)
-		self.surface.set_alpha(alpha_value)
-
-		# Render the selected font surface.
-		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
-		self.selected_surface.set_alpha(alpha_value)
-
-		# Render the on font surface.
-		self.on_surface = self.font.render(self.text_value, False, self.on_font_color)
-		self.on_surface.set_alpha(alpha_value)
-
-		# Render the off font surface.
-		self.off_surface = self.font.render(self.text_value, False, self.off_font_color)
-		self.off_surface.set_alpha(alpha_value)
-
-		# Render the selected and on surface.
-		self.selected_on_surface = self.font.render(self.text_value, False, self.selected_on_font_color)
-		self.selected_on_surface.set_alpha(alpha_value)
-
-		# Render the selected and off surface.
-		self.selected_off_surface = self.font.render(self.text_value, False, self.selected_off_font_color)
-		self.selected_off_surface.set_alpha(alpha_value)
+		self.alpha_value = alpha_value
 
 		# Setup the shadow.
 		self.shadow_color = TextItem.shadow_color
 		self.shadow_offset = TextItem.shadow_offset
 
+		self.setup_surfaces()
+
+	def setup_surfaces(self):
+		# Render the font surface.
+		self.surface = self.font.render(self.text_value, False, self.font_color)
+		self.surface.set_alpha(self.alpha_value)
+
+		# Render the selected font surface.
+		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
+		self.selected_surface.set_alpha(self.alpha_value)
+
+		# Render the on font surface.
+		self.on_surface = self.font.render(self.text_value, False, self.on_font_color)
+		self.on_surface.set_alpha(self.alpha_value)
+
+		# Render the off font surface.
+		self.off_surface = self.font.render(self.text_value, False, self.off_font_color)
+		self.off_surface.set_alpha(self.alpha_value)
+
+		# Render the selected and on surface.
+		self.selected_on_surface = self.font.render(self.text_value, False, self.selected_on_font_color)
+		self.selected_on_surface.set_alpha(self.alpha_value)
+
+		# Render the selected and off surface.
+		self.selected_off_surface = self.font.render(self.text_value, False, self.selected_off_font_color)
+		self.selected_off_surface.set_alpha(self.alpha_value)
+
 		# Create the surface used for drawing the shadow.
 		self.shadow_surface = self.font.render(self.text_value, False, self.shadow_color)
-		self.shadow_surface.set_alpha(alpha_value)
+		self.shadow_surface.set_alpha(self.alpha_value)
 
 	def set_font(self, font_path):
 		if not self.font_path == font_path:
 			self.font = pygame.font.Font(font_path, self.font_size)
+			self.setup_surfaces()
 
 	def set_size(self, font_size):
 		if not self.font_size == font_size:
 			temp_alpha = self.surface.get_alpha()
 			self.font_size = font_size
 			self.font = pygame.font.Font(self.font_path, self.font_size)
-			self.surface = self.font.render(self.text_value, False, self.font_color)
-			self.surface.set_alpha(temp_alpha)
+			self.setup_surfaces()
 
 	def get_width(self):
 		return self.font.size(self.text_value)[0]
@@ -92,16 +98,16 @@ class TextItem:
 	def get_height(self):
 		return self.font.size(self.text_value)[1]
 
-	def blink(self, time_passed, blink_rate):
+	def blink(self, time_passed):
 		"""
 		If called once per loop, switches the target surface alpha value between 255 and 0 every blink_rate.
 		The surface spends 2/3s of the time with alpha value 0 as with 255.
 		"""
-		if time_passed > blink_rate:
+		if time_passed > self.blink_rate:
 			if self.surface.get_alpha() == 255:
 				self.surface.set_alpha(0)
 				self.shadow_surface.set_alpha(0)
-				return blink_rate // 3
+				return self.blink_rate // 3
 			else:
 				self.surface.set_alpha(255)
 				self.shadow_surface.set_alpha(255)
