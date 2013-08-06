@@ -26,13 +26,17 @@ class Countdown:
 
 		self.time_passed = 0
 		self.time_to_countdown = 1500
-		self.countdown_ready_time = 1000
+		self.countdown_ready_time = 2000
 		#self.countdown_ready_transition_time = 250
 		self.countdown_go_time = 600
 		#self.countdown_go_transition_time = 250
 		self.countdown_ready = textitem.TextItem("Ready", (255, 255, 255))
-		self.countdown_ready.x = (SCREEN_WIDTH - self.countdown_ready.get_width()) / 2
+		self.countdown_ready.x = -self.countdown_ready.get_width()
 		self.countdown_ready.y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
+		self.countdown_ready_desired_x = (SCREEN_WIDTH / 2) - self.countdown_ready.get_width()
+		self.countdown_ready_desired_y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
+		self.countdown_ready_speed = 50
+		self.countdown_ready_slow_speed = 2
 		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
 		self.countdown_go.x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
 		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
@@ -42,7 +46,6 @@ class Countdown:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
-			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.blit(self.background_surface, (0, 0))
 
 			self.time_passed += self.main_clock.get_time()
@@ -50,6 +53,18 @@ class Countdown:
 				print("soon countdown")
 			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time:
 				print("displaying ready")
+				if self.countdown_ready.x < self.countdown_ready_desired_x:
+					if (self.countdown_ready.x + self.countdown_ready_speed) > self.countdown_ready_desired_x:
+						self.countdown_ready.x = self.countdown_ready_desired_x
+					else:
+						self.countdown_ready.x += self.countdown_ready_speed
+				elif self.countdown_ready.x >= (self.countdown_ready_desired_x + self.countdown_ready.get_width()):
+						self.countdown_ready.x += self.countdown_ready_speed
+				else:
+					if (self.countdown_ready.x + self.countdown_ready_slow_speed) > (self.countdown_ready_desired_x + self.countdown_ready.get_width()):
+						self.countdown_ready.x = self.countdown_ready_desired_x + self.countdown_ready.get_width()
+					else:
+						self.countdown_ready.x += self.countdown_ready_slow_speed
 				self.countdown_ready.draw(self.window_surface)
 			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				print("displaying go")

@@ -15,8 +15,10 @@ class Menu:
 		# Setup a dictionary that contains the functions that each item will call when activated.
 		self.functions = {}
 
-		# Store the last clicked button, so if a user clicks a button and then holds down the mouse button it only registers as one click.
+		# Store the last clicked button, so if we click a button and then hold down the mouse button it only registers as one click.
 		self.last_clicked_item = None
+
+		# We keep track if we clicked outside a button until we release the mouse button.
 		self.clicked_outside = {}
 
 		# Store the current position in the menu.
