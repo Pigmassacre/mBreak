@@ -13,6 +13,7 @@ import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
 from settings.settings import *
+import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens.game as game
@@ -33,22 +34,10 @@ class MainMenu:
 		self.logo_desired_x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
 		self.logo_desired_y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
 
-		# Setup the menus and add the buttons to them.
-		self.main_menu = self.setup_menu()
-		self.main_menu.add(self.setup_button("Start"), self.start)
-		self.main_menu.add(self.setup_button("Options"), self.options)
-		self.main_menu.add(self.setup_button("Quit"), self.quit)
-
-		self.options_menu = self.setup_menu()
-		self.options_menu.add(self.setup_button("Controls"), self.controls)
-		self.options_menu.add(self.setup_button("Graphics"), self.graphics)
-		self.options_menu.add(self.setup_button("Back"), self.back)
-
-		self.graphics_menu = self.setup_menu()
-		self.graphics_menu.add(self.setup_button("Shadows"), self.shadows)
-		self.graphics_menu.add(self.setup_button("Particles"), self.particles)
-		self.graphics_menu.add(self.setup_button("Traces"), self.traces)
-		self.graphics_menu.add(self.setup_button("Back"), self.back)
+		# Setup all the menu buttons.
+		self.setup_main_menu()
+		self.setup_options_menu()
+		self.setup_graphics_menu()
 
 		# The next screen to be started when gameloop ends.
 		self.active_menu = [self.main_menu]
@@ -58,6 +47,38 @@ class MainMenu:
 		self.setup_music()
 
 		self.gameloop()
+
+	def setup_main_menu(self):
+		self.main_menu = self.setup_menu()
+		self.main_menu.add(self.setup_button("Start"), self.start)
+		self.main_menu.add(self.setup_button("Options"), self.options)
+		self.main_menu.add(self.setup_button("Quit"), self.quit)
+
+	def setup_options_menu(self):
+		self.options_menu = self.setup_menu()
+		self.options_menu.add(self.setup_button("Controls"), self.controls)
+		self.options_menu.add(self.setup_button("Graphics"), self.graphics)
+		self.options_menu.add(self.setup_button("Back"), self.back)
+
+	def setup_graphics_menu(self):
+		self.graphics_menu = self.setup_menu()
+
+		shadows_button = self.setup_button("Shadows")
+		shadows_button.is_on_off = True
+		shadows_button.on = graphics.SHADOWS
+		self.graphics_menu.add(shadows_button, self.shadows)
+
+		particles_button = self.setup_button("Particles")
+		particles_button.is_on_off = True
+		particles_button.on = graphics.PARTICLES
+		self.graphics_menu.add(particles_button, self.particles)
+
+		traces_button = self.setup_button("Traces")
+		traces_button.is_on_off = True
+		traces_button.on = graphics.TRACES
+		self.graphics_menu.add(traces_button, self.traces)
+
+		self.graphics_menu.add(self.setup_button("Back"), self.back)
 
 	def setup_menu_transition(self, menu_to_setup):
 		self.menu_speed = 48
@@ -123,13 +144,13 @@ class MainMenu:
 		self.setup_menu_transition(self.active_menu[-1])
 
 	def shadows(self):
-		print("Shadows clicked!")
+		graphics.SHADOWS = self.active_menu[-1].find_item(self.shadows).toggle_on_off()
 
 	def particles(self):
-		print("Particles clicked!")
+		graphics.PARTICLES = self.active_menu[-1].find_item(self.particles).toggle_on_off()
 
 	def traces(self):
-		print("Traces clicked!")
+		graphics.TRACES = self.active_menu[-1].find_item(self.traces).toggle_on_off()
 
 	def back(self):
 		self.active_menu.pop()

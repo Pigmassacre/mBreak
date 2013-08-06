@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import math
+import other.useful as useful
 from settings.settings import *
 
 class TextItem:
@@ -20,6 +21,8 @@ class TextItem:
 	shadow_offset = 3
 	shadow_color = pygame.Color(50, 50, 50, 255)
 	selected_color = pygame.Color(128, 128, 128, 255)
+	on_color = pygame.Color(50, 255, 50, 255)
+	off_color = pygame.Color(255, 50, 50, 255)
 
 	def __init__(self, text_value, font_color, alpha_value = 255):
 		# Load default values.
@@ -28,6 +31,12 @@ class TextItem:
 		self.font = TextItem.font
 		self.selected_font_color = TextItem.selected_color
 		self.selected = False
+		self.on_font_color = TextItem.on_color
+		self.off_font_color = TextItem.off_color
+		self.selected_on_font_color = useful.blend_colors(self.on_font_color, self.selected_font_color, True)
+		self.selected_off_font_color = useful.blend_colors(self.off_font_color, self.selected_font_color, True)
+		self.is_on_off = False
+		self.on = False
 
 		# Set the given values.
 		self.text_value = text_value
@@ -40,6 +49,22 @@ class TextItem:
 		# Render the selected font surface.
 		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
 		self.selected_surface.set_alpha(alpha_value)
+
+		# Render the on font surface.
+		self.on_surface = self.font.render(self.text_value, False, self.on_font_color)
+		self.on_surface.set_alpha(alpha_value)
+
+		# Render the off font surface.
+		self.off_surface = self.font.render(self.text_value, False, self.off_font_color)
+		self.off_surface.set_alpha(alpha_value)
+
+		# Render the selected and on surface.
+		self.selected_on_surface = self.font.render(self.text_value, False, self.selected_on_font_color)
+		self.selected_on_surface.set_alpha(alpha_value)
+
+		# Render the selected and off surface.
+		self.selected_off_surface = self.font.render(self.text_value, False, self.selected_off_font_color)
+		self.selected_off_surface.set_alpha(alpha_value)
 
 		# Setup the shadow.
 		self.shadow_color = TextItem.shadow_color
@@ -84,10 +109,25 @@ class TextItem:
 		else:
 			return time_passed
 
+	def toggle_on_off(self):
+		self.on = not self.on
+		return self.on
+
 	def draw(self, surface):
 		# First blit shadow, then self. Keeps shadow UNDER the text.
 		surface.blit(self.shadow_surface, (self.x + self.shadow_offset, self.y + self.shadow_offset))
-		if not self.selected:
-			surface.blit(self.surface, (self.x, self.y))
+		if self.selected:
+			if self.is_on_off:
+				if self.on:
+					surface.blit(self.selected_on_surface, (self.x, self.y))
+				elif not self.on:
+					surface.blit(self.selected_off_surface, (self.x, self.y))
+			else:
+				surface.blit(self.selected_surface, (self.x, self.y))
+		elif self.is_on_off:
+			if self.on:
+				surface.blit(self.on_surface, (self.x, self.y))
+			else:
+				surface.blit(self.off_surface, (self.x, self.y))
 		else:
-			surface.blit(self.selected_surface, (self.x, self.y))
+			surface.blit(self.surface, (self.x, self.y))
