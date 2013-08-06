@@ -39,7 +39,11 @@ class Countdown:
 		self.countdown_ready_slow_speed = 2
 		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
 		self.countdown_go.x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
-		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
+		self.countdown_go.y = -self.countdown_go.get_height()
+		self.countdown_go_desired_x = (SCREEN_WIDTH - self.countdown_ready.get_width()) / 2
+		self.countdown_go_desired_y = (SCREEN_HEIGHT / 2) - self.countdown_go.get_height()
+		self.countdown_go_speed = 50
+		self.countdown_go_slow_speed = 2
 
 		self.gameloop()
 
@@ -67,7 +71,18 @@ class Countdown:
 						self.countdown_ready.x += self.countdown_ready_slow_speed
 				self.countdown_ready.draw(self.window_surface)
 			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
-				print("displaying go")
+				if self.countdown_go.y < self.countdown_go_desired_y:
+					if (self.countdown_go.y + self.countdown_go_speed) > self.countdown_go_desired_y:
+						self.countdown_go.y = self.countdown_go_desired_y
+					else:
+						self.countdown_go.y += self.countdown_go_speed
+				elif self.countdown_go.y >= (self.countdown_go_desired_y + self.countdown_go.get_width()):
+						self.countdown_go.y += self.countdown_go_speed
+				else:
+					if (self.countdown_go.y + self.countdown_go_slow_speed) > (self.countdown_go_desired_y + self.countdown_go.get_width()):
+						self.countdown_go.y = self.countdown_go_desired_y + self.countdown_go.get_width()
+					else:
+						self.countdown_go.y += self.countdown_go_slow_speed
 				self.countdown_go.draw(self.window_surface)
 			else:
 				print("game has started")
