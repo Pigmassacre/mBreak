@@ -36,6 +36,10 @@ class Menu:
 
 		self.functions[item] = function
 
+	def cleanup(self):
+		for item in self.items:
+			item.x = self.x - (item.get_width() / 2)
+
 	def remove(self, item):
 		self.items.remove(item)
 
