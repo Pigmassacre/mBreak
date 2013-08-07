@@ -28,10 +28,9 @@ class Splash:
 
 	background_color = pygame.Color(0, 0, 0)
 
-	def __init__(self, window_surface, main_clock, debug_font):
+	def __init__(self, window_surface, main_clock):
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.debug_font = debug_font
 
 		self.x = (SCREEN_WIDTH - Splash.splash.get_width()) / 2
 		self.y = (SCREEN_HEIGHT - Splash.splash.get_height()) / 2
@@ -101,4 +100,4 @@ class Splash:
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(MAX_FPS)
 
-		intromenu.IntroMenu(self.window_surface, self.main_clock, self.debug_font)
+		intromenu.IntroMenu(self.window_surface, self.main_clock)

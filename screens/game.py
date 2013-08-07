@@ -37,11 +37,10 @@ class Game:
 	corner_top_right = pygame.image.load("res/background/planks/planks_corner_top_right.png")
 	corner_top_right = pygame.transform.scale(corner_top_right, (corner_top_right.get_width() * GAME_SCALE, corner_top_right.get_height() * GAME_SCALE))
 
-	def __init__(self, window_surface, main_clock, debug_font):
+	def __init__(self, window_surface, main_clock):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.debug_font = debug_font
 
 		# The next screen to be started when gameloop ends.
 		self.next_screen = screens.mainmenu.MainMenu
@@ -162,7 +161,7 @@ class Game:
 		groups.empty()
 
 		if not self.next_screen == None:
-			self.next_screen(self.window_surface, self.main_clock, self.debug_font)
+			self.next_screen(self.window_surface, self.main_clock, self)
 		else:
 			pygame.quit()
 			sys.exit()
@@ -230,7 +229,7 @@ class Game:
 
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(self.window_surface, self.main_clock, self.debug_font)
+			debug.display(self.window_surface, self.main_clock)
 
 	def draw_background(self, surface):
 		surface.blit(Game.wall_horizontal, (LEVEL_X, LEVEL_Y - (4 * GAME_SCALE)))

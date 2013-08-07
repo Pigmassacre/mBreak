@@ -23,11 +23,10 @@ import screens.game as game
 
 class MainMenu:
 
-	def __init__(self, window_surface, main_clock, debug_font, title_logo = None):
+	def __init__(self, window_surface, main_clock, title_logo = None):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.debug_font = debug_font
 		self.next_screen = game.Game
 
 		# Setup the logo and the variables needed to handle the animation of it.
@@ -149,10 +148,11 @@ class MainMenu:
 
 	def start(self, item):
 		self.active_menu.append(self.prepare_menu)
-		#self.active_menu.append(self.prepare_menu_right)
 		self.menu_transition.setup_menu_transition(self.active_menu[-1])
-		#pygame.mixer.music.stop()
-		#self.done = True	
+
+	def start_game(self, item):
+		pygame.mixer.music.stop()
+		self.done = True
 
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
@@ -179,7 +179,7 @@ class MainMenu:
 		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 
 	def color(self, item):
-		print(str(item.color) + " clicked!")
+		print(str(item) + " with color " + str(item.color) + " clicked!")
 
 	def quit(self, item):
 		self.done = True
@@ -218,7 +218,7 @@ class MainMenu:
 
 			if DEBUG_MODE:
 				# Display various debug information.
-				debug.display(self.window_surface, self.main_clock, self.debug_font)
+				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
@@ -263,4 +263,4 @@ class MainMenu:
 			pygame.quit()
 			sys.exit()
 		else:
-			self.next_screen(self.window_surface, self.main_clock, self.debug_font)
+			self.next_screen(self.window_surface, self.main_clock)

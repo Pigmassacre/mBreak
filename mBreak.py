@@ -25,11 +25,8 @@ def main():
 	# Set the window caption.
 	pygame.display.set_caption(WINDOW_CAPTION)
 
-	# Setup the debug font, used for all debug messages.
-	debug_font = pygame.font.Font(DEBUG_FONT, 9)
-
 	# Start the intro menu.
-	splash.Splash(window_surface, main_clock, debug_font)
+	splash.Splash(window_surface, main_clock)
 
 # Start the game!
 main()

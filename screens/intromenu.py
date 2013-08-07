@@ -17,10 +17,9 @@ import screens.mainmenu as mainmenu
 
 class IntroMenu:
 
-	def __init__(self, window_surface, main_clock, debug_font):
+	def __init__(self, window_surface, main_clock):
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.debug_font = debug_font
 
 		# Setup the logo and store the surface of the logo.
 		self.title_logo = self.setup_logo()
@@ -77,7 +76,6 @@ class IntroMenu:
 					sys.exit()
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					# TODO: Add transition effect (logo moves up).
 					self.done = True
 			
 			# If the music isn't playing, start it.
@@ -97,11 +95,11 @@ class IntroMenu:
 			
 			if DEBUG_MODE:
 				# Display various debug information.
-				debug.display(self.window_surface, self.main_clock, self.debug_font)
+				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(MAX_FPS)
 
-		mainmenu.MainMenu(self.window_surface, self.main_clock, self.debug_font, self.title_logo)
+		mainmenu.MainMenu(self.window_surface, self.main_clock, self.title_logo)
