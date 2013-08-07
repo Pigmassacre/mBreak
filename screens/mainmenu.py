@@ -14,6 +14,7 @@ import gui.logo as logo
 import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
+import gui.transition as transition
 from settings.settings import *
 import settings.graphics as graphics
 
@@ -44,7 +45,10 @@ class MainMenu:
 
 		# The next screen to be started when gameloop ends.
 		self.active_menu = [self.main_menu]
-		self.setup_menu_transition(self.active_menu[0])
+
+		# Setup the menu transitions.
+		self.menu_transition = transition.Transition(48)
+		self.menu_transition.setup_menu_transition(self.active_menu[0])
 
 		# Setup and play music.
 		self.setup_music()
@@ -98,18 +102,6 @@ class MainMenu:
 
 		self.graphics_menu.add(self.setup_button("Back"), self.back)
 
-	def setup_menu_transition(self, menu_to_setup):
-		self.menu_speed = 48
-		self.menu_start_positions = {}
-		menu_to_setup.cleanup()
-		for item in menu_to_setup.items:
-			odd = random.choice([True, False])
-			self.menu_start_positions[item] = item.x
-			if odd:
-				item.x = SCREEN_WIDTH
-			else:
-				item.x = -item.get_width()
-
 	def setup_logo(self, title_logo):
 		if title_logo == None:
 			self.title_logo = logo.Logo()
@@ -158,20 +150,20 @@ class MainMenu:
 	def start(self, item):
 		self.active_menu.append(self.prepare_menu)
 		#self.active_menu.append(self.prepare_menu_right)
-		self.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 		#pygame.mixer.music.stop()
 		#self.done = True	
 
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
-		self.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 
 	def controls(self, item):
 		print("Controls clicked!")
 
 	def graphics(self, item):
 		self.active_menu.append(self.graphics_menu)
-		self.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 
 	def shadows(self, item):
 		graphics.SHADOWS = item.toggle_on_off()
@@ -184,7 +176,7 @@ class MainMenu:
 
 	def back(self, item):
 		self.active_menu.pop()
-		self.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 
 	def color(self, item):
 		print(str(item.color) + " clicked!")
@@ -209,7 +201,7 @@ class MainMenu:
 					# If the escape key is pressed, we go back a level in the menu system. If we're at the lowest level, we quit.
 					if len(self.active_menu) > 1:
 						self.active_menu.pop()
-						self.setup_menu_transition(self.active_menu[-1])
+						self.menu_transition.setup_menu_transition(self.active_menu[-1])
 					else:
 						sys.exit()
 						pygame.quit()
@@ -262,18 +254,7 @@ class MainMenu:
 		self.title_logo.draw(self.window_surface)
 
 	def show_menu(self):
-		for item in self.active_menu[-1].items:
-			if self.menu_start_positions[item] < item.x:
-				if (item.x - self.menu_speed) < self.menu_start_positions[item]:
-					item.x = self.menu_start_positions[item]
-				else:
-					item.x -= self.menu_speed
-			elif self.menu_start_positions[item] > item.x:
-				if (item.x + self.menu_speed) > self.menu_start_positions[item]:
-					item.x = self.menu_start_positions[item]
-				else:
-					item.x += self.menu_speed
-
+		self.menu_transition.handle_menu_transition(self.active_menu[-1])
 		self.active_menu[-1].update()
 		self.active_menu[-1].draw(self.window_surface)
 
