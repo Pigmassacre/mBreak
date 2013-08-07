@@ -73,3 +73,26 @@ class GridMenu(menu.Menu):
 			temp_size_pos = self.populate_grid(item, temp_row_size, temp_row_position)
 			temp_row_size = temp_size_pos[0]
 			temp_row_position = temp_size_pos[1]
+
+	def update(self):
+		mouse_pos = pygame.mouse.get_pos()
+		pressed_buttons = pygame.mouse.get_pressed()
+
+		for item in self.items:
+			item.selected = False
+
+			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
+			if pressed_buttons[0]:
+				if not self.clicked_outside[item]:
+					self.clicked_outside[item] = not self.is_mouse_over_item(item, mouse_pos)
+			else:
+				self.clicked_outside[item] = False
+			
+			if self.is_mouse_over_item(item, mouse_pos):
+				item.selected = True
+				if pressed_buttons[0] and not self.clicked_outside[item]:
+					if not self.last_clicked_item == item:
+						self.functions[item](item)
+						self.last_clicked_item = item
+				else:
+					self.last_clicked_item = None

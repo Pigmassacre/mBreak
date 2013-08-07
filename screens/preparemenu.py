@@ -51,6 +51,7 @@ class PrepareMenu:
 		back_button = self.setup_textitem("Back")
 		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
 		self.back_menu.add(back_button, self.back)
+		self.back_menu.items[0].selected = True
 		
 		start_button = self.setup_textitem("Start")
 		self.start_menu = menu.Menu(SCREEN_WIDTH - (SCREEN_WIDTH / 5), SCREEN_HEIGHT - (2 * start_button.get_height()))
@@ -169,7 +170,18 @@ class PrepareMenu:
 					self.done = True
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					self.start()
+					if self.back_menu.items[0].selected:
+						self.back_menu.functions[self.back_menu.items[0]](self.back_menu.items[0])
+					elif self.start_menu.items[0].selected:
+						self.start_menu.functions[self.start_menu.items[0]](self.start_menu.items[0])
+				elif event.type == KEYDOWN and event.key == K_LEFT:
+					if self.start_menu.items[0].selected:
+						self.start_menu.items[0].selected = False
+						self.back_menu.items[0].selected = True
+				elif event.type == KEYDOWN and event.key == K_RIGHT:
+					if self.back_menu.items[0].selected:
+						self.back_menu.items[0].selected = False
+						self.start_menu.items[0].selected = True
 
 			self.show_player_text()
 
@@ -208,10 +220,17 @@ class PrepareMenu:
 		
 		self.back_menu_transition.handle_menu_transition(self.back_menu)
 		self.back_menu.update()
-		self.back_menu.draw(self.window_surface)
-
+		
 		self.start_menu_transition.handle_menu_transition(self.start_menu)
 		self.start_menu.update()
+
+		# If the mouse cursor is above one menu, it unselect other menus.
+		if self.back_menu.is_mouse_over_item(self.back_menu.items[0], pygame.mouse.get_pos()):
+			self.start_menu.items[0].selected = False
+		elif self.start_menu.is_mouse_over_item(self.start_menu.items[0], pygame.mouse.get_pos()):
+			self.back_menu.items[0].selected = False
+
+		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)
 
 	def on_exit(self):

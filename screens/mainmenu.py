@@ -191,16 +191,13 @@ class MainMenu:
 					for item in self.active_menu[-1].items:
 						if item.selected:
 							if self.active_menu[-1].items.index(item) - 1 >= 0:
-								print(str(self.active_menu[-1].items.index(item) - 1))
 								self.active_menu[-1].items[self.active_menu[-1].items.index(item) - 1].selected = True
 								item.selected = False
 								break
 				elif event.type == KEYDOWN and event.key == K_DOWN:
 					for item in self.active_menu[-1].items:
 						if item.selected:
-							print("it's selected!")
 							if self.active_menu[-1].items.index(item) + 1 <= len(self.active_menu[-1].items) - 1:
-								print(str(self.active_menu[-1].items.index(item) + 1))
 								self.active_menu[-1].items[self.active_menu[-1].items.index(item) + 1].selected = True
 								item.selected = False
 								break
