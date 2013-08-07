@@ -14,8 +14,8 @@ class ColorItem():
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	shadow_color = pygame.Color(50, 50, 50, 255)
-	shadow_offset_x = 0
-	shadow_offset_y = 3
+	shadow_offset_x = 0 * GAME_SCALE
+	shadow_offset_y = 1 * GAME_SCALE
 	selected_border_color = pygame.Color(255, 255, 255, 255)
 	selected_border_size = 2 * GAME_SCALE
 	x = 0

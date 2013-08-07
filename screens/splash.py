@@ -23,8 +23,8 @@ class Splash:
 	splash_bottom_half = splash.subsurface(pygame.Rect((0, (splash.get_height()) / 2), (splash.get_width(), splash.get_height() / 2)))
 
 	splash_time = 1750
-	top_half_speed = 30
-	bottom_half_speed = -30
+	top_half_speed = 10 * GAME_SCALE
+	bottom_half_speed = -10 * GAME_SCALE
 
 	background_color = pygame.Color(0, 0, 0)
 

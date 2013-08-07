@@ -1,11 +1,11 @@
 from pygame.locals import *
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = 854
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 285#854
+SCREEN_HEIGHT = 160#480
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-GAME_SCALE = 3
+GAME_SCALE = 2
 
 # Level width and height is the actual level width and height. Level x and y is the position in the base area that the level is placed in.
 LEVEL_WIDTH = 176 * GAME_SCALE

@@ -34,7 +34,8 @@ class MainMenu:
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
-		self.logo_transition = transition.Transition(5)
+		self.logo_transition = transition.Transition()
+		self.logo_transition.speed = 2 * GAME_SCALE
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()

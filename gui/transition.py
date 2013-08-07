@@ -10,9 +10,11 @@ from settings.settings import *
 
 class Transition():
 
-	def __init__(self, speed = 44):
-		self.speed = speed
-		
+	speed = 14 * GAME_SCALE
+
+	def __init__(self):
+		self.speed = Transition.speed
+
 	def setup_all_sides_transition(self, menu_to_setup):
 		self.start_positions = {}
 		menu_to_setup.cleanup()

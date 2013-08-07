@@ -18,8 +18,8 @@ class TextItem:
 	font = pygame.font.Font(font_path, font_size)
 	x = 0
 	y = 0
-	shadow_offset_x = 0
-	shadow_offset_y = 3
+	shadow_offset_x = 0 * GAME_SCALE
+	shadow_offset_y = 1 * GAME_SCALE
 	shadow_color = pygame.Color(50, 50, 50, 255)
 	selected_color = pygame.Color(128, 128, 128, 255)
 	on_color = pygame.Color(20, 255, 20, 255)
