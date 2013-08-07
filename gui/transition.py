@@ -40,24 +40,27 @@ class Transition():
 
 	def handle_menu_transition(self, menu_to_handle):
 		for item in menu_to_handle.items:
-			if self.start_positions[item][0] < item.x:
-				if (item.x - self.speed) < self.start_positions[item][0]:
-					item.x = self.start_positions[item][0]
-				else:
-					item.x -= self.speed
-			elif self.start_positions[item][0] > item.x:
-				if (item.x + self.speed) > self.start_positions[item][0]:
-					item.x = self.start_positions[item][0]
-				else:
-					item.x += self.speed
+			self.move_item_to_position(item, self.start_positions[item])
 
-			if self.start_positions[item][1] < item.y:
-				if (item.y - self.speed) < self.start_positions[item][1]:
-					item.y = self.start_positions[item][1]
-				else:
-					item.y -= self.speed
-			elif self.start_positions[item][1] > item.y:
-				if (item.y + self.speed) > self.start_positions[item][1]:
-					item.y = self.start_positions[item][1]
-				else:
-					item.y += self.speed
+	def move_item_to_position(self, item, position):
+		if position[0] < item.x:
+			if (item.x - self.speed) < position[0]:
+				item.x = position[0]
+			else:
+				item.x -= self.speed
+		elif position[0] > item.x:
+			if (item.x + self.speed) > position[0]:
+				item.x = position[0]
+			else:
+				item.x += self.speed
+
+		if position[1] < item.y:
+			if (item.y - self.speed) < position[1]:
+				item.y = position[1]
+			else:
+				item.y -= self.speed
+		elif position[1] > item.y:
+			if (item.y + self.speed) > position[1]:
+				item.y = position[1]
+			else:
+				item.y += self.speed

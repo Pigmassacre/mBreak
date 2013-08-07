@@ -31,10 +31,8 @@ class MainMenu:
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
-
-		self.logo_speed = 5
-		self.logo_desired_x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
-		self.logo_desired_y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
+		self.logo_desired_position = ((SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
+		self.logo_transition = transition.Transition(5)
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
@@ -60,6 +58,14 @@ class MainMenu:
 		self.main_menu.add(self.setup_button("Options"), self.options)
 		self.main_menu.add(self.setup_button("Quit"), self.quit)
 
+	def start(self, item):
+		self.active_menu.append(self.prepare_menu)
+		self.menu_transition.setup_grid_menu_transition(self.active_menu[-1])
+
+	def options(self, item):
+		self.active_menu.append(self.options_menu)
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+
 	def setup_prepare_menu(self):
 		self.prepare_menu = self.setup_grid_menu()
 		self.setup_color_items(self.prepare_menu)
@@ -75,11 +81,21 @@ class MainMenu:
 		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), self.color)
 		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), self.color)
 
+	def color(self, item):
+		print(str(item) + " with color " + str(item.color) + " clicked!")
+
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
 		self.options_menu.add(self.setup_button("Controls"), self.controls)
 		self.options_menu.add(self.setup_button("Graphics"), self.graphics)
 		self.options_menu.add(self.setup_button("Back"), self.back)
+
+	def controls(self, item):
+		print("Controls clicked!")
+
+	def graphics(self, item):
+		self.active_menu.append(self.graphics_menu)
+		self.menu_transition.setup_menu_transition(self.active_menu[-1])
 
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
@@ -100,6 +116,15 @@ class MainMenu:
 		self.graphics_menu.add(traces_button, self.traces)
 
 		self.graphics_menu.add(self.setup_button("Back"), self.back)
+
+	def shadows(self, item):
+		graphics.SHADOWS = item.toggle_on_off()
+
+	def particles(self, item):
+		graphics.PARTICLES = item.toggle_on_off()
+
+	def traces(self, item):
+		graphics.TRACES = item.toggle_on_off()
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
@@ -146,40 +171,13 @@ class MainMenu:
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-	def start(self, item):
-		self.active_menu.append(self.prepare_menu)
-		self.menu_transition.setup_grid_menu_transition(self.active_menu[-1])
-
 	def start_game(self, item):
 		pygame.mixer.music.stop()
 		self.done = True
 
-	def options(self, item):
-		self.active_menu.append(self.options_menu)
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
-
-	def controls(self, item):
-		print("Controls clicked!")
-
-	def graphics(self, item):
-		self.active_menu.append(self.graphics_menu)
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
-
-	def shadows(self, item):
-		graphics.SHADOWS = item.toggle_on_off()
-
-	def particles(self, item):
-		graphics.PARTICLES = item.toggle_on_off()
-
-	def traces(self, item):
-		graphics.TRACES = item.toggle_on_off()
-
 	def back(self, item):
 		self.active_menu.pop()
 		self.menu_transition.setup_menu_transition(self.active_menu[-1])
-
-	def color(self, item):
-		print(str(item) + " with color " + str(item.color) + " clicked!")
 
 	def quit(self, item):
 		self.done = True
@@ -210,10 +208,10 @@ class MainMenu:
 					self.start()
 
 			# Move the logo to the desired position.
-			self.update_logo()
+			self.show_logo()
 
 			#  If the logo is in place, show the menu.
-			if self.title_logo.x == self.logo_desired_x and self.title_logo.y == self.logo_desired_y:
+			if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 				self.show_menu()
 
 			if DEBUG_MODE:
@@ -228,29 +226,8 @@ class MainMenu:
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
 
-	def update_logo(self):
-		if self.logo_desired_x < self.title_logo.x:
-			if (self.title_logo.x - self.logo_speed) < self.logo_desired_x:
-				self.title_logo.x = self.logo_desired_x
-			else:
-				self.title_logo.x -= self.logo_speed
-		elif self.logo_desired_x > self.title_logo.x:
-			if (self.title_logo.x + self.logo_speed) > self.logo_desired_x:
-				self.title_logo.x = self.logo_desired_x
-			else:
-				self.title_logo.x += self.logo_speed
-
-		if self.logo_desired_y < self.title_logo.y:
-			if (self.title_logo.y - self.logo_speed) < self.logo_desired_y:
-				self.title_logo.y = self.logo_desired_y
-			else:
-				self.title_logo.y -= self.logo_speed
-		elif self.logo_desired_y > self.title_logo.y:
-			if (self.title_logo.y + self.logo_speed) > self.logo_desired_y:
-				self.title_logo.y = self.logo_desired_y
-			else:
-				self.title_logo.y += self.logo_speed
-
+	def show_logo(self):
+		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
 		self.title_logo.draw(self.window_surface)
 
 	def show_menu(self):
@@ -263,4 +240,4 @@ class MainMenu:
 			pygame.quit()
 			sys.exit()
 		else:
-			self.next_screen(self.window_surface, self.main_clock)
+			self.next_screen(self.window_surface, self.main_clock, self.title_logo)
