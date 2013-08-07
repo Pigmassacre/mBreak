@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -14,25 +13,31 @@ class GridMenu(menu.Menu):
 
 	def __init__(self, x, y, position = 0):
 		menu.Menu.__init__(self, x, y, position)
-
+		
 		self.max_number_of_columns = GridMenu.max_number_of_columns
 		self.offset = GridMenu.offset
 		self.current_row_size = 0
 		self.current_row_position = self.y
 
 	def get_width(self):
+		min_x = 99999
 		max_x = 0
 		for item in self.items:
-			if item.x > max_x:
+			if item.x < min_x:
+				min_x = item.x
+			if item.x + item.get_width() > max_x:
 				max_x = item.x + item.get_width()
-		return max_x - self.x
+		return max_x - min_x
 
 	def get_height(self):
+		min_y = 99999
 		max_y = 0
 		for item in self.items:
-			if item.y > max_y:
-				max_y = item.y + item.get_width()
-		return max_y - self.y
+			if item.y < min_y:
+				min_y = item.y
+			if item.y + item.get_height() > max_y:
+				max_y = item.y + item.get_height()
+		return max_y - min_y
 
 	def add(self, item, function):
 		self.items.append(item)

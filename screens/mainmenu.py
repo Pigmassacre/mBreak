@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
@@ -149,7 +148,6 @@ class MainMenu:
 			pygame.mixer.music.play()
 
 	def start(self, item):
-		pygame.mixer.music.stop()
 		self.done = True
 
 	def back(self, item):

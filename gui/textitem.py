@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -122,7 +121,7 @@ class TextItem:
 		return self.on
 
 	def draw(self, surface):
-		# First blit shadow, then self. Keeps shadow UNDER the text.
+		# First blit shadow, then the text. Keeps shadow UNDER the text.
 		surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
 		if self.selected:
 			if self.is_on_off:

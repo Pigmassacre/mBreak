@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -60,12 +59,12 @@ class Menu:
 		self.clicked_outside[item] = False
 		self.functions[item] = function
 
+	def remove(self, item):
+		self.items.remove(item)
+
 	def cleanup(self):
 		for item in self.items:
 			item.x = self.x - (item.get_width() / 2)
-
-	def remove(self, item):
-		self.items.remove(item)
 
 	def update(self):
 		mouse_pos = pygame.mouse.get_pos()

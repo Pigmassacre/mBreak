@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
@@ -32,23 +31,30 @@ class PrepareMenu:
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = game.Game
 
-		# Setup all the menues.
+		# Configure the GUI.
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
 		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 2
 		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4
 
+		self.player_one_text = self.setup_textitem("Player One")
+		self.player_one_text.x = self.prepare_menu_one.x - self.player_one_text.get_width() - 4 * GAME_SCALE
+		self.player_one_text.y = self.prepare_menu_one.y + ((self.prepare_menu_one.get_height() - self.player_one_text.get_height()) / 2)
+		
 		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
 		self.prepare_menu_two.x = (SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 2
 		self.prepare_menu_two.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 4)
 
-		back_button = self.setup_button("Back")
+		self.player_two_text = self.setup_textitem("Player Two")
+		self.player_two_text.x = self.prepare_menu_two.x - self.player_two_text.get_width() - 4 * GAME_SCALE
+		self.player_two_text.y = self.prepare_menu_two.y + ((self.prepare_menu_two.get_height() - self.player_two_text.get_height()) / 2)
+
+		back_button = self.setup_textitem("Back")
 		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
 		self.back_menu.add(back_button, self.back)
-		print(str(self.back_menu.x))
-		start_button = self.setup_button("Start")
+		
+		start_button = self.setup_textitem("Start")
 		self.start_menu = menu.Menu(SCREEN_WIDTH - (SCREEN_WIDTH / 5), SCREEN_HEIGHT - (2 * start_button.get_height()))
 		self.start_menu.add(start_button, self.start)
-		print(str(self.start_menu.x))
 
 		# Setup the menu transitions.
 		self.prepare_menu_one_transition = transition.Transition()
@@ -75,7 +81,6 @@ class PrepareMenu:
 	def setup_prepare_menu(self, function):
 		prepare_menu = self.setup_grid_menu()
 		self.setup_color_items(prepare_menu, function)
-		prepare_menu.cleanup()
 		return prepare_menu
 
 	def setup_color_items(self, grid_menu, function):
@@ -87,10 +92,14 @@ class PrepareMenu:
 		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), function)
 
 	def color_one(self, item):
-		print(str(item) + " with color " + str(item.color) + " clicked!")
+		print(str(item) + " one with color " + str(item.color) + " clicked!")
+		print("color item x: " + str(item.x))
+		print("color item y: " + str(item.y))
 
 	def color_two(self, item):
-		print(str(item) + " with color " + str(item.color) + " clicked!")
+		print(str(item) + " two with color " + str(item.color) + " clicked!")
+		print("color item x: " + str(item.x))
+		print("color item y: " + str(item.y))
 
 	def setup_menu(self):
 		x = SCREEN_WIDTH / 2
@@ -108,7 +117,7 @@ class PrepareMenu:
 
 		return grid_menu
 
-	def setup_button(self, text):
+	def setup_textitem(self, text):
 		font_color = (255, 255, 255)
 		alpha_value = 255
 
@@ -156,6 +165,8 @@ class PrepareMenu:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					self.start()
 
+			self.show_player_text()
+
 			self.show_menu()
 
 			if DEBUG_MODE:
@@ -169,6 +180,10 @@ class PrepareMenu:
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
+
+	def show_player_text(self):
+		self.player_one_text.draw(self.window_surface)
+		self.player_two_text.draw(self.window_surface)
 
 	def show_menu(self):
 		self.prepare_menu_one_transition.handle_menu_transition(self.prepare_menu_one)
