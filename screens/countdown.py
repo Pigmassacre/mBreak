@@ -51,6 +51,11 @@ class Countdown:
 		while not self.done:
 			self.window_surface.blit(self.background_surface, (0, 0))
 
+			for event in pygame.event.get():
+				if event.type == QUIT:
+					sys.exit()
+					pygame.quit()
+
 			self.time_passed += self.main_clock.get_time()
 			if self.time_passed < self.time_to_countdown:
 				print("soon countdown")

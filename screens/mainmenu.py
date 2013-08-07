@@ -12,6 +12,8 @@ import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
+import gui.gridmenu as gridmenu
+import gui.coloritem as coloritem
 from settings.settings import *
 import settings.graphics as graphics
 
@@ -36,6 +38,7 @@ class MainMenu:
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
+		self.setup_prepare_menu()
 		self.setup_options_menu()
 		self.setup_graphics_menu()
 
@@ -53,6 +56,21 @@ class MainMenu:
 		self.main_menu.add(self.setup_button("Start"), self.start)
 		self.main_menu.add(self.setup_button("Options"), self.options)
 		self.main_menu.add(self.setup_button("Quit"), self.quit)
+
+	def setup_prepare_menu(self):
+		self.prepare_menu = self.setup_grid_menu()
+		self.setup_color_items(self.prepare_menu)
+		self.prepare_menu.x = (SCREEN_WIDTH - self.prepare_menu.get_width()) / 2
+		self.prepare_menu.y = (SCREEN_HEIGHT - self.prepare_menu.get_height()) / 2
+		self.prepare_menu.cleanup()
+
+	def setup_color_items(self, grid_menu):
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), self.red)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 0, 255)), self.green)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 0, 255, 255)), self.blue)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 255, 0, 255)), self.red)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), self.red)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), self.red)
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
@@ -91,7 +109,7 @@ class MainMenu:
 				item.x = SCREEN_WIDTH
 				odd = False
 			else:
-				item. x = -item.get_width()
+				item.x = -item.get_width()
 				odd = True
 
 	def setup_logo(self, title_logo):
@@ -115,6 +133,14 @@ class MainMenu:
 
 		return main_menu
 
+	def setup_grid_menu(self):
+		x = SCREEN_WIDTH / 2
+		y = SCREEN_HEIGHT / 2
+
+		grid_menu = gridmenu.GridMenu(x, y)
+
+		return grid_menu
+
 	def setup_button(self, text):
 		font_color = (255, 255, 255)
 		alpha_value = 255
@@ -123,14 +149,20 @@ class MainMenu:
 
 		return text
 
+	def setup_color_item(self, color):
+		return coloritem.ColorItem()
+
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
 	def start(self, item):
-		pygame.mixer.music.stop()
-		self.done = True
+		self.active_menu.append(self.prepare_menu)
+		#self.active_menu.append(self.prepare_menu_right)
+		self.setup_menu_transition(self.active_menu[-1])
+		#pygame.mixer.music.stop()
+		#self.done = True	
 
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
@@ -156,6 +188,15 @@ class MainMenu:
 		self.active_menu.pop()
 		self.setup_menu_transition(self.active_menu[-1])
 
+	def red(self, item):
+		print("Red clicked!")
+
+	def green(self, item):
+		print("Green clicked!")
+
+	def blue(self, item):
+		print("Blue clicked!")
+
 	def quit(self, item):
 		self.done = True
 		self.next_screen = None
@@ -168,10 +209,18 @@ class MainMenu:
 			self.window_surface.fill(BACKGROUND_COLOR)
 			
 			for event in pygame.event.get():
-				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-					# If the ESCAPE key is pressed or the window is closed, the game is shut down.
+				if event.type == QUIT:
+					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
+				elif event.type == KEYDOWN and event.key == K_ESCAPE:
+					# If the escape key is pressed, we go back a level in the menu system. If we're at the lowest level, we quit.
+					if len(self.active_menu) > 1:
+						self.active_menu.pop()
+						self.setup_menu_transition(self.active_menu[-1])
+					else:
+						sys.exit()
+						pygame.quit()
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					self.start()
@@ -220,7 +269,7 @@ class MainMenu:
 
 		self.title_logo.draw(self.window_surface)
 
-	def show_menu(self):		
+	def show_menu(self):
 		for item in self.active_menu[-1].items:
 			if self.menu_start_positions[item] < item.x:
 				if (item.x - self.menu_speed) < self.menu_start_positions[item]:

@@ -131,8 +131,10 @@ class Game:
 		self.done = False
 		while not self.done:
 			for event in pygame.event.get():
-				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-					# Return to intromenu.
+				if event.type == QUIT:
+					sys.exit()
+					pygame.quit()
+				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					self.done = True
 				elif event.type == KEYDOWN and event.key == K_l:
 					debug.create_ball_left(self.player_left)

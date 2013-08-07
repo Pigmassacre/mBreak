@@ -31,6 +31,20 @@ class Menu:
 		self.x = x
 		self.y = y
 
+	def get_width(self):
+		max_size = 0
+		for item in self.items:
+			if item.get_width() > max_size:
+				max_size = item.get_width()
+		return max_size
+
+	def get_height(self):
+		max_size = 0
+		for item in self.items:
+			if item.get_height() > max_size:
+				max_size = item.get_height()
+		return max_size
+
 	def add(self, item, function):
 		if len(self.items) > 0:
 			last_item = self.items[-1]
