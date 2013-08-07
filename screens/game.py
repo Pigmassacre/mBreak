@@ -37,7 +37,7 @@ class Game:
 	corner_top_right = pygame.image.load("res/background/planks/planks_corner_top_right.png")
 	corner_top_right = pygame.transform.scale(corner_top_right, (corner_top_right.get_width() * GAME_SCALE, corner_top_right.get_height() * GAME_SCALE))
 
-	def __init__(self, window_surface, main_clock):
+	def __init__(self, window_surface, main_clock, player_one_color, player_two_color):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
@@ -56,16 +56,13 @@ class Game:
 		self.convert_background()
 
 		# Create the left player.
-		self.player_left = self.create_player_left()
+		self.player_left = self.create_player_left(player_one_color)
 		
 		# Create the right player.
-		self.player_right = self.create_player_right()
+		self.player_right = self.create_player_right(player_two_color)
 
 		# Setup the game world.
 		self.setup_gamefield(self.player_left, self.player_right)
-
-		# Stop the music (eventually start music)
-		pygame.mixer.music.stop()
 
 		self.gameloop()
 
@@ -76,21 +73,19 @@ class Game:
 		Game.corner_top_left.convert()
 		Game.corner_top_right.convert()
 
-	def create_player_left(self):
+	def create_player_left(self, color):
 		name = PLAYER_LEFT_NAME
 		key_up = PLAYER_LEFT_KEY_UP
 		key_down = PLAYER_LEFT_KEY_DOWN
-		color = pygame.Color(255, 0, 0, 255)
 
 		player_left = player.Player(name, key_up, key_down, color)
 
 		return player_left
 
-	def create_player_right(self):
+	def create_player_right(self, color):
 		name = PLAYER_RIGHT_NAME
 		key_up = PLAYER_RIGHT_KEY_UP
 		key_down = PLAYER_RIGHT_KEY_DOWN
-		color = pygame.Color(0, 0, 255, 255)
 
 		player_right = player.Player(name, key_up, key_down, color)
 		

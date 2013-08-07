@@ -30,6 +30,8 @@ class PrepareMenu:
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = game.Game
+		self.player_one_color = None
+		self.player_two_color = None
 
 		# Configure the GUI.
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
@@ -81,10 +83,6 @@ class PrepareMenu:
 
 		self.gameloop()
 
-	def start(self, item):
-		pygame.mixer.music.stop()
-		self.done = True
-
 	def setup_prepare_menu(self, function):
 		prepare_menu = self.setup_grid_menu()
 		self.setup_color_items(prepare_menu, function)
@@ -99,14 +97,31 @@ class PrepareMenu:
 		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), function)
 
 	def color_one(self, item):
-		print(str(item) + " one with color " + str(item.color) + " clicked!")
-		print("color item x: " + str(item.x))
-		print("color item y: " + str(item.y))
+		self.player_one_color = self.toggle_color(item, self.prepare_menu_one, self.prepare_menu_two)
+		print("color: " + str(self.player_one_color))
 
 	def color_two(self, item):
-		print(str(item) + " two with color " + str(item.color) + " clicked!")
-		print("color item x: " + str(item.x))
-		print("color item y: " + str(item.y))
+		self.player_two_color = self.toggle_color(item, self.prepare_menu_two, self.prepare_menu_one)
+		print("color: " + str(self.player_two_color))
+
+	def toggle_color(self, item, primary_menu, secondary_menu):
+		chosen_item = None
+		for menu_item in primary_menu.items:
+			if menu_item.chosen:
+				chosen_item = menu_item
+				break
+
+		if chosen_item == None:
+			if not item.unavailable:
+				item.chosen = not item.chosen
+				secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+				return item.color
+		elif chosen_item == item:
+			item.chosen = not item.chosen
+			secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+			return None
+		elif not chosen_item == item:
+			return chosen_item.color
 
 	def setup_menu(self):
 		x = SCREEN_WIDTH / 2
@@ -140,9 +155,12 @@ class PrepareMenu:
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-	def start_game(self, item):
-		pygame.mixer.music.stop()
-		self.done = True
+	def start(self, item):
+		if not self.player_one_color == None and not self.player_two_color == None:
+			pygame.mixer.music.stop()
+			self.done = True
+		else:
+			print("Haven't chosen colors.")
 
 	def back(self, item):
 		self.next_screen = screens.mainmenu.MainMenu
@@ -237,5 +255,7 @@ class PrepareMenu:
 		if self.next_screen == None:
 			pygame.quit()
 			sys.exit()
+		elif self.next_screen == game.Game:
+			self.next_screen(self.window_surface, self.main_clock, self.player_one_color, self.player_two_color)
 		else:
 			self.next_screen(self.window_surface, self.main_clock)
