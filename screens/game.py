@@ -229,7 +229,7 @@ class Game:
 
 		if DEBUG_MODE:
 			# Display various debug information.
-			debug.display(self.window_surface, self.main_clock)
+			debug.Debug.display(self.window_surface, self.main_clock)
 
 	def draw_background(self, surface):
 		surface.blit(Game.wall_horizontal, (LEVEL_X, LEVEL_Y - (4 * GAME_SCALE)))

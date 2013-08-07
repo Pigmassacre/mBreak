@@ -19,7 +19,7 @@ from settings.settings import *
 import settings.graphics as graphics
 
 # Import any needed game screens here.
-import screens.game as game
+import screens.preparemenu as preparemenu
 
 class MainMenu:
 
@@ -27,7 +27,9 @@ class MainMenu:
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.next_screen = game.Game
+
+		# The next screen to be started when the gameloop ends.
+		self.next_screen = preparemenu.PrepareMenu
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
@@ -36,11 +38,10 @@ class MainMenu:
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
-		self.setup_prepare_menu()
 		self.setup_options_menu()
 		self.setup_graphics_menu()
 
-		# The next screen to be started when gameloop ends.
+		# The menu to display.
 		self.active_menu = [self.main_menu]
 
 		# Setup the menu transitions.
@@ -58,31 +59,9 @@ class MainMenu:
 		self.main_menu.add(self.setup_button("Options"), self.options)
 		self.main_menu.add(self.setup_button("Quit"), self.quit)
 
-	def start(self, item):
-		self.active_menu.append(self.prepare_menu)
-		self.menu_transition.setup_grid_menu_transition(self.active_menu[-1])
-
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
 		self.menu_transition.setup_menu_transition(self.active_menu[-1])
-
-	def setup_prepare_menu(self):
-		self.prepare_menu = self.setup_grid_menu()
-		self.setup_color_items(self.prepare_menu)
-		self.prepare_menu.x = (SCREEN_WIDTH - self.prepare_menu.get_width()) / 2
-		self.prepare_menu.y = SCREEN_HEIGHT / 2
-		self.prepare_menu.cleanup()
-
-	def setup_color_items(self, grid_menu):
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), self.color)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 0, 255)), self.color)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 0, 255, 255)), self.color)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 255, 0, 255)), self.color)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), self.color)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), self.color)
-
-	def color(self, item):
-		print(str(item) + " with color " + str(item.color) + " clicked!")
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
@@ -163,15 +142,12 @@ class MainMenu:
 
 		return text
 
-	def setup_color_item(self, color):
-		return coloritem.ColorItem()
-
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.load(TITLE_MUSIC)
 			pygame.mixer.music.play()
 
-	def start_game(self, item):
+	def start(self, item):
 		pygame.mixer.music.stop()
 		self.done = True
 
@@ -240,4 +216,4 @@ class MainMenu:
 			pygame.quit()
 			sys.exit()
 		else:
-			self.next_screen(self.window_surface, self.main_clock, self.title_logo)
+			self.next_screen(self.window_surface, self.main_clock)

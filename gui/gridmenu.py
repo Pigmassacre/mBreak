@@ -25,7 +25,6 @@ class GridMenu(menu.Menu):
 		for item in self.items:
 			if item.x > max_x:
 				max_x = item.x + item.get_width()
-		print(str(max_x - self.x))
 		return max_x - self.x
 
 	def get_height(self):
@@ -33,7 +32,6 @@ class GridMenu(menu.Menu):
 		for item in self.items:
 			if item.y > max_y:
 				max_y = item.y + item.get_width()
-		print(str(max_y - self.y))
 		return max_y - self.y
 
 	def add(self, item, function):
