@@ -65,12 +65,12 @@ class MainMenu:
 		self.prepare_menu.cleanup()
 
 	def setup_color_items(self, grid_menu):
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), self.red)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 0, 255)), self.green)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 0, 255, 255)), self.blue)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 255, 0, 255)), self.red)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), self.red)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), self.red)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), self.color)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 0, 255)), self.color)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 0, 255, 255)), self.color)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 255, 0, 255)), self.color)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), self.color)
+		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), self.color)
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
@@ -186,14 +186,8 @@ class MainMenu:
 		self.active_menu.pop()
 		self.setup_menu_transition(self.active_menu[-1])
 
-	def red(self, item):
-		print("Red clicked!")
-
-	def green(self, item):
-		print("Green clicked!")
-
-	def blue(self, item):
-		print("Blue clicked!")
+	def color(self, item):
+		print(str(item.color) + " clicked!")
 
 	def quit(self, item):
 		self.done = True
