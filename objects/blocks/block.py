@@ -21,7 +21,8 @@ class Block(pygame.sprite.Sprite):
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
 	particle_spawn_amount = 4
-	
+	particle_size = 0.75 * GAME_SCALE
+
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
 
@@ -70,4 +71,4 @@ class Block(pygame.sprite.Sprite):
 			speed = 5
 			retardation = 0.25
 			alpha_step = 5
-			particle.Particle(self.x, self.y, 2, 2, angle, speed, retardation, self.color, alpha_step)
+			particle.Particle(self.x, self.y, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
