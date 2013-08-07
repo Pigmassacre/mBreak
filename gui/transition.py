@@ -14,6 +14,17 @@ class Transition():
 	def __init__(self):
 		self.speed = Transition.speed
 
+	def setup_single_item_left_right_transition(self, item):
+		self.start_positions = {}
+		self.start_positions[item] = (item.x, item.y)
+		if random.choice([True, False]):
+			if random.choice([True, False]):
+				item.x = SCREEN_WIDTH
+			else:
+				item.x = -item.get_width()
+		else:
+			item.y = SCREEN_HEIGHT
+
 	def setup_all_sides_transition(self, menu_to_setup):
 		self.start_positions = {}
 		menu_to_setup.cleanup()
@@ -41,7 +52,10 @@ class Transition():
 
 	def handle_menu_transition(self, menu_to_handle):
 		for item in menu_to_handle.items:
-			self.move_item_to_position(item, self.start_positions[item])
+			self.handle_item_transition(item)
+
+	def handle_item_transition(self, item):
+		self.move_item_to_position(item, self.start_positions[item])
 
 	def move_item_to_position(self, item, position):
 		if position[0] < item.x:

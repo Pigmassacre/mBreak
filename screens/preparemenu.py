@@ -37,16 +37,16 @@ class PrepareMenu:
 		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4
 
 		self.player_one_text = self.setup_textitem("Player One")
-		self.player_one_text.x = self.prepare_menu_one.x - self.player_one_text.get_width() - 4 * GAME_SCALE
-		self.player_one_text.y = self.prepare_menu_one.y + ((self.prepare_menu_one.get_height() - self.player_one_text.get_height()) / 2)
+		self.player_one_text.x = (SCREEN_WIDTH - self.player_one_text.get_width()) / 2
+		self.player_one_text.y = self.prepare_menu_one.y - (self.player_one_text.get_height() * 2)
 		
 		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
 		self.prepare_menu_two.x = (SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 2
 		self.prepare_menu_two.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 4)
 
 		self.player_two_text = self.setup_textitem("Player Two")
-		self.player_two_text.x = self.prepare_menu_two.x - self.player_two_text.get_width() - 4 * GAME_SCALE
-		self.player_two_text.y = self.prepare_menu_two.y + ((self.prepare_menu_two.get_height() - self.player_two_text.get_height()) / 2)
+		self.player_two_text.x = (SCREEN_WIDTH - self.player_two_text.get_width()) / 2
+		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		back_button = self.setup_textitem("Back")
 		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
@@ -60,8 +60,14 @@ class PrepareMenu:
 		self.prepare_menu_one_transition = transition.Transition()
 		self.prepare_menu_one_transition.setup_all_sides_transition(self.prepare_menu_one)
 
+		self.player_one_text_transition = transition.Transition()
+		self.player_one_text_transition.setup_single_item_left_right_transition(self.player_one_text)
+
 		self.prepare_menu_two_transition = transition.Transition()
 		self.prepare_menu_two_transition.setup_all_sides_transition(self.prepare_menu_two)
+
+		self.player_two_text_transition = transition.Transition()
+		self.player_two_text_transition.setup_single_item_left_right_transition(self.player_two_text)
 
 		self.back_menu_transition = transition.Transition()
 		self.back_menu_transition.setup_all_sides_transition(self.back_menu)
@@ -190,9 +196,15 @@ class PrepareMenu:
 		self.prepare_menu_one.update()
 		self.prepare_menu_one.draw(self.window_surface)
 
+		self.player_one_text_transition.handle_item_transition(self.player_one_text)
+		self.player_one_text.draw(self.window_surface)
+
 		self.prepare_menu_two_transition.handle_menu_transition(self.prepare_menu_two)
 		self.prepare_menu_two.update()
 		self.prepare_menu_two.draw(self.window_surface)
+
+		self.player_two_text_transition.handle_item_transition(self.player_two_text)
+		self.player_two_text.draw(self.window_surface)
 		
 		self.back_menu_transition.handle_menu_transition(self.back_menu)
 		self.back_menu.update()

@@ -12,15 +12,17 @@ from settings.settings import *
 class ColorItem():
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
+	x = 0
+	y = 0
+	width = 16 * GAME_SCALE
+	height = 16 * GAME_SCALE
 	shadow_color = pygame.Color(50, 50, 50, 255)
 	shadow_offset_x = 0 * GAME_SCALE
 	shadow_offset_y = 1 * GAME_SCALE
 	selected_border_color = pygame.Color(255, 255, 255, 255)
 	selected_border_size = 2 * GAME_SCALE
-	x = 0
-	y = 0
-	width = 16 * GAME_SCALE
-	height = 16 * GAME_SCALE
+	chosen_color = pygame.Color(200, 200, 200, 255)
+	unavailable_color = pygame.Color(100, 100, 100, 255)
 
 	def __init__(self, color):
 		self.selected = False
@@ -32,10 +34,15 @@ class ColorItem():
 		
 		# Setup the color values, used for drawing the ColorItem.
 		self.color = copy.copy(color)
-		self.selected_border_color = ColorItem.selected_border_color
 		self.shadow_color = ColorItem.shadow_color
 		self.shadow_offset_x = ColorItem.shadow_offset_x
 		self.shadow_offset_y = ColorItem.shadow_offset_y
+		self.selected_border_color = ColorItem.selected_border_color
+		self.chosen_color = ColorItem.chosen_color
+		self.unavailable_color = ColorItem.unavailable_color
+
+		self.chosen = False
+		self.unavailable = False
 
 		# Create the rect used for drawing the ColorItem.
 		self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
@@ -61,4 +68,9 @@ class ColorItem():
 		if self.selected:
 			surface.fill(self.selected_border_color, self.selected_rect)
 
-		surface.fill(self.color, self.rect)
+		if self.unavailable:
+			surface.fill(self.unavailable_color, self.rect)
+		elif self.chosen:
+			surface.fill(self.chosen_color, self.rect)
+		else:
+			surface.fill(self.color, self.rect)
