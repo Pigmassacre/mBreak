@@ -46,7 +46,7 @@ class MainMenu:
 		self.active_menu = [self.main_menu]
 
 		# Setup the menu transitions.
-		self.menu_transition = transition.Transition(48)
+		self.menu_transition = transition.Transition()
 		self.menu_transition.setup_menu_transition(self.active_menu[0])
 
 		# Setup and play music.

@@ -10,7 +10,7 @@ from settings.settings import *
 
 class Transition():
 
-	def __init__(self, speed):
+	def __init__(self, speed = 44):
 		self.speed = speed
 
 	def setup_grid_menu_transition(self, menu_to_setup):
