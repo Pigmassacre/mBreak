@@ -61,7 +61,7 @@ class MainMenu:
 		self.prepare_menu = self.setup_grid_menu()
 		self.setup_color_items(self.prepare_menu)
 		self.prepare_menu.x = (SCREEN_WIDTH - self.prepare_menu.get_width()) / 2
-		self.prepare_menu.y = (SCREEN_HEIGHT - self.prepare_menu.get_height()) / 2
+		self.prepare_menu.y = SCREEN_HEIGHT / 2
 		self.prepare_menu.cleanup()
 
 	def setup_color_items(self, grid_menu):
@@ -102,15 +102,13 @@ class MainMenu:
 		self.menu_speed = 48
 		self.menu_start_positions = {}
 		menu_to_setup.cleanup()
-		odd = random.choice([True, False])
 		for item in menu_to_setup.items:
+			odd = random.choice([True, False])
 			self.menu_start_positions[item] = item.x
 			if odd:
 				item.x = SCREEN_WIDTH
-				odd = False
 			else:
 				item.x = -item.get_width()
-				odd = True
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
