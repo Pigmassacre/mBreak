@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import math
 from settings.settings import *
 
@@ -71,8 +72,6 @@ class Menu:
 		pressed_buttons = pygame.mouse.get_pressed()
 
 		for item in self.items:
-			item.selected = False
-
 			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
 			if pressed_buttons[0]:
 				if not self.clicked_outside[item]:
@@ -81,6 +80,8 @@ class Menu:
 				self.clicked_outside[item] = False
 			
 			if self.is_mouse_over_item(item, mouse_pos):
+				for another_item in self.items:
+					another_item.selected = False
 				item.selected = True
 				if pressed_buttons[0] and not self.clicked_outside[item]:
 					if not self.last_clicked_item == item:

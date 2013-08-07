@@ -18,12 +18,9 @@ class Transition():
 		self.start_positions = {}
 		self.start_positions[item] = (item.x, item.y)
 		if random.choice([True, False]):
-			if random.choice([True, False]):
-				item.x = SCREEN_WIDTH
-			else:
-				item.x = -item.get_width()
+			item.x = SCREEN_WIDTH
 		else:
-			item.y = SCREEN_HEIGHT
+			item.x = -item.get_width()
 
 	def setup_all_sides_transition(self, menu_to_setup):
 		self.start_positions = {}

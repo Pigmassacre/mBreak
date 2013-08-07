@@ -13,7 +13,7 @@ class GridMenu(menu.Menu):
 
 	def __init__(self, x, y, position = 0):
 		menu.Menu.__init__(self, x, y, position)
-		
+
 		self.max_number_of_columns = GridMenu.max_number_of_columns
 		self.offset = GridMenu.offset
 		self.current_row_size = 0

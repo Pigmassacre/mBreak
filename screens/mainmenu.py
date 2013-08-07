@@ -58,6 +58,7 @@ class MainMenu:
 		self.main_menu.add(self.setup_button("Start"), self.start)
 		self.main_menu.add(self.setup_button("Options"), self.options)
 		self.main_menu.add(self.setup_button("Quit"), self.quit)
+		self.main_menu.items[0].selected = True
 
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
@@ -68,6 +69,7 @@ class MainMenu:
 		self.options_menu.add(self.setup_button("Controls"), self.controls)
 		self.options_menu.add(self.setup_button("Graphics"), self.graphics)
 		self.options_menu.add(self.setup_button("Back"), self.back)
+		self.options_menu.items[0].selected = True
 
 	def controls(self, item):
 		print("Controls clicked!")
@@ -95,6 +97,7 @@ class MainMenu:
 		self.graphics_menu.add(traces_button, self.traces)
 
 		self.graphics_menu.add(self.setup_button("Back"), self.back)
+		self.graphics_menu.items[0].selected = True
 
 	def shadows(self, item):
 		graphics.SHADOWS = item.toggle_on_off()
@@ -180,7 +183,27 @@ class MainMenu:
 						pygame.quit()
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					self.start()
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							self.active_menu[-1].functions[item](item)
+							break
+				elif event.type == KEYDOWN and event.key == K_UP:
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							if self.active_menu[-1].items.index(item) - 1 >= 0:
+								print(str(self.active_menu[-1].items.index(item) - 1))
+								self.active_menu[-1].items[self.active_menu[-1].items.index(item) - 1].selected = True
+								item.selected = False
+								break
+				elif event.type == KEYDOWN and event.key == K_DOWN:
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							print("it's selected!")
+							if self.active_menu[-1].items.index(item) + 1 <= len(self.active_menu[-1].items) - 1:
+								print(str(self.active_menu[-1].items.index(item) + 1))
+								self.active_menu[-1].items[self.active_menu[-1].items.index(item) + 1].selected = True
+								item.selected = False
+								break
 
 			# Move the logo to the desired position.
 			self.show_logo()
