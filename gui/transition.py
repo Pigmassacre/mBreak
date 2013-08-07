@@ -12,8 +12,8 @@ class Transition():
 
 	def __init__(self, speed = 44):
 		self.speed = speed
-
-	def setup_grid_menu_transition(self, menu_to_setup):
+		
+	def setup_all_sides_transition(self, menu_to_setup):
 		self.start_positions = {}
 		menu_to_setup.cleanup()
 		for item in menu_to_setup.items:
@@ -26,7 +26,7 @@ class Transition():
 			else:
 				item.y = SCREEN_HEIGHT
 
-	def setup_menu_transition(self, menu_to_setup):
+	def setup_left_right_transition(self, menu_to_setup):
 		self.start_positions = {}
 		menu_to_setup.cleanup()
 		odd = random.choice([True, False])

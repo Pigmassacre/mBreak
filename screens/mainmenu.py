@@ -46,7 +46,7 @@ class MainMenu:
 
 		# Setup the menu transitions.
 		self.menu_transition = transition.Transition()
-		self.menu_transition.setup_menu_transition(self.active_menu[0])
+		self.menu_transition.setup_left_right_transition(self.active_menu[0])
 
 		# Setup and play music.
 		self.setup_music()
@@ -61,7 +61,7 @@ class MainMenu:
 
 	def options(self, item):
 		self.active_menu.append(self.options_menu)
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_left_right_transition(self.active_menu[-1])
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
@@ -74,7 +74,7 @@ class MainMenu:
 
 	def graphics(self, item):
 		self.active_menu.append(self.graphics_menu)
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_left_right_transition(self.active_menu[-1])
 
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
@@ -153,7 +153,7 @@ class MainMenu:
 
 	def back(self, item):
 		self.active_menu.pop()
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_left_right_transition(self.active_menu[-1])
 
 	def quit(self, item):
 		self.done = True
@@ -175,7 +175,7 @@ class MainMenu:
 					# If the escape key is pressed, we go back a level in the menu system. If we're at the lowest level, we quit.
 					if len(self.active_menu) > 1:
 						self.active_menu.pop()
-						self.menu_transition.setup_menu_transition(self.active_menu[-1])
+						self.menu_transition.setup_left_right_transition(self.active_menu[-1])
 					else:
 						sys.exit()
 						pygame.quit()

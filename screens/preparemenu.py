@@ -36,15 +36,32 @@ class PrepareMenu:
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
 		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 2
 		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4
+
 		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
 		self.prepare_menu_two.x = (SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 2
 		self.prepare_menu_two.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 4)
 
+		back_button = self.setup_button("Back")
+		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
+		self.back_menu.add(back_button, self.back)
+		print(str(self.back_menu.x))
+		start_button = self.setup_button("Start")
+		self.start_menu = menu.Menu(SCREEN_WIDTH - (SCREEN_WIDTH / 5), SCREEN_HEIGHT - (2 * start_button.get_height()))
+		self.start_menu.add(start_button, self.start)
+		print(str(self.start_menu.x))
+
 		# Setup the menu transitions.
 		self.prepare_menu_one_transition = transition.Transition()
-		self.prepare_menu_one_transition.setup_grid_menu_transition(self.prepare_menu_one)
+		self.prepare_menu_one_transition.setup_all_sides_transition(self.prepare_menu_one)
+
 		self.prepare_menu_two_transition = transition.Transition()
-		self.prepare_menu_two_transition.setup_grid_menu_transition(self.prepare_menu_two)
+		self.prepare_menu_two_transition.setup_all_sides_transition(self.prepare_menu_two)
+
+		self.back_menu_transition = transition.Transition()
+		self.back_menu_transition.setup_all_sides_transition(self.back_menu)
+
+		self.start_menu_transition = transition.Transition()
+		self.start_menu_transition.setup_all_sides_transition(self.start_menu)
 
 		# Setup and play music.
 		self.setup_music()
@@ -112,8 +129,8 @@ class PrepareMenu:
 		self.done = True
 
 	def back(self, item):
-		self.active_menu.pop()
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+		self.next_screen = screens.mainmenu.MainMenu
+		self.done = True
 
 	def quit(self, item):
 		self.done = True
@@ -155,11 +172,20 @@ class PrepareMenu:
 
 	def show_menu(self):
 		self.prepare_menu_one_transition.handle_menu_transition(self.prepare_menu_one)
-		self.prepare_menu_two_transition.handle_menu_transition(self.prepare_menu_two)
 		self.prepare_menu_one.update()
-		self.prepare_menu_two.update()
 		self.prepare_menu_one.draw(self.window_surface)
+
+		self.prepare_menu_two_transition.handle_menu_transition(self.prepare_menu_two)
+		self.prepare_menu_two.update()
 		self.prepare_menu_two.draw(self.window_surface)
+		
+		self.back_menu_transition.handle_menu_transition(self.back_menu)
+		self.back_menu.update()
+		self.back_menu.draw(self.window_surface)
+
+		self.start_menu_transition.handle_menu_transition(self.start_menu)
+		self.start_menu.update()
+		self.start_menu.draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == None:

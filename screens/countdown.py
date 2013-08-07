@@ -16,11 +16,10 @@ from settings.settings import *
 
 class Countdown:
 
-	def __init__(self, window_surface, main_clock, debug_font):
+	def __init__(self, window_surface, main_clock):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
-		self.debug_font = debug_font
 
 		self.background_surface = self.window_surface.copy()
 
@@ -57,7 +56,7 @@ class Countdown:
 					pygame.quit()
 
 			self.time_passed += self.main_clock.get_time()
-			if self.time_passed < self.time_to_countdown + self.countdown_ready_time:
+			if self.time_passed > self.time_to_countdown and self.time_passed < self.time_to_countdown + self.countdown_ready_time:
 				if self.countdown_ready.x < self.countdown_ready_desired_x:
 					if (self.countdown_ready.x + self.countdown_ready_speed) > self.countdown_ready_desired_x:
 						self.countdown_ready.x = self.countdown_ready_desired_x
@@ -71,7 +70,7 @@ class Countdown:
 					else:
 						self.countdown_ready.x += self.countdown_ready_slow_speed
 				self.countdown_ready.draw(self.window_surface)
-			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
+			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time and self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				if self.countdown_go.x < self.countdown_go_desired_x:
 					if (self.countdown_go.x + self.countdown_go_speed) > self.countdown_go_desired_x:
 						self.countdown_go.x = self.countdown_go_desired_x
@@ -85,7 +84,7 @@ class Countdown:
 					else:
 						self.countdown_go.x += self.countdown_go_slow_speed
 				self.countdown_go.draw(self.window_surface)
-			else:
+			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				print("game has started")
 				self.done = True
 

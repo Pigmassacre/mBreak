@@ -125,7 +125,7 @@ class Game:
 		# Draw all the objects, then start the countdown. We do this before the main game loop so we don't have to answer to any events.
 		self.update()
 		self.draw()
-		screens.countdown.Countdown(self.window_surface, self.main_clock, self.debug_font)
+		screens.countdown.Countdown(self.window_surface, self.main_clock)
 
 		self.done = False
 		while not self.done:
@@ -161,7 +161,7 @@ class Game:
 		groups.empty()
 
 		if not self.next_screen == None:
-			self.next_screen(self.window_surface, self.main_clock, self)
+			self.next_screen(self.window_surface, self.main_clock)
 		else:
 			pygame.quit()
 			sys.exit()
