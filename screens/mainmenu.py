@@ -148,7 +148,7 @@ class MainMenu:
 
 	def start(self, item):
 		self.active_menu.append(self.prepare_menu)
-		self.menu_transition.setup_menu_transition(self.active_menu[-1])
+		self.menu_transition.setup_grid_menu_transition(self.active_menu[-1])
 
 	def start_game(self, item):
 		pygame.mixer.music.stop()

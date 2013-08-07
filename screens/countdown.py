@@ -57,10 +57,7 @@ class Countdown:
 					pygame.quit()
 
 			self.time_passed += self.main_clock.get_time()
-			if self.time_passed < self.time_to_countdown:
-				print("soon countdown")
-			elif self.time_passed < self.time_to_countdown + self.countdown_ready_time:
-				print("displaying ready")
+			if self.time_passed < self.time_to_countdown + self.countdown_ready_time:
 				if self.countdown_ready.x < self.countdown_ready_desired_x:
 					if (self.countdown_ready.x + self.countdown_ready_speed) > self.countdown_ready_desired_x:
 						self.countdown_ready.x = self.countdown_ready_desired_x

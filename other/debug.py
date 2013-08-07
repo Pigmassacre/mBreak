@@ -41,6 +41,7 @@ class Debug:
 	# Initialize the font module.
 	pygame.font.init()
 
+	# Default variables go here.
 	font_path = "fonts/8-BIT WONDER.TTF"
 	font_size = 9 * GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
