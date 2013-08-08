@@ -129,7 +129,7 @@ class PrepareMenu:
 		elif not chosen_item == item:
 			if not item.unavailable:
 				chosen_item.chosen = not chosen_item.chosen
-				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = not secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable
+				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
 				item.chosen = not item.chosen
 				secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
 				return item.color

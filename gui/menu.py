@@ -32,18 +32,26 @@ class Menu:
 		self.y = y
 
 	def get_width(self):
-		max_size = 0
+		self.cleanup()
+		min_x = 99999
+		max_x = 0
 		for item in self.items:
-			if item.get_width() > max_size:
-				max_size = item.get_width()
-		return max_size
+			if item.x < min_x:
+				min_x = item.x
+			if item.x + item.get_width() > max_x:
+				max_x = item.x + item.get_width()
+		return max_x - min_x
 
 	def get_height(self):
-		max_size = 0
+		self.cleanup()
+		min_y = 99999
+		max_y = 0
 		for item in self.items:
-			if item.get_height() > max_size:
-				max_size = item.get_height()
-		return max_size
+			if item.y < min_y:
+				min_y = item.y
+			if item.y + item.get_height() > max_y:
+				max_y = item.y + item.get_height()
+		return max_y - min_y
 
 	def add(self, item, function):
 		if len(self.items) > 0:

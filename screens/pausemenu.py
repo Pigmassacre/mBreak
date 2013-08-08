@@ -24,10 +24,11 @@ import screens
 
 class PauseMenu:
 
-	def __init__(self, window_surface, main_clock):
+	def __init__(self, window_surface, main_clock, background_surface):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
+		self.background_surface = background_surface
 
 		# Configure the GUI.
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
@@ -40,10 +41,10 @@ class PauseMenu:
 
 		self.gameloop()
 
-	def setup_prepare_menu(self, function):
-		prepare_menu = self.setup_grid_menu()
-		self.setup_color_items(prepare_menu, function)
-		return prepare_menu
+	def setup_pause_menu(self, function):
+		pause_menu = self.setup_menu()
+		self.setup_color_items(pause_menu, function)
+		return pause_menu
 
 	def setup_menu(self):
 		x = SCREEN_WIDTH / 2
@@ -64,8 +65,8 @@ class PauseMenu:
 		self.done = False
 
 		while not self.done:
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(BACKGROUND_COLOR)
+			# Begin every frame by blitting the background surface.
+			self.window_surface.blit(self.background_surface (0, 0))
 			
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -78,18 +79,24 @@ class PauseMenu:
 					self.done = True
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					if self.back_menu.items[0].selected:
-						self.back_menu.functions[self.back_menu.items[0]](self.back_menu.items[0])
-					elif self.start_menu.items[0].selected:
-						self.start_menu.functions[self.start_menu.items[0]](self.start_menu.items[0])
-				elif event.type == KEYDOWN and event.key == K_LEFT:
-					if self.start_menu.items[0].selected:
-						self.start_menu.items[0].selected = False
-						self.back_menu.items[0].selected = True
-				elif event.type == KEYDOWN and event.key == K_RIGHT:
-					if self.back_menu.items[0].selected:
-						self.back_menu.items[0].selected = False
-						self.start_menu.items[0].selected = True
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							self.active_menu[-1].functions[item](item)
+							break
+				elif event.type == KEYDOWN and event.key == K_UP:
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							if self.active_menu[-1].items.index(item) - 1 >= 0:
+								self.active_menu[-1].items[self.active_menu[-1].items.index(item) - 1].selected = True
+								item.selected = False
+								break
+				elif event.type == KEYDOWN and event.key == K_DOWN:
+					for item in self.active_menu[-1].items:
+						if item.selected:
+							if self.active_menu[-1].items.index(item) + 1 <= len(self.active_menu[-1].items) - 1:
+								self.active_menu[-1].items[self.active_menu[-1].items.index(item) + 1].selected = True
+								item.selected = False
+								break
 
 			self.show_player_text()
 

@@ -19,28 +19,6 @@ class GridMenu(menu.Menu):
 		self.current_row_size = 0
 		self.current_row_position = self.y
 
-	def get_width(self):
-		self.cleanup()
-		min_x = 99999
-		max_x = 0
-		for item in self.items:
-			if item.x < min_x:
-				min_x = item.x
-			if item.x + item.get_width() > max_x:
-				max_x = item.x + item.get_width()
-		return max_x - min_x
-
-	def get_height(self):
-		self.cleanup()
-		min_y = 99999
-		max_y = 0
-		for item in self.items:
-			if item.y < min_y:
-				min_y = item.y
-			if item.y + item.get_height() > max_y:
-				max_y = item.y + item.get_height()
-		return max_y - min_y
-
 	def add(self, item, function):
 		self.items.append(item)
 		self.current_row_size += 1
