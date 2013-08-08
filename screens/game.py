@@ -20,8 +20,8 @@ from settings.settings import *
 import settings.graphics as graphics
 
 # Import any needed game screens here.
-import screens
-import screens.countdown
+import screens.gameover as gameover
+import screens.countdown as countdown
 import screens.pausemenu as pausemenu
 
 class Game:
@@ -44,7 +44,13 @@ class Game:
 		self.main_clock = main_clock
 
 		# The next screen to be started when gameloop ends.
-		self.next_screen = screens.mainmenu.MainMenu
+		self.next_screen = gameover.GameOver
+
+		# The winner is sent to the gameover screen for display.
+		self.winner = None
+
+		# The score is kept to be sent to the gameover screen and also to be kept for "best-of" matches.
+		self.score = {}
 
 		# Setup the objects.
 		block_normal.convert()
@@ -81,6 +87,8 @@ class Game:
 
 		player_left = player.Player(name, key_up, key_down, color)
 
+		self.score[player_left] = 0
+
 		return player_left
 
 	def create_player_right(self, color):
@@ -89,6 +97,8 @@ class Game:
 		key_down = PLAYER_RIGHT_KEY_DOWN
 
 		player_right = player.Player(name, key_up, key_down, color)
+
+		self.score[player_right] = 0
 		
 		return player_right
 
@@ -117,11 +127,11 @@ class Game:
 				temp_block_right = block_normal.NormalBlock(LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_right)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
-		left_paddle_x = LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_weak * block.Block.width) + (paddle.Paddle.width * 3)
+		left_paddle_x = LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_weak * block.Block.width) + (paddle.Paddle.width * 4)
 		left_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
 
-		right_paddle_x = LEVEL_MAX_X - (amount_of_strong * paddle.Paddle.width) - (amount_of_weak * paddle.Paddle.width) - (paddle.Paddle.width * 4)
+		right_paddle_x = LEVEL_MAX_X - (amount_of_strong * paddle.Paddle.width) - (amount_of_weak * paddle.Paddle.width) - (paddle.Paddle.width * 5)
 		right_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_right)
 		paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
@@ -129,17 +139,18 @@ class Game:
 
 	def gameloop(self):
 		# We start a countdown before the game starts.
-		countdown = screens.countdown.Countdown(self.main_clock, self.start_game)
-		self.update(countdown)
+		countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
+		self.update(countdown_screen)
 		self.draw()	
 
 		self.done = False
 		while not self.done:
 			for event in pygame.event.get():
 				if event.type == QUIT:
+					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
-				if countdown.done:
+				if countdown_screen.done:
 					if event.type == KEYDOWN and event.key == K_ESCAPE:
 						pausemenu.PauseMenu(self.window_surface, self.main_clock)
 					elif event.type == KEYDOWN and event.key == K_l:
@@ -151,37 +162,32 @@ class Game:
 
 			# Win detection: for now just go back to previous screen if the game is over.
 			if len(self.player_left.block_group) == 0:
+				self.winner = self.player_left
 				self.done = True
 			elif len(self.player_right.block_group) == 0:
+				self.winner = self.player_right
 				self.done = True
 
-			self.update(countdown)
+			self.update(countdown_screen)
 
 			self.draw()
 			
-			countdown.update_and_draw(self.window_surface)
+			countdown_screen.update_and_draw(self.window_surface)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(MAX_FPS)
 
-		# Gameloop is over, so we clear all the groups of their contents.
-		groups.empty()
-
-		if not self.next_screen == None:
-			self.next_screen(self.window_surface, self.main_clock)
-		else:
-			pygame.quit()
-			sys.exit()
+		self.on_exit()
 
 	def start_game(self):
 		self.create_ball_left()
 		self.create_ball_right()
 
-	def update(self, countdown):
+	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
-		if DEBUG_MODE and countdown.done:
+		if DEBUG_MODE and countdown_screen.done:
 			debug.update(self.player_left, self.player_right)
 
 		# Update the balls.
@@ -250,3 +256,16 @@ class Game:
 		surface.blit(Game.corner_top_left, (LEVEL_MAX_X, LEVEL_MAX_Y))
 		surface.blit(Game.corner_top_right, (LEVEL_MAX_X, LEVEL_Y - (4 * GAME_SCALE)))
 		surface.blit(Game.corner_top_right, (LEVEL_X - (4 * GAME_SCALE), LEVEL_MAX_Y))
+
+	def on_exit(self):
+		# Gameloop is over, so we clear all the groups of their contents.
+		groups.empty()
+
+		if self.next_screen == None:
+			pygame.quit()
+			sys.exit()
+		elif self.next_screen == gameover.GameOver:
+			self.score[self.winner] = self.score[self.winner] + 1
+			self.next_screen(self.window_surface, self.main_clock, self.player_left.color, self.player_right.color, self.winner, self.score)
+		else:
+			self.next_screen(self.window_surface, self.main_clock)

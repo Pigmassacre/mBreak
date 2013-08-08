@@ -23,12 +23,12 @@ MAX_FPS = 60
 TITLE_MUSIC = "res/music/title_screen.ogg"
 
 # Player Left settings.
-PLAYER_LEFT_NAME = "Player Left"
+PLAYER_LEFT_NAME = "Player One"
 PLAYER_LEFT_KEY_UP = K_w
 PLAYER_LEFT_KEY_DOWN = K_s
 
 # Player Right settings.
-PLAYER_RIGHT_NAME = "Player Right"
+PLAYER_RIGHT_NAME = "Player Two"
 PLAYER_RIGHT_KEY_UP = K_UP
 PLAYER_RIGHT_KEY_DOWN = K_DOWN
 

@@ -75,7 +75,6 @@ class Menu:
 		for item in self.items:
 			item.x = self.x - (item.get_width() / 2)
 			item.y = self.y + ((item.get_height() * 2) * self.items.index(item))
-			print(str(self.items.index(item)))
 
 	def update(self):
 		mouse_pos = pygame.mouse.get_pos()

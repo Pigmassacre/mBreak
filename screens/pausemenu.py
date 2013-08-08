@@ -37,7 +37,6 @@ class PauseMenu:
 		self.pause_menu = self.setup_pause_menu()
 		self.pause_menu.x = SCREEN_WIDTH / 2
 		self.pause_menu.y = (SCREEN_HEIGHT - self.pause_menu.get_height()) / 2
-		print("pausemenu x,y: " + str(self.pause_menu.x) + ", " + str(self.pause_menu.y))
 		self.pause_menu.cleanup()
 		self.pause_menu.items[0].selected = True
 
@@ -54,7 +53,6 @@ class PauseMenu:
 		pause_menu = menu.Menu()
 		pause_menu.add(textitem.TextItem("Resume"), self.resume)
 		pause_menu.add(textitem.TextItem("Quit"), self.quit)
-		pause_menu.cleanup()
 		return pause_menu
 
 	def resume(self, item):
@@ -119,7 +117,6 @@ class PauseMenu:
 		self.pause_menu_quit_transition.handle_item_transition(self.pause_menu.items[1])
 		self.pause_menu.update()
 		self.pause_menu.draw(self.window_surface)
-		print("pausemenu x,y: " + str(self.pause_menu.x) + ", " + str(self.pause_menu.y))
 
 	def on_exit(self):
 		if not self.next_screen == None:

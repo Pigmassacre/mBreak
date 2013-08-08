@@ -52,12 +52,12 @@ class PrepareMenu:
 		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
+		self.back_menu = menu.Menu(back_button.get_height() + (back_button.get_width() / 2), SCREEN_HEIGHT - (2 * back_button.get_height()))
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 		
 		start_button = textitem.TextItem("Start")
-		self.start_menu = menu.Menu(SCREEN_WIDTH - (SCREEN_WIDTH / 5), SCREEN_HEIGHT - (2 * start_button.get_height()))
+		self.start_menu = menu.Menu(SCREEN_WIDTH - start_button.get_height() - (start_button.get_width() / 2), SCREEN_HEIGHT - (2 * start_button.get_height()))
 		self.start_menu.add(start_button, self.start)
 
 		# Setup the menu transitions.
