@@ -84,7 +84,7 @@ class PrepareMenu:
 
 		# Setup the menu transitions.
 		self.number_of_rounds_menu_transition = transition.Transition()
-		self.number_of_rounds_menu_transition.setup_transition(self.number_of_rounds_menu, True, True, False, True)
+		self.number_of_rounds_menu_transition.setup_transition(self.number_of_rounds_menu, True, True, False, False)
 
 		self.number_of_rounds_text_transition = transition.Transition()
 		self.number_of_rounds_text_transition.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
