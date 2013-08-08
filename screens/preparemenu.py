@@ -35,19 +35,19 @@ class PrepareMenu:
 
 		# Configure the GUI.
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
-		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 2
-		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4
+		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 4
+		self.prepare_menu_one.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4)
 
 		self.player_one_text = self.setup_textitem("Player One")
-		self.player_one_text.x = (SCREEN_WIDTH - self.player_one_text.get_width()) / 2
+		self.player_one_text.x = self.prepare_menu_one.x + ((self.prepare_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.prepare_menu_one.y - (self.player_one_text.get_height() * 2)
 		
 		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
-		self.prepare_menu_two.x = (SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 2
+		self.prepare_menu_two.x = 3 * ((SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 4)
 		self.prepare_menu_two.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 4)
 
 		self.player_two_text = self.setup_textitem("Player Two")
-		self.player_two_text.x = (SCREEN_WIDTH - self.player_two_text.get_width()) / 2
+		self.player_two_text.x = self.prepare_menu_two.x + ((self.prepare_menu_two.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		back_button = self.setup_textitem("Back")
@@ -61,22 +61,22 @@ class PrepareMenu:
 
 		# Setup the menu transitions.
 		self.prepare_menu_one_transition = transition.Transition()
-		self.prepare_menu_one_transition.setup_all_sides_transition(self.prepare_menu_one)
+		self.prepare_menu_one_transition.setup_transition(self.prepare_menu_one, True, False, False, True)
 
 		self.player_one_text_transition = transition.Transition()
-		self.player_one_text_transition.setup_single_item_left_right_transition(self.player_one_text)
+		self.player_one_text_transition.setup_single_item_transition(self.player_one_text, True, False, False, False)
 
 		self.prepare_menu_two_transition = transition.Transition()
-		self.prepare_menu_two_transition.setup_all_sides_transition(self.prepare_menu_two)
+		self.prepare_menu_two_transition.setup_transition(self.prepare_menu_two, False, True, False, True)
 
 		self.player_two_text_transition = transition.Transition()
-		self.player_two_text_transition.setup_single_item_left_right_transition(self.player_two_text)
+		self.player_two_text_transition.setup_single_item_transition(self.player_two_text, False, True, False, False)
 
 		self.back_menu_transition = transition.Transition()
-		self.back_menu_transition.setup_all_sides_transition(self.back_menu)
+		self.back_menu_transition.setup_transition(self.back_menu, True, False, False, True)
 
 		self.start_menu_transition = transition.Transition()
-		self.start_menu_transition.setup_all_sides_transition(self.start_menu)
+		self.start_menu_transition.setup_transition(self.start_menu, False, True, False, True)
 
 		# Setup and play music.
 		self.setup_music()
