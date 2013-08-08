@@ -24,11 +24,16 @@ import screens
 
 class PauseMenu:
 
+	tint_color = pygame.Color(255, 255, 255, 128)
+
 	def __init__(self, window_surface, main_clock):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
+
+		# Tint the window surface and set it as the background surface.
 		self.background_surface = window_surface.copy()
+		useful.tint_surface(self.background_surface)
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = None

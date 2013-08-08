@@ -20,12 +20,14 @@ class TextItem:
 	shadow_offset_x = 0 * GAME_SCALE
 	shadow_offset_y = 1 * GAME_SCALE
 	shadow_color = pygame.Color(50, 50, 50, 255)
-	selected_color = pygame.Color(128, 128, 128, 255)
-	on_color = pygame.Color(20, 255, 20, 255)
-	off_color = pygame.Color(255, 20, 20, 255)
+	selected_color = pygame.Color(255, 255, 255, 255)
+	on_color = pygame.Color(0, 170, 0, 255)
+	selected_on_color = pygame.Color(0, 255, 0, 255)
+	off_color = pygame.Color(170, 0, 0, 255)
+	selected_off_color = pygame.Color(255, 0, 0, 255)
 	blink_rate = 750
 
-	def __init__(self, text_value, font_color = pygame.Color(255, 255, 255), alpha_value = 255):
+	def __init__(self, text_value, font_color = pygame.Color(128, 128, 128), alpha_value = 255):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y
@@ -34,8 +36,8 @@ class TextItem:
 		self.selected = False
 		self.on_font_color = TextItem.on_color
 		self.off_font_color = TextItem.off_color
-		self.selected_on_font_color = useful.blend_colors(self.on_font_color, self.selected_font_color, True)
-		self.selected_off_font_color = useful.blend_colors(self.off_font_color, self.selected_font_color, True)
+		self.selected_on_font_color = TextItem.selected_on_color
+		self.selected_off_font_color = TextItem.selected_off_color
 		self.is_on_off = False
 		self.on = False
 		self.blink_rate = TextItem.blink_rate

@@ -4,7 +4,14 @@ __license__ = "All Rights Reserved"
 
 # Store various useful classes in here, for now atleast.
 import pygame
+from pygame.locals import *
 import math
+
+def tint_surface(surface):
+	tint_color = pygame.Color(0, 0, 0, 128)
+	tint_surface = pygame.Surface((surface.get_width(), surface.get_height()), SRCALPHA)
+	tint_surface.fill(tint_color)
+	surface.blit(tint_surface, (0, 0))
 
 def blend_colors(old_color, blend_color, blend_alpha=False):
 	new_r = int(old_color.r * (blend_color.r / 255.0))

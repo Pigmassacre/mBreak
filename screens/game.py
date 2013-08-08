@@ -46,8 +46,9 @@ class Game:
 		# The next screen to be started when gameloop ends.
 		self.next_screen = gameover.GameOver
 
-		# The winner is sent to the gameover screen for display.
+		# The winner and the loser is sent to the gameover screen for display.
 		self.winner = None
+		self.loser = None
 
 		# The score is kept to be sent to the gameover screen and also to be kept for "best-of" matches.
 		self.score = {}
@@ -153,19 +154,20 @@ class Game:
 				if countdown_screen.done:
 					if event.type == KEYDOWN and event.key == K_ESCAPE:
 						pausemenu.PauseMenu(self.window_surface, self.main_clock)
-					elif event.type == KEYDOWN and event.key == K_l:
-						debug.create_ball_left(self.player_left)
-					elif event.type == KEYDOWN and event.key == K_r:
-						debug.create_ball_right(self.player_right)
-					elif event.type == KEYDOWN and event.key == K_p:
-						debug.create_powerup()
+					if DEBUG_MODE:
+						if event.type == KEYDOWN and event.key == K_l:
+							debug.create_ball_left(self.player_left)
+						elif event.type == KEYDOWN and event.key == K_r:
+							debug.create_ball_right(self.player_right)
+						elif event.type == KEYDOWN and event.key == K_p:
+							debug.create_powerup()
 
 			# Win detection: for now just go back to previous screen if the game is over.
 			if len(self.player_left.block_group) == 0:
-				self.winner = self.player_left
+				self.score[self.player_right] = self.score[self.player_right] + 1
 				self.done = True
 			elif len(self.player_right.block_group) == 0:
-				self.winner = self.player_right
+				self.score[self.player_left] = self.score[self.player_left] + 1
 				self.done = True
 
 			self.update(countdown_screen)
@@ -265,7 +267,6 @@ class Game:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == gameover.GameOver:
-			self.score[self.winner] = self.score[self.winner] + 1
-			self.next_screen(self.window_surface, self.main_clock, self.player_left.color, self.player_right.color, self.winner, self.score)
+			self.next_screen(self.window_surface, self.main_clock, self.player_left, self.player_right, self.score)
 		else:
 			self.next_screen(self.window_surface, self.main_clock)

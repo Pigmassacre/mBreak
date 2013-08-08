@@ -39,7 +39,7 @@ class PrepareMenu:
 		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 4
 		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 2
 
-		self.player_one_text = textitem.TextItem("Player One")
+		self.player_one_text = textitem.TextItem("Player One", pygame.Color(255, 255, 255))
 		self.player_one_text.x = self.prepare_menu_one.x + ((self.prepare_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.prepare_menu_one.y - (self.player_one_text.get_height() * 2)
 		
@@ -47,7 +47,7 @@ class PrepareMenu:
 		self.prepare_menu_two.x = 3 * ((SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 4)
 		self.prepare_menu_two.y = (SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 2
 
-		self.player_two_text = textitem.TextItem("Player Two")
+		self.player_two_text = textitem.TextItem("Player Two", pygame.Color(255, 255, 255))
 		self.player_two_text.x = self.prepare_menu_two.x + ((self.prepare_menu_two.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
 

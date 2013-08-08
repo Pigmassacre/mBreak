@@ -31,16 +31,16 @@ class Countdown:
 		self.countdown_ready.y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
 		self.countdown_ready_desired_x = (SCREEN_WIDTH / 2) - self.countdown_ready.get_width()
 		self.countdown_ready_desired_y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
-		self.countdown_ready_speed = 50
-		self.countdown_ready_slow_speed = 2
+		self.countdown_ready_speed = 13 * GAME_SCALE
+		self.countdown_ready_slow_speed = 1 * GAME_SCALE
 		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
 		self.countdown_go.set_size(18 * GAME_SCALE)
 		self.countdown_go.x = -self.countdown_go.get_width()
 		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
 		self.countdown_go_desired_x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
 		self.countdown_go_desired_y = (SCREEN_HEIGHT / 2) - self.countdown_go.get_height()
-		self.countdown_go_speed = 50
-		self.countdown_go_slow_speed = 3
+		self.countdown_go_speed = 13 * GAME_SCALE
+		self.countdown_go_slow_speed = 1.3 * GAME_SCALE
 
 		self.done = False
 

@@ -24,19 +24,33 @@ import screens
 
 class GameOver:
 
-	def __init__(self, window_surface, main_clock, player_one_color, player_two_color, winner, score):
+	tint_color = pygame.Color(255, 255, 255, 128)
+
+	def __init__(self, window_surface, main_clock, player_one, player_two, score):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
+
+		# Tint the window surface and set it as the background surface.
+		self.background_surface = window_surface.copy()
+		useful.tint_surface(self.background_surface)
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = screens.mainmenu.MainMenu
 
 		# Keep track of the players color, the winner and the score.
-		self.player_one_color = player_one_color
-		self.player_two_color = player_two_color
-		self.winner = winner
+		self.player_one = player_one
+		self.player_two = player_two
 		self.score = score
+
+		if self.score[self.player_one] > self.score[self.player_two]:
+			self.winner = self.player_one
+			self.loser = self.player_two
+		elif self.score[self.player_one] < self.score[self.player_two]:
+			self.winner = self.player_two
+			self.loser = self.player_one
+		else:
+			self.winner = None
 
 		# Configure the GUI.
 		self.winning_player_text = textitem.TextItem(self.winner.name + " Wins")
@@ -83,8 +97,8 @@ class GameOver:
 		self.done = False
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(BACKGROUND_COLOR)
-			
+			self.window_surface.blit(self.background_surface, (0, 0))
+
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					# If the window is closed, the game is shut down.
@@ -152,6 +166,6 @@ class GameOver:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.game.Game:
-			self.next_screen(self.window_surface, self.main_clock, self.player_one_color, self.player_two_color)
+			self.next_screen(self.window_surface, self.main_clock, self.player_one.color, self.player_two.color)
 		else:
 			self.next_screen(self.window_surface, self.main_clock)
