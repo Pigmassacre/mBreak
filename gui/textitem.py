@@ -25,7 +25,7 @@ class TextItem:
 	off_color = pygame.Color(255, 20, 20, 255)
 	blink_rate = 750
 
-	def __init__(self, text_value, font_color, alpha_value = 255):
+	def __init__(self, text_value, font_color = pygame.Color(255, 255, 255), alpha_value = 255):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y

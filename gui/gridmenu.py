@@ -20,6 +20,7 @@ class GridMenu(menu.Menu):
 		self.current_row_position = self.y
 
 	def get_width(self):
+		self.cleanup()
 		min_x = 99999
 		max_x = 0
 		for item in self.items:
@@ -30,6 +31,7 @@ class GridMenu(menu.Menu):
 		return max_x - min_x
 
 	def get_height(self):
+		self.cleanup()
 		min_y = 99999
 		max_y = 0
 		for item in self.items:

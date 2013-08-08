@@ -138,11 +138,7 @@ class MainMenu:
 		return grid_menu
 
 	def setup_button(self, text):
-		font_color = (255, 255, 255)
-		alpha_value = 255
-
-		text = textitem.TextItem(text, font_color, alpha_value)
-
+		text = textitem.TextItem(text)
 		return text
 
 	def setup_music(self):

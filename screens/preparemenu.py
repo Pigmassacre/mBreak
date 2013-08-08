@@ -14,6 +14,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
+import gui.toast as toast
 from settings.settings import *
 import settings.graphics as graphics
 
@@ -77,6 +78,11 @@ class PrepareMenu:
 
 		self.start_menu_transition = transition.Transition()
 		self.start_menu_transition.setup_transition(self.start_menu, False, True, False, True)
+
+		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
+		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1000, self.main_clock)
+		self.not_all_colors_chosen_toast.x = (SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
+		self.not_all_colors_chosen_toast.y = self.prepare_menu_two.y + self.prepare_menu_two.get_height() +  (2 * self.not_all_colors_chosen_toast.get_height())
 
 		# Setup and play music.
 		self.setup_music()
@@ -160,7 +166,7 @@ class PrepareMenu:
 			pygame.mixer.music.stop()
 			self.done = True
 		else:
-			print("Haven't chosen colors.")
+			self.not_all_colors_chosen_toast.start()
 
 	def back(self, item):
 		self.next_screen = screens.mainmenu.MainMenu
@@ -204,6 +210,8 @@ class PrepareMenu:
 			self.show_player_text()
 
 			self.show_menu()
+
+			self.show_toasts()
 
 			if DEBUG_MODE:
 				# Display various debug information.
@@ -250,6 +258,9 @@ class PrepareMenu:
 
 		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)
+
+	def show_toasts(self):
+		self.not_all_colors_chosen_toast.update_and_draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == None:
