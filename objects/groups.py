@@ -4,7 +4,16 @@ __license__ = "All Rights Reserved"
 
 import pygame
 
-def empty():
+def empty_after_round():
+	Groups.ball_group.empty()
+	Groups.particle_group.empty()
+	Groups.block_group.empty()
+	Groups.powerup_group.empty()
+	Groups.paddle_group.empty()
+	Groups.shadow_group.empty()
+	Groups.trace_group.empty()
+
+def empty_all():
 	Groups.ball_group.empty()
 	Groups.particle_group.empty()
 	Groups.block_group.empty()

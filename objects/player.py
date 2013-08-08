@@ -36,6 +36,12 @@ class Player(pygame.sprite.Sprite):
 		# Store the selected color, used to colorize objects that belong to the player.
 		self.color = color
 
+	def empty_groups(self):
+		self.paddle_group.empty()
+		self.ball_group.empty()
+		self.block_group.empty()
+		self.powerup_group.empty()
+
 	def update(self):
 		# Update paddles.
 		self.paddle_group.update(self.key_up, self.key_down)

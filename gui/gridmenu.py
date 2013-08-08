@@ -11,7 +11,7 @@ class GridMenu(menu.Menu):
 	max_number_of_columns = 3
 	offset = 2 * GAME_SCALE
 
-	def __init__(self, x, y, position = 0):
+	def __init__(self, x = 0, y = 0, position = 0):
 		menu.Menu.__init__(self, x, y, position)
 
 		self.max_number_of_columns = GridMenu.max_number_of_columns

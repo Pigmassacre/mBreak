@@ -11,6 +11,7 @@ class Toast:
 
 	x = 0
 	y = 0
+	text_color = pygame.Color(255, 0, 0)
 
 	def __init__(self, message, duration, main_clock):
 		# We use the main clock to keep track of the time passed.
@@ -26,7 +27,7 @@ class Toast:
 		self.done = True
 
 		# We load a TextItem to display the message.
-		self.message = textitem.TextItem(message)
+		self.message = textitem.TextItem(message, Toast.text_color)
 
 		self.x = Toast.x
 		self.y = Toast.y

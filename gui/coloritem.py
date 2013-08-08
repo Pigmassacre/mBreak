@@ -26,14 +26,18 @@ class ColorItem():
 	unavailable_color = pygame.Color(100, 100, 100)
 
 	def __init__(self, color):
+		# These values cause the item to be drawn differently.
 		self.selected = False
+		self.chosen = False
+		self.unavailable = False
 
+		# We use these values to position and draw the item.
 		self.x = ColorItem.x
 		self.y = ColorItem.y
 		self.width = ColorItem.width
 		self.height = ColorItem.height
 		
-		# Setup the color values, used for drawing the ColorItem.
+		# Setup the color values.
 		self.color = copy.copy(color)
 		self.shadow_color = ColorItem.shadow_color
 		self.shadow_offset_x = ColorItem.shadow_offset_x
@@ -42,10 +46,7 @@ class ColorItem():
 		self.chosen_border_color = ColorItem.chosen_border_color
 		self.unavailable_color = ColorItem.unavailable_color
 
-		self.chosen = False
-		self.unavailable = False
-
-		# Create the rect used for drawing the ColorItem.
+		# Create the rect used for drawing the item.
 		self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
 		self.selected_rect = pygame.rect.Rect(self.x - (ColorItem.selected_border_size / 2), self.y - (ColorItem.selected_border_size / 2), self.width + ColorItem.selected_border_size, self.height + ColorItem.selected_border_size)
 		self.chosen_rect = pygame.rect.Rect(self.x - (ColorItem.chosen_border_size / 2), self.y - (ColorItem.chosen_border_size / 2), self.width + ColorItem.chosen_border_size, self.height + ColorItem.chosen_border_size)

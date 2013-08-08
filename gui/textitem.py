@@ -15,6 +15,8 @@ class TextItem:
 	font_path = "fonts/8-BIT WONDER.TTF"
 	font_size = 9 * GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
+	
+	# Standard values. These will be used unless any other values are specified per instance of this class.
 	x = 0
 	y = 0
 	shadow_offset_x = 0 * GAME_SCALE

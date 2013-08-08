@@ -8,11 +8,13 @@ import math
 import random
 import other.debug as debug
 import other.useful as useful
+import objects.player as player
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
+import gui.choiceitem as choiceitem
 import gui.transition as transition
 import gui.toast as toast
 from settings.settings import *
@@ -35,43 +37,69 @@ class PrepareMenu:
 		self.player_two_color = None
 
 		# Configure the GUI.
-		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
-		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 4
-		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 2
+		distance_from_screen_edge = 9 * GAME_SCALE
+
+		self.number_of_rounds_menu = gridmenu.GridMenu()
+		# We set the default number of rounds to 1.
+		temp_item = choiceitem.ChoiceItem(1)
+		self.rounds(temp_item)
+		self.number_of_rounds_menu.add(temp_item, self.rounds)
+		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(3), self.rounds)
+		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(5), self.rounds)
+		self.number_of_rounds_menu.x = (SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
+		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
+
+		self.number_of_rounds_text = textitem.TextItem("Rounds", pygame.Color(255, 255, 255))
+		self.number_of_rounds_text.x = (SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2
+		self.number_of_rounds_text.y = self.number_of_rounds_menu.y - (self.number_of_rounds_text.get_height() * 2)
+
+		self.color_menu_one = self.setup_color_menu(self.color_one)
+		self.color_menu_one.x = (SCREEN_WIDTH - self.color_menu_one.get_width()) / 4
+		self.color_menu_one.y = SCREEN_HEIGHT / 2
 
 		self.player_one_text = textitem.TextItem("Player One", pygame.Color(255, 255, 255))
-		self.player_one_text.x = self.prepare_menu_one.x + ((self.prepare_menu_one.get_width() - self.player_one_text.get_width()) / 2)
-		self.player_one_text.y = self.prepare_menu_one.y - (self.player_one_text.get_height() * 2)
+		self.player_one_text.x = self.color_menu_one.x + ((self.color_menu_one.get_width() - self.player_one_text.get_width()) / 2)
+		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
 		
-		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
-		self.prepare_menu_two.x = 3 * ((SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 4)
-		self.prepare_menu_two.y = (SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 2
+		self.color_menu_two = self.setup_color_menu(self.color_two)
+		self.color_menu_two.x = 3 * ((SCREEN_WIDTH - self.color_menu_two.get_width()) / 4)
+		self.color_menu_two.y = SCREEN_HEIGHT / 2
 
 		self.player_two_text = textitem.TextItem("Player Two", pygame.Color(255, 255, 255))
-		self.player_two_text.x = self.prepare_menu_two.x + ((self.prepare_menu_two.get_width() - self.player_two_text.get_width()) / 2)
-		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
+		self.player_two_text.x = self.color_menu_two.x + ((self.color_menu_two.get_width() - self.player_two_text.get_width()) / 2)
+		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu(back_button.get_height() + (back_button.get_width() / 2), SCREEN_HEIGHT - (2 * back_button.get_height()))
+		self.back_menu = menu.Menu()
+		self.back_menu.x = distance_from_screen_edge + (back_button.get_width() / 2)
+		self.back_menu.y = SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 		
 		start_button = textitem.TextItem("Start")
-		self.start_menu = menu.Menu(SCREEN_WIDTH - start_button.get_height() - (start_button.get_width() / 2), SCREEN_HEIGHT - (2 * start_button.get_height()))
+		self.start_menu = menu.Menu()
+		self.start_menu.x = SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2)
+		self.start_menu.y = SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)
 
 		# Setup the menu transitions.
-		self.prepare_menu_one_transition = transition.Transition()
-		self.prepare_menu_one_transition.setup_transition(self.prepare_menu_one, True, False, False, True)
+		self.number_of_rounds_menu_transition = transition.Transition()
+		self.number_of_rounds_menu_transition.setup_transition(self.number_of_rounds_menu, True, True, False, True)
+
+		self.number_of_rounds_text_transition = transition.Transition()
+		self.number_of_rounds_text_transition.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
+
+		self.color_menu_one_transition = transition.Transition()
+		self.color_menu_one_transition.setup_transition(self.color_menu_one, True, False, False, True)
 
 		self.player_one_text_transition = transition.Transition()
-		self.player_one_text_transition.setup_single_item_transition(self.player_one_text, True, False, False, False)
+		self.player_one_text_transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
 
-		self.prepare_menu_two_transition = transition.Transition()
-		self.prepare_menu_two_transition.setup_transition(self.prepare_menu_two, False, True, False, True)
+		self.color_menu_two_transition = transition.Transition()
+		self.color_menu_two_transition.setup_transition(self.color_menu_two, False, True, False, True)
 
 		self.player_two_text_transition = transition.Transition()
-		self.player_two_text_transition.setup_single_item_transition(self.player_two_text, False, True, False, False)
+		self.player_two_text_transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
 
 		self.back_menu_transition = transition.Transition()
 		self.back_menu_transition.setup_transition(self.back_menu, True, False, False, True)
@@ -82,17 +110,22 @@ class PrepareMenu:
 		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
 		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
 		self.not_all_colors_chosen_toast.x = (SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
-		self.not_all_colors_chosen_toast.y = self.prepare_menu_two.y + self.prepare_menu_two.get_height() +  (2 * self.not_all_colors_chosen_toast.get_height())
+		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
 		# Setup and play music.
 		self.setup_music()
 
 		self.gameloop()
 
-	def setup_prepare_menu(self, function):
-		prepare_menu = self.setup_grid_menu()
-		self.setup_color_items(prepare_menu, function)
-		return prepare_menu
+	def setup_music(self):
+		if not pygame.mixer.music.get_busy():
+			pygame.mixer.music.load(TITLE_MUSIC)
+			pygame.mixer.music.play()
+
+	def setup_color_menu(self, function):
+		color_menu = gridmenu.GridMenu()
+		self.setup_color_items(color_menu, function)
+		return color_menu
 
 	def setup_color_items(self, grid_menu, function):
 		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), function)
@@ -103,12 +136,10 @@ class PrepareMenu:
 		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), function)
 
 	def color_one(self, item):
-		self.player_one_color = self.toggle_color(item, self.prepare_menu_one, self.prepare_menu_two)
-		print("color: " + str(self.player_one_color))
+		self.player_one_color = self.toggle_color(item, self.color_menu_one, self.color_menu_two)
 
 	def color_two(self, item):
-		self.player_two_color = self.toggle_color(item, self.prepare_menu_two, self.prepare_menu_one)
-		print("color: " + str(self.player_two_color))
+		self.player_two_color = self.toggle_color(item, self.color_menu_two, self.color_menu_one)
 
 	def toggle_color(self, item, primary_menu, secondary_menu):
 		chosen_item = None
@@ -119,45 +150,39 @@ class PrepareMenu:
 
 		if chosen_item == None:
 			if not item.unavailable:
-				item.chosen = not item.chosen
-				secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+				item.chosen = True
+				secondary_menu.items[primary_menu.items.index(item)].unavailable = True
 				return item.color
 		elif chosen_item == item:
-			item.chosen = not item.chosen
-			secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+			item.chosen = False
+			secondary_menu.items[primary_menu.items.index(item)].unavailable = False
 			return None
 		elif not chosen_item == item:
 			if not item.unavailable:
-				chosen_item.chosen = not chosen_item.chosen
-				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = not secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable
-				item.chosen = not item.chosen
-				secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+				chosen_item.chosen = False
+				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = False
+				item.chosen = True
+				secondary_menu.items[primary_menu.items.index(item)].unavailable = True
 				return item.color
 			return chosen_item.color
 
-	def setup_menu(self):
-		x = SCREEN_WIDTH / 2
-		y = SCREEN_HEIGHT / 2
+	def rounds(self, item):
+		self.number_of_rounds = self.choose_number_of_rounds(item, self.number_of_rounds_menu)
 
-		main_menu = menu.Menu(x, y)
+	def choose_number_of_rounds(self, item, grid_menu):
+		chosen_item = None
+		for menu_item in grid_menu.items:
+			if menu_item.chosen:
+				chosen_item = menu_item
+				break
 
-		return main_menu
+		if chosen_item == None:
+			item.chosen = True
+		elif not chosen_item == item:
+			chosen_item.chosen = False
+			item.chosen = True
 
-	def setup_grid_menu(self):
-		x = SCREEN_WIDTH / 2
-		y = SCREEN_HEIGHT / 2
-
-		grid_menu = gridmenu.GridMenu(x, y)
-
-		return grid_menu
-
-	def setup_color_item(self, color):
-		return coloritem.ColorItem()
-
-	def setup_music(self):
-		if not pygame.mixer.music.get_busy():
-			pygame.mixer.music.load(TITLE_MUSIC)
-			pygame.mixer.music.play()
+		return item.value
 
 	def start(self, item):
 		if not self.player_one_color == None and not self.player_two_color == None:
@@ -205,8 +230,6 @@ class PrepareMenu:
 						self.back_menu.items[0].selected = False
 						self.start_menu.items[0].selected = True
 
-			self.show_player_text()
-
 			self.show_menu()
 
 			self.show_toasts()
@@ -223,21 +246,24 @@ class PrepareMenu:
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
 
-	def show_player_text(self):
-		self.player_one_text.draw(self.window_surface)
-		self.player_two_text.draw(self.window_surface)
-
 	def show_menu(self):
-		self.prepare_menu_one_transition.handle_menu_transition(self.prepare_menu_one)
-		self.prepare_menu_one.update()
-		self.prepare_menu_one.draw(self.window_surface)
+		self.number_of_rounds_menu_transition.handle_menu_transition(self.number_of_rounds_menu)
+		self.number_of_rounds_menu.update()
+		self.number_of_rounds_menu.draw(self.window_surface)
+
+		self.number_of_rounds_text_transition.handle_item_transition(self.number_of_rounds_text)
+		self.number_of_rounds_text.draw(self.window_surface)
+
+		self.color_menu_one_transition.handle_menu_transition(self.color_menu_one)
+		self.color_menu_one.update()
+		self.color_menu_one.draw(self.window_surface)
 
 		self.player_one_text_transition.handle_item_transition(self.player_one_text)
 		self.player_one_text.draw(self.window_surface)
 
-		self.prepare_menu_two_transition.handle_menu_transition(self.prepare_menu_two)
-		self.prepare_menu_two.update()
-		self.prepare_menu_two.draw(self.window_surface)
+		self.color_menu_two_transition.handle_menu_transition(self.color_menu_two)
+		self.color_menu_two.update()
+		self.color_menu_two.draw(self.window_surface)
 
 		self.player_two_text_transition.handle_item_transition(self.player_two_text)
 		self.player_two_text.draw(self.window_surface)
@@ -265,6 +291,23 @@ class PrepareMenu:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == game.Game:
-			self.next_screen(self.window_surface, self.main_clock, self.player_one_color, self.player_two_color)
+			player_one = self.create_player_one(self.player_one_color)
+			player_two = self.create_player_two(self.player_two_color)
+			score = {}
+			score[player_one] = 0
+			score[player_two] = 0
+			self.next_screen(self.window_surface, self.main_clock, player_one, player_two, self.number_of_rounds, score)
 		else:
 			self.next_screen(self.window_surface, self.main_clock)
+
+	def create_player_one(self, color):
+		name = PLAYER_ONE_NAME
+		key_up = PLAYER_ONE_KEY_UP
+		key_down = PLAYER_ONE_KEY_DOWN
+		return player.Player(name, key_up, key_down, color)
+
+	def create_player_two(self, color):
+		name = PLAYER_TWO_NAME
+		key_up = PLAYER_TWO_KEY_UP
+		key_down = PLAYER_TWO_KEY_DOWN
+		return player.Player(name, key_up, key_down, color)

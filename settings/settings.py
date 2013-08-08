@@ -1,7 +1,7 @@
 from pygame.locals import *
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-GAME_SCALE = 2
+GAME_SCALE = 3
 
 # Screen width and height is the game window width and height.
 SCREEN_WIDTH = int(285 * GAME_SCALE) # 854
@@ -22,15 +22,15 @@ MAX_FPS = 60
 # Music settings
 TITLE_MUSIC = "res/music/title_screen.ogg"
 
-# Player Left settings.
-PLAYER_LEFT_NAME = "Player One"
-PLAYER_LEFT_KEY_UP = K_w
-PLAYER_LEFT_KEY_DOWN = K_s
+# Player One settings.
+PLAYER_ONE_NAME = "Player One"
+PLAYER_ONE_KEY_UP = K_w
+PLAYER_ONE_KEY_DOWN = K_s
 
-# Player Right settings.
-PLAYER_RIGHT_NAME = "Player Two"
-PLAYER_RIGHT_KEY_UP = K_UP
-PLAYER_RIGHT_KEY_DOWN = K_DOWN
+# Player Two settings.
+PLAYER_TWO_NAME = "Player Two"
+PLAYER_TWO_KEY_UP = K_UP
+PLAYER_TWO_KEY_DOWN = K_DOWN
 
 # Enables various debug information.
 DEBUG_MODE = True

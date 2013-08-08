@@ -26,7 +26,7 @@ class GameOver:
 
 	tint_color = pygame.Color(255, 255, 255, 128)
 
-	def __init__(self, window_surface, main_clock, player_one, player_two, score):
+	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
@@ -38,11 +38,15 @@ class GameOver:
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = screens.mainmenu.MainMenu
 
-		# Keep track of the players color, the winner and the score.
+		# Keep track of the players and the score for displaying.
 		self.player_one = player_one
 		self.player_two = player_two
 		self.score = score
 
+		# Keep track of the number of rounds for rematch purposes.
+		self.number_of_rounds = number_of_rounds
+
+		# Figure out the winner from the score.
 		if self.score[self.player_one] > self.score[self.player_two]:
 			self.winner = self.player_one
 			self.loser = self.player_two
@@ -53,7 +57,7 @@ class GameOver:
 			self.winner = None
 
 		# Configure the GUI.
-		self.winning_player_text = textitem.TextItem(self.winner.name + " Wins")
+		self.winning_player_text = textitem.TextItem(self.winner.name + " Wins", pygame.Color(255, 255, 255))
 		self.winning_player_text.x = (SCREEN_WIDTH - self.winning_player_text.get_width()) / 2
 		self.winning_player_text.y = (SCREEN_HEIGHT - self.winning_player_text.get_height()) / 2
 
@@ -166,6 +170,6 @@ class GameOver:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.game.Game:
-			self.next_screen(self.window_surface, self.main_clock, self.player_one.color, self.player_two.color)
+			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds)
 		else:
 			self.next_screen(self.window_surface, self.main_clock)

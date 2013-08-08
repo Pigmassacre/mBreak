@@ -66,13 +66,9 @@ class MainMenu:
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
-		self.options_menu.add(textitem.TextItem("Controls"), self.controls)
 		self.options_menu.add(textitem.TextItem("Graphics"), self.graphics)
 		self.options_menu.add(textitem.TextItem("Back"), self.back)
 		self.options_menu.items[0].selected = True
-
-	def controls(self, item):
-		print("Controls clicked!")
 
 	def graphics(self, item):
 		self.active_menu.append(self.graphics_menu)
