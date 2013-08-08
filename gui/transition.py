@@ -7,7 +7,7 @@ import random
 import gui.menu as menu
 from settings.settings import *
 
-class Transition():
+class Transition:
 
 	speed = 14 * GAME_SCALE
 
