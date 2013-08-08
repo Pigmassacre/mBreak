@@ -55,9 +55,9 @@ class MainMenu:
 
 	def setup_main_menu(self):
 		self.main_menu = self.setup_menu()
-		self.main_menu.add(self.setup_button("Start"), self.start)
-		self.main_menu.add(self.setup_button("Options"), self.options)
-		self.main_menu.add(self.setup_button("Quit"), self.quit)
+		self.main_menu.add(textitem.TextItem("Start"), self.start)
+		self.main_menu.add(textitem.TextItem("Options"), self.options)
+		self.main_menu.add(textitem.TextItem("Quit"), self.quit)
 		self.main_menu.items[0].selected = True
 
 	def options(self, item):
@@ -66,9 +66,9 @@ class MainMenu:
 
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
-		self.options_menu.add(self.setup_button("Controls"), self.controls)
-		self.options_menu.add(self.setup_button("Graphics"), self.graphics)
-		self.options_menu.add(self.setup_button("Back"), self.back)
+		self.options_menu.add(textitem.TextItem("Controls"), self.controls)
+		self.options_menu.add(textitem.TextItem("Graphics"), self.graphics)
+		self.options_menu.add(textitem.TextItem("Back"), self.back)
 		self.options_menu.items[0].selected = True
 
 	def controls(self, item):
@@ -81,22 +81,22 @@ class MainMenu:
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
 
-		shadows_button = self.setup_button("Shadows")
+		shadows_button = textitem.TextItem("Shadows")
 		shadows_button.is_on_off = True
 		shadows_button.on = graphics.SHADOWS
 		self.graphics_menu.add(shadows_button, self.shadows)
 
-		particles_button = self.setup_button("Particles")
+		particles_button = textitem.TextItem("Particles")
 		particles_button.is_on_off = True
 		particles_button.on = graphics.PARTICLES
 		self.graphics_menu.add(particles_button, self.particles)
 
-		traces_button = self.setup_button("Traces")
+		traces_button = textitem.TextItem("Traces")
 		traces_button.is_on_off = True
 		traces_button.on = graphics.TRACES
 		self.graphics_menu.add(traces_button, self.traces)
 
-		self.graphics_menu.add(self.setup_button("Back"), self.back)
+		self.graphics_menu.add(textitem.TextItem("Back"), self.back)
 		self.graphics_menu.items[0].selected = True
 
 	def shadows(self, item):
@@ -136,10 +136,6 @@ class MainMenu:
 		grid_menu = gridmenu.GridMenu(x, y)
 
 		return grid_menu
-
-	def setup_button(self, text):
-		text = textitem.TextItem(text)
-		return text
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():

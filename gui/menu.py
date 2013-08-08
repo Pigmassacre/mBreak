@@ -8,7 +8,7 @@ from settings.settings import *
 
 class Menu:
 
-	def __init__(self, x, y, position = 0):
+	def __init__(self, x = 0, y = 0, position = 0):
 		# Setup a list to contain all the menu items.
 		self.items = []
 
@@ -74,6 +74,8 @@ class Menu:
 	def cleanup(self):
 		for item in self.items:
 			item.x = self.x - (item.get_width() / 2)
+			item.y = self.y + ((item.get_height() * 2) * self.items.index(item))
+			print(str(self.items.index(item)))
 
 	def update(self):
 		mouse_pos = pygame.mouse.get_pos()

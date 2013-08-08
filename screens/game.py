@@ -22,6 +22,7 @@ import settings.graphics as graphics
 # Import any needed game screens here.
 import screens
 import screens.countdown
+import screens.pausemenu as pausemenu
 
 class Game:
 
@@ -140,7 +141,7 @@ class Game:
 					pygame.quit()
 				if countdown.done:
 					if event.type == KEYDOWN and event.key == K_ESCAPE:
-						self.done = True
+						pausemenu.PauseMenu(self.window_surface, self.main_clock)
 					elif event.type == KEYDOWN and event.key == K_l:
 						debug.create_ball_left(self.player_left)
 					elif event.type == KEYDOWN and event.key == K_r:
@@ -235,9 +236,6 @@ class Game:
 
 		# Draw the background walls and overlying area.
 		self.draw_background(self.window_surface)
-
-		# Draw the players.
-		# groups.Groups.player_group.draw(self.window_surface)
 
 		if DEBUG_MODE:
 			# Display various debug information.
