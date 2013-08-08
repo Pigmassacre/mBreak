@@ -100,26 +100,27 @@ class Game:
 			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_right)
 
 	def setup_gamefield(self, player_left, player_right):
+		distance_to_blocks_from_wall = block.Block.width * 2
 		amount_of_strong = 2
-		amount_of_weak = 2 # TODO
-		y_amount = (LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
+		amount_of_weak = 2
+		amount_of_rows = (LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
 
-		for x in range(0, 2):
-			for y in range(0, y_amount):
-				block_strong.StrongBlock(LEVEL_X + (block.Block.width * 2) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_left)
+		for x in range(0, amount_of_strong):
+			for y in range(0, amount_of_rows):
+				block_strong.StrongBlock(LEVEL_X + distance_to_blocks_from_wall + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_left)
 				temp_block_right = block_strong.StrongBlock(LEVEL_MAX_X - (block.Block.width * 3) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_right)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
-		for x in range(0, x_amount):
-			for y in range(0, y_amount):
-				block_normal.NormalBlock(LEVEL_X + (block.Block.width * 4) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_left)
+		for x in range(0, amount_of_weak):
+			for y in range(0, amount_of_rows):
+				block_normal.NormalBlock(LEVEL_X + (distance_to_blocks_from_wall * amount_of_strong) + (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_left)
 				temp_block_right = block_normal.NormalBlock(LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_right)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
-		left_paddle_x = LEVEL_X + (x_amount * paddle.Paddle.width) + (2 * paddle.Paddle.width) + (paddle.Paddle.width * 3)
+		left_paddle_x = LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_weak * block.Block.width) + (paddle.Paddle.width * 3)
 		left_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		player_left.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_left))
 
-		right_paddle_x = LEVEL_MAX_X - (x_amount * paddle.Paddle.width) - (2 * paddle.Paddle.width) - (paddle.Paddle.width * 4)
+		right_paddle_x = LEVEL_MAX_X - (amount_of_strong * paddle.Paddle.width) - (amount_of_weak * paddle.Paddle.width) - (paddle.Paddle.width * 4)
 		right_paddle_y = (LEVEL_Y + (LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_right)
 		paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)

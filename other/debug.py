@@ -9,10 +9,6 @@ import objects.multiball as multiball
 import objects.ball as ball
 from settings.settings import *
 
-def create_ball(x, y, angle, owner):
-	speed = 1.0 * GAME_SCALE
-	return ball.Ball(x, y, angle, speed, owner)
-
 def create_powerup():
 	size = 150
 	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - size, LEVEL_X + (LEVEL_WIDTH / 2) + size)
@@ -22,13 +18,13 @@ def create_powerup():
 def create_ball_left(player_left):
 	for paddle in player_left.paddle_group:
 		angle = random.uniform((3 * math.pi) / 2, (5* math.pi) / 2)
-		temp_ball = create_ball(paddle.x + (paddle.width * 2), paddle.y + (paddle.height / 2), angle, player_left)
+		temp_ball = ball.Ball(paddle.x + (paddle.width * 2), paddle.y + (paddle.height / 2), angle, player_left)
 
 def create_ball_right(player_right):
 	for paddle in player_right.paddle_group:
 		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
-		temp_ball = create_ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
-		
+		temp_ball = ball.Ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
+
 def update(player_left, player_right):
 	if pygame.key.get_pressed()[K_SPACE]:
 		create_ball_left(player_left)

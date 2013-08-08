@@ -39,7 +39,7 @@ class PrepareMenu:
 		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 4
 		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 2
 
-		self.player_one_text = self.setup_textitem("Player One")
+		self.player_one_text = textitem.TextItem("Player One")
 		self.player_one_text.x = self.prepare_menu_one.x + ((self.prepare_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.prepare_menu_one.y - (self.player_one_text.get_height() * 2)
 		
@@ -47,16 +47,16 @@ class PrepareMenu:
 		self.prepare_menu_two.x = 3 * ((SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 4)
 		self.prepare_menu_two.y = (SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 2
 
-		self.player_two_text = self.setup_textitem("Player Two")
+		self.player_two_text = textitem.TextItem("Player Two")
 		self.player_two_text.x = self.prepare_menu_two.x + ((self.prepare_menu_two.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.prepare_menu_two.y - (self.player_two_text.get_height() * 2)
 
-		back_button = self.setup_textitem("Back")
+		back_button = textitem.TextItem("Back")
 		self.back_menu = menu.Menu(SCREEN_WIDTH / 5, SCREEN_HEIGHT - (2 * back_button.get_height()))
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 		
-		start_button = self.setup_textitem("Start")
+		start_button = textitem.TextItem("Start")
 		self.start_menu = menu.Menu(SCREEN_WIDTH - (SCREEN_WIDTH / 5), SCREEN_HEIGHT - (2 * start_button.get_height()))
 		self.start_menu.add(start_button, self.start)
 
@@ -80,7 +80,7 @@ class PrepareMenu:
 		self.start_menu_transition.setup_transition(self.start_menu, False, True, False, True)
 
 		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
-		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1000, self.main_clock)
+		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
 		self.not_all_colors_chosen_toast.x = (SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
 		self.not_all_colors_chosen_toast.y = self.prepare_menu_two.y + self.prepare_menu_two.get_height() +  (2 * self.not_all_colors_chosen_toast.get_height())
 
@@ -127,6 +127,12 @@ class PrepareMenu:
 			secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
 			return None
 		elif not chosen_item == item:
+			if not item.unavailable:
+				chosen_item.chosen = not chosen_item.chosen
+				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = not secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable
+				item.chosen = not item.chosen
+				secondary_menu.items[primary_menu.items.index(item)].unavailable = not secondary_menu.items[primary_menu.items.index(item)].unavailable
+				return item.color
 			return chosen_item.color
 
 	def setup_menu(self):
@@ -144,14 +150,6 @@ class PrepareMenu:
 		grid_menu = gridmenu.GridMenu(x, y)
 
 		return grid_menu
-
-	def setup_textitem(self, text):
-		font_color = (255, 255, 255)
-		alpha_value = 255
-
-		text = textitem.TextItem(text, font_color, alpha_value)
-
-		return text
 
 	def setup_color_item(self, color):
 		return coloritem.ColorItem()
