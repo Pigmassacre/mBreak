@@ -91,8 +91,17 @@ class Game:
 		
 		return player_right
 
+	def create_ball_left(self):
+		for paddle in self.player_left.paddle_group:
+			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), 0, self.player_left)
+
+	def create_ball_right(self):
+		for paddle in self.player_right.paddle_group:
+			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_right)
+
 	def setup_gamefield(self, player_left, player_right):
-		x_amount = 2
+		amount_of_strong = 2
+		amount_of_weak = 2 # TODO
 		y_amount = (LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
 
 		for x in range(0, 2):
@@ -117,10 +126,10 @@ class Game:
 		player_right.paddle_group.add(paddle_right)
 
 	def gameloop(self):
-		# Draw all the objects, then start the countdown. We do this before the main game loop so we don't have to answer to any events.
-		self.update()
-		self.draw()
-		screens.countdown.Countdown(self.window_surface, self.main_clock)
+		# We start a countdown before the game starts.
+		countdown = screens.countdown.Countdown(self.main_clock, self.start_game)
+		self.update(countdown)
+		self.draw()	
 
 		self.done = False
 		while not self.done:
@@ -128,14 +137,15 @@ class Game:
 				if event.type == QUIT:
 					sys.exit()
 					pygame.quit()
-				elif event.type == KEYDOWN and event.key == K_ESCAPE:
-					self.done = True
-				elif event.type == KEYDOWN and event.key == K_l:
-					debug.create_ball_left(self.player_left)
-				elif event.type == KEYDOWN and event.key == K_r:
-					debug.create_ball_right(self.player_right)
-				elif event.type == KEYDOWN and event.key == K_p:
-					debug.create_powerup()
+				if countdown.done:
+					if event.type == KEYDOWN and event.key == K_ESCAPE:
+						self.done = True
+					elif event.type == KEYDOWN and event.key == K_l:
+						debug.create_ball_left(self.player_left)
+					elif event.type == KEYDOWN and event.key == K_r:
+						debug.create_ball_right(self.player_right)
+					elif event.type == KEYDOWN and event.key == K_p:
+						debug.create_powerup()
 
 			# Win detection: for now just go back to previous screen if the game is over.
 			if len(self.player_left.block_group) == 0:
@@ -143,10 +153,12 @@ class Game:
 			elif len(self.player_right.block_group) == 0:
 				self.done = True
 
-			self.update()
+			self.update(countdown)
 
 			self.draw()
 			
+			countdown.update_and_draw(self.window_surface)
+
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
@@ -161,9 +173,13 @@ class Game:
 			pygame.quit()
 			sys.exit()
 
-	def update(self):
+	def start_game(self):
+		self.create_ball_left()
+		self.create_ball_right()
+
+	def update(self, countdown):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
-		if DEBUG_MODE:
+		if DEBUG_MODE and countdown.done:
 			debug.update(self.player_left, self.player_right)
 
 		# Update the balls.

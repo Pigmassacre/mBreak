@@ -36,7 +36,7 @@ class PrepareMenu:
 		# Configure the GUI.
 		self.prepare_menu_one = self.setup_prepare_menu(self.color_one)
 		self.prepare_menu_one.x = (SCREEN_WIDTH - self.prepare_menu_one.get_width()) / 4
-		self.prepare_menu_one.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 4)
+		self.prepare_menu_one.y = (SCREEN_HEIGHT - self.prepare_menu_one.get_height()) / 2
 
 		self.player_one_text = self.setup_textitem("Player One")
 		self.player_one_text.x = self.prepare_menu_one.x + ((self.prepare_menu_one.get_width() - self.player_one_text.get_width()) / 2)
@@ -44,7 +44,7 @@ class PrepareMenu:
 		
 		self.prepare_menu_two = self.setup_prepare_menu(self.color_two)
 		self.prepare_menu_two.x = 3 * ((SCREEN_WIDTH - self.prepare_menu_two.get_width()) / 4)
-		self.prepare_menu_two.y = 3 * ((SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 4)
+		self.prepare_menu_two.y = (SCREEN_HEIGHT - self.prepare_menu_two.get_height()) / 2
 
 		self.player_two_text = self.setup_textitem("Player Two")
 		self.player_two_text.x = self.prepare_menu_two.x + ((self.prepare_menu_two.get_width() - self.player_two_text.get_width()) / 2)

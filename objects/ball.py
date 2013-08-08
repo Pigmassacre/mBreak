@@ -26,6 +26,7 @@ class Ball(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * GAME_SCALE
 	height = image.get_height() * GAME_SCALE
+	speed = 1 * GAME_SCALE
 	max_speed = 3 * GAME_SCALE
 	damage = 10
 	spin_speed_strength = 0.05
@@ -36,7 +37,7 @@ class Ball(pygame.sprite.Sprite):
 	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, x, y, angle, speed, owner):
+	def __init__(self, x, y, angle, owner):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -57,10 +58,7 @@ class Ball(pygame.sprite.Sprite):
 		self.max_speed = Ball.max_speed
 
 		# Set the speed variable.
-		if speed <= self.max_speed:
-			self.speed = speed
-		else:
-			self.speed = self.max_speed
+		self.speed = Ball.speed
 		
 		# Store the owner.
 		self.owner = owner
@@ -114,6 +112,10 @@ class Ball(pygame.sprite.Sprite):
 		# Save the previous position.
 		self.previous.x = self.x
 		self.previous.y = self.y
+
+		# Make sure that speed isn't over max_speed.
+		if self.speed > self.max_speed:
+			self.speed = self.max_speed
 
 		# Move the ball with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)

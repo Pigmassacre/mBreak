@@ -23,14 +23,12 @@ def create_ball_left(player_left):
 	for paddle in player_left.paddle_group:
 		angle = random.uniform((3 * math.pi) / 2, (5* math.pi) / 2)
 		temp_ball = create_ball(paddle.x + (paddle.width * 2), paddle.y + (paddle.height / 2), angle, player_left)
-		temp_ball.owner = player_left
 
 def create_ball_right(player_right):
 	for paddle in player_right.paddle_group:
 		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
 		temp_ball = create_ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
-		temp_ball.owner = player_right
-
+		
 def update(player_left, player_right):
 	if pygame.key.get_pressed()[K_SPACE]:
 		create_ball_left(player_left)

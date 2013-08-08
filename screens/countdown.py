@@ -16,12 +16,11 @@ from settings.settings import *
 
 class Countdown:
 
-	def __init__(self, window_surface, main_clock):
-		# Store the game variables.
-		self.window_surface = window_surface
+	def __init__(self, main_clock, function_to_call):
+		# We use the main clock to keep track of the time passed.
 		self.main_clock = main_clock
-
-		self.background_surface = self.window_surface.copy()
+		# This is the function that is called when the countdown is over.
+		self.function_to_call = function_to_call
 
 		self.time_passed = 0
 		self.time_to_countdown = 1500
@@ -43,18 +42,10 @@ class Countdown:
 		self.countdown_go_speed = 50
 		self.countdown_go_slow_speed = 3
 
-		self.gameloop()
-
-	def gameloop(self):
 		self.done = False
-		while not self.done:
-			self.window_surface.blit(self.background_surface, (0, 0))
 
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					sys.exit()
-					pygame.quit()
-
+	def update_and_draw(self, surface):
+		if not self.done:
 			self.time_passed += self.main_clock.get_time()
 			if self.time_passed > self.time_to_countdown and self.time_passed < self.time_to_countdown + self.countdown_ready_time:
 				if self.countdown_ready.x < self.countdown_ready_desired_x:
@@ -69,7 +60,7 @@ class Countdown:
 						self.countdown_ready.x = self.countdown_ready_desired_x + self.countdown_ready.get_width()
 					else:
 						self.countdown_ready.x += self.countdown_ready_slow_speed
-				self.countdown_ready.draw(self.window_surface)
+				self.countdown_ready.draw(surface)
 			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time and self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				if self.countdown_go.x < self.countdown_go_desired_x:
 					if (self.countdown_go.x + self.countdown_go_speed) > self.countdown_go_desired_x:
@@ -83,12 +74,7 @@ class Countdown:
 						self.countdown_go.x = self.countdown_go_desired_x + self.countdown_go.get_width()
 					else:
 						self.countdown_go.x += self.countdown_go_slow_speed
-				self.countdown_go.draw(self.window_surface)
+				self.countdown_go.draw(surface)
 			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
-				print("game has started")
+				self.function_to_call()
 				self.done = True
-
-			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(MAX_FPS)

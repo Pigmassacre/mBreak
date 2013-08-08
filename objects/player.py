@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
+import objects.ball as ball
 from pygame.locals import *
 from settings.settings import *
 
