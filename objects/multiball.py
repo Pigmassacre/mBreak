@@ -10,6 +10,7 @@ import objects.powerup as powerup
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
+import objects.timeout as timeout
 from settings.settings import *
 
 def convert():
@@ -25,6 +26,7 @@ class Multiball(powerup.Powerup):
 	height = image.get_height() * GAME_SCALE
 	width = 8 * GAME_SCALE
 	height = 8 * GAME_SCALE
+	duration = 10000
 
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -47,14 +49,25 @@ class Multiball(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
+		# We use the owner of the entity to find out where to spawn the ball.
 		owner = entity.owner
 
 		for paddle in owner.paddle_group:
 			if paddle.x < (SCREEN_WIDTH / 2):
+				# If the paddle is on the left side, spawn ball on the right side of the paddle. 
 				x = paddle.x + paddle.width + 1
 				angle = 0
 			else:
+				# Otherwise spawn on the left side of the paddle.
 				x = paddle.x - paddle.width - 1
 				angle = math.pi
 
-			groups.Groups.ball_group.add(ball.Ball(x, paddle.y + (paddle.height / 2), angle, owner))
+			# Create a ball and store it temporarily.
+			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, owner)
+
+			# Create a timeout effect and add it to the ball.
+			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)
+
+			# Add the effect to the balls effectgroup and the main effectsgroup.
+			temp_ball.effect_group.add(timeout_effect)
+			groups.Groups.effect_group.add(timeout_effect)

@@ -8,12 +8,18 @@ from settings.settings import *
 
 class Effect(pygame.sprite.Sprite):
 
-	def __init__(self, parent):
+	def __init__(self, parent, duration):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
 		# Store the parent.
 		self.parent = parent
+
+		# We store the amount of time passed. When time passed is greater than timeout time, the parent is killed.
+		self.time_passed = 0
+
+		# Store the duration. The effect will be killed when time_passed is greater than duration.
+		self.duration = duration
 
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
@@ -21,19 +27,26 @@ class Effect(pygame.sprite.Sprite):
 		# Store self in the main effect_group.
 		groups.Groups.effect_group.add(self)
 
-	def on_hit_ball(self, entity):
-		print(str(entity) + " hit ball " + str(entity))
+	def on_hit_ball(self, hit_ball):
+		pass
 
-	def on_hit_block(self, entity):
-		print(str(entity) + " hit block " + str(entity))
+	def on_hit_block(self, hit_block):
+		pass
+
+	def on_hit_paddle(self, hit_paddle):
+		pass
 		
-	def on_hit_wall(self, entity):
-		print(str(entity) + " hit a wall.")
+	def on_hit_wall(self):
+		pass
 
-	def update(self):
+	def update(self, main_clock):
 		self.rect.x = self.parent.rect.x
 		self.rect.y = self.parent.rect.y
 		self.rect.width = self.parent.rect.width
 		self.rect.height = self.parent.rect.height
-		
-		print("Updating effect " + str(self))
+
+		self.time_passed += main_clock.get_time()
+
+		if self.time_passed >= self.duration:
+			self.kill()
+			self.on_kill()

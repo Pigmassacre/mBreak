@@ -84,6 +84,16 @@ class Ball(pygame.sprite.Sprite):
 		self.owner.ball_group.add(self)
 		groups.Groups.ball_group.add(self)
 
+		# Create an effect group to handle effects on this ball.
+		self.effect_group = pygame.sprite.Group()
+
+	def destroy(self):
+		# This should be called when the ball is to be destroyed. It will take care of killing itself and anything affecting it completely.
+		self.kill()
+		self.shadow.kill()
+		for effect in self.effect_group:
+			effect.kill()
+
 	def update(self, main_clock):
 		self.collided = False
 
@@ -210,6 +220,7 @@ class Ball(pygame.sprite.Sprite):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
 		for paddle in paddle_collide_list:
 			self.spawn_particles()
+			self.hit_paddle(paddle)
 			self.collided = True
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
@@ -247,6 +258,10 @@ class Ball(pygame.sprite.Sprite):
 			elif self.rect.left <= paddle.rect.right and self.rect.right > paddle.rect.right:
 				# Right side of paddle collided with.
 				self.hit_right_side_of_paddle(paddle)
+
+	def hit_paddle(self, paddle):
+		for effect in self.effect_group:
+			effect.on_hit_paddle(paddle)
 
 	def hit_left_side_of_paddle(self, paddle):
 		# Calculate spin, and then reverse angle.

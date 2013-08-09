@@ -45,10 +45,7 @@ class Player(pygame.sprite.Sprite):
 		self.block_group.empty()
 		self.powerup_group.empty()
 		self.effect_group.empty()
-
-	def add_effect(self, effect):
-		self.effect_group.add(effect)
-
+		
 	def update(self):
 		# Update paddles.
 		self.paddle_group.update(self.key_up, self.key_down)
