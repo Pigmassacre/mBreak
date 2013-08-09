@@ -24,6 +24,9 @@ class Effect(pygame.sprite.Sprite):
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
 
+		# Image is used to draw the effect. If image is None, it will not be drawn.
+		self.image = None
+
 		# Store self in the main effect_group.
 		groups.Groups.effect_group.add(self)
 
@@ -40,13 +43,19 @@ class Effect(pygame.sprite.Sprite):
 		pass
 
 	def update(self, main_clock):
-		self.rect.x = self.parent.rect.x
-		self.rect.y = self.parent.rect.y
-		self.rect.width = self.parent.rect.width
-		self.rect.height = self.parent.rect.height
+		self.rect.x = self.parent.rect.x + ((self.parent.rect.width - self.rect.width) / 2)
+		self.rect.y = self.parent.rect.y + ((self.parent.rect.height - self.rect.height) / 2)
 
 		self.time_passed += main_clock.get_time()
 
 		if self.time_passed >= self.duration:
 			self.kill()
 			self.on_kill()
+
+	def draw(self, surface):
+		# If the image exists, we blit it to the surface.
+		if not self.image == None:
+			surface.blit(self.image, self.rect)
+
+	def on_kill(self):
+		pass

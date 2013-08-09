@@ -226,7 +226,8 @@ class Game:
 		groups.Groups.ball_group.draw(self.window_surface)
 
 		# Draw the effects.
-		groups.Groups.effect_group.draw(self.window_surface)
+		for effect in groups.Groups.effect_group:
+			effect.draw(self.window_surface)
 
 		# Draw the background walls and overlying area.
 		self.draw_background(self.window_surface)

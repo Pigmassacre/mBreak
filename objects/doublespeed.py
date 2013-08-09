@@ -7,6 +7,7 @@ import random
 import math
 import other.useful as useful
 import objects.powerup as powerup
+import objects.speed as speed
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
@@ -25,6 +26,9 @@ class DoubleSpeed(powerup.Powerup):
 	height = image.get_height() * GAME_SCALE
 	width = 8 * GAME_SCALE
 	height = 8 * GAME_SCALE
+
+	# The amount of time the effect will last.
+	duration = 10000
 
 	# Scale image to game_scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -46,5 +50,14 @@ class DoubleSpeed(powerup.Powerup):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
+		
+		# Add the effect to all the balls of the entity owner.
+		for ball in entity.owner.ball_group:
+			# Create a speed effect to be added to the ball.
+			speed_effect = speed.Speed(ball, DoubleSpeed.duration)
+			
+			# Add the effect to all necessary groups.
+			ball.effect_group.add(speed_effect)
+			groups.Groups.effect_group.add(speed_effect)
+			ball.owner.effect_group.add(speed_effect)
 
-		# Add doublespeed effect to owner of entitys effect list.

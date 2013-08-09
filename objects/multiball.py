@@ -26,6 +26,8 @@ class Multiball(powerup.Powerup):
 	height = image.get_height() * GAME_SCALE
 	width = 8 * GAME_SCALE
 	height = 8 * GAME_SCALE
+
+	# The amount of time the effect will last.
 	duration = 10000
 
 	# Scale image to game_scale.
@@ -49,10 +51,7 @@ class Multiball(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# We use the owner of the entity to find out where to spawn the ball.
-		owner = entity.owner
-
-		for paddle in owner.paddle_group:
+		for paddle in entity.owner.paddle_group:
 			if paddle.x < (SCREEN_WIDTH / 2):
 				# If the paddle is on the left side, spawn ball on the right side of the paddle. 
 				x = paddle.x + paddle.width + 1
@@ -63,11 +62,21 @@ class Multiball(powerup.Powerup):
 				angle = math.pi
 
 			# Create a ball and store it temporarily.
-			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, owner)
+			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, entity.owner)
+
+			# Add all the players effects to the ball.
+			temp_effect = None
+			for effect in entity.owner.effect_group:
+				# Add this effect to the ball.
+				# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
+				temp_effect = effect.__class__(temp_ball, effect.duration - effect.time_passed)
+				temp_ball.effect_group.add(temp_effect)
+				groups.Groups.effect_group.add(temp_effect)
+				entity.owner.effect_group.add(temp_effect)
 
 			# Create a timeout effect and add it to the ball.
 			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)
 
-			# Add the effect to the balls effectgroup and the main effectsgroup.
+			# Add the effect to the ball effect group and the groups effects group.
 			temp_ball.effect_group.add(timeout_effect)
 			groups.Groups.effect_group.add(timeout_effect)

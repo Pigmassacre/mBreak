@@ -6,14 +6,16 @@ import pygame
 import random
 import math
 import objects.multiball as multiball
+import objects.doublespeed as doublespeed
 import objects.ball as ball
 from settings.settings import *
 
 def create_powerup():
+	powerup_list = [doublespeed.DoubleSpeed]
 	size = 150
 	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - size, LEVEL_X + (LEVEL_WIDTH / 2) + size)
 	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - size, LEVEL_Y + (LEVEL_HEIGHT / 2) + size)
-	return multiball.Multiball(x, y)
+	return random.choice(powerup_list)(x, y)
 
 def create_ball_left(player_left):
 	for paddle in player_left.paddle_group:
