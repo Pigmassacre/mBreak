@@ -16,8 +16,8 @@ def empty_after_round():
 
 def empty_all():
 	Groups.player_group.empty()
-	self.empty_after_round()
-	
+	empty_after_round()
+
 class Groups:
 
 	# Define the group that contains all the balls.

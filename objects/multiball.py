@@ -47,18 +47,14 @@ class Multiball(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		x = entity.x
-		y = entity.y
-		speed = entity.speed
-		angle = entity.angle
-		damage = entity.damage
 		owner = entity.owner
 
-		amount_to_spawn = 3
+		for paddle in owner.paddle_group:
+			if paddle.x < (SCREEN_WIDTH / 2):
+				x = paddle.x + paddle.width + 1
+				angle = 0
+			else:
+				x = paddle.x - paddle.width - 1
+				angle = math.pi
 
-		for i in range(0, amount_to_spawn):
-			print("Angle: " + str(angle))
-			angle = angle + ((2 * math.pi) / amount_to_spawn)
-			x = x + math.cos(angle)
-			y = y + math.sin(angle)
-			groups.Groups.ball_group.add(ball.Ball(x, y, angle, speed, owner))
+			groups.Groups.ball_group.add(ball.Ball(x, paddle.y + (paddle.height / 2), angle, owner))
