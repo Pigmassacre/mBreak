@@ -11,7 +11,7 @@ import objects.ball as ball
 from settings.settings import *
 
 def create_powerup():
-	powerup_list = [doublespeed.DoubleSpeed]
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed]
 	size = 150
 	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - size, LEVEL_X + (LEVEL_WIDTH / 2) + size)
 	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - size, LEVEL_Y + (LEVEL_HEIGHT / 2) + size)

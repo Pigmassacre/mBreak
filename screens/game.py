@@ -11,6 +11,8 @@ import objects.ball as ball
 import objects.paddle as paddle
 import objects.player as player
 import objects.multiball as multiball
+import objects.doublespeed as doublespeed
+import objects.speed as speed
 import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
@@ -61,6 +63,7 @@ class Game:
 		paddle.convert()
 		ball.convert()
 		multiball.convert()
+		doublespeed.convert()
 
 		# Make sure that the background images are converted.
 		self.convert_background()
@@ -176,7 +179,16 @@ class Game:
 		groups.Groups.ball_group.update(self.main_clock)
 
 		# Update the effects.
-		groups.Groups.effect_group.update(self.main_clock)
+		# First, we update the speed effects.
+		for effect in groups.Groups.effect_group:
+			if effect.__class__ == speed.Speed:
+				effect.update(self.main_clock)
+
+		# Then, we update every other effect. Because the speed effect moves the ball, if we update speed after any other effect we might get
+		# some wrong looking graphics (things will not line up with the balls with the speed effect).
+		for effect in groups.Groups.effect_group:
+			if not effect.__class__ == speed.Speed:
+				effect.update(self.main_clock)
 		
 		# Update the particles.
 		if graphics.PARTICLES:
