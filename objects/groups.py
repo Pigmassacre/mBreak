@@ -9,20 +9,15 @@ def empty_after_round():
 	Groups.particle_group.empty()
 	Groups.block_group.empty()
 	Groups.powerup_group.empty()
+	Groups.effect_group.empty()
 	Groups.paddle_group.empty()
 	Groups.shadow_group.empty()
 	Groups.trace_group.empty()
 
 def empty_all():
-	Groups.ball_group.empty()
-	Groups.particle_group.empty()
-	Groups.block_group.empty()
-	Groups.powerup_group.empty()
-	Groups.paddle_group.empty()
 	Groups.player_group.empty()
-	Groups.shadow_group.empty()
-	Groups.trace_group.empty()
-
+	self.empty_after_round()
+	
 class Groups:
 
 	# Define the group that contains all the balls.
@@ -39,6 +34,9 @@ class Groups:
 
 	# Define the group that contains all the powerups.
 	powerup_group = pygame.sprite.Group()
+
+	# Define the group that contains all the effects.
+	effect_group = pygame.sprite.Group()
 
 	# Define the group that contains all the paddles.
 	paddle_group = pygame.sprite.Group()

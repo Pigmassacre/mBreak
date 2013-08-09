@@ -174,6 +174,9 @@ class Game:
 
 		# Update the balls.
 		groups.Groups.ball_group.update(self.main_clock)
+
+		# Update the effects.
+		groups.Groups.effect_group.update(self.main_clock)
 		
 		# Update the particles.
 		if graphics.PARTICLES:
@@ -191,7 +194,7 @@ class Game:
 			groups.Groups.shadow_group.update(self.main_clock)
 
 	def draw(self):
-		# Begin a frame by blitting the background to the game_surface.
+		# Begin a frame by blitting the background to the window_surface.
 		self.window_surface.fill(BACKGROUND_COLOR)
 		self.window_surface.blit(Game.floor_surface, (LEVEL_X, LEVEL_Y))
 
@@ -221,6 +224,9 @@ class Game:
 
 		# Draw the balls.
 		groups.Groups.ball_group.draw(self.window_surface)
+
+		# Draw the effects.
+		groups.Groups.effect_group.draw(self.window_surface)
 
 		# Draw the background walls and overlying area.
 		self.draw_background(self.window_surface)

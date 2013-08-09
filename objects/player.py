@@ -30,6 +30,9 @@ class Player(pygame.sprite.Sprite):
 		# Create a group to store powerups in.
 		self.powerup_group = pygame.sprite.Group()
 
+		# Create a group to store effects in.
+		self.effect_group = pygame.sprite.Group()
+
 		# Store the player in the main player_group.
 		groups.Groups.player_group.add(self)
 
@@ -41,6 +44,10 @@ class Player(pygame.sprite.Sprite):
 		self.ball_group.empty()
 		self.block_group.empty()
 		self.powerup_group.empty()
+		self.effect_group.empty()
+
+	def add_effect(self, effect):
+		self.effect_group.add(effect)
 
 	def update(self):
 		# Update paddles.
