@@ -126,5 +126,5 @@ class PauseMenu:
 	def on_exit(self):
 		if not self.next_screen == None:
 			# Gameloop is over, so we clear all the groups of their contents.
-			groups.empty()
+			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

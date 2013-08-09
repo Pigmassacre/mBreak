@@ -8,6 +8,7 @@ import math
 import random
 import other.debug as debug
 import other.useful as useful
+import objects.groups as groups
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
@@ -170,6 +171,9 @@ class GameOver:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.game.Game:
-			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds)
+			self.score[self.player_one] = 0
+			self.score[self.player_two] = 0
+			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
 		else:
+			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

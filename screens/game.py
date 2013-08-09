@@ -255,12 +255,12 @@ class Game:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == Game:
-			# The game is over so we empty all the groups but the groups that contain the players.
+			# The game is over, but we're restarting Game so we empty all the groups but the groups that contain the players.
 			groups.empty_after_round()
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
 		elif self.next_screen == gameover.GameOver:
-			# The game is over so we empty all the groups.
-			groups.empty_all()
+			# The game is over, but we're allowing for a rematch so we empty all the groups but the groups that contain the players.
+			groups.empty_after_round()
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
 		else:
 			# The game is over so we empty all the groups.
