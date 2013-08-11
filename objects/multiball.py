@@ -11,7 +11,8 @@ import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
 import objects.timeout as timeout
-from settings.settings import *
+import objects.speed as speed
+import settings.settings as settings
 
 def convert():
 	Multiball.image.convert_alpha()
@@ -22,15 +23,13 @@ class Multiball(powerup.Powerup):
 	image = pygame.image.load("res/powerup/multiball.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	width = 8 * GAME_SCALE
-	height = 8 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 
 	# The amount of time the effect will last.
 	duration = 10000
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
@@ -43,7 +42,7 @@ class Multiball(powerup.Powerup):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
-		if DEBUG_MODE:
+		if settings.DEBUG_MODE:
 			print("Multiball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def hit(self, entity):
@@ -52,7 +51,7 @@ class Multiball(powerup.Powerup):
 		self.shadow.kill()
 
 		for paddle in entity.owner.paddle_group:
-			if paddle.x < (SCREEN_WIDTH / 2):
+			if paddle.x < (settings.SCREEN_WIDTH / 2):
 				# If the paddle is on the left side, spawn ball on the right side of the paddle. 
 				x = paddle.x + paddle.width + 1
 				angle = 0
@@ -70,13 +69,6 @@ class Multiball(powerup.Powerup):
 				# Add this effect to the ball.
 				# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
 				temp_effect = effect.__class__(temp_ball, effect.duration - effect.time_passed)
-				temp_ball.effect_group.add(temp_effect)
-				groups.Groups.effect_group.add(temp_effect)
-				entity.owner.effect_group.add(temp_effect)
 
-			# Create a timeout effect and add it to the ball.
-			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)
-
-			# Add the effect to the ball effect group and the groups effects group.
-			temp_ball.effect_group.add(timeout_effect)
-			groups.Groups.effect_group.add(timeout_effect)
+			# Create a timeout effect which is added to the ball.
+			timeout.Timeout(temp_ball, Multiball.duration)

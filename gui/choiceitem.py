@@ -7,7 +7,7 @@ import copy
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 class ChoiceItem():
 
@@ -16,21 +16,21 @@ class ChoiceItem():
 
 	# The standard text values are stored here, such as standard font, font size and so on.
 	font_path = "fonts/8-BIT WONDER.TTF"
-	font_size = 9 * GAME_SCALE
+	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	x = 0
 	y = 0
-	width = 16 * GAME_SCALE
-	height = 16 * GAME_SCALE
+	width = 16 * settings.GAME_SCALE
+	height = 16 * settings.GAME_SCALE
 	shadow_color = pygame.Color(50, 50, 50, 255)
-	shadow_offset_x = 0 * GAME_SCALE
-	shadow_offset_y = 1 * GAME_SCALE
+	shadow_offset_x = 0 * settings.GAME_SCALE
+	shadow_offset_y = 1 * settings.GAME_SCALE
 	selected_border_color = pygame.Color(255, 255, 255, 255)
-	selected_border_size = 2 * GAME_SCALE
+	selected_border_size = 2 * settings.GAME_SCALE
 	chosen_border_color = pygame.Color(200, 200, 200)
-	chosen_border_size = 2 * GAME_SCALE
+	chosen_border_size = 2 * settings.GAME_SCALE
 
 	def __init__(self, value, color = pygame.Color(128, 128, 128), font_color = pygame.Color(255, 255, 255), alpha_value = 255):
 		# These values cause the item to be drawn differently.

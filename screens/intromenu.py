@@ -10,7 +10,7 @@ import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
-from settings.settings import *
+import settings.settings as settings
 
 # Import any needed game screens here.
 import screens.mainmenu as mainmenu
@@ -39,8 +39,8 @@ class IntroMenu:
 	def setup_logo(self):
 		title_logo = logo.Logo()
 
-		x = (SCREEN_WIDTH - title_logo.get_width()) / 2
-		y = (SCREEN_HEIGHT / 2) - title_logo.get_height()
+		x = (settings.SCREEN_WIDTH - title_logo.get_width()) / 2
+		y = (settings.SCREEN_HEIGHT / 2) - title_logo.get_height()
 		title_logo.x = x
 		title_logo.y = y
 
@@ -54,27 +54,27 @@ class IntroMenu:
 
 		text = textitem.TextItem(text, font_color, alpha_value)
 
-		text.x = (SCREEN_WIDTH - text.get_width()) / 2
+		text.x = (settings.SCREEN_WIDTH - text.get_width()) / 2
 		text.y = title_logo.y + title_logo.get_height() + text.get_height()
 
 		return text
 
 	def setup_music(self):
-		pygame.mixer.music.load(TITLE_MUSIC)
+		pygame.mixer.music.load(settings.TITLE_MUSIC)
 		pygame.mixer.music.play()
 
 	def gameloop(self):
 		self.done = False
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(BACKGROUND_COLOR)
+			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
 					# If the ESCAPE key is pressed or the window is closed, the game is shut down.
 					pygame.quit()
 					sys.exit()
-				elif event.type == KEYDOWN and event.key == K_RETURN:
+				elif event.type == KEYDOWN and event.key == K_RETURN:# or event.type == MOUSE_PRESSED and event.key == K_MOUSE_1:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					self.done = True
 			
@@ -93,13 +93,13 @@ class IntroMenu:
 			# Draw the title message.
 			self.title_message.draw(self.window_surface)
 			
-			if DEBUG_MODE:
+			if settings.DEBUG_MODE:
 				# Display various debug information.
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(MAX_FPS)
+			self.main_clock.tick(settings.MAX_FPS)
 
 		mainmenu.MainMenu(self.window_surface, self.main_clock, self.title_logo)

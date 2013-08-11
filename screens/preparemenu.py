@@ -17,7 +17,7 @@ import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
 import gui.transition as transition
 import gui.toast as toast
-from settings.settings import *
+import settings.settings as settings
 import settings.graphics as graphics
 
 # Import any needed game screens here.
@@ -37,7 +37,7 @@ class PrepareMenu:
 		self.player_two_color = None
 
 		# Configure the GUI.
-		distance_from_screen_edge = 9 * GAME_SCALE
+		distance_from_screen_edge = 9 * settings.GAME_SCALE
 
 		self.number_of_rounds_menu = gridmenu.GridMenu()
 		# We set the default number of rounds to 1.
@@ -46,24 +46,24 @@ class PrepareMenu:
 		self.number_of_rounds_menu.add(temp_item, self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(3), self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(5), self.rounds)
-		self.number_of_rounds_menu.x = (SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
+		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
 		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
 
 		self.number_of_rounds_text = textitem.TextItem("Rounds", pygame.Color(255, 255, 255))
-		self.number_of_rounds_text.x = (SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2
+		self.number_of_rounds_text.x = (settings.SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2
 		self.number_of_rounds_text.y = self.number_of_rounds_menu.y - (self.number_of_rounds_text.get_height() * 2)
 
 		self.color_menu_one = self.setup_color_menu(self.color_one)
-		self.color_menu_one.x = (SCREEN_WIDTH - self.color_menu_one.get_width()) / 4
-		self.color_menu_one.y = SCREEN_HEIGHT / 2
+		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width()) / 4
+		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2
 
 		self.player_one_text = textitem.TextItem("Player One", pygame.Color(255, 255, 255))
 		self.player_one_text.x = self.color_menu_one.x + ((self.color_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
 		
 		self.color_menu_two = self.setup_color_menu(self.color_two)
-		self.color_menu_two.x = 3 * ((SCREEN_WIDTH - self.color_menu_two.get_width()) / 4)
-		self.color_menu_two.y = SCREEN_HEIGHT / 2
+		self.color_menu_two.x = 3 * ((settings.SCREEN_WIDTH - self.color_menu_two.get_width()) / 4)
+		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2
 
 		self.player_two_text = textitem.TextItem("Player Two", pygame.Color(255, 255, 255))
 		self.player_two_text.x = self.color_menu_two.x + ((self.color_menu_two.get_width() - self.player_two_text.get_width()) / 2)
@@ -72,14 +72,14 @@ class PrepareMenu:
 		back_button = textitem.TextItem("Back")
 		self.back_menu = menu.Menu()
 		self.back_menu.x = distance_from_screen_edge + (back_button.get_width() / 2)
-		self.back_menu.y = SCREEN_HEIGHT - (2 * back_button.get_height())
+		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 		
 		start_button = textitem.TextItem("Start")
 		self.start_menu = menu.Menu()
-		self.start_menu.x = SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2)
-		self.start_menu.y = SCREEN_HEIGHT - (2 * start_button.get_height())
+		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2)
+		self.start_menu.y = settings.SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)
 
 		# Setup the menu transitions.
@@ -109,7 +109,7 @@ class PrepareMenu:
 
 		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
 		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
-		self.not_all_colors_chosen_toast.x = (SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
+		self.not_all_colors_chosen_toast.x = (settings.SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
 		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
 		# Setup and play music.
@@ -119,7 +119,7 @@ class PrepareMenu:
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
-			pygame.mixer.music.load(TITLE_MUSIC)
+			pygame.mixer.music.load(settings.TITLE_MUSIC)
 			pygame.mixer.music.play()
 
 	def setup_color_menu(self, function):
@@ -204,7 +204,7 @@ class PrepareMenu:
 
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(BACKGROUND_COLOR)
+			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -234,14 +234,14 @@ class PrepareMenu:
 
 			self.show_toasts()
 
-			if DEBUG_MODE:
+			if settings.DEBUG_MODE:
 				# Display various debug information.
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(MAX_FPS)
+			self.main_clock.tick(settings.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
@@ -301,13 +301,13 @@ class PrepareMenu:
 			self.next_screen(self.window_surface, self.main_clock)
 
 	def create_player_one(self, color):
-		name = PLAYER_ONE_NAME
-		key_up = PLAYER_ONE_KEY_UP
-		key_down = PLAYER_ONE_KEY_DOWN
+		name = settings.PLAYER_ONE_NAME
+		key_up = settings.PLAYER_ONE_KEY_UP
+		key_down = settings.PLAYER_ONE_KEY_DOWN
 		return player.Player(name, key_up, key_down, color)
 
 	def create_player_two(self, color):
-		name = PLAYER_TWO_NAME
-		key_up = PLAYER_TWO_KEY_UP
-		key_down = PLAYER_TWO_KEY_DOWN
+		name = settings.PLAYER_TWO_NAME
+		key_up = settings.PLAYER_TWO_KEY_UP
+		key_down = settings.PLAYER_TWO_KEY_DOWN
 		return player.Player(name, key_up, key_down, color)

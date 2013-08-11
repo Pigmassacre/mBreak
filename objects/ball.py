@@ -10,7 +10,8 @@ import objects.particle as particle
 import objects.trace as trace
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
+import settings.graphics as graphics
 
 def convert():
 	Ball.image.convert()
@@ -24,10 +25,10 @@ class Ball(pygame.sprite.Sprite):
 	sound_effect = pygame.mixer.Sound("res/sounds/ball_hit_wall.wav")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	speed = 1 * GAME_SCALE
-	max_speed = 3 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
+	speed = 1 * settings.GAME_SCALE
+	max_speed = 3 * settings.GAME_SCALE
 	damage = 10
 	spin_speed_strength = 0.05
 	spin_angle_strength = 0.05
@@ -134,50 +135,51 @@ class Ball(pygame.sprite.Sprite):
 		self.rect.y = self.y
 
 		# Check collision with x-edges.
-		if self.rect.x < LEVEL_X:
+		if self.rect.x < settings.LEVEL_X:
 			self.spawn_particles()
 			self.collided = True
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
-			self.x = LEVEL_X
+			self.x = settings.LEVEL_X
 			self.rect.x = self.x
-		elif self.rect.x + self.rect.width > LEVEL_MAX_X:
+		elif self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
 			self.spawn_particles()
 			self.collided = True
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
 			# Constrain ball to screen size.
-			self.x = LEVEL_MAX_X - self.rect.width			
+			self.x = settings.LEVEL_MAX_X - self.rect.width			
 			self.rect.x = self.x
 
 		# Check collision with y-edges.
-		if self.rect.y < LEVEL_Y:
+		if self.rect.y < settings.LEVEL_Y:
 			self.spawn_particles()
 			self.collided = True
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
-			self.y = LEVEL_Y
+			self.y = settings.LEVEL_Y
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > LEVEL_MAX_Y:
+		elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
 			self.spawn_particles()
 			self.collided = True
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
 			# Constrain ball to screen size.
-			self.y = LEVEL_MAX_Y - self.rect.height
+			self.y = settings.LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y
 
 		# If it's time, spawn a trace.
 		self.trace_spawn_time = self.trace_spawn_time + main_clock.get_time()
 		if self.trace_spawn_time >= Ball.trace_spawn_rate:
-			trace.Trace(self)
-			self.trace_spawn_time = 0
+			if graphics.TRACES:
+				trace.Trace(self)
+				self.trace_spawn_time = 0
 
 		# If we have collided with anything, play the sound effect.
 		if self.collided:

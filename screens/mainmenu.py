@@ -14,7 +14,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
-from settings.settings import *
+import settings.settings as settings
 import settings.graphics as graphics
 
 # Import any needed game screens here.
@@ -32,9 +32,9 @@ class MainMenu:
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
-		self.logo_desired_position = ((SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
+		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 2 * GAME_SCALE
+		self.logo_transition.speed = 2 * settings.GAME_SCALE
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
@@ -73,6 +73,9 @@ class MainMenu:
 	def graphics(self, item):
 		self.active_menu.append(self.graphics_menu)
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+		
+		# Move the logo so the graphics menu has enough space.
+		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4) - self.graphics_menu_offset)
 
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
@@ -91,6 +94,15 @@ class MainMenu:
 		traces_button.is_on_off = True
 		traces_button.on = graphics.TRACES
 		self.graphics_menu.add(traces_button, self.traces)
+		
+		traces_button = textitem.TextItem("Background")
+		traces_button.is_on_off = True
+		traces_button.on = graphics.BACKGROUND
+		self.graphics_menu.add(traces_button, self.background)
+		
+		# We store the graphics offset so we can offset the logo by this later.
+		self.graphics_menu_offset = (shadows_button.get_height() * 2)
+		self.graphics_menu.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
 
 		self.graphics_menu.add(textitem.TextItem("Back"), self.back)
 		self.graphics_menu.items[0].selected = True
@@ -103,31 +115,27 @@ class MainMenu:
 
 	def traces(self, item):
 		graphics.TRACES = item.toggle_on_off()
+		
+	def background(self, item):
+		graphics.BACKGROUND = item.toggle_on_off()
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
 			self.title_logo = logo.Logo()
-
-			x = (SCREEN_WIDTH - self.title_logo.get_width()) / 2
-			y = ((SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
-			self.title_logo.x = x
-			self.title_logo.y = y
-
+			
+			self.title_logo.x = (settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2
+			self.title_logo.y = ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4)
+			
 			self.title_logo.play()
 		else:
 			self.title_logo = title_logo
-
-	def setup_menu(self):
-		x = SCREEN_WIDTH / 2
-		y = SCREEN_HEIGHT / 2
-
-		main_menu = menu.Menu(x, y)
-
-		return main_menu
+	
+	def setup_menu(self, x = settings.SCREEN_WIDTH / 2, y = settings.SCREEN_HEIGHT / 2):
+		return menu.Menu(x, y)
 
 	def setup_grid_menu(self):
-		x = SCREEN_WIDTH / 2
-		y = SCREEN_HEIGHT / 2
+		x = settings.SCREEN_WIDTH / 2
+		y = settings.SCREEN_HEIGHT / 2
 
 		grid_menu = gridmenu.GridMenu(x, y)
 
@@ -135,7 +143,7 @@ class MainMenu:
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
-			pygame.mixer.music.load(TITLE_MUSIC)
+			pygame.mixer.music.load(settings.TITLE_MUSIC)
 			pygame.mixer.music.play()
 
 	def start(self, item):
@@ -144,7 +152,10 @@ class MainMenu:
 	def back(self, item):
 		self.active_menu.pop()
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
-
+		
+		# Restore the logo's position.
+		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
+		
 	def quit(self, item):
 		self.done = True
 		self.next_screen = None
@@ -154,7 +165,7 @@ class MainMenu:
 
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(BACKGROUND_COLOR)
+			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT:
@@ -196,14 +207,14 @@ class MainMenu:
 			if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 				self.show_menu()
 
-			if DEBUG_MODE:
+			if settings.DEBUG_MODE:
 				# Display various debug information.
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(MAX_FPS)
+			self.main_clock.tick(settings.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
@@ -219,6 +230,9 @@ class MainMenu:
 
 	def on_exit(self):
 		if self.next_screen == None:
+			# We save the settings before we quit.
+			settings.save()
+			graphics.save()
 			pygame.quit()
 			sys.exit()
 		else:

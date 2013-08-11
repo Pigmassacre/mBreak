@@ -16,7 +16,7 @@ import gui.coloritem as coloritem
 import gui.transition as transition
 import gui.toast as toast
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 import settings.graphics as graphics
 
 # Import any needed game screens here.
@@ -40,8 +40,8 @@ class PauseMenu:
 
 		# Configure the GUI.
 		self.pause_menu = self.setup_pause_menu()
-		self.pause_menu.x = SCREEN_WIDTH / 2
-		self.pause_menu.y = (SCREEN_HEIGHT - self.pause_menu.get_height()) / 2
+		self.pause_menu.x = settings.SCREEN_WIDTH / 2
+		self.pause_menu.y = (settings.SCREEN_HEIGHT - self.pause_menu.get_height()) / 2
 		self.pause_menu.cleanup()
 		self.pause_menu.items[0].selected = True
 
@@ -105,14 +105,14 @@ class PauseMenu:
 
 			self.show_menu()
 
-			if DEBUG_MODE:
+			if settings.DEBUG_MODE:
 				# Display various debug information.
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(MAX_FPS)
+			self.main_clock.tick(settings.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

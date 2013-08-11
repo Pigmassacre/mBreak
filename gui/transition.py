@@ -5,11 +5,11 @@ import pygame
 import math
 import random
 import gui.menu as menu
-from settings.settings import *
+import settings.settings as settings
 
 class Transition:
 
-	speed = 14 * GAME_SCALE
+	speed = 14 * settings.GAME_SCALE
 
 	def __init__(self):
 		self.speed = Transition.speed
@@ -26,11 +26,11 @@ class Transition:
 			if choice == "left":
 				item.x = -item.get_width()
 			elif choice == "right":
-				item.x = SCREEN_WIDTH
+				item.x = settings.SCREEN_WIDTH
 			elif choice == "up":
 				item.y = -item.get_height()
 			elif choice == "down":
-				item.y = SCREEN_HEIGHT
+				item.y = settings.SCREEN_HEIGHT
 
 	def setup_single_item_transition(self, item, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
@@ -42,11 +42,11 @@ class Transition:
 		if choice == "left":
 			item.x = -item.get_width()
 		elif choice == "right":
-			item.x = SCREEN_WIDTH
+			item.x = settings.SCREEN_WIDTH
 		elif choice == "up":
 			item.y = -item.get_height()
 		elif choice == "down":
-			item.y = SCREEN_HEIGHT
+			item.y = settings.SCREEN_HEIGHT
 
 	def setup_odd_even_transition(self, menu_to_setup, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
@@ -62,18 +62,18 @@ class Transition:
 				if choice == "left":
 					item.x = -item.get_width()
 				elif choice == "right":
-					item.x = SCREEN_WIDTH
+					item.x = settings.SCREEN_WIDTH
 				elif choice == "up":
 					item.y = -item.get_height()
 				elif choice == "down":
-					item.y = SCREEN_HEIGHT
+					item.y = settings.SCREEN_HEIGHT
 			else:
 				if choice == "left":
-					item.x = SCREEN_WIDTH
+					item.x = settings.SCREEN_WIDTH
 				elif choice == "right":
 					item.x = -item.get_width()
 				elif choice == "up":
-					item.y = SCREEN_HEIGHT
+					item.y = settings.SCREEN_HEIGHT
 				elif choice == "down":
 					item.y = -item.get_height()
 			odd = not odd

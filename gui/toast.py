@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame, sys
 from pygame.locals import *
 import gui.textitem as textitem
-from settings.settings import *
+import settings.settings as settings
 
 class Toast:
 

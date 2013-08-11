@@ -12,7 +12,7 @@ import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
-from settings.settings import *
+import settings.settings as settings
 
 class Countdown:
 
@@ -28,19 +28,19 @@ class Countdown:
 		self.countdown_go_time = 1250
 		self.countdown_ready = textitem.TextItem("Ready", (255, 255, 255))
 		self.countdown_ready.x = -self.countdown_ready.get_width()
-		self.countdown_ready.y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
-		self.countdown_ready_desired_x = (SCREEN_WIDTH / 2) - self.countdown_ready.get_width()
-		self.countdown_ready_desired_y = (SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
-		self.countdown_ready_speed = 13 * GAME_SCALE
-		self.countdown_ready_slow_speed = 1 * GAME_SCALE
+		self.countdown_ready.y = (settings.SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
+		self.countdown_ready_desired_x = (settings.SCREEN_WIDTH / 2) - self.countdown_ready.get_width()
+		self.countdown_ready_desired_y = (settings.SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
+		self.countdown_ready_speed = 13 * settings.GAME_SCALE
+		self.countdown_ready_slow_speed = 1 * settings.GAME_SCALE
 		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
-		self.countdown_go.set_size(18 * GAME_SCALE)
+		self.countdown_go.set_size(18 * settings.GAME_SCALE)
 		self.countdown_go.x = -self.countdown_go.get_width()
-		self.countdown_go.y = (SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
-		self.countdown_go_desired_x = (SCREEN_WIDTH - self.countdown_go.get_width()) / 2
-		self.countdown_go_desired_y = (SCREEN_HEIGHT / 2) - self.countdown_go.get_height()
-		self.countdown_go_speed = 13 * GAME_SCALE
-		self.countdown_go_slow_speed = 1.3 * GAME_SCALE
+		self.countdown_go.y = (settings.SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
+		self.countdown_go_desired_x = (settings.SCREEN_WIDTH - self.countdown_go.get_width()) / 2
+		self.countdown_go_desired_y = (settings.SCREEN_HEIGHT / 2) - self.countdown_go.get_height()
+		self.countdown_go_speed = 13 * settings.GAME_SCALE
+		self.countdown_go_slow_speed = 1.3 * settings.GAME_SCALE
 
 		self.done = False
 

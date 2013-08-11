@@ -9,7 +9,7 @@ import objects.shadow as shadow
 import objects.groups as groups
 import objects.particle as particle
 import gui.textitem as textitem
-from settings.settings import *
+import settings.settings as settings
 
 class Block(pygame.sprite.Sprite):
 
@@ -17,12 +17,12 @@ class Block(pygame.sprite.Sprite):
 	image = pygame.image.load("res/block/block.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 	particle_spawn_amount = 4
-	particle_size = 0.75 * GAME_SCALE
+	particle_size = 0.75 * settings.GAME_SCALE
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, owner, x, y, width, height, health):

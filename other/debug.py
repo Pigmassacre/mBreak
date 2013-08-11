@@ -3,18 +3,19 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import random
 import math
+import objects.powerup as powerup
 import objects.multiball as multiball
 import objects.doublespeed as doublespeed
 import objects.ball as ball
-from settings.settings import *
+import settings.settings as settings
 
 def create_powerup():
 	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed]
-	size = 150
-	x = random.uniform(LEVEL_X + (LEVEL_WIDTH / 2) - size, LEVEL_X + (LEVEL_WIDTH / 2) + size)
-	y = random.uniform(LEVEL_Y + (LEVEL_HEIGHT / 2) - size, LEVEL_Y + (LEVEL_HEIGHT / 2) + size)
+	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
+	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
 	return random.choice(powerup_list)(x, y)
 
 def create_ball_left(player_left):
@@ -39,7 +40,7 @@ class Debug:
 
 	# Default variables go here.
 	font_path = "fonts/8-BIT WONDER.TTF"
-	font_size = 9 * GAME_SCALE
+	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
 	font_color = (255, 255, 255)
 	x = 25

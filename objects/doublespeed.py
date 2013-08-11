@@ -11,7 +11,7 @@ import objects.speed as speed
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 def convert():
 	DoubleSpeed.image.convert_alpha()
@@ -22,15 +22,15 @@ class DoubleSpeed(powerup.Powerup):
 	image = pygame.image.load("res/powerup/doublespeed.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	width = 8 * GAME_SCALE
-	height = 8 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
+	width = 8 * settings.GAME_SCALE
+	height = 8 * settings.GAME_SCALE
 
 	# The amount of time the effect will last.
 	duration = 10000
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
@@ -43,7 +43,7 @@ class DoubleSpeed(powerup.Powerup):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
-		if DEBUG_MODE:
+		if settings.DEBUG_MODE:
 			print("DoubleSpeed spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def hit(self, entity):
@@ -56,8 +56,5 @@ class DoubleSpeed(powerup.Powerup):
 			# Create a speed effect to be added to the ball.
 			speed_effect = speed.Speed(ball, DoubleSpeed.duration)
 			
-			# Add the effect to all necessary groups.
-			ball.effect_group.add(speed_effect)
-			groups.Groups.effect_group.add(speed_effect)
-			ball.owner.effect_group.add(speed_effect)
-
+		# Add this effect to the owner of the ball.
+		entity.owner.effect_group.add(speed_effect)

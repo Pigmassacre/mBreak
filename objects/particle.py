@@ -8,7 +8,7 @@ import copy
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 class Particle(pygame.sprite.Sprite):
 
@@ -71,11 +71,11 @@ class Particle(pygame.sprite.Sprite):
 		self.rect.y = self.y
 
 		# Kill the particle if it is no longer in the visible game area.
-		if self.rect.x + self.rect.width <= LEVEL_X:
+		if self.rect.x + self.rect.width <= settings.LEVEL_X:
 			self.destroy()
-		elif self.rect.x >= LEVEL_MAX_X:
+		elif self.rect.x >= settings.LEVEL_MAX_X:
 			self.destroy()
-		if self.rect.y + self.rect.height <= LEVEL_Y:
+		if self.rect.y + self.rect.height <= settings.LEVEL_Y:
 			self.destroy()
-		elif self.rect.y >= LEVEL_MAX_Y:
+		elif self.rect.y >= settings.LEVEL_MAX_Y:
 			self.destroy()

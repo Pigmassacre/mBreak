@@ -10,7 +10,7 @@ import objects.powerup as powerup
 import objects.homingrocket as homingrocket
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 def convert():
 	Rocket.image.convert_alpha()
@@ -21,12 +21,12 @@ class Rocket(powerup.Powerup):
 	image = pygame.image.load("res/powerup/rocket.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	width = 8 * GAME_SCALE
-	height = 8 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
+	width = 8 * settings.GAME_SCALE
+	height = 8 * settings.GAME_SCALE
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
@@ -47,4 +47,4 @@ class Rocket(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		homingrocket.HomingRocket(, self.x, self.y, Rocket.speed, entity)
+		#homingrocket.HomingRocket(, self.x, self.y, Rocket.speed, entity)

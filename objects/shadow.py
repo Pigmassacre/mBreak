@@ -2,20 +2,21 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import math
 import other.useful as useful
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 class Shadow(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	offset_x = 1 * GAME_SCALE
-	offset_y = 2 * GAME_SCALE
+	offset_x = 1 * settings.GAME_SCALE
+	offset_y = 2 * settings.GAME_SCALE
 	linger_time = 1500
 	alpha_step = 50
 
-	def __init__(self, parent, color=pygame.Color(0, 0, 0, 128), linger=False, fill=False):
+	def __init__(self, parent, color = pygame.Color(0, 0, 0, 128), linger = False, fill = False):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -63,9 +64,9 @@ class Shadow(pygame.sprite.Sprite):
 	def blit_to(self, window_surface):
 		if self.fill:
 			self.surface.fill(self.color)
-			window_surface.blit(self.surface, self.rect)
+			return window_surface.blit(self.surface, self.rect)
 		else:
-			window_surface.blit(self.image, self.rect)
+			return window_surface.blit(self.image, self.rect)
 
 	def update(self, main_clock):
 		if self.linger:

@@ -9,7 +9,7 @@ import other.useful as useful
 import objects.rocket as rocket
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 def convert():
 	HomingRocket.image.convert_alpha()
@@ -20,16 +20,16 @@ class HomingRocket(pygame.sprite.Sprite):
 	image = pygame.image.load("res/powerup/homingrocket.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	width = 4 * GAME_SCALE
-	height = 8 * GAME_SCALE
-	max_speed = 3 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
+	width = 4 * settings.GAME_SCALE
+	height = 8 * settings.GAME_SCALE
+	max_speed = 3 * settings.GAME_SCALE
 	damage = 10
 	homing_angle_strength = 0.12
 	particle_spawn_amount = 4
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	# TODO: Add target selection code and chasing code.

@@ -7,7 +7,7 @@ import other.useful as useful
 import objects.blocks.block as block
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 def convert():
 	NormalBlock.image.convert()
@@ -18,11 +18,11 @@ class NormalBlock(block.Block):
 	image = pygame.image.load("res/block/block.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 	health = 10
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):

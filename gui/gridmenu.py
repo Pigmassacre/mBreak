@@ -4,12 +4,12 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import gui.menu as menu
-from settings.settings import *
+import settings.settings as settings
 
 class GridMenu(menu.Menu):
 
 	max_number_of_columns = 3
-	offset = 2 * GAME_SCALE
+	offset = 2 * settings.GAME_SCALE
 
 	def __init__(self, x = 0, y = 0, position = 0):
 		menu.Menu.__init__(self, x, y, position)

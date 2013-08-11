@@ -6,7 +6,7 @@ import pygame
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 def convert():
 	Paddle.image.convert()
@@ -17,13 +17,13 @@ class Paddle(pygame.sprite.Sprite):
 	image = pygame.image.load("res/paddle/paddle.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
-	acceleration = 0.75 * GAME_SCALE
-	retardation = 2 * GAME_SCALE
-	max_speed = 2 * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
+	acceleration = 0.75 * settings.GAME_SCALE
+	retardation = 2 * settings.GAME_SCALE
+	max_speed = 2 * settings.GAME_SCALE
 
-	# Scale image to game_scale.
+	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):
@@ -88,11 +88,11 @@ class Paddle(pygame.sprite.Sprite):
 		self.rect.y = self.y
 
 		# Check collision with y-edges.
-		if self.rect.y < LEVEL_Y:
+		if self.rect.y < settings.LEVEL_Y:
 			# Constrain paddle to screen size.
-			self.y = LEVEL_Y
+			self.y = settings.LEVEL_Y
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > LEVEL_MAX_Y:
+		elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
 			# Constrain paddle to screen size.
-			self.y = LEVEL_MAX_Y - self.rect.height
+			self.y = settings.LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y

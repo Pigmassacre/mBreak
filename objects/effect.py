@@ -4,7 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 class Effect(pygame.sprite.Sprite):
 
@@ -27,6 +27,9 @@ class Effect(pygame.sprite.Sprite):
 		# Image is used to draw the effect. If image is None, it will not be drawn.
 		self.image = None
 
+		# We store self in the parents effect_group.
+		self.parent.effect_group.add(self)
+		
 		# Store self in the main effect_group.
 		groups.Groups.effect_group.add(self)
 

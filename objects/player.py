@@ -6,7 +6,7 @@ import pygame
 import objects.groups as groups
 import objects.ball as ball
 from pygame.locals import *
-from settings.settings import *
+import settings.settings as settings
 
 class Player(pygame.sprite.Sprite):
 

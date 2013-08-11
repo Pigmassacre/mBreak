@@ -1,0 +1,11 @@
+# PLAYER 1 SETTINGS
+p1name		Pigma
+
+# PLAYER 2 SETTINGS
+p2name		Zaps
+
+# GRAPHICS
+shadows 	1
+particles 	1
+traces 		1
+background 	0

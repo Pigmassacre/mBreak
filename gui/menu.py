@@ -4,7 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 from pygame.locals import *
 import math
-from settings.settings import *
+import settings.settings as settings
 
 class Menu:
 

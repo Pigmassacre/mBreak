@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import objects.groups as groups
 import objects.effect as effect
-from settings.settings import *
+import settings.settings as settings
 
 class Speed(effect.Effect):
 

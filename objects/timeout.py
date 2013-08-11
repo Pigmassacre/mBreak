@@ -6,7 +6,7 @@ import pygame
 import other.useful as useful
 import objects.groups as groups
 import objects.effect as effect
-from settings.settings import *
+import settings.settings as settings
 
 class Timeout(effect.Effect):
 
@@ -14,8 +14,8 @@ class Timeout(effect.Effect):
 	image = pygame.image.load("res/effect/timeout.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * GAME_SCALE
-	height = image.get_height() * GAME_SCALE
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 
 	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))

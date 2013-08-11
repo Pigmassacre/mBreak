@@ -4,9 +4,12 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
-from settings.settings import *
+import settings.settings as settings
 
 class Powerup(pygame.sprite.Sprite):
+
+	width = 8 * settings.GAME_SCALE
+	height = 8 * settings.GAME_SCALE
 
 	def __init__(self, x, y, width, height):
 		# We start by calling the superconstructor.
@@ -22,11 +25,11 @@ class Powerup(pygame.sprite.Sprite):
 		# Store self in the main powerup_group.
 		groups.Groups.powerup_group.add(self)
 
-		if DEBUG_MODE:
+		if settings.DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def hit(self, entity):
 		self.kill()
 
-		if DEBUG_MODE:
+		if settings.DEBUG_MODE:
 			print("Powerup hit!")

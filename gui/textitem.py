@@ -4,7 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import other.useful as useful
-from settings.settings import *
+import settings.settings as settings
 
 class TextItem:
 
@@ -13,14 +13,14 @@ class TextItem:
 
 	# The standard text values are stored here, such as standard font, font size and so on.
 	font_path = "fonts/8-BIT WONDER.TTF"
-	font_size = 9 * GAME_SCALE
+	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
 	
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	x = 0
 	y = 0
-	shadow_offset_x = 0 * GAME_SCALE
-	shadow_offset_y = 1 * GAME_SCALE
+	shadow_offset_x = 0 * settings.GAME_SCALE
+	shadow_offset_y = 1 * settings.GAME_SCALE
 	shadow_color = pygame.Color(50, 50, 50, 255)
 	selected_color = pygame.Color(255, 255, 255, 255)
 	on_color = pygame.Color(0, 90, 0, 255)
