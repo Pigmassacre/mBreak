@@ -8,4 +8,4 @@ p2name		Zaps
 shadows 	1
 particles 	1
 traces 		1
-background 	0
+background 	1

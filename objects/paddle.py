@@ -21,7 +21,7 @@ class Paddle(pygame.sprite.Sprite):
 	height = image.get_height() * settings.GAME_SCALE
 	acceleration = 0.75 * settings.GAME_SCALE
 	retardation = 2 * settings.GAME_SCALE
-	max_speed = 2 * settings.GAME_SCALE
+	max_speed = 1.25 * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))

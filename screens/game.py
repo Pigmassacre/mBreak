@@ -20,6 +20,8 @@ import objects.groups as groups
 import gui.textitem as textitem
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.background as background
+import screens.level as level
 
 # Import any needed game screens here.
 import screens.gameover as gameover
@@ -27,23 +29,6 @@ import screens.countdown as countdown
 import screens.pausemenu as pausemenu
 
 class Game:
-
-	# Setup the background images.
-	floor_surface = pygame.image.load("res/background/planks/planks_floor.png")
-	floor_surface = pygame.transform.scale(floor_surface, (floor_surface.get_width() * settings.GAME_SCALE, floor_surface.get_height() * settings.GAME_SCALE))
-	wall_vertical = pygame.image.load("res/background/planks/planks_wall_vertical.png")
-	wall_vertical = pygame.transform.scale(wall_vertical, (wall_vertical.get_width() * settings.GAME_SCALE, wall_vertical.get_height() * settings.GAME_SCALE))
-	wall_horizontal = pygame.image.load("res/background/planks/planks_wall_horizontal.png")
-	wall_horizontal = pygame.transform.scale(wall_horizontal, (wall_horizontal.get_width() * settings.GAME_SCALE, wall_horizontal.get_height() * settings.GAME_SCALE))
-	corner_top_left = pygame.image.load("res/background/planks/planks_corner_top_left.png")
-	corner_top_left = pygame.transform.scale(corner_top_left, (corner_top_left.get_width() * settings.GAME_SCALE, corner_top_left.get_height() * settings.GAME_SCALE))
-	corner_top_right = pygame.image.load("res/background/planks/planks_corner_top_right.png")
-	corner_top_right = pygame.transform.scale(corner_top_right, (corner_top_right.get_width() * settings.GAME_SCALE, corner_top_right.get_height() * settings.GAME_SCALE))
-
-	wall_horizontal_top_rect = pygame.Rect(settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_Y - (4 * settings.GAME_SCALE), wall_horizontal.get_width() + (8 * settings.GAME_SCALE), wall_horizontal.get_height())
-	wall_horizontal_bottom_rect = pygame.Rect(settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_MAX_Y, wall_horizontal.get_width() + (8 * settings.GAME_SCALE), wall_horizontal.get_height())
-	wall_vertical_left_rect = pygame.Rect(settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_Y, wall_vertical.get_width(), wall_vertical.get_height())
-	wall_vertical_right_rect = pygame.Rect(settings.LEVEL_MAX_X, settings.LEVEL_Y, wall_vertical.get_width(), wall_vertical.get_height())
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done = 0):
 		# Store the game variables.
@@ -70,8 +55,8 @@ class Game:
 		multiball.convert()
 		doublespeed.convert()
 
-		# Make sure that the background images are converted.
-		self.convert_background()
+		# Create and store the background.
+		self.game_background = background.Background("planks")
 
 		# Store player one.
 		self.player_one = player_one
@@ -79,17 +64,11 @@ class Game:
 		# Store player two.
 		self.player_two = player_two
 
-		# Setup the game world.
-		self.setup_gamefield(self.player_one, self.player_two)
+		# Create and store the level.
+		self.game_level = level.Level(self.player_one, self.player_two)
 
+		# And finally, start the gameloop!
 		self.gameloop()
-
-	def convert_background(self):
-		Game.floor_surface.convert()
-		Game.wall_vertical.convert()
-		Game.wall_horizontal.convert()
-		Game.corner_top_left.convert()
-		Game.corner_top_right.convert()
 
 	def create_ball_left(self):
 		for paddle in self.player_one.paddle_group:
@@ -99,35 +78,8 @@ class Game:
 		for paddle in self.player_two.paddle_group:
 			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_two)
 
-	def setup_gamefield(self, player_one, player_two):
-		distance_to_blocks_from_wall = block.Block.width * 2
-		amount_of_strong = 2
-		amount_of_weak = 2
-		amount_of_rows = (settings.LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
-
-		for x in range(0, amount_of_strong):
-			for y in range(0, amount_of_rows):
-				block_strong.StrongBlock(settings.LEVEL_X + distance_to_blocks_from_wall + (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_one)
-				temp_block_right = block_strong.StrongBlock(settings.LEVEL_MAX_X - (block.Block.width * 3) - (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_two)
-				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
-		for x in range(0, amount_of_weak):
-			for y in range(0, amount_of_rows):
-				block_normal.NormalBlock(settings.LEVEL_X + (distance_to_blocks_from_wall * amount_of_strong) + (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_one)
-				temp_block_right = block_normal.NormalBlock(settings.LEVEL_MAX_X - (block.Block.width * 5) - (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), self.player_two)
-				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
-
-		left_paddle_x = settings.LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_weak * block.Block.width) + (paddle.Paddle.width * 4)
-		left_paddle_y = (settings.LEVEL_Y + (settings.LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
-		player_one.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_one))
-
-		right_paddle_x = settings.LEVEL_MAX_X - (amount_of_strong * paddle.Paddle.width) - (amount_of_weak * paddle.Paddle.width) - (paddle.Paddle.width * 5)
-		right_paddle_y = (settings.LEVEL_Y + (settings.LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
-		paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_two)
-		paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
-		player_two.paddle_group.add(paddle_right)
-
 	def gameloop(self):
-		# We start a countdown before the game starts.
+		# We start a countdown before the game starts. WHen the countdown finishes, it calls start_game().
 		countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
 
 		self.done = False
@@ -214,7 +166,7 @@ class Game:
 		# Begin a frame by blitting the background to the window_surface.
 		self.window_surface.fill(settings.BACKGROUND_COLOR)
 		if graphics.BACKGROUND:
-			self.window_surface.blit(Game.floor_surface, (settings.LEVEL_X, settings.LEVEL_Y))
+			self.window_surface.blit(self.game_background.floor_surface, (settings.LEVEL_X, settings.LEVEL_Y))
 
 		# Draw the shadows.
 		if graphics.SHADOWS:
@@ -248,27 +200,11 @@ class Game:
 			effect.draw(self.window_surface)
 
 		# Draw the background walls and overlying area.	
-		self.draw_background(self.window_surface)
+		self.game_background.draw(self.window_surface)
 
 		if settings.DEBUG_MODE:
 			# Display various debug information.
 			debug.Debug.display(self.window_surface, self.main_clock)
-
-	def draw_background(self, surface):
-		if graphics.BACKGROUND:
-			surface.blit(Game.wall_horizontal, (settings.LEVEL_X, settings.LEVEL_Y - (4 * settings.GAME_SCALE)))
-			surface.blit(Game.wall_horizontal, (settings.LEVEL_X, settings.LEVEL_MAX_Y))
-			surface.blit(Game.wall_vertical, (settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_Y))
-			surface.blit(Game.wall_vertical, (settings.LEVEL_MAX_X, settings.LEVEL_Y))
-			surface.blit(Game.corner_top_left, (settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_Y - (4 * settings.GAME_SCALE)))
-			surface.blit(Game.corner_top_left, (settings.LEVEL_MAX_X, settings.LEVEL_MAX_Y))
-			surface.blit(Game.corner_top_right, (settings.LEVEL_MAX_X, settings.LEVEL_Y - (4 * settings.GAME_SCALE)))
-			surface.blit(Game.corner_top_right, (settings.LEVEL_X - (4 * settings.GAME_SCALE), settings.LEVEL_MAX_Y))
-		else:
-			surface.fill(settings.BORDER_COLOR, Game.wall_horizontal_top_rect)
-			surface.fill(settings.BORDER_COLOR, Game.wall_horizontal_bottom_rect)
-			surface.fill(settings.BORDER_COLOR, Game.wall_vertical_left_rect)
-			surface.fill(settings.BORDER_COLOR, Game.wall_vertical_right_rect)
 
 	def on_exit(self):
 		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
