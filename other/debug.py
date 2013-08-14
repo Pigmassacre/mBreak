@@ -10,11 +10,12 @@ import objects.powerup as powerup
 import objects.multiball as multiball
 import objects.doublespeed as doublespeed
 import objects.fire as fire
+import objects.frost as frost
 import objects.ball as ball
 import settings.settings as settings
 
 def create_powerup():
-	powerup_list = [fire.Fire]
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost]
 	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
 	return random.choice(powerup_list)(x, y)
