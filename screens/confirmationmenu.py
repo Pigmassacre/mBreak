@@ -18,15 +18,18 @@ class ConfirmationMenu:
 
 	tint_color = pygame.Color(255, 255, 255, 128)
 
-	def __init__(self, window_surface, main_clock, function_to_call):
+	def __init__(self, window_surface, main_clock, function_to_call, function_argument):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
-		# Store the function to call if the user accepts.
+		# This is the function that will be called if the dialog is accepted.
 		self.function_to_call = function_to_call
 
-		# If accepted is true when the gameloop ends, self.function_to_call is called. Otherwise, nothing is done.
+		# The argument we will use to call the function_to_call.
+		self.function_argument = function_argument
+
+		# If this is true when the gameloop ends, function_to_call will be called.
 		self.accepted = False
 
 		# Tint the window surface and set it as the background surface.
@@ -44,23 +47,25 @@ class ConfirmationMenu:
 		self.gameloop()
 
 	def setup_menu(self):
-		# Setup the textitem.
-		self.confirmation_text = textitem.TextItem("Are you sure", pygame.Color(255, 255, 255))
-		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
-		self.confirmation_text.y = item_side_padding
-
-		# Setup the menu-
+		# Setup the menu.
 		self.confirmation_menu = menu.Menu()
 		self.confirmation_menu.add(textitem.TextItem("Yes"), self.accept)
 		self.confirmation_menu.add(textitem.TextItem("No"), self.refuse)
 		self.confirmation_menu.x = settings.SCREEN_WIDTH / 2
 		self.confirmation_menu.y = (settings.SCREEN_HEIGHT - self.confirmation_menu.get_height()) / 2
 		self.confirmation_menu.cleanup()
-		self.confirmation_menu.items[0].selected = True
+
+		# Set the default action to be to refuse.
+		self.confirmation_menu.items[1].selected = True
+
+		# Setup the textitem.
+		self.confirmation_text = textitem.TextItem("Are you sure", pygame.Color(255, 255, 255))
+		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
+		self.confirmation_text.y = self.confirmation_menu.y - (2 * self.confirmation_text.get_height())
 
 	def setup_transitions(self):
 		self.transitions = transition.Transition()
-		self.transitions.setup_single_item_transition(self.confirmation_text_transition, True, True, True, False)
+		self.transitions.setup_single_item_transition(self.confirmation_text, True, True, True, False)
 		self.transitions.setup_single_item_transition(self.confirmation_menu.items[0], True, True, False, False)
 		self.transitions.setup_single_item_transition(self.confirmation_menu.items[1], True, True, False, True)
 
@@ -85,8 +90,8 @@ class ConfirmationMenu:
 					sys.exit()
 					pygame.quit()
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
-					# If the escape key is pressed, we resume the game.
-					self.resume(None)
+					# If the escape key is pressed, we call refuse.
+					self.refuse(None)
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					for item in self.confirmation_menu.items:
@@ -110,6 +115,7 @@ class ConfirmationMenu:
 								item.selected = False
 								break
 
+			# Update and show the menu.
 			self.show_menu()
 
 			if settings.DEBUG_MODE:
@@ -125,6 +131,17 @@ class ConfirmationMenu:
 		self.on_exit()
 
 	def show_menu(self):
+		# Handle all transitions.
 		self.transitions.update()
+
+		# Draw the confirmation text.
+		self.confirmation_text.draw(self.window_surface)
+
+		# Update and draw the confirmation menu.
 		self.confirmation_menu.update()
 		self.confirmation_menu.draw(self.window_surface)
+
+	def on_exit(self):
+		# We're done, so we call the function_to_call if we should, otherwise we do nothing.
+		if self.accepted:
+			self.function_to_call(self.function_argument)

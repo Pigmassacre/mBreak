@@ -16,6 +16,7 @@ import settings.settings as settings
 
 # Import any needed game screens here.
 import screens
+import screens.confirmationmenu as confirmationmenu
 
 class PauseMenu:
 
@@ -50,11 +51,14 @@ class PauseMenu:
 	def setup_pause_menu(self):
 		pause_menu = menu.Menu()
 		pause_menu.add(textitem.TextItem("Resume"), self.resume)
-		pause_menu.add(textitem.TextItem("Quit"), self.quit)
+		pause_menu.add(textitem.TextItem("Quit"), self.maybe_quit)
 		return pause_menu
 
 	def resume(self, item):
 		self.done = True
+
+	def maybe_quit(self, item):
+		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
 		self.done = True
@@ -96,6 +100,7 @@ class PauseMenu:
 								item.selected = False
 								break
 
+			# Update and show the menu.
 			self.show_menu()
 
 			if settings.DEBUG_MODE:

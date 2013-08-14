@@ -217,9 +217,10 @@ class Game:
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface)
 
-		# Draw the scores.
-		self.player_one_score_text.draw(self.window_surface)
-		self.player_two_score_text.draw(self.window_surface)
+		# Draw the scores if we're playing more than one round.
+		if self.number_of_rounds > 1:
+			self.player_one_score_text.draw(self.window_surface)
+			self.player_two_score_text.draw(self.window_surface)
 
 		if settings.DEBUG_MODE:
 			# Display various debug information.
