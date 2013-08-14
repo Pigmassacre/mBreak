@@ -5,7 +5,7 @@ p1name		Pigma
 p2name		Zaps
 
 # GRAPHICS
-shadows 	0
+shadows 	1
 particles 	1
-traces 		0
-background 	0
+traces 		1
+background 	1

@@ -10,8 +10,11 @@ import other.debug as debug
 import objects.ball as ball
 import objects.paddle as paddle
 import objects.player as player
+import objects.powerup as powerup
 import objects.multiball as multiball
 import objects.doublespeed as doublespeed
+import objects.fire as fire
+import objects.frost as frost
 import objects.speed as speed
 import objects.blocks.block as block
 import objects.blocks.normal as block_normal
@@ -39,7 +42,7 @@ class Game:
 		# The next screen to be started when gameloop ends.
 		self.next_screen = gameover.GameOver
 
-		# Keep track of the number of rounds. Gameloop will "run-its-course" this many times.
+		# Keep track of the number of rounds.
 		self.number_of_rounds = number_of_rounds
 
 		# Keep track of the number of rounds we've done so far.
@@ -69,7 +72,19 @@ class Game:
 		# Create and store the level.
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 2, 1)
 
-		# Creat the score texts.
+		# The list of available powerups to spawn.
+		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost]
+
+		# The rate at which powerups will perhaps be spawned.
+		self.powerup_spawn_rate = 8000
+
+		# The chance that a powerup will spawn when it should spawn.
+		self.powerup_spawn_chance = 0.5
+
+		# The chance that another powerup will spawn if a powerup actually spawns.
+		self.powerup_extra_spawn_chance = 0.1
+
+		# Create the score texts.
 		item_side_padding = textitem.TextItem.font_size
 
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
@@ -97,6 +112,9 @@ class Game:
 		# We start a countdown before the game starts. WHen the countdown finishes, it calls start_game().
 		countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
 
+		# When this reaches powerup_spawn_rate, a powerup has a chance to spawn.
+		self.powerup_spawn_time = 0
+
 		self.done = False
 		while not self.done:
 			for event in pygame.event.get():
@@ -115,13 +133,28 @@ class Game:
 						elif event.type == KEYDOWN and event.key == K_p:
 							debug.create_powerup()
 
-			# Win detection: for now just go back to previous screen if the game is over.
+			# Detect if a player has won or not.
 			if len(self.player_one.block_group) == 0:
 				self.score[self.player_two] = self.score[self.player_two] + 1
 				self.done = True
 			elif len(self.player_two.block_group) == 0:
 				self.score[self.player_one] = self.score[self.player_one] + 1
 				self.done = True
+
+			# Check if it's time to try to spawn a powerup.
+			self.powerup_spawn_time += self.main_clock.get_time()
+			if self.powerup_spawn_time >= self.powerup_spawn_rate:
+				# Check if the spawn will be successful.
+				if random.uniform(0, 1) <= self.powerup_spawn_chance:
+					self.create_powerup()
+
+					# Reset the powerup spawn timer.
+					self.powerup_spawn_time = 0
+
+					# Check if an extra powerup should be spawned.
+					if random.uniform(0, 1) <= self.powerup_extra_spawn_chance:
+						self.create_powerup()
+
 
 			self.update(countdown_screen)
 
@@ -137,6 +170,11 @@ class Game:
 			self.main_clock.tick(settings.MAX_FPS)
 
 		self.on_exit()
+
+	def create_powerup(self):
+		x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
+		y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
+		return random.choice(self.powerup_list)(x, y)
 
 	def start_game(self):
 		self.create_ball_left()

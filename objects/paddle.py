@@ -70,6 +70,8 @@ class Paddle(pygame.sprite.Sprite):
 	def update(self, key_up, key_down):
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if acceleration is above zero, since if it is zero the paddle cannot move anyway.
+		# Since we only want to reduce velocity if either acceleration is zero, or a key isn't hold we cannot just always
+		# reduce velocity.
 		if self.acceleration > 0:
 			if pygame.key.get_pressed()[key_up]:
 					self.velocity_y = self.velocity_y - self.acceleration
@@ -88,6 +90,7 @@ class Paddle(pygame.sprite.Sprite):
 				if self.velocity_y > 0:
 					self.velocity_y = 0
 		else:
+			# If acceleration is zero, we still want to reduce our velocity.
 			if self.velocity_y > 0:
 				self.velocity_y = self.velocity_y - self.retardation
 				if self.velocity_y < 0:
