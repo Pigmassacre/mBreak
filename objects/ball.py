@@ -175,7 +175,7 @@ class Ball(pygame.sprite.Sprite):
 			self.rect.y = self.y
 
 		# If it's time, spawn a trace.
-		self.trace_spawn_time = self.trace_spawn_time + main_clock.get_time()
+		self.trace_spawn_time += main_clock.get_time()
 		if self.trace_spawn_time >= Ball.trace_spawn_rate:
 			if graphics.TRACES:
 				trace.Trace(self)
@@ -216,7 +216,7 @@ class Ball(pygame.sprite.Sprite):
 			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
 			alpha_step = 5
-			particle.Particle(self.x, self.y, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
+			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
 
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
@@ -288,6 +288,7 @@ class Ball(pygame.sprite.Sprite):
 		ball_collide_list = pygame.sprite.spritecollide(self, groups.Groups.ball_group, False)
 		for ball in ball_collide_list:
 			self.spawn_particles()
+			self.hit_ball(ball)
 			if self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
 				# Top side of ball collided with. Compare with edges:
 				if ball.rect.left - self.rect.left > ball.rect.top - self.rect.top:
@@ -337,11 +338,14 @@ class Ball(pygame.sprite.Sprite):
 			self.collided = True
 		groups.Groups.ball_group.add(self)
 
+	def hit_ball(self, ball):
+		for effect in self.effect_group:
+			effect.on_hit_ball(ball)
+
 	def check_collision_blocks(self):
 		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
 		block_information = {}
 		for block in blocks_collided_with:
-			# TODO: Test with self.previous instead of self.rect?
 			# Determine what side of the block we've collided with.
 			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
 				# Top side of block collided with. Compare with edges:
@@ -458,6 +462,10 @@ class Ball(pygame.sprite.Sprite):
 		# We've hit a block, so spawn a particle, damage that block and set collision to True.
 		self.spawn_particles()
 		block.on_hit(Ball.damage)
+
+		for effect in self.effect_group:
+			effect.on_hit_block(block)
+
 		self.collided = True
 
 	def hit_top_side_of_block(self, block):

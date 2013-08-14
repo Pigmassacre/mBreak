@@ -150,6 +150,9 @@ class Game:
 		# Update the balls.
 		groups.Groups.ball_group.update(self.main_clock)
 
+		# Update the blocks.
+		groups.Groups.block_group.update()
+
 		# Update the effects.
 		# First, we update the speed effects.
 		for effect in groups.Groups.effect_group:

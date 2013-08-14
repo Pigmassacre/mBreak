@@ -56,18 +56,25 @@ class Block(pygame.sprite.Sprite):
 		self.owner.block_group.add(self)
 		groups.Groups.block_group.add(self)
 
+		# Create an effect group to handle effects on this block.
+		self.effect_group = pygame.sprite.Group()
+
 	def on_hit(self, damage):
-		self.spawn_particles()
-
+		# Reduce the health.
 		self.health = self.health - damage
-		if self.health <= 0:
-			self.kill()
-			self.shadow.kill()
 
-	def spawn_particles(self):
+		# Spawn some particles-
 		for _ in range(0, Block.particle_spawn_amount):
 			angle = random.uniform(0, math.pi)
 			speed = 5
 			retardation = 0.25
 			alpha_step = 5
-			particle.Particle(self.x, self.y, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
+			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
+
+	def update(self):
+		# Kill the block if health is reduced to zero.
+		if self.health <= 0:
+			self.kill()
+			self.shadow.kill()
+			for effect in self.effect_group:
+				effect.kill()
