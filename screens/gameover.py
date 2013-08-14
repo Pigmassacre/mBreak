@@ -20,7 +20,6 @@ import settings.settings as settings
 import settings.graphics as graphics
 
 # Import any needed game screens here.
-#import screens.game as game
 import screens
 
 class GameOver:
@@ -60,6 +59,7 @@ class GameOver:
 		# Configure the GUI.
 		item_side_padding = textitem.TextItem.font_size
 
+		# Determine if there is a clear winner, or if there is a draw.
 		if not self.winner == None:
 			winning_text = self.winner.name + " Wins"
 		else:
@@ -79,14 +79,10 @@ class GameOver:
 		self.rematch_menu.add(rematch_button, self.rematch)
 
 		# Setup the menu transitions.
-		self.winning_player_text_transition = transition.Transition()
-		self.winning_player_text_transition.setup_single_item_transition(self.winning_player_text, True, True, True, False)
-
-		self.quit_menu_transition = transition.Transition()
-		self.quit_menu_transition.setup_transition(self.quit_menu, True, False, False, True)
-
-		self.rematch_menu_transition = transition.Transition()
-		self.rematch_menu_transition.setup_transition(self.rematch_menu, False, True, False, True)
+		self.transitions = transition.Transition()
+		self.transitions.setup_single_item_transition(self.winning_player_text, True, True, True, False)
+		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
+		self.transitions.setup_transition(self.rematch_menu, False, True, False, True)
 
 		# Setup and play music.
 		self.setup_music()
@@ -156,13 +152,14 @@ class GameOver:
 		self.winning_player_text.draw(self.window_surface)
 
 	def show_menu(self):
-		self.winning_player_text_transition.handle_item_transition(self.winning_player_text)
+		# Update all transitions.
+		self.transitions.update()
+
+		# Draw the winning players name.
 		self.winning_player_text.draw(self.window_surface)
 
-		self.quit_menu_transition.handle_menu_transition(self.quit_menu)
+		# Update the menus.
 		self.quit_menu.update()
-		
-		self.rematch_menu_transition.handle_menu_transition(self.rematch_menu)
 		self.rematch_menu.update()
 
 		# If the mouse cursor is above one menu, it unselect other menus.
@@ -171,6 +168,7 @@ class GameOver:
 		elif self.rematch_menu.is_mouse_over_item(self.rematch_menu.items[0], pygame.mouse.get_pos()):
 			self.quit_menu.items[0].selected = False
 
+		# Draw the menus.
 		self.quit_menu.draw(self.window_surface)
 		self.rematch_menu.draw(self.window_surface)
 

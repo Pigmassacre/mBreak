@@ -2,13 +2,12 @@ __author__ = "Olof Karlsson"
 __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
-# Store various useful classes in here, for now atleast.
 import pygame
 from pygame.locals import *
 import math
 
 def tint_surface(surface):
-	tint_color = pygame.Color(0, 0, 0, 128)
+	tint_color = pygame.Color(0, 0, 0, 200)
 	tint_surface = pygame.Surface((surface.get_width(), surface.get_height()), SRCALPHA)
 	tint_surface.fill(tint_color)
 	surface.blit(tint_surface, (0, 0))

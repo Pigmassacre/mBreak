@@ -2,7 +2,6 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import math
 import random
 import gui.menu as menu
 import settings.settings as settings
@@ -12,12 +11,25 @@ class Transition:
 	speed = 14 * settings.GAME_SCALE
 
 	def __init__(self):
+		# The speed at which each item moves.
 		self.speed = Transition.speed
+
+		# A list of all items registered to this transition object.
+		self.items = []
+
+		# This is used to store all the start positions of each item.
+		self.start_positions = {}
+
+	def add_items(self, menu_to_add):
+		for item in menu_to_add.items:
+			if not item in self.items:
+				self.items.append(item)
 
 	def setup_transition(self, menu_to_setup, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
 
-		self.start_positions = {}
+		self.add_items(menu_to_setup)
+
 		menu_to_setup.cleanup()
 
 		for item in menu_to_setup.items:
@@ -35,7 +47,8 @@ class Transition:
 	def setup_odd_even_transition(self, menu_to_setup, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
 
-		self.start_positions = {}
+		self.add_items(menu_to_setup)
+
 		menu_to_setup.cleanup()
 
 		odd = random.choice([True, False])
@@ -65,7 +78,9 @@ class Transition:
 	def setup_single_item_transition(self, item, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
 
-		self.start_positions = {}
+		if not item in self.items:
+			self.items.append(item)
+
 		self.start_positions[item] = (item.x, item.y)
 
 		choice = random.choice(choices)
@@ -90,12 +105,9 @@ class Transition:
 			choices.append("down")
 		return choices
 
-	def handle_menu_transition(self, menu_to_handle):
-		for item in menu_to_handle.items:
-			self.handle_item_transition(item)
-
-	def handle_item_transition(self, item):
-		self.move_item_to_position(item, self.start_positions[item])
+	def update(self):
+		for item in self.items:
+			self.move_item_to_position(item, self.start_positions[item])
 
 	def move_item_to_position(self, item, position):
 		if position[0] < item.x:

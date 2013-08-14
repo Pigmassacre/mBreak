@@ -222,7 +222,7 @@ class MainMenu:
 		self.title_logo.draw(self.window_surface)
 
 	def show_menu(self):
-		self.menu_transition.handle_menu_transition(self.active_menu[-1])
+		self.menu_transition.update()
 		self.active_menu[-1].update()
 		self.active_menu[-1].draw(self.window_surface)
 

@@ -3,9 +3,6 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-from libs import pyganim
-import math
-import random
 import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
@@ -14,10 +11,8 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
-import gui.toast as toast
 import objects.groups as groups
 import settings.settings as settings
-import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens
@@ -46,11 +41,9 @@ class PauseMenu:
 		self.pause_menu.items[0].selected = True
 
 		# Setup the menu transitions.
-		self.pause_menu_back_transition = transition.Transition()
-		self.pause_menu_back_transition.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
-
-		self.pause_menu_quit_transition = transition.Transition()
-		self.pause_menu_quit_transition.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
+		self.transitions = transition.Transition()
+		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
+		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
 
 		self.gameloop()
 
@@ -118,8 +111,10 @@ class PauseMenu:
 		self.on_exit()
 
 	def show_menu(self):
-		self.pause_menu_back_transition.handle_item_transition(self.pause_menu.items[0])
-		self.pause_menu_quit_transition.handle_item_transition(self.pause_menu.items[1])
+		# Update the transitions.
+		self.transitions.update()
+
+		# Update and show the menu.
 		self.pause_menu.update()
 		self.pause_menu.draw(self.window_surface)
 

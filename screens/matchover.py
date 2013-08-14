@@ -48,6 +48,17 @@ class MatchOver:
 		self.number_of_rounds_done = number_of_rounds_done
 
 		# Configure the GUI.
+		self.setup_menus()
+
+		# Setup the menu transitions.
+		self.setup_transitions()
+
+		# Setup and play music.
+		self.setup_music()
+
+		self.gameloop()
+
+	def setup_menus(self):
 		item_side_padding = textitem.TextItem.font_size
 
 		self.rounds_left_text = textitem.TextItem("Rounds Left", pygame.Color(255, 255, 255))
@@ -85,35 +96,16 @@ class MatchOver:
 		self.next_match_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
 
-		# Setup the menu transitions.
-		self.rounds_left_text_transition = transition.Transition()
-		self.rounds_left_text_transition.setup_single_item_transition(self.rounds_left_text, True, True, True, False)
-
-		self.rounds_left_number_text_transition = transition.Transition()
-		self.rounds_left_number_text_transition.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
-
-		self.player_one_score_text_transition = transition.Transition()
-		self.player_one_score_text_transition.setup_single_item_transition(self.player_one_score_text, True, False, False, False)
-
-		self.player_one_text_transition = transition.Transition()
-		self.player_one_text_transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
-
-		self.player_two_score_text_transition = transition.Transition()
-		self.player_two_score_text_transition.setup_single_item_transition(self.player_two_score_text, False, True, False, False)
-
-		self.player_two_text_transition = transition.Transition()
-		self.player_two_text_transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
-
-		self.quit_menu_transition = transition.Transition()
-		self.quit_menu_transition.setup_transition(self.quit_menu, True, False, False, True)
-
-		self.next_match_menu_transition = transition.Transition()
-		self.next_match_menu_transition.setup_transition(self.next_match_menu, False, True, False, True)
-
-		# Setup and play music.
-		self.setup_music()
-
-		self.gameloop()
+	def setup_transitions(self):
+		self.transitions = transition.Transition()
+		self.transitions.setup_single_item_transition(self.rounds_left_text, True, True, True, False)
+		self.transitions.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
+		self.transitions.setup_single_item_transition(self.player_one_score_text, True, False, False, False)
+		self.transitions.setup_single_item_transition(self.player_one_text, True, False, True, False)
+		self.transitions.setup_single_item_transition(self.player_two_score_text, False, True, False, False)
+		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
+		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
+		self.transitions.setup_transition(self.next_match_menu, False, True, False, True)
 
 	def setup_music(self):
 		pygame.mixer.music.load(settings.TITLE_MUSIC)
@@ -160,39 +152,8 @@ class MatchOver:
 						self.quit_menu.items[0].selected = False
 						self.next_match_menu.items[0].selected = True
 
-			# Handle the transitions and blit all items.
-			self.rounds_left_text_transition.handle_item_transition(self.rounds_left_text)
-			self.rounds_left_text.draw(self.window_surface)
-
-			self.rounds_left_number_text_transition.handle_item_transition(self.rounds_left_number_text)
-			self.rounds_left_number_text.draw(self.window_surface)
-
-			self.player_one_text_transition.handle_item_transition(self.player_one_text)
-			self.player_one_text.draw(self.window_surface)
-
-			self.player_one_score_text_transition.handle_item_transition(self.player_one_score_text)
-			self.player_one_score_text.draw(self.window_surface)
-
-			self.player_two_text_transition.handle_item_transition(self.player_two_text)
-			self.player_two_text.draw(self.window_surface)
-
-			self.player_two_score_text_transition.handle_item_transition(self.player_two_score_text)
-			self.player_two_score_text.draw(self.window_surface)
-
-			self.quit_menu_transition.handle_menu_transition(self.quit_menu)
-			self.quit_menu.update()
-			
-			self.next_match_menu_transition.handle_menu_transition(self.next_match_menu)
-			self.next_match_menu.update()
-
-			# If the mouse cursor is above one menu, it unselect other menus.
-			if self.quit_menu.is_mouse_over_item(self.quit_menu.items[0], pygame.mouse.get_pos()):
-				self.next_match_menu.items[0].selected = False
-			elif self.next_match_menu.is_mouse_over_item(self.next_match_menu.items[0], pygame.mouse.get_pos()):
-				self.quit_menu.items[0].selected = False
-
-			self.quit_menu.draw(self.window_surface)
-			self.next_match_menu.draw(self.window_surface)
+			# Update and draw all items.
+			self.update_and_draw()
 
 			if settings.DEBUG_MODE:
 				# Display various debug information.
@@ -204,7 +165,32 @@ class MatchOver:
 			self.main_clock.tick(settings.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()	
+		self.on_exit()
+
+	def update_and_draw(self):
+		# Handle the transitions and blit all items.
+		self.transitions.update()
+
+		self.rounds_left_text.draw(self.window_surface)
+		self.rounds_left_number_text.draw(self.window_surface)
+
+		self.player_one_text.draw(self.window_surface)
+		self.player_one_score_text.draw(self.window_surface)
+
+		self.player_two_text.draw(self.window_surface)
+		self.player_two_score_text.draw(self.window_surface)
+
+		self.quit_menu.update()
+		self.next_match_menu.update()
+
+		# If the mouse cursor is above one menu, it unselect other menus.
+		if self.quit_menu.is_mouse_over_item(self.quit_menu.items[0], pygame.mouse.get_pos()):
+			self.next_match_menu.items[0].selected = False
+		elif self.next_match_menu.is_mouse_over_item(self.next_match_menu.items[0], pygame.mouse.get_pos()):
+			self.quit_menu.items[0].selected = False
+
+		self.quit_menu.draw(self.window_surface)
+		self.next_match_menu.draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == None:

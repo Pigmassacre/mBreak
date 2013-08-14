@@ -69,6 +69,19 @@ class Game:
 		# Create and store the level.
 		self.game_level = level.Level(self.player_one, self.player_two, 2, 2, 0)
 
+		# Creat the score texts.
+		item_side_padding = textitem.TextItem.font_size
+
+		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
+		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
+		self.player_one_score_text.x = item_side_padding
+		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
+
+		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
+		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
+		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - self.player_two_score_text.get_width()
+		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
+
 		# And finally, start the gameloop!
 		self.gameloop()
 
@@ -203,6 +216,10 @@ class Game:
 
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface)
+
+		# Draw the scores.
+		self.player_one_score_text.draw(self.window_surface)
+		self.player_two_score_text.draw(self.window_surface)
 
 		if settings.DEBUG_MODE:
 			# Display various debug information.

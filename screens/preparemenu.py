@@ -39,13 +39,18 @@ class PrepareMenu:
 		# Configure the GUI.
 		distance_from_screen_edge = 9 * settings.GAME_SCALE
 
-		self.number_of_rounds_menu = gridmenu.GridMenu()
+		self.number_of_rounds_menu = gridmenu.GridMenu(5)
+
 		# We set the default number of rounds to 1.
 		temp_item = choiceitem.ChoiceItem(1)
 		self.rounds(temp_item)
+
+		# Add that item, and the other items to the menu.
 		self.number_of_rounds_menu.add(temp_item, self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(3), self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(5), self.rounds)
+		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(7), self.rounds)
+		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(9), self.rounds)
 		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
 		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
 
@@ -83,29 +88,15 @@ class PrepareMenu:
 		self.start_menu.add(start_button, self.start)
 
 		# Setup the menu transitions.
-		self.number_of_rounds_menu_transition = transition.Transition()
-		self.number_of_rounds_menu_transition.setup_transition(self.number_of_rounds_menu, True, True, False, False)
-
-		self.number_of_rounds_text_transition = transition.Transition()
-		self.number_of_rounds_text_transition.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
-
-		self.color_menu_one_transition = transition.Transition()
-		self.color_menu_one_transition.setup_transition(self.color_menu_one, True, False, False, True)
-
-		self.player_one_text_transition = transition.Transition()
-		self.player_one_text_transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
-
-		self.color_menu_two_transition = transition.Transition()
-		self.color_menu_two_transition.setup_transition(self.color_menu_two, False, True, False, True)
-
-		self.player_two_text_transition = transition.Transition()
-		self.player_two_text_transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
-
-		self.back_menu_transition = transition.Transition()
-		self.back_menu_transition.setup_transition(self.back_menu, True, False, False, True)
-
-		self.start_menu_transition = transition.Transition()
-		self.start_menu_transition.setup_transition(self.start_menu, False, True, False, True)
+		self.transitions = transition.Transition()
+		self.transitions.setup_transition(self.number_of_rounds_menu, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
+		self.transitions.setup_transition(self.color_menu_one, True, False, False, True)
+		self.transitions.setup_single_item_transition(self.player_one_text, True, False, True, False)
+		self.transitions.setup_transition(self.color_menu_two, False, True, False, True)
+		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
+		self.transitions.setup_transition(self.back_menu, True, False, False, True)
+		self.transitions.setup_transition(self.start_menu, False, True, False, True)
 
 		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
 		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
@@ -247,31 +238,26 @@ class PrepareMenu:
 		self.on_exit()
 
 	def show_menu(self):
-		self.number_of_rounds_menu_transition.handle_menu_transition(self.number_of_rounds_menu)
+		# Handle all transitions.
+		self.transitions.update()
+
+		# Update and show all menus and items.
 		self.number_of_rounds_menu.update()
 		self.number_of_rounds_menu.draw(self.window_surface)
 
-		self.number_of_rounds_text_transition.handle_item_transition(self.number_of_rounds_text)
 		self.number_of_rounds_text.draw(self.window_surface)
 
-		self.color_menu_one_transition.handle_menu_transition(self.color_menu_one)
 		self.color_menu_one.update()
 		self.color_menu_one.draw(self.window_surface)
 
-		self.player_one_text_transition.handle_item_transition(self.player_one_text)
 		self.player_one_text.draw(self.window_surface)
 
-		self.color_menu_two_transition.handle_menu_transition(self.color_menu_two)
 		self.color_menu_two.update()
 		self.color_menu_two.draw(self.window_surface)
 
-		self.player_two_text_transition.handle_item_transition(self.player_two_text)
 		self.player_two_text.draw(self.window_surface)
 		
-		self.back_menu_transition.handle_menu_transition(self.back_menu)
 		self.back_menu.update()
-		
-		self.start_menu_transition.handle_menu_transition(self.start_menu)
 		self.start_menu.update()
 
 		# If the mouse cursor is above one menu, it unselect other menus.
