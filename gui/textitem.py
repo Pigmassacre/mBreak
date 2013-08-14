@@ -106,6 +106,8 @@ class TextItem:
 			self.font_size = font_size
 			self.font = pygame.font.Font(self.font_path, self.font_size)
 			self.setup_surfaces()
+			if self.is_on_off:
+				self.setup_is_on_off(self.off_text_value, self.on)
 
 	def get_width(self):
 		return self.font.size(self.text_value)[0]
@@ -122,7 +124,7 @@ class TextItem:
 			if self.surface.get_alpha() == 255:
 				self.surface.set_alpha(0)
 				self.shadow_surface.set_alpha(0)
-				return self.blink_rate // 3
+				return self.blink_rate / 3
 			else:
 				self.surface.set_alpha(255)
 				self.shadow_surface.set_alpha(255)

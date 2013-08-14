@@ -58,17 +58,24 @@ class GameOver:
 			self.winner = None
 
 		# Configure the GUI.
-		self.winning_player_text = textitem.TextItem(self.winner.name + " Wins", pygame.Color(255, 255, 255))
+		item_side_padding = textitem.TextItem.font_size
+
+		if not self.winner == None:
+			winning_text = self.winner.name + " Wins"
+		else:
+			winning_text = "Draw"
+
+		self.winning_player_text = textitem.TextItem(winning_text, pygame.Color(255, 255, 255))
 		self.winning_player_text.x = (settings.SCREEN_WIDTH - self.winning_player_text.get_width()) / 2
 		self.winning_player_text.y = (settings.SCREEN_HEIGHT - self.winning_player_text.get_height()) / 2
 
 		quit_button = textitem.TextItem("Quit")
-		self.quit_menu = menu.Menu(quit_button.get_height() + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - (2 * quit_button.get_height()))
+		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.quit)
 		self.quit_menu.items[0].selected = True
 		
 		rematch_button = textitem.TextItem("Rematch")
-		self.rematch_menu = menu.Menu(settings.SCREEN_WIDTH - rematch_button.get_height() - (rematch_button.get_width() / 2), settings.SCREEN_HEIGHT - (2 * rematch_button.get_height()))
+		self.rematch_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (rematch_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - rematch_button.get_height())
 		self.rematch_menu.add(rematch_button, self.rematch)
 
 		# Setup the menu transitions.
@@ -95,6 +102,7 @@ class GameOver:
 		self.done = True
 
 	def rematch(self, item):
+		pygame.mixer.music.stop()
 		self.done = True
 		self.next_screen = screens.game.Game
 

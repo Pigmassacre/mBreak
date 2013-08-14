@@ -25,6 +25,7 @@ import screens.level as level
 
 # Import any needed game screens here.
 import screens.gameover as gameover
+import screens.matchover as matchover
 import screens.countdown as countdown
 import screens.pausemenu as pausemenu
 
@@ -47,7 +48,7 @@ class Game:
 		# The score is kept to be sent to the gameover screen and also to be kept for "best-of" matches.
 		self.score = score
 
-		# Setup the objects.
+		# Convert all the objects to a more efficient format. We do this here as a "preloading" sort of measure.
 		block_normal.convert()
 		block_strong.convert()
 		paddle.convert()
@@ -55,7 +56,8 @@ class Game:
 		multiball.convert()
 		doublespeed.convert()
 
-		# Create and store the background.
+		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
+		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
 		self.game_background = background.Background("planks")
 
 		# Store player one.
@@ -65,7 +67,7 @@ class Game:
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two)
+		self.game_level = level.Level(self.player_one, self.player_two, 2, 2, 0)
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -213,15 +215,20 @@ class Game:
 
 		# We decrement the number of rounds by 1 because we've just played one round.
 		self.number_of_rounds_done += 1
-		if self.number_of_rounds_done == self.number_of_rounds:
+
+		if (self.score[self.player_one] > self.number_of_rounds / 2 or 
+			self.score[self.player_two] > self.number_of_rounds / 2 or 
+			self.number_of_rounds_done == self.number_of_rounds):
+			# If we've played the correct amount of rounds, or there's no point in continuing further, we set next screen to GameOver.
 			self.next_screen = gameover.GameOver
 		else:
-			self.next_screen = Game
+			# Else, continue to MatchOver screen.
+			self.next_screen = matchover.MatchOver
 
 		if self.next_screen == None:
 			pygame.quit()
 			sys.exit()
-		elif self.next_screen == Game:
+		elif self.next_screen == matchover.MatchOver:
 			# The game is over, but we're restarting Game so we empty all the groups but the groups that contain the players.
 			groups.empty_after_round()
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)

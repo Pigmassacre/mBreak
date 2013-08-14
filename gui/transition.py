@@ -32,22 +32,6 @@ class Transition:
 			elif choice == "down":
 				item.y = settings.SCREEN_HEIGHT
 
-	def setup_single_item_transition(self, item, left, right, up, down):
-		choices = self.setup_choices(left, right, up, down)
-
-		self.start_positions = {}
-		self.start_positions[item] = (item.x, item.y)
-
-		choice = random.choice(choices)
-		if choice == "left":
-			item.x = -item.get_width()
-		elif choice == "right":
-			item.x = settings.SCREEN_WIDTH
-		elif choice == "up":
-			item.y = -item.get_height()
-		elif choice == "down":
-			item.y = settings.SCREEN_HEIGHT
-
 	def setup_odd_even_transition(self, menu_to_setup, left, right, up, down):
 		choices = self.setup_choices(left, right, up, down)
 
@@ -77,6 +61,22 @@ class Transition:
 				elif choice == "down":
 					item.y = -item.get_height()
 			odd = not odd
+
+	def setup_single_item_transition(self, item, left, right, up, down):
+		choices = self.setup_choices(left, right, up, down)
+
+		self.start_positions = {}
+		self.start_positions[item] = (item.x, item.y)
+
+		choice = random.choice(choices)
+		if choice == "left":
+			item.x = -item.get_width()
+		elif choice == "right":
+			item.x = settings.SCREEN_WIDTH
+		elif choice == "up":
+			item.y = -item.get_height()
+		elif choice == "down":
+			item.y = settings.SCREEN_HEIGHT
 
 	def setup_choices(self, left, right, up, down):
 		choices = []
