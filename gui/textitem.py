@@ -65,12 +65,22 @@ class TextItem:
 		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
 		self.selected_surface.set_alpha(self.alpha_value)
 
+		# Create the surface used for drawing the shadow.
+		self.shadow_surface = self.font.render(self.text_value, False, self.shadow_color)
+		self.shadow_surface.set_alpha(self.alpha_value)
+
+	def setup_is_on_off(self, off_text_value, state):
+		# Set the textitem to be on and off, set the on state and save the off text value.
+		self.is_on_off = True
+		self.on = state
+		self.off_text_value = off_text_value
+
 		# Render the on font surface.
 		self.on_surface = self.font.render(self.text_value, False, self.on_font_color)
 		self.on_surface.set_alpha(self.alpha_value)
 
 		# Render the off font surface.
-		self.off_surface = self.font.render(self.text_value, False, self.off_font_color)
+		self.off_surface = self.font.render(self.off_text_value, False, self.off_font_color)
 		self.off_surface.set_alpha(self.alpha_value)
 
 		# Render the selected and on surface.
@@ -78,12 +88,12 @@ class TextItem:
 		self.selected_on_surface.set_alpha(self.alpha_value)
 
 		# Render the selected and off surface.
-		self.selected_off_surface = self.font.render(self.text_value, False, self.selected_off_font_color)
+		self.selected_off_surface = self.font.render(self.off_text_value, False, self.selected_off_font_color)
 		self.selected_off_surface.set_alpha(self.alpha_value)
 
 		# Create the surface used for drawing the shadow.
-		self.shadow_surface = self.font.render(self.text_value, False, self.shadow_color)
-		self.shadow_surface.set_alpha(self.alpha_value)
+		self.shadow_off_surface = self.font.render(self.off_text_value, False, self.shadow_color)
+		self.shadow_off_surface.set_alpha(self.alpha_value)
 
 	def set_font(self, font_path):
 		if not self.font_path == font_path:
@@ -125,8 +135,16 @@ class TextItem:
 		return self.on
 
 	def draw(self, surface):
-		# First blit shadow, then the text. Keeps shadow UNDER the text.
-		surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+		# First we determine what shadow to blit, and then blit that. We do this before we blit the text so the shadow is under the text.
+		if self.is_on_off:
+			if self.on:
+				surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+			else:
+				surface.blit(self.shadow_off_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+		else:
+			surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+
+		# Then we determine what text surface to blit, and blit that.
 		if self.selected:
 			if self.is_on_off:
 				if self.on:

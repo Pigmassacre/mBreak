@@ -80,30 +80,28 @@ class MainMenu:
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
 
-		shadows_button = textitem.TextItem("Shadows")
-		shadows_button.is_on_off = True
-		shadows_button.on = graphics.SHADOWS
+		# Setup the buttons and make them "on/off" buttons.
+		shadows_button = textitem.TextItem("Shadows On")
+		shadows_button.setup_is_on_off("Shadows Off", graphics.SHADOWS)
 		self.graphics_menu.add(shadows_button, self.shadows)
 
-		particles_button = textitem.TextItem("Particles")
-		particles_button.is_on_off = True
-		particles_button.on = graphics.PARTICLES
+		particles_button = textitem.TextItem("Particles On")
+		particles_button.setup_is_on_off("Particles Off", graphics.PARTICLES)
 		self.graphics_menu.add(particles_button, self.particles)
 
-		traces_button = textitem.TextItem("Traces")
-		traces_button.is_on_off = True
-		traces_button.on = graphics.TRACES
+		traces_button = textitem.TextItem("Traces On")
+		traces_button.setup_is_on_off("Traces Off", graphics.TRACES)
 		self.graphics_menu.add(traces_button, self.traces)
 		
-		traces_button = textitem.TextItem("Background")
-		traces_button.is_on_off = True
-		traces_button.on = graphics.BACKGROUND
+		traces_button = textitem.TextItem("Background On")
+		traces_button.setup_is_on_off("Background Off", graphics.BACKGROUND)
 		self.graphics_menu.add(traces_button, self.background)
 		
 		# We store the graphics offset so we can offset the logo by this later.
 		self.graphics_menu_offset = (shadows_button.get_height() * 2)
 		self.graphics_menu.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
 
+		# We add a back button to the menu.
 		self.graphics_menu.add(textitem.TextItem("Back"), self.back)
 		self.graphics_menu.items[0].selected = True
 
