@@ -13,10 +13,19 @@ import settings.settings as settings
 
 class Freezing(effect.Effect):
 
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	image = pygame.image.load("res/effect/freezing.png")
+
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 	acceleration_reduction = 2 * settings.GAME_SCALE
 	paddle_freezing_duration = 2000
-	particle_spawn_rate = 150
+	particle_spawn_rate = 250
 	particle_spawn_amount = 2
+
+	# Scale image to settings.GAME_SCALE.
+	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, parent, duration = 10000):
 		# We start by calling the superconstructor.
@@ -25,13 +34,21 @@ class Freezing(effect.Effect):
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
 
-		# If the parent is a paddle, prevent movement.
+		# If the parent is a paddle, prevent movement and show an effect on top of the paddle.
 		if self.parent.__class__ == paddle.Paddle:
 			self.parent.acceleration -= Freezing.acceleration_reduction
 
+			# Create the image attribute that is drawn to the surface.
+			self.image = Freezing.image.copy()
+
+			# Set the rects width and height to the standard values.
+			self.rect.width = Freezing.width
+			self.rect.height = Freezing.height
+
 	def on_hit_paddle(self, hit_paddle):
 		# Spread the effect to any hit paddles. This effect does not last as long on paddles as it does on any other object.
-		Freezing(hit_paddle, Freezing.paddle_freezing_duration)
+		if not self.parent.owner == hit_paddle.owner:
+			Freezing(hit_paddle, Freezing.paddle_freezing_duration)
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.
@@ -46,10 +63,10 @@ class Freezing(effect.Effect):
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(0, Freezing.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = 0.8
-				retardation = speed / 36.0
+				speed = random.uniform(0.2 * settings.GAME_SCALE, 0.35 * settings.GAME_SCALE)
+				retardation = speed / 48.0
 				color = pygame.Color(random.randint(0, 50), random.randint(0, 255), random.randint(220, 255))
-				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 5)
+				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 1)
 
 	def on_kill(self):
 		# We make sure to call the supermethod.

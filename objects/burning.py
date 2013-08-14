@@ -13,8 +13,8 @@ import settings.settings as settings
 class Burning(effect.Effect):
 
 	damage_per_second = 1.0
-	particle_spawn_rate = 50
-	particle_spawn_amount = 3
+	particle_spawn_rate = 70
+	particle_spawn_amount = 4
 
 	def __init__(self, parent, duration = 10000):
 		# We start by calling the superconstructor.
@@ -44,7 +44,7 @@ class Burning(effect.Effect):
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(0, Burning.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = 2.25
+				speed = random.uniform(0.75 * settings.GAME_SCALE, 0.9 * settings.GAME_SCALE)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 5)

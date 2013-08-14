@@ -10,27 +10,27 @@ import objects.groups as groups
 import settings.settings as settings
 
 def convert():
-	StrongBlock.image.convert()
+	WeakBlock.image.convert()
 
-class StrongBlock(block.Block):
+class WeakBlock(block.Block):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/block/block_strong.png")
+	image = pygame.image.load("res/block/block_weak.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	health = 30
+	health = 10
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
-		block.Block.__init__(self, owner, x, y, StrongBlock.width, StrongBlock.height, StrongBlock.health)
+		block.Block.__init__(self, owner, x, y, WeakBlock.width, WeakBlock.height, WeakBlock.health)
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = StrongBlock.image.copy()
+		self.image = WeakBlock.image.copy()
 
 		# Colorize the block.
 		self.color = self.owner.color

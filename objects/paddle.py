@@ -70,28 +70,41 @@ class Paddle(pygame.sprite.Sprite):
 	def update(self, key_up, key_down):
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if acceleration is above zero, since if it is zero the paddle cannot move anyway.
-		if pygame.key.get_pressed()[key_up]:
-			if self.acceleration > 0:
-				self.velocity_y = self.velocity_y - self.acceleration
-				if self.velocity_y < -self.max_speed:
-					self.velocity_y = -self.max_speed
-		elif pygame.key.get_pressed()[key_down]:
-			if self.acceleration > 0:
-				self.velocity_y = self.velocity_y + self.acceleration
-				if self.velocity_y > self.max_speed:
-					self.velocity_y = self.max_speed
-		elif self.velocity_y > 0:
-			self.velocity_y = self.velocity_y - self.retardation
-			if self.velocity_y < 0:
-				self.velocity_y = 0
-		elif self.velocity_y < 0:
-			self.velocity_y = self.velocity_y + self.retardation
+		if self.acceleration > 0:
+			if pygame.key.get_pressed()[key_up]:
+					self.velocity_y = self.velocity_y - self.acceleration
+					if self.velocity_y < -self.max_speed:
+						self.velocity_y = -self.max_speed
+			elif pygame.key.get_pressed()[key_down]:
+					self.velocity_y = self.velocity_y + self.acceleration
+					if self.velocity_y > self.max_speed:
+						self.velocity_y = self.max_speed
+			elif self.velocity_y > 0:
+				self.velocity_y = self.velocity_y - self.retardation
+				if self.velocity_y < 0:
+					self.velocity_y = 0
+			elif self.velocity_y < 0:
+				self.velocity_y = self.velocity_y + self.retardation
+				if self.velocity_y > 0:
+					self.velocity_y = 0
+		else:
 			if self.velocity_y > 0:
-				self.velocity_y = 0
+				self.velocity_y = self.velocity_y - self.retardation
+				if self.velocity_y < 0:
+					self.velocity_y = 0
+			elif self.velocity_y < 0:
+				self.velocity_y = self.velocity_y + self.retardation
+				if self.velocity_y > 0:
+					self.velocity_y = 0
 
 		# Move the paddle according to its velocity.
 		self.y = self.y + self.velocity_y
 		self.rect.y = self.y
+
+		# Move any effects on the paddle.
+		for effect in self.effect_group:
+			effect.rect.x = self.rect.x
+			effect.rect.y = self.rect.y
 
 		# Check collision with y-edges.
 		if self.rect.y < settings.LEVEL_Y:

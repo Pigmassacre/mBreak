@@ -67,7 +67,7 @@ class Game:
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 2, 2, 0)
+		self.game_level = level.Level(self.player_one, self.player_two, 1, 2, 1)
 
 		# Creat the score texts.
 		item_side_padding = textitem.TextItem.font_size
@@ -158,7 +158,7 @@ class Game:
 		for effect in groups.Groups.effect_group:
 			if effect.__class__ == speed.Speed:
 				effect.update(self.main_clock)
-
+		
 		# Then, we update every other effect. Because the speed effect moves the ball, if we update speed after any other effect we might get
 		# some wrong looking graphics (things will not line up with the balls with the speed effect).
 		for effect in groups.Groups.effect_group:

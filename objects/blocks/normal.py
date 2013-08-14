@@ -20,14 +20,18 @@ class NormalBlock(block.Block):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	health = 10
+	health = 20
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
-		block.Block.__init__(self, owner, x, y, NormalBlock.width, NormalBlock.height, NormalBlock.health)		
+		block.Block.__init__(self, owner, x, y, NormalBlock.width, NormalBlock.height, NormalBlock.health)	
 
-	#def on_hit(self):
-		
+		# Create the image attribute that is drawn to the surface.
+		self.image = NormalBlock.image.copy()
+
+		# Colorize the block.
+		self.color = self.owner.color
+		useful.colorize_image(self.image, self.color)	
