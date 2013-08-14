@@ -21,6 +21,7 @@ import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens
+import screens.confirmationmenu as confirmationmenu
 
 class MatchOver:
 
@@ -89,7 +90,7 @@ class MatchOver:
 
 		quit_button = textitem.TextItem("Quit")
 		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
-		self.quit_menu.add(quit_button, self.quit)
+		self.quit_menu.add(quit_button, self.maybe_quit)
 		self.quit_menu.items[0].selected = True
 		
 		next_match_button = textitem.TextItem("Next Match")
@@ -110,6 +111,9 @@ class MatchOver:
 	def setup_music(self):
 		pygame.mixer.music.load(settings.TITLE_MUSIC)
 		pygame.mixer.music.play()
+
+	def maybe_quit(self, item):
+		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
 		self.next_screen = screens.mainmenu.MainMenu
@@ -132,9 +136,8 @@ class MatchOver:
 					sys.exit()
 					pygame.quit()
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
-					# If the escape key is pressed, we go back to the main menu.
-					self.next_screen = screens.mainmenu.MainMenu
-					self.done = True
+					# If the escape key is pressed, we do the same thing as the quit button.
+					self.maybe_quit(None)
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					if self.quit_menu.items[0].selected:
@@ -171,15 +174,7 @@ class MatchOver:
 		# Handle the transitions and blit all items.
 		self.transitions.update()
 
-		self.rounds_left_text.draw(self.window_surface)
-		self.rounds_left_number_text.draw(self.window_surface)
-
-		self.player_one_text.draw(self.window_surface)
-		self.player_one_score_text.draw(self.window_surface)
-
-		self.player_two_text.draw(self.window_surface)
-		self.player_two_score_text.draw(self.window_surface)
-
+		# We update the menus first, so if the confirmationmenu is shown the screen is empty.
 		self.quit_menu.update()
 		self.next_match_menu.update()
 
@@ -191,6 +186,15 @@ class MatchOver:
 
 		self.quit_menu.draw(self.window_surface)
 		self.next_match_menu.draw(self.window_surface)
+
+		self.rounds_left_text.draw(self.window_surface)
+		self.rounds_left_number_text.draw(self.window_surface)
+
+		self.player_one_text.draw(self.window_surface)
+		self.player_one_score_text.draw(self.window_surface)
+
+		self.player_two_text.draw(self.window_surface)
+		self.player_two_score_text.draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == None:
