@@ -43,8 +43,9 @@ class Burning(effect.Effect):
 			self.rect.height = Burning.height
 
 	def on_hit_block(self, hit_block):
-		# Spread the effect to any hit blocks.
-		Burning(hit_block)
+		# Spread the effect to any hit blocks not owned by the parents owner.
+		if not self.parent.owner == hit_block.owner:
+			Burning(hit_block)
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.

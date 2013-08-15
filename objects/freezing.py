@@ -46,7 +46,7 @@ class Freezing(effect.Effect):
 			self.rect.height = Freezing.height
 
 	def on_hit_paddle(self, hit_paddle):
-		# Spread the effect to any hit paddles. This effect does not last as long on paddles as it does on any other object.
+		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
 		if not self.parent.owner == hit_paddle.owner:
 			Freezing(hit_paddle, Freezing.paddle_freezing_duration)
 
