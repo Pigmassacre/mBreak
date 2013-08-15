@@ -185,11 +185,17 @@ class Game:
 		if settings.DEBUG_MODE and countdown_screen.done:
 			debug.update(self.player_one, self.player_two)
 
+		# Update the players.
+		groups.Groups.player_group.update()
+
 		# Update the balls.
 		groups.Groups.ball_group.update(self.main_clock)
 
 		# Update the blocks.
 		groups.Groups.block_group.update()
+
+		# Update the powerups.
+		groups.Groups.powerup_group.update(self.main_clock)
 
 		# Update the effects.
 		# First, we update the speed effects.
@@ -210,9 +216,6 @@ class Game:
 		# Update the traces.
 		if graphics.TRACES:
 			groups.Groups.trace_group.update()
-		
-		# Update the players.
-		groups.Groups.player_group.update()
 		
 		# Update the shadows.
 		if graphics.SHADOWS:
@@ -238,11 +241,6 @@ class Game:
 		# Draw the powerups.
 		groups.Groups.powerup_group.draw(self.window_surface)
 
-		# Draw the particles.
-		if graphics.PARTICLES:
-			for particle in groups.Groups.particle_group:
-				self.window_surface.fill(particle.color, particle.rect)
-
 		# Draw the traces.
 		if graphics.TRACES:
 			for trace in groups.Groups.trace_group:
@@ -254,6 +252,11 @@ class Game:
 		# Draw the effects.
 		for effect in groups.Groups.effect_group:
 			effect.draw(self.window_surface)
+
+		# Draw the particles.
+		if graphics.PARTICLES:
+			for particle in groups.Groups.particle_group:
+				self.window_surface.fill(particle.color, particle.rect)
 
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface)

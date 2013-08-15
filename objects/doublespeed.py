@@ -56,3 +56,6 @@ class DoubleSpeed(powerup.Powerup):
 			
 		# Add this effect to the owner of the ball.
 		entity.owner.effect_group.add(speed_effect)
+
+		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
+		entity.owner.add_powerup(DoubleSpeed, speed_effect.duration)

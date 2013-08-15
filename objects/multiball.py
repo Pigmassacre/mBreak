@@ -72,3 +72,6 @@ class Multiball(powerup.Powerup):
 
 			# Create a timeout effect which is added to the ball.
 			timeout.Timeout(temp_ball, Multiball.duration)
+
+		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
+		entity.owner.add_powerup(Multiball, Multiball.duration)

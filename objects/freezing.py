@@ -21,7 +21,7 @@ class Freezing(effect.Effect):
 	height = image.get_height() * settings.GAME_SCALE
 	acceleration_reduction = 2 * settings.GAME_SCALE
 	paddle_freezing_duration = 2000
-	particle_spawn_rate = 250
+	particle_spawn_rate = 600
 	particle_spawn_amount = 2
 
 	# Scale image to settings.GAME_SCALE.
@@ -64,9 +64,9 @@ class Freezing(effect.Effect):
 			for _ in range(0, random.randrange(0, Freezing.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
 				speed = random.uniform(0.2 * settings.GAME_SCALE, 0.35 * settings.GAME_SCALE)
-				retardation = speed / 48.0
-				color = pygame.Color(random.randint(0, 50), random.randint(0, 255), random.randint(220, 255))
-				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 1)
+				retardation = speed / 76.0
+				color = pygame.Color(random.randint(0, 50), random.randint(125, 255), random.randint(220, 255))
+				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 2, self.parent.rect.width / 2, angle, speed, retardation, color, 1)
 
 	def on_kill(self):
 		# We make sure to call the supermethod.

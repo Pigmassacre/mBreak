@@ -25,11 +25,24 @@ class Powerup(pygame.sprite.Sprite):
 		# Store self in the main powerup_group.
 		groups.Groups.powerup_group.add(self)
 
+		# We also create an effect_group ourselves, in case anyone wants to add any sort of effect to us.
+		self.effect_group = pygame.sprite.Group()
+
 		if settings.DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def hit(self, entity):
-		self.kill()
+		self.destroy()
 
 		if settings.DEBUG_MODE:
 			print("Powerup hit!")
+
+	def destroy(self):
+		self.kill()
+		for effect in self.effect_group:
+			effect.kill()
+
+	def update(self, main_clock):
+		# Update the rects position.
+		self.rect.x = self.x
+		self.rect.y = self.y
