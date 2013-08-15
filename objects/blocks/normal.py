@@ -16,6 +16,7 @@ class NormalBlock(block.Block):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/block/block.png")
+	half_health_image = pygame.image.load("res/block/block.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
@@ -24,6 +25,7 @@ class NormalBlock(block.Block):
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
+	half_health_image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
@@ -34,4 +36,14 @@ class NormalBlock(block.Block):
 
 		# Colorize the block.
 		self.color = self.owner.color
-		useful.colorize_image(self.image, self.color)	
+		useful.colorize_image(self.image, self.color)
+
+		# Create the image that is drawn when health is half or less.
+		self.half_health_image = NormalBlock.half_health_image.copy()
+
+		# Colorize that image.
+		self.half_health_color = useful.blend_colors(self.owner.color, block.Block.half_health_blend_color)
+		useful.colorize_image(self.half_health_image, self.half_health_color)
+
+		# Create a shadow.
+		self.shadow = shadow.Shadow(self)

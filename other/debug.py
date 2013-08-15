@@ -45,8 +45,8 @@ class Debug:
 	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
 	font_color = (255, 255, 255)
-	x = font_size * settings.GAME_SCALE
-	y = font_size * settings.GAME_SCALE
+	x = font_size
+	y = font_size
 
 	@staticmethod
 	def display(surface, main_clock):

@@ -15,15 +15,18 @@ class Block(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/block/block.png")
+	half_health_image = pygame.image.load("res/block/block.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	particle_spawn_amount = 4
 	particle_size = 0.75 * settings.GAME_SCALE
+	half_health_blend_color = pygame.Color(128, 128, 128)
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
+	half_health_image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, owner, x, y, width, height, health):
 		# We start by calling the superconstructor.
@@ -42,15 +45,8 @@ class Block(pygame.sprite.Sprite):
 		# Set the health. This is the amount of damage the block can take before it breaks.
 		self.health = health
 
-		# Create the image attribute that is drawn to the surface.
-		self.image = Block.image.copy()
-
-		# Colorize the block.
-		self.color = self.owner.color
-		useful.colorize_image(self.image, self.color)
-
-		# Create a shadow.
-		self.shadow = shadow.Shadow(self)
+		# We also store the health as the maximum amount of health the block has.
+		self.max_health = health
 		
 		# Add self to owners block_group and main block_group.
 		self.owner.block_group.add(self)
@@ -62,6 +58,9 @@ class Block(pygame.sprite.Sprite):
 	def on_hit(self, damage):
 		# Reduce the health.
 		self.health = self.health - damage
+
+		if self.health <= self.max_health / 2:
+			self.image = self.half_health_image
 
 		# Spawn some particles-
 		for _ in range(0, Block.particle_spawn_amount):

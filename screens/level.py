@@ -19,27 +19,27 @@ class Level:
 		self.amount_of_strong = amount_of_strong
 		self.amount_of_normal = amount_of_normal
 		self.amount_of_weak = amount_of_weak
-		amount_of_rows = (settings.LEVEL_HEIGHT - (block.Block.height * 2)) / block.Block.height
+		amount_of_rows = settings.LEVEL_HEIGHT / block.Block.height #  - (block.Block.height * 2)
 
 		# Create and place the given amount of strong blocks.
 		for x in range(0, amount_of_strong):
 			for y in range(0, amount_of_rows):
-				strongblock.StrongBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_one)
-				temp_block_right = strongblock.StrongBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_two)
+				strongblock.StrongBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_one)
+				temp_block_right = strongblock.StrongBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_two)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 		# Create and place the given amount of normal blocks.
 		for x in range(0, amount_of_normal):
 			for y in range(0, amount_of_rows):
-				normalblock.NormalBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * amount_of_strong) + (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_one)
-				temp_block_right = normalblock.NormalBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * amount_of_strong) - (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_two)
+				normalblock.NormalBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * amount_of_strong) + (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_one)
+				temp_block_right = normalblock.NormalBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * amount_of_strong) - (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_two)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 		# Create and place the given amount of weak blocks.
 		for x in range(0, amount_of_weak):
 			for y in range(0, amount_of_rows):
-				weakblock.WeakBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * amount_of_strong) + (block.Block.width * amount_of_normal) + (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_one)
-				temp_block_right = weakblock.WeakBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * amount_of_strong) - (block.Block.width * amount_of_normal) - (block.Block.width * x), settings.LEVEL_Y + block.Block.height + (block.Block.height * y), player_two)
+				weakblock.WeakBlock(settings.LEVEL_X + distance_to_blocks_from_left_wall + (block.Block.width * amount_of_strong) + (block.Block.width * amount_of_normal) + (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_one)
+				temp_block_right = weakblock.WeakBlock(settings.LEVEL_MAX_X - distance_to_blocks_from_right_wall - (block.Block.width * amount_of_strong) - (block.Block.width * amount_of_normal) - (block.Block.width * x), settings.LEVEL_Y + (block.Block.height * y), player_two)
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 		# Create a paddle for player one.
