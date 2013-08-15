@@ -31,7 +31,7 @@ class Ball(pygame.sprite.Sprite):
 	max_speed = 3 * settings.GAME_SCALE
 	damage = 10
 	spin_speed_strength = 0.05
-	spin_angle_strength = 0.05
+	spin_angle_strength = 0.08
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
 
@@ -186,14 +186,25 @@ class Ball(pygame.sprite.Sprite):
 			Ball.sound_effect.play()
 
 	def calculate_spin(self, paddle):
+		# Determine if the velocity is positive, negative or just zero.
+		"""if paddle.velocity_y > 0:
+			velocity_y = 1
+		elif paddle.velocity_y < 0:
+			velocity_y = -1
+		else:
+			velocity_y = 0"""
+
+		velocity_y = paddle.velocity_y / settings.GAME_SCALE
+
+		# Use the velocity to calculate the spin.
 		if self.angle <= (math.pi / 2):
-			self.angle = self.angle - (paddle.velocity_y * Ball.spin_angle_strength)
+			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= math.pi:
-			self.angle = self.angle + (paddle.velocity_y * Ball.spin_angle_strength)
+			self.angle = self.angle + (velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= (3 * math.pi) / 2:
-			self.angle = self.angle + (paddle.velocity_y * Ball.spin_angle_strength)
+			self.angle = self.angle + (velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= (2 * math.pi):
-			self.angle = self.angle - (paddle.velocity_y * Ball.spin_angle_strength)
+			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
 
 	def place_left_of(self, other):
 		self.x = other.rect.left - self.rect.width - 1

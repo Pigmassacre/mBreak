@@ -3,7 +3,7 @@ import os
 import shutil
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-GAME_SCALE = 3
+GAME_SCALE = 1
 
 # Screen width and height is the game window width and height.
 SCREEN_WIDTH = int(285 * GAME_SCALE)
@@ -40,9 +40,11 @@ DEBUG_MODE = True
 DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
 
 def load():
+	# Tries to load the player names from settings.txt.
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
 
+	# We open and read the settings file line by line.
 	file = open("settings.txt", "r")
 	try:
 		for line in file:
@@ -54,13 +56,14 @@ def load():
 		file.close()
 			
 def save():
+	# Tries to save the player names to settings.txt.
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
 
 	# We use a temporary file to write to, so we don't corrupt our old file if the process fails.
 	temp_file = open("settings.txt.tmp", "w")
 	
-	# Open and read the settings file.
+	# Open and read the settings file line by line.
 	file = open("settings.txt", "r+")
 	try:
 		for line in file:
@@ -82,5 +85,5 @@ def save():
 		os.rename("settings.txt.tmp", "settings.txt")
 		os.remove("settings.txt.backup")
 	except OSError:
-		print("Error renaming and removing temporary file at end.")
+		print("Error renaming and removing temporary file at end of the procedure.")
 		

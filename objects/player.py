@@ -49,12 +49,13 @@ class Player(pygame.sprite.Sprite):
 		self.last_powerup_group_size = len(self.powerup_group)
 
 		# The offset between each powerup.
-		self.powerup_offset = 3 * settings.GAME_SCALE
+		self.powerup_offset = 2 * settings.GAME_SCALE
 
 		# Store the selected color, used to colorize objects that belong to the player.
 		self.color = color
 
 	def empty_groups(self):
+		# Empty all the groups.
 		self.paddle_group.empty()
 		self.ball_group.empty()
 		self.block_group.empty()

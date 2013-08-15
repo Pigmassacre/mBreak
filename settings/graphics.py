@@ -7,11 +7,13 @@ TRACES = True
 BACKGROUND = True
 
 def load():
+	# Tries to load the graphics options from settings.txt.
 	global SHADOWS
 	global PARTICLES
 	global TRACES
 	global BACKGROUND
 
+	# Open and read the settings file line by line.
 	file = open("settings.txt", "r")
 	try:
 		for line in file:
@@ -27,6 +29,7 @@ def load():
 		file.close()
 			
 def save():
+	# Tries to save the graphics options to settings.txt.
 	global SHADOWS
 	global PARTICLES
 	global TRACES
@@ -35,7 +38,7 @@ def save():
 	# We use a temporary file to write to, so we don't corrupt our old file if the process fails.
 	temp_file = open("settings.txt.tmp", "w")
 	
-	# Open and read the settings file.
+	# Open and read the settings file line by line.
 	file = open("settings.txt", "r+")
 	try:
 		for line in file:
@@ -61,5 +64,5 @@ def save():
 		os.rename("settings.txt.tmp", "settings.txt")
 		os.remove("settings.txt.backup")
 	except OSError:
-		print("Error renaming and removing temporary file at end.")
+		print("Error renaming and removing temporary file at end of the procedure.")
 	
