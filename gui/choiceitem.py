@@ -24,10 +24,10 @@ class ChoiceItem():
 	y = 0
 	width = 16 * settings.GAME_SCALE
 	height = 16 * settings.GAME_SCALE
-	shadow_color = pygame.Color(50, 50, 50, 255)
+	shadow_color = pygame.Color(50, 50, 50)
 	shadow_offset_x = 0 * settings.GAME_SCALE
 	shadow_offset_y = 1 * settings.GAME_SCALE
-	selected_border_color = pygame.Color(255, 255, 255, 255)
+	selected_border_color = pygame.Color(255, 255, 255)
 	selected_border_size = 2 * settings.GAME_SCALE
 	chosen_border_color = pygame.Color(200, 200, 200)
 	chosen_border_size = 2 * settings.GAME_SCALE

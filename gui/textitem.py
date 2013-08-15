@@ -21,12 +21,12 @@ class TextItem:
 	y = 0
 	shadow_offset_x = 0 * settings.GAME_SCALE
 	shadow_offset_y = 1 * settings.GAME_SCALE
-	shadow_color = pygame.Color(50, 50, 50, 255)
-	selected_color = pygame.Color(255, 255, 255, 255)
-	on_color = pygame.Color(0, 90, 0, 255)
-	selected_on_color = pygame.Color(0, 255, 0, 255)
-	off_color = pygame.Color(90, 0, 0, 255)
-	selected_off_color = pygame.Color(255, 0, 0, 255)
+	shadow_color = pygame.Color(50, 50, 50)
+	selected_color = pygame.Color(255, 255, 255)
+	on_color = pygame.Color(0, 90, 0)
+	selected_on_color = pygame.Color(0, 255, 0)
+	off_color = pygame.Color(90, 0, 0)
+	selected_off_color = pygame.Color(255, 0, 0)
 	blink_rate = 750
 
 	def __init__(self, text_value, font_color = pygame.Color(128, 128, 128), alpha_value = 255):
