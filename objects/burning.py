@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import random
+import objects.blocks.block as block
 import objects.groups as groups
 import objects.effect as effect
 import objects.particle as particle
@@ -12,9 +13,18 @@ import settings.settings as settings
 
 class Burning(effect.Effect):
 
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	image = pygame.image.load("res/effect/burning.png")
+
+	# Standard values. These will be used unless any other values are specified per instance of this class.
+	width = image.get_width() * settings.GAME_SCALE
+	height = image.get_height() * settings.GAME_SCALE
 	damage_per_second = 1.0
 	particle_spawn_rate = 100
 	particle_spawn_amount = 3
+
+	# Scale image to settings.GAME_SCALE.
+	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, parent, duration = 10000):
 		# We start by calling the superconstructor.
@@ -22,6 +32,15 @@ class Burning(effect.Effect):
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
+
+		# If the parent is subclass of block, show an effect on top of the block.
+		if issubclass(self.parent.__class__, block.Block):
+			# Create the image attribute that is drawn to the surface.
+			self.image = Burning.image.copy()
+
+			# Set the rects width and height to the standard values.
+			self.rect.width = Burning.width
+			self.rect.height = Burning.height
 
 	def on_hit_block(self, hit_block):
 		# Spread the effect to any hit blocks.
