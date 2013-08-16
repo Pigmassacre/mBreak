@@ -54,7 +54,7 @@ class AboutMenu:
 		self.pyganim_credits_author.x = (settings.SCREEN_WIDTH - self.pyganim_credits_author.get_width()) / 2
 		self.pyganim_credits_author.y = self.pyganim_credits_source_code.y + self.pyganim_credits_author.get_height()
 
-		self.music_credits_title = textitem.TextItem("Title screen music is sexxy bit 3 dot xm")
+		self.music_credits_title = textitem.TextItem("Title screen music is sexxxy bit 3 dot xm")
 		self.music_credits_title.set_size(font_size)
 		self.music_credits_title.x = (settings.SCREEN_WIDTH - self.music_credits_title.get_width()) / 2
 		self.music_credits_title.y = self.pyganim_credits_author.y + (2 * self.music_credits_title.get_height())

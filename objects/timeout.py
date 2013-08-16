@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import other.useful as useful
 import objects.ball as ball
+import objects.powerup as powerup
 import objects.groups as groups
 import objects.effect as effect
 import settings.settings as settings
@@ -39,5 +40,10 @@ class Timeout(effect.Effect):
 		effect.Effect.update(self, main_clock)
 
 	def on_kill(self):
-		# Effect is over, so we fully kill the parent the effect is attached to.
-		self.parent.destroy()
+		# When the timeout times out, we kill the parent the effect is attached to. If the parent is a powerup, we don't want
+		# any sound to play, so we make sure that doesn't happen.
+		if issubclass(self.parent.__class__, powerup.Powerup):
+			# Sending false to powerups destroy method will make it not play any sound.
+			self.parent.destroy(False)
+		else:
+			self.parent.destroy()

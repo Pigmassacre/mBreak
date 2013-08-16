@@ -21,6 +21,7 @@ class Ball(pygame.sprite.Sprite):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/ball/ball.png")
 
+	# Initialize the mixer (so we can load a sound) and load the sound effect.
 	pygame.mixer.init(44100, -16, 2, 2048)
 	sound_effect = pygame.mixer.Sound("res/sounds/ball_hit_wall2.wav")
 

@@ -17,6 +17,7 @@ class Block(pygame.sprite.Sprite):
 	image = pygame.image.load("res/block/block.png")
 	half_health_image = pygame.image.load("res/block/block.png")
 
+	# Initialize the mixer (so we can load a sound) and load the sound effect.
 	pygame.mixer.init(44100, -16, 2, 2048)
 	sound_effect = pygame.mixer.Sound("res/sounds/explosion2.wav")
 

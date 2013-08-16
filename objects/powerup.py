@@ -3,10 +3,19 @@ __version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
+import random
 import objects.groups as groups
 import settings.settings as settings
 
 class Powerup(pygame.sprite.Sprite):
+
+	# Initialize the mixer (so we can load a sound) and load the sound effects.
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effects = []
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup1.wav"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup2.wav"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup3.wav"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.wav"))
 
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE
@@ -37,10 +46,16 @@ class Powerup(pygame.sprite.Sprite):
 		if settings.DEBUG_MODE:
 			print("Powerup hit!")
 
-	def destroy(self):
+	def destroy(self, play_sound = True):
 		self.kill()
+
+		# Destroy all effects attached to this powerup.
 		for effect in self.effect_group:
 			effect.kill()
+
+		# Play a random sound from the sound_effects list.
+		if play_sound:
+			Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
 
 	def update(self, main_clock):
 		# Update the rects position.
