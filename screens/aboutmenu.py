@@ -38,12 +38,12 @@ class AboutMenu:
 
 		font_size = 6 * settings.GAME_SCALE
 
-		self.pyganim_credits = textitem.TextItem("Pyganim is used for animating the mBreak logo", pygame.Color(255, 255, 255))
+		self.pyganim_credits = textitem.TextItem("Pyganim is used for animating the mBreak logo")
 		self.pyganim_credits.set_size(font_size)
 		self.pyganim_credits.x = (settings.SCREEN_WIDTH - self.pyganim_credits.get_width()) / 2
 		self.pyganim_credits.y = 9 * settings.GAME_SCALE
 
-		self.pyganim_credits_source_code = textitem.TextItem("Pyganim source code is not included in this game", pygame.Color(255, 255, 255))
+		self.pyganim_credits_source_code = textitem.TextItem("Pyganim source code is not included in this game")
 		self.pyganim_credits_source_code.set_size(font_size)
 		self.pyganim_credits_source_code.x = (settings.SCREEN_WIDTH - self.pyganim_credits_source_code.get_width()) / 2
 		self.pyganim_credits_source_code.y = self.pyganim_credits.y + self.pyganim_credits_source_code.get_height()
@@ -52,6 +52,36 @@ class AboutMenu:
 		self.pyganim_credits_author.set_size(font_size)
 		self.pyganim_credits_author.x = (settings.SCREEN_WIDTH - self.pyganim_credits_author.get_width()) / 2
 		self.pyganim_credits_author.y = self.pyganim_credits_source_code.y + self.pyganim_credits_author.get_height()
+
+		self.music_credits_title = textitem.TextItem("Title screen music is sexxy bit 3 dot xm")
+		self.music_credits_title.set_size(font_size)
+		self.music_credits_title.x = (settings.SCREEN_WIDTH - self.music_credits_title.get_width()) / 2
+		self.music_credits_title.y = self.pyganim_credits_author.y + (2 * self.music_credits_title.get_height())
+
+		self.music_credits_after_game = textitem.TextItem("Postgame music is october chip dot xm")
+		self.music_credits_after_game.set_size(font_size)
+		self.music_credits_after_game.x = (settings.SCREEN_WIDTH - self.music_credits_after_game.get_width()) / 2
+		self.music_credits_after_game.y = self.music_credits_title.y + self.music_credits_after_game.get_height()
+
+		self.music_credits_title_author = textitem.TextItem("Both made by Drozerix", pygame.Color(255, 255, 255))
+		self.music_credits_title_author.set_size(font_size)
+		self.music_credits_title_author.x = (settings.SCREEN_WIDTH - self.music_credits_title_author.get_width()) / 2
+		self.music_credits_title_author.y = self.music_credits_after_game.y + self.music_credits_title_author.get_height()
+
+		self.music_credits_game = textitem.TextItem("Game music is stardstm dot mod")
+		self.music_credits_game.set_size(font_size)
+		self.music_credits_game.x = (settings.SCREEN_WIDTH - self.music_credits_game.get_width()) / 2
+		self.music_credits_game.y = self.music_credits_title_author.y + (2 * self.music_credits_game.get_height())
+
+		self.music_credits_game_author = textitem.TextItem("Made by Jester", pygame.Color(255, 255, 255))
+		self.music_credits_game_author.set_size(font_size)
+		self.music_credits_game_author.x = (settings.SCREEN_WIDTH - self.music_credits_game_author.get_width()) / 2
+		self.music_credits_game_author.y = self.music_credits_game.y + self.music_credits_game_author.get_height()
+
+		self.more_info_and_licenses = textitem.TextItem("More info and licenses are in the readme", pygame.Color(200, 20, 200))
+		self.more_info_and_licenses.set_size(font_size)
+		self.more_info_and_licenses.x = (settings.SCREEN_WIDTH - self.more_info_and_licenses.get_width()) / 2
+		self.more_info_and_licenses.y = self.music_credits_game_author.y + (2 * self.more_info_and_licenses.get_height())
 
 		self.made_by_author = textitem.TextItem("Olof Karlsson AKA Pigmassacre", pygame.Color(200, 0, 0))
 		self.made_by_author.set_size(font_size)
@@ -77,7 +107,7 @@ class AboutMenu:
 		if not pygame.mixer.music.get_busy():
 			# We only care about loading and playing the music if it isn't already playing.
 			pygame.mixer.music.load(settings.TITLE_MUSIC)
-			pygame.mixer.music.play()
+			pygame.mixer.music.play(-1)
 
 	def back(self, item):
 		# Simply moves back to the main menu.
@@ -127,6 +157,15 @@ class AboutMenu:
 		self.pyganim_credits.draw(self.window_surface)
 		self.pyganim_credits_author.draw(self.window_surface)
 		self.pyganim_credits_source_code.draw(self.window_surface)
+
+		self.music_credits_title.draw(self.window_surface)
+		self.music_credits_after_game.draw(self.window_surface)
+		self.music_credits_title_author.draw(self.window_surface)
+
+		self.music_credits_game.draw(self.window_surface)
+		self.music_credits_game_author.draw(self.window_surface)
+
+		self.more_info_and_licenses.draw(self.window_surface)
 
 		self.made_by_info.draw(self.window_surface)
 		self.made_by_author.draw(self.window_surface)

@@ -26,7 +26,7 @@ class DoubleSpeed(powerup.Powerup):
 	height = image.get_height() * settings.GAME_SCALE
 	
 	# The amount of time the effect will last.
-	duration = 10000
+	duration = 7500
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))

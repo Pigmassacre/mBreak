@@ -19,8 +19,8 @@ class Freezing(effect.Effect):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	acceleration_reduction = 2 * settings.GAME_SCALE
-	paddle_freezing_duration = 2000
+	max_speed_reduction = 0.4 * settings.GAME_SCALE
+	paddle_freezing_duration = 1000
 	particle_spawn_rate = 600
 	particle_spawn_amount = 2
 	duration = 10000
@@ -42,7 +42,7 @@ class Freezing(effect.Effect):
 
 		# If the parent is a paddle, prevent movement and show an effect on top of the paddle.
 		if self.parent.__class__ == paddle.Paddle:
-			self.parent.acceleration -= Freezing.acceleration_reduction
+			self.parent.max_speed -= Freezing.max_speed_reduction
 
 			# Create the image attribute that is drawn to the surface.
 			self.image = Freezing.image.copy()
@@ -80,4 +80,4 @@ class Freezing(effect.Effect):
 
 		# Restore the acceleration we removed from the parent.
 		if self.parent.__class__ == paddle.Paddle:
-			self.parent.acceleration += Freezing.acceleration_reduction
+			self.parent.max_speed += Freezing.max_speed_reduction

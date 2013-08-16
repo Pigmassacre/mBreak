@@ -171,7 +171,7 @@ class MainMenu:
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
 			pygame.mixer.music.load(settings.TITLE_MUSIC)
-			pygame.mixer.music.play()
+			pygame.mixer.music.play(-1)
 
 	def start(self, item):
 		self.done = True

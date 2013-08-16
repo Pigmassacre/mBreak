@@ -61,7 +61,7 @@ class IntroMenu:
 
 	def setup_music(self):
 		pygame.mixer.music.load(settings.TITLE_MUSIC)
-		pygame.mixer.music.play()
+		pygame.mixer.music.play(-1)
 
 	def gameloop(self):
 		self.done = False

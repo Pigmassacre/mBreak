@@ -109,8 +109,8 @@ class MatchOver:
 		self.transitions.setup_transition(self.next_match_menu, False, True, False, True)
 
 	def setup_music(self):
-		pygame.mixer.music.load(settings.TITLE_MUSIC)
-		pygame.mixer.music.play()
+		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
+		pygame.mixer.music.play(-1)
 
 	def maybe_quit(self, item):
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
@@ -118,6 +118,7 @@ class MatchOver:
 	def quit(self, item):
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
+		pygame.mixer.music.stop()
 
 	def next_match(self, item):
 		pygame.mixer.music.stop()

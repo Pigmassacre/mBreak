@@ -247,7 +247,6 @@ class Ball(pygame.sprite.Sprite):
 	def check_collision_paddles(self):
 		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
 		for paddle in paddle_collide_list:
-			self.spawn_particles()
 			self.hit_paddle(paddle)
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
@@ -287,6 +286,8 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_right_side_of_paddle(paddle)
 
 	def hit_paddle(self, paddle):
+		self.spawn_particles()
+
 		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
@@ -490,7 +491,12 @@ class Ball(pygame.sprite.Sprite):
 	def hit_block(self, block):
 		# We've hit a block, so spawn a particle, damage that block and set collision to True.
 		self.spawn_particles()
-		block.on_hit(Ball.damage)
+
+		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
+		if block.owner == self.owner:
+			block.on_hit(Ball.damage / 2.0)
+		else:
+			block.on_hit(Ball.damage)
 
 		# Tell all the effects that we've just hit a block.
 		for effect in self.effect_group:

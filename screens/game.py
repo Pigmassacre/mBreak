@@ -93,6 +93,9 @@ class Game:
 		# The chance that a THIRD powerup will spawn if a second powerup actually spawns.
 		self.powerup_third_spawn_chance = 0.1
 
+		# If there is already a doublespeed powerup on the gamefield, this is the chance that any further will spawn.
+		self.powerup_second_speed_spawn_chance = 0.1
+
 		# Create the score texts.
 		item_side_padding = textitem.TextItem.font_size
 
@@ -106,16 +109,17 @@ class Game:
 		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - self.player_two_score_text.get_width()
 		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
 
+		# We setup and play music.
+		self.setup_music()
+
 		# And finally, start the gameloop!
 		self.gameloop()
 
-	def create_ball_left(self):
-		for paddle in self.player_one.paddle_group:
-			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), 0, self.player_one)
-
-	def create_ball_right(self):
-		for paddle in self.player_two.paddle_group:
-			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_two)
+	def setup_music(self):
+		if not pygame.mixer.music.get_busy():
+			# We only care about loading and playing the music if it isn't already playing.
+			pygame.mixer.music.load(settings.GAME_MUSIC)
+			pygame.mixer.music.play(-1)
 
 	def gameloop(self):
 		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
@@ -173,7 +177,6 @@ class Game:
 			self.score[self.player_one] = self.score[self.player_one] + 1
 			self.done = True
 
-
 	def try_to_spawn_powerups(self):
 		# If it's time, all powerup spawn chances will increase by a certain amount.
 		self.powerup_increase_spawn_time += self.main_clock.get_time()
@@ -182,6 +185,9 @@ class Game:
 			self.powerup_spawn_chance += self.powerup_spawn_chance_increase
 			self.powerup_second_spawn_chance += self.powerup_spawn_chance_increase
 			self.powerup_third_spawn_chance += self.powerup_spawn_chance_increase
+
+			# The second speed chance increases slighty slower.
+			self.powerup_second_speed_spawn_chance += self.powerup_spawn_chance_increase / 3.0
 
 			# Finally, reset the timer.
 			self.powerup_increase_spawn_time = 0
@@ -205,13 +211,44 @@ class Game:
 				self.powerup_spawn_time = 0
 
 	def create_powerup(self):
+		# Pick a random position in the middle of the level.
 		x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 		y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
-		return random.choice(self.powerup_list)(x, y)
+
+		# Store what should spawn temporarily.
+		powerup_to_spawn = random.choice(self.powerup_list)
+
+		# If what should've spawned is doublespeed, check if we're allowed to spawn that.
+		if powerup_to_spawn == doublespeed.DoubleSpeed:
+			# Go through all the powerups in the level and...
+			for a_powerup in groups.Groups.powerup_group:
+				# Check if there is already a speed powerup on the field.
+				if a_powerup.__class__ == doublespeed.DoubleSpeed:
+					# If there is, check if we should allow it to spawn.
+					if random.uniform(0, 1) <= self.powerup_second_speed_spawn_chance:
+						# Ok, it should spawn, so spawn it.
+						print("spawning another doublespeed")
+						return powerup_to_spawn(x, y)
+					else:
+						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't doublespeed and then break the loop.
+						print("already a doublespeed, spawning something else")
+						powerup_to_spawn = random.choice(filter(lambda x: x != doublespeed.DoubleSpeed, self.powerup_list))
+						break
+		
+		# If we got this far, we just spawn that powerup.
+		return powerup_to_spawn(x, y)
 
 	def start_game(self):
 		self.create_ball_left()
 		self.create_ball_right()
+
+	def create_ball_left(self):
+		for paddle in self.player_one.paddle_group:
+			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), 0, self.player_one)
+
+	def create_ball_right(self):
+		for paddle in self.player_two.paddle_group:
+			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_two)
 
 	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.

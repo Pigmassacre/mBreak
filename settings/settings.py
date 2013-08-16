@@ -23,7 +23,9 @@ BORDER_COLOR = (200, 200, 200)
 MAX_FPS = 60
 
 # Music settings
-TITLE_MUSIC = "res/music/title_screen.ogg"
+TITLE_MUSIC = "res/music/sexxxy_bit_3!!!.xm"
+GAME_MUSIC = "res/music/stardstm.mod"
+AFTER_GAME_MUSIC = "res/music/october_chip.xm"
 
 # Player One settings.
 PLAYER_ONE_NAME = "One"

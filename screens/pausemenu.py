@@ -61,6 +61,7 @@ class PauseMenu:
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
+		pygame.mixer.music.stop()
 		self.done = True
 		self.next_screen = screens.mainmenu.MainMenu
 

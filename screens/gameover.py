@@ -90,12 +90,13 @@ class GameOver:
 		self.gameloop()
 
 	def setup_music(self):
-		pygame.mixer.music.load(settings.TITLE_MUSIC)
+		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
 		pygame.mixer.music.play()
 
 	def quit(self, item):
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
+		pygame.mixer.music.stop()
 
 	def rematch(self, item):
 		pygame.mixer.music.stop()

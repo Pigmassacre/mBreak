@@ -92,16 +92,26 @@ class Player(pygame.sprite.Sprite):
 	def update(self):
 		# We check if any object has been removed from the powerup group.
 		if len(self.powerup_group) < self.last_powerup_group_size:
-			# We calculate the difference which we will nudge all powerups x-position by.
-			difference = self.last_powerup_group_size - len(self.powerup_group)
-			if difference > 0:
-				# If an object has been removed, we update the position of all items in the list.
-				for a_powerup in self.powerup_group:
-					# Determine wether to removed or add the difference to the position depending on selfs position.
+			# We use this to position the powerups.
+			previous_powerup = None
+
+			# If an object has been removed, we update the position of all items in the list.
+			for a_powerup in self.powerup_group:
+				# Determine how to place the powerups.
+				if previous_powerup == None:
+					# If the previous powerup is none, we can just place the powerup at our position.
+					a_powerup.x = self.x
+				else:
+					# Otherwise, we place the powerup next to the previous powerup.
 					if self.x <= settings.SCREEN_WIDTH / 2:
-						a_powerup.x -= (difference * a_powerup.width) + self.powerup_offset
+						# To the left of the previous powerup.
+						a_powerup.x = previous_powerup.x + previous_powerup.width + self.powerup_offset
 					else:
-						a_powerup.x += (difference * a_powerup.width) + self.powerup_offset
+						# To the right of the previous powerup.
+						a_powerup.x = previous_powerup.x - a_powerup.width - self.powerup_offset
+					
+				# Set this powerup as the previous one.
+				previous_powerup = a_powerup
 
 			# Finally, change the last_powerup_group_size to match the current size.
 			self.last_powerup_group_size = len(self.powerup_group)

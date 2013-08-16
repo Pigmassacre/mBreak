@@ -62,7 +62,7 @@ class PrepareMenu:
 		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2
 
 		# The text above the color menu for player one.
-		self.player_one_text = textitem.TextItem("Player One", pygame.Color(255, 255, 255))
+		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
 		self.player_one_text.x = self.color_menu_one.x + ((self.color_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
 		
@@ -72,7 +72,7 @@ class PrepareMenu:
 		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2
 
 		# The text above the color menu for player two.
-		self.player_two_text = textitem.TextItem("Player Two", pygame.Color(255, 255, 255))
+		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
 		self.player_two_text.x = self.color_menu_two.x + ((self.color_menu_two.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
 
