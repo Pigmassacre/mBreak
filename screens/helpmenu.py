@@ -8,6 +8,8 @@ import other.useful as useful
 import objects.player as player
 import objects.powerup as powerup
 import objects.burning as burning
+import objects.freezing as freezing
+import objects.multiball as multiball
 import objects.blocks.weak as weakblock
 import objects.blocks.normal as normalblock
 import objects.blocks.strong as strongblock
@@ -68,6 +70,18 @@ class HelpMenu:
 		self.info_about[temp_item] = self.show_fire_info
 		self.help_menu.add(temp_item, self.view_info)
 
+		temp_item = imageitem.ImageItem("res/powerup/frost.png")
+		self.info_about[temp_item] = self.show_frost_info
+		self.help_menu.add(temp_item, self.view_info)
+
+		temp_item = imageitem.ImageItem("res/powerup/doublespeed.png")
+		self.info_about[temp_item] = self.show_doublespeed_info
+		self.help_menu.add(temp_item, self.view_info)
+
+		temp_item = imageitem.ImageItem("res/powerup/multiball.png")
+		self.info_about[temp_item] = self.show_multiball_info
+		self.help_menu.add(temp_item, self.view_info)
+
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 		self.help_menu.y = distance_from_screen_edge
 
@@ -84,6 +98,9 @@ class HelpMenu:
 		self.setup_block_info()
 		self.setup_paddle_info()
 		self.setup_fire_info()
+		self.setup_frost_info()
+		self.setup_doublespeed_info()
+		self.setup_multiball_info()
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition()
@@ -364,6 +381,117 @@ class HelpMenu:
 
 	def show_fire_info(self, surface):
 		for info_text in self.fire_info_texts:
+			info_text.draw(surface)
+
+	def setup_frost_info(self):
+		self.frost_info_texts = []
+
+		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
+
+		self.frost_info_title_text = textitem.TextItem("Frost", pygame.Color(255, 255, 255))
+		self.frost_info_title_text.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_title_text.x = (settings.SCREEN_WIDTH - self.frost_info_title_text.get_width()) / 2
+		self.frost_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.frost_info_title_text.get_height()
+		self.frost_info_texts.append(self.frost_info_title_text)
+
+		self.frost_info_text_1 = textitem.TextItem("This powerup will make your balls ice cold", pygame.Color(255, 255, 255))
+		self.frost_info_text_1.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_text_1.x = self.distance_from_screen_edge
+		self.frost_info_text_1.y = self.frost_info_title_text.y + (2 * self.frost_info_text_1.get_height())
+		self.frost_info_texts.append(self.frost_info_text_1)
+
+		self.frost_info_text_2 = textitem.TextItem("Your opponents paddle will frozen by your balls", pygame.Color(255, 255, 255))
+		self.frost_info_text_2.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_text_2.x = self.distance_from_screen_edge
+		self.frost_info_text_2.y = self.frost_info_text_1.y + (2 * self.frost_info_text_2.get_height())
+		self.frost_info_texts.append(self.frost_info_text_2)
+
+		self.frost_info_text_3 = textitem.TextItem("This effect lasts for " + str(freezing.Freezing.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
+		self.frost_info_text_3.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_text_3.x = self.distance_from_screen_edge
+		self.frost_info_text_3.y = self.frost_info_text_2.y + (2 * self.frost_info_text_3.get_height())
+		self.frost_info_texts.append(self.frost_info_text_3)
+
+		self.frost_info_text_4 = textitem.TextItem("Frozen paddles cannot move", pygame.Color(255, 255, 255))
+		self.frost_info_text_4.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_text_4.x = self.distance_from_screen_edge
+		self.frost_info_text_4.y = self.frost_info_text_3.y + (2 * self.frost_info_text_4.get_height())
+		self.frost_info_texts.append(self.frost_info_text_4)
+
+		self.frost_info_text_5 = textitem.TextItem("Your own paddle will not be frozen by your balls", pygame.Color(255, 255, 255))
+		self.frost_info_text_5.set_size(6 * settings.GAME_SCALE)
+		self.frost_info_text_5.x = self.distance_from_screen_edge
+		self.frost_info_text_5.y = self.frost_info_text_4.y + (2 * self.frost_info_text_5.get_height())
+		self.frost_info_texts.append(self.frost_info_text_5)
+
+	def show_frost_info(self, surface):
+		for info_text in self.frost_info_texts:
+			info_text.draw(surface)
+
+	def setup_doublespeed_info(self):
+		self.doublespeed_info_texts = []
+
+		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
+
+		self.doublespeed_info_title_text = textitem.TextItem("Doublespeed", pygame.Color(255, 255, 255))
+		self.doublespeed_info_title_text.set_size(6 * settings.GAME_SCALE)
+		self.doublespeed_info_title_text.x = (settings.SCREEN_WIDTH - self.doublespeed_info_title_text.get_width()) / 2
+		self.doublespeed_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.doublespeed_info_title_text.get_height()
+		self.doublespeed_info_texts.append(self.doublespeed_info_title_text)
+
+		self.doublespeed_info_text_1 = textitem.TextItem("This powerup makes your balls move at double", pygame.Color(255, 255, 255))
+		self.doublespeed_info_text_1.set_size(6 * settings.GAME_SCALE)
+		self.doublespeed_info_text_1.x = self.distance_from_screen_edge
+		self.doublespeed_info_text_1.y = self.doublespeed_info_title_text.y + (2 * self.doublespeed_info_text_1.get_height())
+		self.doublespeed_info_texts.append(self.doublespeed_info_text_1)
+
+		self.doublespeed_info_text_2 = textitem.TextItem("their original speed", pygame.Color(255, 255, 255))
+		self.doublespeed_info_text_2.set_size(6 * settings.GAME_SCALE)
+		self.doublespeed_info_text_2.x = self.distance_from_screen_edge
+		self.doublespeed_info_text_2.y = self.doublespeed_info_text_1.y + self.doublespeed_info_text_2.get_height()
+		self.doublespeed_info_texts.append(self.doublespeed_info_text_2)
+
+		self.doublespeed_info_text_3 = textitem.TextItem("This effect lasts for " + str(freezing.Freezing.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
+		self.doublespeed_info_text_3.set_size(6 * settings.GAME_SCALE)
+		self.doublespeed_info_text_3.x = self.distance_from_screen_edge
+		self.doublespeed_info_text_3.y = self.doublespeed_info_text_2.y + (2 * self.doublespeed_info_text_3.get_height())
+		self.doublespeed_info_texts.append(self.doublespeed_info_text_3)
+
+		self.doublespeed_info_text_4 = textitem.TextItem("Multiple instances of speed will stack additively", pygame.Color(255, 255, 255))
+		self.doublespeed_info_text_4.set_size(6 * settings.GAME_SCALE)
+		self.doublespeed_info_text_4.x = self.distance_from_screen_edge
+		self.doublespeed_info_text_4.y = self.doublespeed_info_text_3.y + (2 * self.doublespeed_info_text_4.get_height())
+		self.doublespeed_info_texts.append(self.doublespeed_info_text_4)
+
+	def show_doublespeed_info(self, surface):
+		for info_text in self.doublespeed_info_texts:
+			info_text.draw(surface)
+
+	def setup_multiball_info(self):
+		self.multiball_info_texts = []
+
+		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
+
+		self.multiball_info_title_text = textitem.TextItem("Multiball", pygame.Color(255, 255, 255))
+		self.multiball_info_title_text.set_size(6 * settings.GAME_SCALE)
+		self.multiball_info_title_text.x = (settings.SCREEN_WIDTH - self.multiball_info_title_text.get_width()) / 2
+		self.multiball_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.multiball_info_title_text.get_height()
+		self.multiball_info_texts.append(self.multiball_info_title_text)
+
+		self.multiball_info_text_1 = textitem.TextItem("This powerup gives you an extra ball that lasts for", pygame.Color(255, 255, 255))
+		self.multiball_info_text_1.set_size(6 * settings.GAME_SCALE)
+		self.multiball_info_text_1.x = self.distance_from_screen_edge
+		self.multiball_info_text_1.y = self.multiball_info_title_text.y + (2 * self.multiball_info_text_1.get_height())
+		self.multiball_info_texts.append(self.multiball_info_text_1)
+
+		self.multiball_info_text_2 = textitem.TextItem(str(multiball.Multiball.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
+		self.multiball_info_text_2.set_size(6 * settings.GAME_SCALE)
+		self.multiball_info_text_2.x = self.distance_from_screen_edge
+		self.multiball_info_text_2.y = self.multiball_info_text_1.y + self.multiball_info_text_2.get_height()
+		self.multiball_info_texts.append(self.multiball_info_text_2)
+
+	def show_multiball_info(self, surface):
+		for info_text in self.multiball_info_texts:
 			info_text.draw(surface)
 
 	def back(self, item):
