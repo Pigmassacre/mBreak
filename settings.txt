@@ -1,8 +1,8 @@
 # PLAYER 1 SETTINGS
-p1name		Pigma
+p1name		One
 
 # PLAYER 2 SETTINGS
-p2name		Zaps
+p2name		Two
 
 # GRAPHICS
 shadows 	1
