@@ -40,52 +40,59 @@ class HelpMenu:
 		# This is a dictionary that contains information linked to certain imageitems.
 		self.info_about = {}
 
+		# This is a dictionary that maps transitions methods to certain imageitems.
+		self.transition_method = {}
+
 		# This contains the currently active function that displays the currently active information.
 		self.active_info = self.show_ball_info
 
 		# Configure the GUI.
-		distance_from_screen_edge = 9 * settings.GAME_SCALE
-
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
-		self.help_menu = gridmenu.GridMenu(12)
+		self.help_menu = gridmenu.GridMenu(7)
 
 		# Setup and add the ball item. Also set it as the default selected item.
-		temp_item = imageitem.ImageItem("res/ball/ball.png")
-		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0))
-		self.info_about[temp_item] = self.show_ball_info
-		self.view_info(temp_item)
-		self.help_menu.add(temp_item, self.view_info)
+		first_item = imageitem.ImageItem("res/ball/ball.png")
+		useful.colorize_image(first_item.image, pygame.Color(255, 0, 0))
+		self.info_about[first_item] = self.show_ball_info
+		self.transition_method[first_item] = self.setup_ball_info_transitions
+		self.help_menu.add(first_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/block/block.png")
 		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0))
 		self.info_about[temp_item] = self.show_block_info
+		self.transition_method[temp_item] = self.setup_block_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/paddle/paddle.png")
 		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0))
 		self.info_about[temp_item] = self.show_paddle_info
+		self.transition_method[temp_item] = self.setup_paddle_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/powerup/fire.png")
 		self.info_about[temp_item] = self.show_fire_info
+		self.transition_method[temp_item] = self.setup_fire_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/powerup/frost.png")
 		self.info_about[temp_item] = self.show_frost_info
+		self.transition_method[temp_item] = self.setup_frost_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/powerup/doublespeed.png")
 		self.info_about[temp_item] = self.show_doublespeed_info
+		self.transition_method[temp_item] = self.setup_doublespeed_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		temp_item = imageitem.ImageItem("res/powerup/multiball.png")
 		self.info_about[temp_item] = self.show_multiball_info
+		self.transition_method[temp_item] = self.setup_multiball_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
-		self.help_menu.y = distance_from_screen_edge
+		self.help_menu.y = 9 * settings.GAME_SCALE
 
-		# The back button, displayed in the bottom-left corner of the screen.
+		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
 		self.back_menu = menu.Menu()
 		self.back_menu.x = settings.SCREEN_WIDTH / 2
@@ -93,7 +100,13 @@ class HelpMenu:
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 
+		# We setup all menu transitions.
+		self.transitions = transition.Transition()
+		self.transitions.setup_transition(self.help_menu, True, True, True, False)
+		self.transitions.setup_transition(self.back_menu, True, True, False, False)
+
 		# Setup the info items.
+		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 		self.setup_ball_info()
 		self.setup_block_info()
 		self.setup_paddle_info()
@@ -102,10 +115,8 @@ class HelpMenu:
 		self.setup_doublespeed_info()
 		self.setup_multiball_info()
 
-		# We setup all menu transitions.
-		self.transitions = transition.Transition()
-		self.transitions.setup_transition(self.help_menu, True, True, True, False)
-		self.transitions.setup_transition(self.back_menu, True, False, False, True)
+		# Set the first item as the active information.
+		self.view_info(first_item)
 
 		# We setup and play music.
 		self.setup_music()
@@ -120,8 +131,11 @@ class HelpMenu:
 			pygame.mixer.music.play()
 
 	def view_info(self, item):
-		# Set the number of rounds to the value of the selected item.
+		# Set the active info to the one chosen by the user.
 		self.active_info = self.choose_active_info(item, self.help_menu)
+
+		# Setup the transitions for that info.
+		self.transition_method[item]()
 
 	def choose_active_info(self, item, grid_menu):
 		# Figure out what item is the chosen item.
@@ -145,8 +159,6 @@ class HelpMenu:
 
 	def setup_ball_info(self):
 		self.ball_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.ball_info_title_text = textitem.TextItem("Ball", pygame.Color(255, 255, 255))
 		self.ball_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -196,14 +208,22 @@ class HelpMenu:
 		self.ball_info_text_7.y = self.ball_info_text_6.y + self.ball_info_text_7.get_height()
 		self.ball_info_texts.append(self.ball_info_text_7)
 
+	def setup_ball_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.ball_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_4, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_5, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_6, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.ball_info_text_7, True, True, False, False)
+
 	def show_ball_info(self, surface):
 		for info_text in self.ball_info_texts:
 			info_text.draw(surface)
 
 	def setup_block_info(self):
 		self.block_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.block_info_title_text = textitem.TextItem("Block", pygame.Color(255, 255, 255))
 		self.block_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -259,14 +279,23 @@ class HelpMenu:
 		self.block_info_text_5.y = self.block_info_text_5_image.y + ((self.block_info_text_5_image.get_height() - self.block_info_text_5.get_height()) / 2)
 		self.block_info_texts.append(self.block_info_text_5)
 
+	def setup_block_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.block_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_3_image, True, False, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_3, False, True, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_4_image, True, False, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_4, False, True, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_5_image, True, False, False, False)
+		self.transitions.setup_single_item_transition(self.block_info_text_5, False, True, False, False)
+
 	def show_block_info(self, surface):
 		for info_text in self.block_info_texts:
 			info_text.draw(surface)
 
 	def setup_paddle_info(self):
 		self.paddle_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.paddle_info_title_text = textitem.TextItem("Paddle", pygame.Color(255, 255, 255))
 		self.paddle_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -334,14 +363,25 @@ class HelpMenu:
 		self.paddle_info_text_10.y = self.paddle_info_text_9.y + self.paddle_info_text_10.get_height()
 		self.paddle_info_texts.append(self.paddle_info_text_10)
 
+	def setup_paddle_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.paddle_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_4, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_5, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_6, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_7, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_8, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_9, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.paddle_info_text_10, True, True, False, False)
+
 	def show_paddle_info(self, surface):
 		for info_text in self.paddle_info_texts:
 			info_text.draw(surface)
 
 	def setup_fire_info(self):
 		self.fire_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.fire_info_title_text = textitem.TextItem("Fire", pygame.Color(255, 255, 255))
 		self.fire_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -379,14 +419,20 @@ class HelpMenu:
 		self.fire_info_text_5.y = self.fire_info_text_4.y + (2 * self.fire_info_text_5.get_height())
 		self.fire_info_texts.append(self.fire_info_text_5)
 
+	def setup_fire_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.fire_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.fire_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.fire_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.fire_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.fire_info_text_4, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.fire_info_text_5, True, True, False, False)
+
 	def show_fire_info(self, surface):
 		for info_text in self.fire_info_texts:
 			info_text.draw(surface)
 
 	def setup_frost_info(self):
 		self.frost_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.frost_info_title_text = textitem.TextItem("Frost", pygame.Color(255, 255, 255))
 		self.frost_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -424,14 +470,20 @@ class HelpMenu:
 		self.frost_info_text_5.y = self.frost_info_text_4.y + (2 * self.frost_info_text_5.get_height())
 		self.frost_info_texts.append(self.frost_info_text_5)
 
+	def setup_frost_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.frost_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.frost_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.frost_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.frost_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.frost_info_text_4, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.frost_info_text_5, True, True, False, False)
+
 	def show_frost_info(self, surface):
 		for info_text in self.frost_info_texts:
 			info_text.draw(surface)
 
 	def setup_doublespeed_info(self):
 		self.doublespeed_info_texts = []
-
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 
 		self.doublespeed_info_title_text = textitem.TextItem("Doublespeed", pygame.Color(255, 255, 255))
 		self.doublespeed_info_title_text.set_size(6 * settings.GAME_SCALE)
@@ -463,6 +515,13 @@ class HelpMenu:
 		self.doublespeed_info_text_4.y = self.doublespeed_info_text_3.y + (2 * self.doublespeed_info_text_4.get_height())
 		self.doublespeed_info_texts.append(self.doublespeed_info_text_4)
 
+	def setup_doublespeed_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.doublespeed_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.doublespeed_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.doublespeed_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.doublespeed_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.doublespeed_info_text_4, True, True, False, False)
+		
 	def show_doublespeed_info(self, surface):
 		for info_text in self.doublespeed_info_texts:
 			info_text.draw(surface)
@@ -470,26 +529,29 @@ class HelpMenu:
 	def setup_multiball_info(self):
 		self.multiball_info_texts = []
 
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
-
 		self.multiball_info_title_text = textitem.TextItem("Multiball", pygame.Color(255, 255, 255))
 		self.multiball_info_title_text.set_size(6 * settings.GAME_SCALE)
 		self.multiball_info_title_text.x = (settings.SCREEN_WIDTH - self.multiball_info_title_text.get_width()) / 2
 		self.multiball_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.multiball_info_title_text.get_height()
 		self.multiball_info_texts.append(self.multiball_info_title_text)
 
-		self.multiball_info_text_1 = textitem.TextItem("This powerup gives you an extra ball that lasts for", pygame.Color(255, 255, 255))
+		self.multiball_info_text_1 = textitem.TextItem("This powerup gives you an extra ball that lasts", pygame.Color(255, 255, 255))
 		self.multiball_info_text_1.set_size(6 * settings.GAME_SCALE)
 		self.multiball_info_text_1.x = self.distance_from_screen_edge
 		self.multiball_info_text_1.y = self.multiball_info_title_text.y + (2 * self.multiball_info_text_1.get_height())
 		self.multiball_info_texts.append(self.multiball_info_text_1)
 
-		self.multiball_info_text_2 = textitem.TextItem(str(multiball.Multiball.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
+		self.multiball_info_text_2 = textitem.TextItem("for " + str(multiball.Multiball.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
 		self.multiball_info_text_2.set_size(6 * settings.GAME_SCALE)
 		self.multiball_info_text_2.x = self.distance_from_screen_edge
 		self.multiball_info_text_2.y = self.multiball_info_text_1.y + self.multiball_info_text_2.get_height()
 		self.multiball_info_texts.append(self.multiball_info_text_2)
 
+	def setup_multiball_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.multiball_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.multiball_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.multiball_info_text_2, True, True, False, False)
+		
 	def show_multiball_info(self, surface):
 		for info_text in self.multiball_info_texts:
 			info_text.draw(surface)
@@ -556,7 +618,7 @@ class HelpMenu:
 			sys.exit()
 		elif self.next_screen == screens.mainmenu.MainMenu:
 			# Start the mainmenu but make sure that we retain the menu history we had when we entered the help menu.
-			self.next_screen(self.window_surface, self.main_clock, None, self.came_from_options)
+			self.next_screen(self.window_surface, self.main_clock, None, self.came_from_options, self.__class__)
 		else:
 			# For any other screen we just call it using the normal variables.
 			self.next_screen(self.window_surface, self.main_clock)

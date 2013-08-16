@@ -26,12 +26,12 @@ MAX_FPS = 60
 TITLE_MUSIC = "res/music/title_screen.ogg"
 
 # Player One settings.
-PLAYER_ONE_NAME = "Pigmassacre"
+PLAYER_ONE_NAME = "One"
 PLAYER_ONE_KEY_UP = pygame.locals.K_w
 PLAYER_ONE_KEY_DOWN = pygame.locals.K_s
 
 # Player Two settings.
-PLAYER_TWO_NAME = "Arre"
+PLAYER_TWO_NAME = "Two"
 PLAYER_TWO_KEY_UP = pygame.locals.K_UP
 PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 
@@ -44,9 +44,30 @@ def load():
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
 
+	try:
+		# This will raise an OSError if the file doesn't exist.
+		if os.path.getsize("settings.txt") == 0:
+			raise OSError
+	except OSError:
+		# If the file doesn't exist, fill it with the default values.
+		file = open("settings.txt", "w")
+		file.write("# PLAYER 1 SETTINGS\n")
+		file.write("p1name		" + PLAYER_ONE_NAME + "\n")
+		file.write("\n")
+		file.write("# PLAYER 2 SETTINGS\n")
+		file.write("p2name		" + PLAYER_TWO_NAME + "\n")
+		file.write("\n")
+		file.write("# GRAPHICS\n")
+		file.write("shadows 	1\n")
+		file.write("particles 	1\n")
+		file.write("traces 		1\n")
+		file.write("background 	1")
+		file.close()
+
 	# We open and read the settings file line by line.
 	file = open("settings.txt", "r")
 	try:
+		# If the settings.txt file isn't empty, try to load the values.
 		for line in file:
 			if "p1name" in line:
 				PLAYER_ONE_NAME = line.strip("p1name").strip()

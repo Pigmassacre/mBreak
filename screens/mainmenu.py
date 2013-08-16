@@ -20,10 +20,11 @@ import settings.graphics as graphics
 # Import any needed game screens here.
 import screens.preparemenu as preparemenu
 import screens.helpmenu as helpmenu
+import screens.aboutmenu as aboutmenu
 
 class MainMenu:
 
-	def __init__(self, window_surface, main_clock, title_logo = None, return_to_options = False):
+	def __init__(self, window_surface, main_clock, title_logo = None, return_to_options = False, returned_from = None):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
@@ -46,12 +47,20 @@ class MainMenu:
 		self.active_menu = [self.main_menu]
 		if return_to_options:
 			self.active_menu.append(self.options_menu)
-			for item in self.options_menu.items:
-				# An ugly hack to make sure that the help menu item is selected when we return from the help menu.
-				if item.text_value == "Help":
-					item.selected = True
-				else:
-					item.selected = False
+			if returned_from == helpmenu.HelpMenu:
+				for item in self.options_menu.items:
+					# An ugly hack to make sure that the help menu item is selected when we return from the help menu.
+					if item.text_value == "Help":
+						item.selected = True
+					else:
+						item.selected = False
+			elif returned_from == aboutmenu.AboutMenu:
+				for item in self.options_menu.items:
+					# And here to make sure that the about item is selected when we return from the about menu.
+					if item.text_value == "About":
+						item.selected = True
+					else:
+						item.selected = False
 
 		# Setup the menu transitions.
 		self.menu_transition = transition.Transition()
@@ -78,6 +87,7 @@ class MainMenu:
 		self.options_menu = self.setup_menu()
 		self.options_menu.add(textitem.TextItem("Graphics"), self.graphics)
 		self.options_menu.add(textitem.TextItem("Help"), self.help)
+		self.options_menu.add(textitem.TextItem("About"), self.about)
 		self.options_menu.add(textitem.TextItem("Back"), self.back)
 		self.options_menu.items[0].selected = True
 
@@ -91,6 +101,10 @@ class MainMenu:
 	def help(self, item):
 		self.done = True
 		self.next_screen = helpmenu.HelpMenu
+
+	def about(self, item):
+		self.done = True
+		self.next_screen = aboutmenu.AboutMenu
 
 	def setup_graphics_menu(self):
 		self.graphics_menu = self.setup_menu()
@@ -249,7 +263,7 @@ class MainMenu:
 			graphics.save()
 			pygame.quit()
 			sys.exit()
-		elif self.next_screen == helpmenu.HelpMenu:
+		elif self.next_screen == helpmenu.HelpMenu or self.next_screen == aboutmenu.AboutMenu:
 			# We start the help menu and make sure that we return to the options menu.
 			self.next_screen(self.window_surface, self.main_clock, True)
 		else:
