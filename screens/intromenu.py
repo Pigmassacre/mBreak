@@ -102,4 +102,5 @@ class IntroMenu:
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(settings.MAX_FPS)
 
+		# We're done, so continue to the main menu.
 		mainmenu.MainMenu(self.window_surface, self.main_clock, self.title_logo)

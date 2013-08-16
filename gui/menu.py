@@ -8,6 +8,10 @@ import settings.settings as settings
 
 class Menu:
 
+	# Initialize the mixer (so we can load a sound) and load the sound effect.
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effect = pygame.mixer.Sound("res/sounds/select.ogg")
+
 	def __init__(self, x = 0, y = 0, position = 0):
 		# Setup a list to contain all the menu items.
 		self.items = []
@@ -17,6 +21,9 @@ class Menu:
 
 		# Setup a dictionary that contains the functions that each item will call when activated.
 		self.functions = {}
+
+		# We keep track of the previously selected item so we know when to play a sound effect.
+		self.previous_selected_item = None
 
 		# Store the last clicked button, so if we click a button and then hold down the mouse button it only registers as one click.
 		self.last_clicked_item = None
@@ -80,6 +87,9 @@ class Menu:
 		mouse_pos = pygame.mouse.get_pos()
 		pressed_buttons = pygame.mouse.get_pressed()
 
+		# We use this list to figure out if no items are selected
+		selected_items = []
+
 		for item in self.items:
 			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
 			if pressed_buttons[0]:
@@ -87,7 +97,7 @@ class Menu:
 					self.clicked_outside[item] = not self.is_mouse_over_item(item, mouse_pos)
 			else:
 				self.clicked_outside[item] = False
-			
+
 			if self.is_mouse_over_item(item, mouse_pos):
 				for another_item in self.items:
 					another_item.selected = False
@@ -98,6 +108,17 @@ class Menu:
 						self.last_clicked_item = item
 				else:
 					self.last_clicked_item = None
+
+			# If the item is selected but we still haven't played a sound effect, do so.
+			if item.selected:
+				selected_items.append(item)
+				if item != self.previous_selected_item:
+					Menu.sound_effect.play()
+					self.previous_selected_item = item
+
+		# If there is no selected item in this menu, reset the previous selected item.
+		if len(selected_items) == 0:
+			self.previous_selected_item = None
 
 	def is_mouse_over_item(self, item, mouse_pos):
 		x = mouse_pos[0]

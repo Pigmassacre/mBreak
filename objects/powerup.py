@@ -12,10 +12,10 @@ class Powerup(pygame.sprite.Sprite):
 	# Initialize the mixer (so we can load a sound) and load the sound effects.
 	pygame.mixer.init(44100, -16, 2, 2048)
 	sound_effects = []
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup1.wav"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup2.wav"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup3.wav"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.wav"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup1.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup2.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup3.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.ogg"))
 
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE

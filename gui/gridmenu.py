@@ -57,6 +57,9 @@ class GridMenu(menu.Menu):
 		mouse_pos = pygame.mouse.get_pos()
 		pressed_buttons = pygame.mouse.get_pressed()
 
+		# We use this list to figure out if no items are selected
+		selected_items = []
+
 		for item in self.items:
 			item.selected = False
 
@@ -75,3 +78,15 @@ class GridMenu(menu.Menu):
 						self.last_clicked_item = item
 				else:
 					self.last_clicked_item = None
+
+			# If the item is selected but we still haven't played a sound effect, do so.
+			if item.selected:
+				selected_items.append(item)
+				if item != self.previous_selected_item:
+					menu.Menu.sound_effect.play()
+					self.previous_selected_item = item
+
+		# If there is no selected item in this menu, reset the previous selected item.
+		if len(selected_items) == 0:
+			self.previous_selected_item = None
+				

@@ -19,7 +19,7 @@ class Block(pygame.sprite.Sprite):
 
 	# Initialize the mixer (so we can load a sound) and load the sound effect.
 	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/explosion2.wav")
+	sound_effect = pygame.mixer.Sound("res/sounds/explosion.ogg")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
