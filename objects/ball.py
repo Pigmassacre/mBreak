@@ -30,8 +30,9 @@ class Ball(pygame.sprite.Sprite):
 	speed = 1 * settings.GAME_SCALE
 	max_speed = 3 * settings.GAME_SCALE
 	damage = 10
-	spin_speed_strength = 0.05
-	spin_angle_strength = 0.08
+	spin_speed_strength = 0.05 # Not used, but exists for balancing purposes.
+	spin_angle_strength = 0.09
+	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
 
@@ -110,19 +111,31 @@ class Ball(pygame.sprite.Sprite):
 		# Check collision with powerups.
 		self.check_collision_powerups()
 
-		# Constrain angle to angle != pi/2 and angle != 3pi/2
-		if self.angle == (math.pi / 2)  or self.angle == ((3 * math.pi) / 2):
-			self.angle = self.angle + random.randrange(-1, 2, 2) * 0.25
+		# Here we check if the angle of the ball is in the restricted areas. We do this to make sure that the balls don't get stuck
+		# bouncing up and down in the middle of the gamefield, since that makes for a very boring game.
+		if self.angle > (math.pi / 2) - Ball.least_allowed_vertical_angle and self.angle < (math.pi / 2) + Ball.least_allowed_vertical_angle:
+			if self.angle > (math.pi / 2):
+				self.angle = (math.pi / 2) + Ball.least_allowed_vertical_angle
+			elif self.angle < (math.pi / 2):
+				self.angle = (math.pi / 2) - Ball.least_allowed_vertical_angle
+			else:
+				# If the angle is EXACTLY pi/2, we just randomly decide what angle to "nudge" the ball to.
+				self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
+		elif self.angle > ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle and self.angle < ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle:			
+			if self.angle > ((3 * math.pi) / 2):
+				self.angle = ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle
+			elif self.angle < ((3 * math.pi) / 2):
+				self.angle = ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle
+			else:
+				# If the angle is EXACTLY 3pi/2, we just randomly decide what angle to "nudge" the ball to.
+				self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
 
-		# Constrain angle to 0 < angle < 2pi
+		# Constrain angle to 0 < angle < 2pi. Even though angles over 2pi or under 0 work fine when translating the angles to x and y positions, 
+		# such angles mess with our ability to calculate other stuff. So we just make sure that the angle is between 0 and 2pi.
 		if self.angle > (2 * math.pi):
 			self.angle = self.angle - (2 * math.pi)
 		elif self.angle < 0:
 			self.angle = (2 * math.pi) + self.angle
-			
-		# Save the previous position.
-		self.previous.x = self.x
-		self.previous.y = self.y
 
 		# Make sure that speed isn't over max_speed.
 		if self.speed > self.max_speed:
@@ -136,8 +149,8 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with x-edges.
 		if self.rect.x < settings.LEVEL_X:
-			self.spawn_particles()
-			self.collided = True
+			self.hit_wall()
+
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -145,8 +158,8 @@ class Ball(pygame.sprite.Sprite):
 			self.x = settings.LEVEL_X
 			self.rect.x = self.x
 		elif self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
-			self.spawn_particles()
-			self.collided = True
+			self.hit_wall()
+
 			# Reverse angle on x-axis.
 			self.angle = math.pi - self.angle
 
@@ -156,8 +169,8 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with y-edges.
 		if self.rect.y < settings.LEVEL_Y:
-			self.spawn_particles()
-			self.collided = True
+			self.hit_wall()
+
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
@@ -165,8 +178,7 @@ class Ball(pygame.sprite.Sprite):
 			self.y = settings.LEVEL_Y
 			self.rect.y = self.y
 		elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
-			self.spawn_particles()
-			self.collided = True
+			self.hit_wall()
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
@@ -185,15 +197,18 @@ class Ball(pygame.sprite.Sprite):
 		if self.collided:
 			Ball.sound_effect.play()
 
-	def calculate_spin(self, paddle):
-		# Determine if the velocity is positive, negative or just zero.
-		"""if paddle.velocity_y > 0:
-			velocity_y = 1
-		elif paddle.velocity_y < 0:
-			velocity_y = -1
-		else:
-			velocity_y = 0"""
+	def hit_wall(self):
+		# Spawn some particles.
+		self.spawn_particles()
 
+		# Tell all the effects that we've just hit a wall.
+		for effect in self.effect_group:
+			effect.on_hit_wall()
+
+		self.collided = True
+
+	def calculate_spin(self, paddle):
+		# We determine the velocity of the paddle with regards to the game scale.
 		velocity_y = paddle.velocity_y / settings.GAME_SCALE
 
 		# Use the velocity to calculate the spin.
@@ -234,7 +249,6 @@ class Ball(pygame.sprite.Sprite):
 		for paddle in paddle_collide_list:
 			self.spawn_particles()
 			self.hit_paddle(paddle)
-			self.collided = True
 			if self.rect.bottom >= paddle.rect.top and self.rect.top < paddle.rect.top:
 				# Top side of paddle collided with. Compare with edges:
 				if paddle.rect.left - self.rect.left > paddle.rect.top - self.rect.top:
@@ -273,8 +287,11 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_right_side_of_paddle(paddle)
 
 	def hit_paddle(self, paddle):
+		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
+
+		self.collided = True
 
 	def hit_left_side_of_paddle(self, paddle):
 		# Calculate spin, and then reverse angle.
@@ -345,13 +362,14 @@ class Ball(pygame.sprite.Sprite):
 			delta_x = ball.rect.centerx - self.rect.centerx
 			delta_y = ball.rect.centery - self.rect.centery
 			ball.angle = math.atan2(delta_y, delta_x)
-
-			self.collided = True
 		groups.Groups.ball_group.add(self)
 
 	def hit_ball(self, ball):
+		# Tell all the effects that we've just hit another ball.
 		for effect in self.effect_group:
 			effect.on_hit_ball(ball)
+
+		self.collided = True
 
 	def check_collision_blocks(self):
 		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
@@ -474,6 +492,7 @@ class Ball(pygame.sprite.Sprite):
 		self.spawn_particles()
 		block.on_hit(Ball.damage)
 
+		# Tell all the effects that we've just hit a block.
 		for effect in self.effect_group:
 			effect.on_hit_block(block)
 

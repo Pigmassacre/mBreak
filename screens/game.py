@@ -76,13 +76,22 @@ class Game:
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost]
 
 		# The rate at which powerups will perhaps be spawned.
-		self.powerup_spawn_rate = 8000
+		self.powerup_spawn_rate = 6000
+
+		# After this amount of time has passed, the powerup spawn chance will be increased.
+		self.powerup_increase_spawn_rate = 4000
+
+		# This is the amount that all the spawn chances will increase by every powerup_increase_spawn_rate.
+		self.powerup_spawn_chance_increase = 0.02
 
 		# The chance that a powerup will spawn when it should spawn.
-		self.powerup_spawn_chance = 0.5
+		self.powerup_spawn_chance = 0.3
 
 		# The chance that another powerup will spawn if a powerup actually spawns.
-		self.powerup_extra_spawn_chance = 0.1
+		self.powerup_second_spawn_chance = 0.2
+
+		# The chance that a THIRD powerup will spawn if a second powerup actually spawns.
+		self.powerup_third_spawn_chance = 0.1
 
 		# Create the score texts.
 		item_side_padding = textitem.TextItem.font_size
@@ -95,7 +104,7 @@ class Game:
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
 		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
 		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - self.player_two_score_text.get_width()
-		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
+		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -109,11 +118,14 @@ class Game:
 			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_two)
 
 	def gameloop(self):
-		# We start a countdown before the game starts. WHen the countdown finishes, it calls start_game().
+		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
 		countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
 
 		# When this reaches powerup_spawn_rate, a powerup has a chance to spawn.
 		self.powerup_spawn_time = 0
+
+		# When this reaches powerup_increase_spawn_rate, the chance for powerups to spawn will be increased.
+		self.powerup_increase_spawn_time = 0
 
 		self.done = False
 		while not self.done:
@@ -133,28 +145,9 @@ class Game:
 						elif event.type == KEYDOWN and event.key == K_p:
 							debug.create_powerup()
 
-			# Detect if a player has won or not.
-			if len(self.player_one.block_group) == 0:
-				self.score[self.player_two] = self.score[self.player_two] + 1
-				self.done = True
-			elif len(self.player_two.block_group) == 0:
-				self.score[self.player_one] = self.score[self.player_one] + 1
-				self.done = True
+			self.check_for_winner()
 
-			# Check if it's time to try to spawn a powerup.
-			self.powerup_spawn_time += self.main_clock.get_time()
-			if self.powerup_spawn_time >= self.powerup_spawn_rate:
-				# Check if the spawn will be successful.
-				if random.uniform(0, 1) <= self.powerup_spawn_chance:
-					self.create_powerup()
-
-					# Reset the powerup spawn timer.
-					self.powerup_spawn_time = 0
-
-					# Check if an extra powerup should be spawned.
-					if random.uniform(0, 1) <= self.powerup_extra_spawn_chance:
-						self.create_powerup()
-
+			self.try_to_spawn_powerups()
 
 			self.update(countdown_screen)
 
@@ -170,6 +163,46 @@ class Game:
 			self.main_clock.tick(settings.MAX_FPS)
 
 		self.on_exit()
+
+	def check_for_winner(self):
+		# Detect if a player has won or not.
+		if len(self.player_one.block_group) == 0:
+			self.score[self.player_two] = self.score[self.player_two] + 1
+			self.done = True
+		elif len(self.player_two.block_group) == 0:
+			self.score[self.player_one] = self.score[self.player_one] + 1
+			self.done = True
+
+
+	def try_to_spawn_powerups(self):
+		# If it's time, all powerup spawn chances will increase by a certain amount.
+		self.powerup_increase_spawn_time += self.main_clock.get_time()
+		if self.powerup_increase_spawn_time >= self.powerup_increase_spawn_rate:
+			# It's time, so increase all spawn chances.
+			self.powerup_spawn_chance += self.powerup_spawn_chance_increase
+			self.powerup_second_spawn_chance += self.powerup_spawn_chance_increase
+			self.powerup_third_spawn_chance += self.powerup_spawn_chance_increase
+
+			# Finally, reset the timer.
+			self.powerup_increase_spawn_time = 0
+
+		# Check if it's time to try to spawn a powerup.
+		self.powerup_spawn_time += self.main_clock.get_time()
+		if self.powerup_spawn_time >= self.powerup_spawn_rate:
+			# Check if the spawn will be successful.
+			if random.uniform(0, 1) <= self.powerup_spawn_chance:
+				self.create_powerup()
+
+				# Check if a second powerup should spawn.
+				if random.uniform(0, 1) <= self.powerup_second_spawn_chance:
+					self.create_powerup()
+
+					# Check if a third powerup should spawn.
+					if random.uniform(0, 1) <= self.powerup_third_spawn_chance:
+						self.create_powerup()
+
+				# Finally, reset the powerup spawn timer.
+				self.powerup_spawn_time = 0
 
 	def create_powerup(self):
 		x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))

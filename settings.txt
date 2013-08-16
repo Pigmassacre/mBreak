@@ -1,3 +1,5 @@
+debugmode	0
+
 # PLAYER 1 SETTINGS
 p1name		One
 

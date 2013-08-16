@@ -41,6 +41,7 @@ DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
 
 def load():
 	# Tries to load the player names from settings.txt.
+	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
 
@@ -51,6 +52,8 @@ def load():
 	except OSError:
 		# If the file doesn't exist, fill it with the default values.
 		file = open("settings.txt", "w")
+		file.write("debugmode 	0\n")
+		file.write("\n")
 		file.write("# PLAYER 1 SETTINGS\n")
 		file.write("p1name		" + PLAYER_ONE_NAME + "\n")
 		file.write("\n")
@@ -69,7 +72,9 @@ def load():
 	try:
 		# If the settings.txt file isn't empty, try to load the values.
 		for line in file:
-			if "p1name" in line:
+			if "debugmode" in line:
+				DEBUG_MODE = bool(int(line.strip("debugmode").strip()))
+			elif "p1name" in line:
 				PLAYER_ONE_NAME = line.strip("p1name").strip()
 			elif "p2name" in line:
 				PLAYER_TWO_NAME = line.strip("p2name").strip()
@@ -78,6 +83,7 @@ def load():
 			
 def save():
 	# Tries to save the player names to settings.txt.
+	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
 
@@ -88,7 +94,9 @@ def save():
 	file = open("settings.txt", "r+")
 	try:
 		for line in file:
-			if "p1name" in line:
+			if "debugmode" in line:
+				temp_file.write(line.replace(line.strip("debugmode").strip(), str(int(DEBUG_MODE))))
+			elif "p1name" in line:
 				temp_file.write(line.replace(line.strip("p1name").strip(), PLAYER_ONE_NAME))
 			elif "p2name" in line:
 				temp_file.write(line.replace(line.strip("p2name").strip(), PLAYER_TWO_NAME))

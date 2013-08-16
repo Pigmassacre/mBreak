@@ -53,7 +53,7 @@ class AboutMenu:
 		self.pyganim_credits_author.x = (settings.SCREEN_WIDTH - self.pyganim_credits_author.get_width()) / 2
 		self.pyganim_credits_author.y = self.pyganim_credits_source_code.y + self.pyganim_credits_author.get_height()
 
-		self.made_by_author = textitem.TextItem("Olof Karlsson AKA Pigmassacre", pygame.Color(128, 20, 255))
+		self.made_by_author = textitem.TextItem("Olof Karlsson AKA Pigmassacre", pygame.Color(200, 0, 0))
 		self.made_by_author.set_size(font_size)
 		self.made_by_author.x = (settings.SCREEN_WIDTH - self.made_by_author.get_width()) / 2
 		self.made_by_author.y = self.back_menu.y - (2 * self.made_by_author.get_height())
