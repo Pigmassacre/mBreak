@@ -19,8 +19,8 @@ class Freezing(effect.Effect):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	max_speed_reduction = 0.4 * settings.GAME_SCALE
-	paddle_freezing_duration = 1000
+	max_speed_reduction = 0.45 * settings.GAME_SCALE
+	paddle_freezing_duration = 1250
 	particle_spawn_rate = 600
 	particle_spawn_amount = 2
 	duration = 10000

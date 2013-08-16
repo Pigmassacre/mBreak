@@ -17,6 +17,9 @@ class Block(pygame.sprite.Sprite):
 	image = pygame.image.load("res/block/block.png")
 	half_health_image = pygame.image.load("res/block/block.png")
 
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effect = pygame.mixer.Sound("res/sounds/explosion2.wav")
+
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
@@ -77,3 +80,6 @@ class Block(pygame.sprite.Sprite):
 			self.shadow.kill()
 			for effect in self.effect_group:
 				effect.kill()
+
+			# Play a sound effect.
+			Block.sound_effect.play()

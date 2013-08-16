@@ -227,11 +227,9 @@ class Game:
 					# If there is, check if we should allow it to spawn.
 					if random.uniform(0, 1) <= self.powerup_second_speed_spawn_chance:
 						# Ok, it should spawn, so spawn it.
-						print("spawning another doublespeed")
 						return powerup_to_spawn(x, y)
 					else:
 						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't doublespeed and then break the loop.
-						print("already a doublespeed, spawning something else")
 						powerup_to_spawn = random.choice(filter(lambda x: x != doublespeed.DoubleSpeed, self.powerup_list))
 						break
 		

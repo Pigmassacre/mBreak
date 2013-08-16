@@ -74,8 +74,8 @@ class IntroMenu:
 					# If the ESCAPE key is pressed or the window is closed, the game is shut down.
 					pygame.quit()
 					sys.exit()
-				elif event.type == KEYDOWN and event.key == K_RETURN:# or event.type == MOUSE_PRESSED and event.key == K_MOUSE_1:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
+				elif event.type == KEYDOWN and event.key == K_RETURN or event.type == MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+					# If ENTER is pressed or the mouse button is clicked, proceed to the next screen, and end this loop.
 					self.done = True
 			
 			# If the music isn't playing, start it.
