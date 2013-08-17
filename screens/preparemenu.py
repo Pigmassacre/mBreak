@@ -13,6 +13,7 @@ import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
 import gui.transition as transition
 import gui.toast as toast
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
@@ -42,6 +43,9 @@ class PrepareMenu:
 		temp_item = choiceitem.ChoiceItem(1)
 		self.rounds(temp_item)
 
+		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
+		self.all_menus = []
+
 		# Add that item, and the other items to the menu.
 		self.number_of_rounds_menu.add(temp_item, self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(3), self.rounds)
@@ -50,6 +54,7 @@ class PrepareMenu:
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(9), self.rounds)
 		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
 		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
+		self.all_menus.append(self.number_of_rounds_menu)
 
 		# The text displayed over the rounds menu.
 		self.number_of_rounds_text = textitem.TextItem("Rounds", pygame.Color(255, 255, 255))
@@ -60,6 +65,7 @@ class PrepareMenu:
 		self.color_menu_one = self.setup_color_menu(self.color_one)
 		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width()) / 4
 		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2
+		self.all_menus.append(self.color_menu_one)
 
 		# The text above the color menu for player one.
 		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
@@ -70,6 +76,7 @@ class PrepareMenu:
 		self.color_menu_two = self.setup_color_menu(self.color_two)
 		self.color_menu_two.x = 3 * ((settings.SCREEN_WIDTH - self.color_menu_two.get_width()) / 4)
 		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2
+		self.all_menus.append(self.color_menu_two)
 
 		# The text above the color menu for player two.
 		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
@@ -83,6 +90,7 @@ class PrepareMenu:
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
+		self.all_menus.append(self.back_menu)
 		
 		# The start button, displayed in the bottom-right corner of the screen.
 		start_button = textitem.TextItem("Start")
@@ -90,6 +98,14 @@ class PrepareMenu:
 		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2)
 		self.start_menu.y = settings.SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)
+		self.all_menus.append(self.start_menu)
+
+		# Register all menus to all menus.
+		self.number_of_rounds_menu.register_other_menus(self.all_menus)
+		self.color_menu_one.register_other_menus(self.all_menus)
+		self.color_menu_two.register_other_menus(self.all_menus)
+		self.back_menu.register_other_menus(self.all_menus)
+		self.start_menu.register_other_menus(self.all_menus)
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition()
@@ -230,22 +246,8 @@ class PrepareMenu:
 					# If the escape key is pressed, we go back to the main menu.
 					self.next_screen = screens.mainmenu.MainMenu
 					self.done = True
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					if self.back_menu.items[0].selected:
-						self.back_menu.functions[self.back_menu.items[0]](self.back_menu.items[0])
-					elif self.start_menu.items[0].selected:
-						self.start_menu.functions[self.start_menu.items[0]](self.start_menu.items[0])
-				elif event.type == KEYDOWN and event.key == K_LEFT:
-					# If the left key is pressed, we unselect the start menu and select the back menu.
-					if self.start_menu.items[0].selected:
-						self.start_menu.items[0].selected = False
-						self.back_menu.items[0].selected = True
-				elif event.type == KEYDOWN and event.key == K_RIGHT:
-					# If the right key is pressed, we unselect the back menu and select the start menu.
-					if self.back_menu.items[0].selected:
-						self.back_menu.items[0].selected = False
-						self.start_menu.items[0].selected = True
+				else:
+					traversal.traverse_menus(event, self.all_menus)
 
 			# We update and draw the menus.
 			self.show_menu()
@@ -288,12 +290,6 @@ class PrepareMenu:
 		
 		self.back_menu.update()
 		self.start_menu.update()
-
-		# If the mouse cursor is above one menu, it unselect other menus.
-		if self.back_menu.is_mouse_over_item(self.back_menu.items[0], pygame.mouse.get_pos()):
-			self.start_menu.items[0].selected = False
-		elif self.start_menu.is_mouse_over_item(self.start_menu.items[0], pygame.mouse.get_pos()):
-			self.back_menu.items[0].selected = False
 
 		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)

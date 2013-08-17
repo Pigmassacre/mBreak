@@ -23,9 +23,27 @@ LICENSES AND LEGAL STUFF:
 ################################################################################
 
 For now, the mBreak source is considered "All Rights Reserved".
-I am strongly considering open-sourcing it soon.
+I am strongly considering open-sourcing it soon, however.
 
-mBreak uses the animation library "Pyganim" made by Al Sweigart for animating the mBreak logo in the game.
+The title screen music is sexxxy_bit_3!!!.xm, made by Drozerix. I got it from
+http://modarchive.org/index.php?request=view_by_moduleid&query=173084 which states that the song has a "Public Domain" license.
+The public domain license can be read here: http://creativecommons.org/licenses/publicdomain/
+
+The music that plays during gameplay is stardstm.mod, made by Jester. I got it from
+http://modarchive.org/index.php?request=view_by_moduleid&query=59344 which states that the song has a "Attribution Non-Commercial
+Share Alike" license, which can be read about here: http://creativecommons.org/licenses/by-nc-sa/3.0/
+
+The post-game music is october_chip.xm, made by Drozerix. I got it from 
+http://modarchive.org/index.php?request=view_by_moduleid&query=173084 which states that the song has a "Public Domain" license.
+The public domain license can be read here: http://creativecommons.org/licenses/publicdomain/
+
+IN NO WAY DO I CLAIM THAT I MADE, OWN OR IN ANY WAY CONTRIBUTED TO THESE SONGS. I simply think they are amazing, and I am 
+VERY glad that they are released with such liberal licenses, allowing me to use them in mBreak.
+
+Seriously, go check out more of Drozerix stuff, he has a ton of good chiptunes.
+
+mBreak uses the animation library "Pyganim" made by Al Sweigart for animating the mBreak logo in the game. The actual logo graphics
+were made by myself, but the code used for animating it is all Pyganim.
 The Pyganim source (which is not included in this game but can be seen at http://inventwithpython.com/pyganim/pyganim.py) states:
 
 # By Al Sweigart al@inventwithpython.com

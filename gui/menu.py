@@ -16,6 +16,9 @@ class Menu:
 		# Setup a list to contain all the menu items.
 		self.items = []
 
+		# We use this list to make sure that only one menu ever has a selected item.
+		self.other_menus = []
+
 		# This is the amount of items the menu will display in a row before generating a new column.
 		self.max_number_of_rows = 3
 
@@ -83,6 +86,12 @@ class Menu:
 			item.x = self.x - (item.get_width() / 2)
 			item.y = self.y + ((item.get_height() * 2) * self.items.index(item))
 
+	def register_other_menus(self, other_menus):
+		# Register the other menus into our own list of other menus.
+		if not other_menus in self.other_menus:
+			# We don't want to register ourself, so we filter ourself out with an anonymous function.
+			self.other_menus.extend(filter(lambda x: x != self, other_menus))
+
 	def update(self):
 		mouse_pos = pygame.mouse.get_pos()
 		pressed_buttons = pygame.mouse.get_pressed()
@@ -111,8 +120,15 @@ class Menu:
 
 			# If the item is selected but we still haven't played a sound effect, do so.
 			if item.selected:
+				# Unselect all other items in the other menus.
+				for other_menu in self.other_menus:
+					for an_item in other_menu.items:
+						an_item.selected = False
 				selected_items.append(item)
 				if item != self.previous_selected_item:
+					# If the item differs from the previously selected item, it must mean it's a newly selected item.
+					# So, we play a sound effect and then set this item as the previously selected item, so we won't play
+					# a sound effect again unless a new item is selected.
 					Menu.sound_effect.play()
 					self.previous_selected_item = item
 

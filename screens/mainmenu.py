@@ -14,6 +14,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
@@ -207,6 +208,9 @@ class MainMenu:
 					else:
 						sys.exit()
 						pygame.quit()
+				else:
+					traversal.traverse_menus(event, self.active_menu[-1])
+					"""
 				elif event.type == KEYDOWN and event.key == K_RETURN:
 					# If ENTER is pressed, proceed to the next screen, and end this loop.
 					for item in self.active_menu[-1].items:
@@ -226,7 +230,7 @@ class MainMenu:
 							if self.active_menu[-1].items.index(item) + 1 <= len(self.active_menu[-1].items) - 1:
 								self.active_menu[-1].items[self.active_menu[-1].items.index(item) + 1].selected = True
 								item.selected = False
-								break
+								break"""
 
 			# Move the logo to the desired position.
 			self.show_logo()

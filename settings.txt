@@ -7,7 +7,7 @@ p1name		Anna
 p2name		Olof
 
 # GRAPHICS
-shadows 	0
+shadows 	1
 particles 	1
 traces 		1
-background 	0
+background 	1
