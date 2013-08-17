@@ -3,19 +3,13 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-from libs import pyganim
-import math
-import random
 import other.debug as debug
 import other.useful as useful
 import objects.groups as groups
 import gui.textitem as textitem
-import gui.logo as logo
 import gui.menu as menu
-import gui.gridmenu as gridmenu
-import gui.coloritem as coloritem
 import gui.transition as transition
-import gui.toast as toast
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
@@ -88,14 +82,23 @@ class MatchOver:
 		self.player_two_text.x = self.player_two_score_text.x + ((self.player_two_score_text.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.player_two_score_text.y - (2 * self.player_two_text.get_height())
 
+		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
+		self.all_menus = []
+
 		quit_button = textitem.TextItem("Quit")
 		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.maybe_quit)
 		self.quit_menu.items[0].selected = True
+		self.all_menus.append(self.quit_menu)
 		
 		next_match_button = textitem.TextItem("Next Match")
 		self.next_match_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
+		self.all_menus.append(self.next_match_menu)
+
+		# Register all menus with each other.
+		for a_menu in self.all_menus:
+			a_menu.register_other_menus(self.all_menus)
 
 	def setup_transitions(self):
 		self.transitions = transition.Transition()
@@ -139,22 +142,8 @@ class MatchOver:
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					# If the escape key is pressed, we do the same thing as the quit button.
 					self.maybe_quit(None)
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					if self.quit_menu.items[0].selected:
-						self.quit_menu.functions[self.quit_menu.items[0]](self.quit_menu.items[0])
-					elif self.next_match_menu.items[0].selected:
-						self.next_match_menu.functions[self.next_match_menu.items[0]](self.next_match_menu.items[0])
-				elif event.type == KEYDOWN and event.key == K_LEFT:
-					# Select the quit menu, unless the quit menu is selected, in which case nothing happens.
-					if self.next_match_menu.items[0].selected:
-						self.next_match_menu.items[0].selected = False
-						self.quit_menu.items[0].selected = True
-				elif event.type == KEYDOWN and event.key == K_RIGHT:
-					# Select the next match menu, unless the next match menu is selected, in which case nothing happens.
-					if self.quit_menu.items[0].selected:
-						self.quit_menu.items[0].selected = False
-						self.next_match_menu.items[0].selected = True
+				else:
+					traversal.traverse_menus(event, self.all_menus)
 
 			# Update and draw all items.
 			self.update_and_draw()

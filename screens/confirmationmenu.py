@@ -11,6 +11,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
+import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
 
@@ -92,28 +93,8 @@ class ConfirmationMenu:
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					# If the escape key is pressed, we call refuse.
 					self.refuse(None)
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					for item in self.confirmation_menu.items:
-						if item.selected:
-							self.confirmation_menu.functions[item](item)
-							break
-				elif event.type == KEYDOWN and event.key == K_UP:
-					# Move up the menu.
-					for item in self.confirmation_menu.items:
-						if item.selected:
-							if self.confirmation_menu.items.index(item) - 1 >= 0:
-								self.confirmation_menu.items[self.confirmation_menu.items.index(item) - 1].selected = True
-								item.selected = False
-								break
-				elif event.type == KEYDOWN and event.key == K_DOWN:
-					# Move down the menu.
-					for item in self.confirmation_menu.items:
-						if item.selected:
-							if self.confirmation_menu.items.index(item) + 1 <= len(self.confirmation_menu.items) - 1:
-								self.confirmation_menu.items[self.confirmation_menu.items.index(item) + 1].selected = True
-								item.selected = False
-								break
+				else:
+					traversal.traverse_menus(event, [self.confirmation_menu])
 
 			# Update and show the menu.
 			self.show_menu()

@@ -100,12 +100,9 @@ class PrepareMenu:
 		self.start_menu.add(start_button, self.start)
 		self.all_menus.append(self.start_menu)
 
-		# Register all menus to all menus.
-		self.number_of_rounds_menu.register_other_menus(self.all_menus)
-		self.color_menu_one.register_other_menus(self.all_menus)
-		self.color_menu_two.register_other_menus(self.all_menus)
-		self.back_menu.register_other_menus(self.all_menus)
-		self.start_menu.register_other_menus(self.all_menus)
+		# Register all menus with each other.
+		for a_menu in self.all_menus:
+			a_menu.register_other_menus(self.all_menus)
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition()

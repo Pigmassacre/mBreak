@@ -18,6 +18,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
 import gui.transition as transition
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
@@ -60,8 +61,12 @@ class HelpMenu:
 		# This contains the currently active function that displays the currently active information.
 		self.active_info = self.show_ball_info
 
+		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
+		self.all_menus = []
+
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
 		self.help_menu = gridmenu.GridMenu(7)
+		self.all_menus.append(self.help_menu)
 
 		# We setup and add all the necessary items to the help_menu.
 		first_item = imageitem.ImageItem("res/ball/ball.png")
@@ -112,6 +117,11 @@ class HelpMenu:
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
+		self.all_menus.append(self.back_menu)
+
+		# Register all menus with each other.
+		for a_menu in self.all_menus:
+			a_menu.register_other_menus(self.all_menus)
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition()
@@ -636,10 +646,8 @@ class HelpMenu:
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					# If the escape key is pressed, we go back to the main menu.
 					self.back(None)
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, figure out what function to call (if any) and call it.
-					if self.back_menu.items[0].selected:
-						self.back_menu.functions[self.back_menu.items[0]](self.back_menu.items[0])
+				else:
+					traversal.traverse_menus(event, self.all_menus)
 
 			# We update and draw the menu and the information.
 			self.show_menu_and_info()

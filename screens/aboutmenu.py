@@ -10,6 +10,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
 import gui.transition as transition
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
@@ -162,10 +163,8 @@ class AboutMenu:
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					# If the escape key is pressed, we go back to the main menu.
 					self.back(None)
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, figure out what function to call (if any) and call it.
-					if self.back_menu.items[0].selected:
-						self.back_menu.functions[self.back_menu.items[0]](self.back_menu.items[0])
+				else:
+					traversal.traverse_menus(event, [self.back_menu])
 
 			# We update and draw the menus.
 			self.show_menu()

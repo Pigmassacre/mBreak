@@ -44,18 +44,20 @@ def select_left_or_right(list_of_menus, left):
 	for a_menu in list_of_menus:
 		same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
 
-	# If there are any items left, we want to retain the item which has the least y-difference AND least x-difference.
 	if len(list_of_possible) > 0:
+		# If there are any items left, we want to retain the item which has the least y-difference AND least x-difference.
 		if len(same_menu_items) == 0:
+			# However, we only care about the y-difference if we're traveling from one menu to another.
 			least_y_difference = 999999
 			for an_item in list_of_possible:
 				# Find the least y difference.
 				if abs(an_item.y - selected_item.y) < least_y_difference:
 					least_y_difference = abs(an_item.y - selected_item.y)
 
-			# We want to retain the items which have a y-difference equal to the least y difference.
+			# We want to retain the items which have a y-difference equal to the least y-difference.
 			list_of_possible = filter(lambda x: abs(x.y - selected_item.y) == least_y_difference, list_of_possible)
 		else:
+			# If we're traveling within the same menu, we only care about those menu items and the x-positions.
 			list_of_possible = same_menu_items
 		
 		least_x_difference = 999999
@@ -85,24 +87,25 @@ def select_up_or_down(list_of_menus, up):
 		# If we're going down, we only want the items which have a y-value LARGER than the selected item.
 		list_of_possible = filter(lambda x: x.y > selected_item.y, list_of_possible)
 
-	# Find out if there if any of the possible items are in the same menu as the selected item. If they are
-	# we only care about those items.
+	# Find out if there if any of the possible items are in the same menu as the selected item.
 	same_menu_items = list(list_of_possible)
 	for a_menu in list_of_menus:
 		same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
 
 	if len(list_of_possible) > 0:
+		# If there are any items left, we want to retain the item which has the least y-difference AND least x-difference.
 		if len(same_menu_items) == 0:
-			# If there are any items left, we want to retain the item which has the least y-difference AND least x-difference.
+			# However, we only care about the x difference if we're traveling from one menu to another.
 			least_x_difference = 999999
 			for an_item in list_of_possible:
 				# Find the least x difference.
 				if abs(an_item.x - selected_item.x) < least_x_difference:
 					least_x_difference = abs(an_item.x - selected_item.x)
 
-			# We want to retain the items which have a x-difference equal to the least x difference.
+			# We want to retain the items which have a x-difference equal to the least x-difference.
 			list_of_possible = filter(lambda x: abs(x.x - selected_item.x) == least_x_difference, list_of_possible)
 		else:
+			# If we're traveling within the same menu, we only care about the items in that menu and the y-positions.
 			list_of_possible = same_menu_items
 
 		least_y_difference = 999999

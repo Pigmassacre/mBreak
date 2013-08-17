@@ -11,6 +11,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.transition as transition
+import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
 
@@ -58,6 +59,10 @@ class PauseMenu:
 		self.done = True
 
 	def maybe_quit(self, item):
+		# We call cleanup before we setup the transitions so that we cannot force the pause menu items to be in weird positions (it's an annoying bug).
+		self.pause_menu.cleanup()
+		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
+		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
@@ -80,26 +85,8 @@ class PauseMenu:
 				elif event.type == KEYDOWN and event.key == K_ESCAPE:
 					# If the escape key is pressed, we resume the game.
 					self.resume(None)
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					for item in self.pause_menu.items:
-						if item.selected:
-							self.pause_menu.functions[item](item)
-							break
-				elif event.type == KEYDOWN and event.key == K_UP:
-					for item in self.pause_menu.items:
-						if item.selected:
-							if self.pause_menu.items.index(item) - 1 >= 0:
-								self.pause_menu.items[self.pause_menu.items.index(item) - 1].selected = True
-								item.selected = False
-								break
-				elif event.type == KEYDOWN and event.key == K_DOWN:
-					for item in self.pause_menu.items:
-						if item.selected:
-							if self.pause_menu.items.index(item) + 1 <= len(self.pause_menu.items) - 1:
-								self.pause_menu.items[self.pause_menu.items.index(item) + 1].selected = True
-								item.selected = False
-								break
+				else:
+					traversal.traverse_menus(event, [self.pause_menu])
 
 			# Update and show the menu.
 			self.show_menu()
