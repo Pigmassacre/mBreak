@@ -48,7 +48,7 @@ class Electricity(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 		
-		# Create one effect and add it to this ball.
+		# Create one effect and add it to this ball.	
 		charged_effect = charged.Charged(entity)
 		
 		# Add this effect to the owner of the ball.
