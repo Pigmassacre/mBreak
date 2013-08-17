@@ -1,5 +1,63 @@
 README for mBreak
 
+################################################################################
+
+HELLO! Are you afraid you might not even be able to start the game? Well, fret not, this readme is here to help!
+
+This game needs Python 2.7.4 and Pygame 1.9.1. If you are using Linux, like Ubuntu, then Python is probably
+already installed on your computer. If it isn't or you are using some other operating system, like Windows, you
+can download Python from here: http://python.org/download/
+
+Pygame can be downloaded from here: http://pygame.org/download.shtml
+
+Pygame needs a 32-bit version of Python, so make sure that you have a 32-bit version of Python installed (even
+if you are on a 64-bit computer).
+
+When everything is installed, to start the game on Windows you simply double-click mBreak.py in the mBreak folder.
+On Linux, you must either be able to run python files as executable (I think...) or you can simply open a terminal-window
+and navigate to the mBreak folder. When inside the folder, type "python mBreak.py" and press ENTER. This will
+start the game.
+
+After the game has started and the intro animation has been shown, click the screen or press the ENTER button to 
+reach the main menu.
+
+From the main menu, you can either start the game, go into an options menu or quit the game.
+
+If you go into the options menu, you can either continue to a menu where you can turn special graphical effects on or off,
+or go to a help menu which will explain certain details about the game. You can also go to an "About" menu where
+you can read about where all the music comes from and stuff like that.
+
+If you press the start button however, you are taken to a second screen where you will be required to pick a color
+for both players. mBreak is multiplayer-ONLY, so if you do not have anyone to play against, well, I guess you can play against
+yourself.
+
+If you'd like, you can also choose the number of rounds that you want to play. The game will automatically decide
+the winner if there is no point in playing any further rounds (say, if you play best out of 3, then after one player wins
+2 times then that player ultimately wins!).
+
+Once both players have chosen their colors, just press the START button in here to start the game.
+
+You will be entered into the game, where a countdown will count down until the game begins. During the countdown
+both players can move their paddles, but no balls will spawn.
+
+After the countdown is over, one ball spawns per player. Your goal is then to break your opponents blocks while
+you protect your own. You do this by moving your paddle up and down, just like in Pong!
+
+When one player loses all his/her blocks, the round is over! If that was the last round, the winner is displayed
+and you can there choose to either quit to the main menu, or go for a rematch.
+
+If there are rounds left to be played, both players score will be displayed and you can either quit to the main menu
+or start the next round.
+
+During the game you can press the ESCAPE key to pause the game. In the pause menu you can either resume the game or quit to
+the main menu. You must confirm your choice if you choose to quit, so you don't accidentally quit in the middle of a game.
+
+There are several powerups available, but more info on those are in the help menu in the game!
+
+Now, go have fun! I hope you enjoy mBreak! :)
+
+################################################################################
+
 mBreak is a multiplayer-breakout/pong style game coded during the summer of 2013 by me, Olof Karlsson AKA Pigmassacre.
 
 mBreak was coded for the final assignment of the course "Multimediaprogrammering med Python" at the Stockholm University.
@@ -25,7 +83,13 @@ LICENSES AND LEGAL STUFF:
 For now, the mBreak source is considered "All Rights Reserved".
 I am strongly considering open-sourcing it soon, however.
 
-Below are the things that I haven't made myself. Everything else except these things I have made myself.
+Below are the things that I haven't made myself.
+
+The font used is 8-BIT WONDER.TTF made by Joiro Hatagaya. The license and readme for this font is in the fonts/ folder.
+The license states: "Currently all my fonts are freeware."
+
+I think it's a really nice looking font. It lacks special characters though, so I have to make do without dots, commas and other
+modern stuff. ;)
 
 The title screen music is sexxxy_bit_3!!!.xm, made by Drozerix. I got it from
 http://modarchive.org/index.php?request=view_by_moduleid&query=173084 which states that the song has a "Public Domain" license.

@@ -3,7 +3,7 @@ import os
 import shutil
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-GAME_SCALE = 3
+GAME_SCALE = 2
 
 # Screen width and height is the game window width and height.
 SCREEN_WIDTH = int(285 * GAME_SCALE)

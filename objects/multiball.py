@@ -8,6 +8,7 @@ import math
 import copy
 import other.useful as useful
 import objects.powerup as powerup
+import objects.charged as charged
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups

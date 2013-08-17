@@ -91,7 +91,7 @@ class MatchOver:
 		self.quit_menu.items[0].selected = True
 		self.all_menus.append(self.quit_menu)
 		
-		next_match_button = textitem.TextItem("Next Match")
+		next_match_button = textitem.TextItem("Next Round")
 		self.next_match_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
 		self.all_menus.append(self.next_match_menu)
