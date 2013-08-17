@@ -4,7 +4,23 @@ __license__ = "All Rights Reserved"
 import pygame
 from pygame.locals import *
 
+"""
+
+This entire module contains all the code that handles traversing through menus with the arrow-keys and the ENTER key.
+To add key-traversal support to a menu (or a bunch of menus at the same time!), all the corresponding screen has 
+to do is call the traverse_menus function while checking all events. The module takes care of the rest.
+
+"""
+
 def traverse_menus(event, list_of_menus):
+	"""
+	Checks for any events that we care about, and then handles those events correctly in regards to the selected item in list_of_menus.
+	There should never be more than one item selected at any time, but if there is, we only care about the first selected item we encounter.
+
+	event is the event given by looping through the list given by pygame.event.get().
+
+	list_of_menus is the list which contains all the menus that we should be able to traverse through.
+	"""
 	if event.type == KEYDOWN and event.key == K_RETURN:
 		# If it is a list, check through all menus in the list.
 		for a_menu in list_of_menus:
@@ -26,6 +42,34 @@ def traverse_menus(event, list_of_menus):
 		select_up_or_down(list_of_menus, False)
 
 def select_left_or_right(list_of_menus, left):
+	"""
+	Tries to traverse to the left or right of the currently selected item.
+
+	The algorithm favors the item with the least x-distance to the selected item AND the least y-distance, with
+	focus on the y-distance being as low as possible.
+
+	What does this mean? Consider the following scenario:
+
+	Item A is to the left of item B.
+	Item B is in the middle of the screen.
+	Item C is to the left of item B, but to the right of item A. It is in the middle of item A and item B.
+
+	However, item C is above item B and item A.
+
+	Item A and item B are at the same y-level.
+
+	Item B is selected.
+
+	If the function is told to traverse left, it will select item A, even though item C has a shorter x-distance to
+	item B.
+
+	This is because item B has a higher y-distance than item A (item A has 0 y-distance!).
+
+	So, the algorithm favors items with as small y-distance as possible, and if several items have the same (smallest)
+	y-distance, it favors the one with the smallest x-distance of those items.
+
+	If there is no item to the left or right of the selected item, nothing happens.
+	"""
 	# First, we want to get the selected item and fill up a list of possible items to traverse to.
 	selected_item = get_selected_item(list_of_menus)
 	list_of_possible = fill_list_of_possible(list_of_menus)
@@ -75,6 +119,32 @@ def select_left_or_right(list_of_menus, left):
 		list_of_possible[0].selected = True
 
 def select_up_or_down(list_of_menus, up):
+	"""
+	Tries to traverse up or down of the currently selected item.
+
+	The algorithm favors the item with the least y-distance to the selected item AND the least x-distance, with
+	focus on the x-distance being as low as possible.
+
+	What does this mean? Consider the following scenario:
+
+	Item A is above item B.
+	Item B is in the middle of the screen.
+	Item C is above item B and below item A (in the middle of item A and B), but also to the left of both item A and B.
+
+	Item A and item B are at the same x-level.
+
+	Item B is selected.
+
+	If the function is told to traverse up, it will select item A, even though item C has a shorter y-distance to
+	item B.
+
+	This is because item B has a higher x-distance than item A (item A has 0 x-distance!).
+
+	So, the algorithm favors items with as small x-distance as possible, and if several items have the same (smallest)
+	x-distance, it favors the one with the smallest y-distance of those items.
+
+	If there is no item to the up or down of the selected item, nothing happens.
+	"""
 	# First, we want to get the selected item and fill up a list of possible items to traverse to.
 	selected_item = get_selected_item(list_of_menus)
 	list_of_possible = fill_list_of_possible(list_of_menus)
