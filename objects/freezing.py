@@ -15,6 +15,10 @@ class Freezing(effect.Effect):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/effect/freezing.png")
 
+	# Initialize the mixer (so we can load a sound) and load the sound effect.
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effect = pygame.mixer.Sound("res/sounds/freezing.ogg")
+
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
@@ -54,6 +58,7 @@ class Freezing(effect.Effect):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
 		if not self.parent.owner == hit_paddle.owner:
 			Freezing(hit_paddle, Freezing.paddle_freezing_duration)
+			Freezing.sound_effect.play()
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.

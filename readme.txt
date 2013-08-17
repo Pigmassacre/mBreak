@@ -25,6 +25,8 @@ LICENSES AND LEGAL STUFF:
 For now, the mBreak source is considered "All Rights Reserved".
 I am strongly considering open-sourcing it soon, however.
 
+Below are the things that I haven't made myself. Everything else except these things I have made myself.
+
 The title screen music is sexxxy_bit_3!!!.xm, made by Drozerix. I got it from
 http://modarchive.org/index.php?request=view_by_moduleid&query=173084 which states that the song has a "Public Domain" license.
 The public domain license can be read here: http://creativecommons.org/licenses/publicdomain/
@@ -41,6 +43,14 @@ IN NO WAY DO I CLAIM THAT I MADE, OWN OR IN ANY WAY CONTRIBUTED TO THESE SONGS. 
 VERY glad that they are released with such liberal licenses, allowing me to use them in mBreak.
 
 Seriously, go check out more of Drozerix stuff, he has a ton of good chiptunes.
+
+All sound effects except freezing.ogg made using www.bfxr.net.
+The Bfxr website states: "You have full rights to all sounds made with bfxr, and are free to use them for commercial purposes."
+The website is available at http://www.bfxr.net/
+
+freezing.ogg is taken from http://www.soundjay.com/ice-sound-effect.html.
+The soundjay license (which is available here: http://www.soundjay.com/tos.html) states:
+"You are allowed to use the sounds free of charge and royalty free in your projects (such as films, videos, games, presentations, animations, stage plays, radio plays, audio books, apps) be it for commercial or non-commercial purposes."
 
 mBreak uses the animation library "Pyganim" made by Al Sweigart for animating the mBreak logo in the game. The actual logo graphics
 were made by myself, but the code used for animating it is all Pyganim.

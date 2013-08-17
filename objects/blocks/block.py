@@ -80,7 +80,7 @@ class Block(pygame.sprite.Sprite):
 			self.kill()
 			self.shadow.kill()
 			for effect in self.effect_group:
-				effect.kill()
+				effect.destroy()
 
 			# Play a sound effect.
 			Block.sound_effect.play()

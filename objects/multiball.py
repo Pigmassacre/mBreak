@@ -64,9 +64,10 @@ class Multiball(powerup.Powerup):
 			# Add all the players effects to the ball.
 			#temp_effect = None
 			for effect in entity.owner.effect_group:
-				# Add this effect to the ball.
+				# Add this effect to the ball. Make sure we don't spread the charged effect.
 				# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
-				effect.__class__(temp_ball, effect.duration - effect.time_passed)
+				if effect.__class__ != charged.Charged:
+					effect.__class__(temp_ball, effect.duration - effect.time_passed)
 
 			# Create a timeout effect which is added to the ball.
 			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)

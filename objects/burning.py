@@ -16,6 +16,10 @@ class Burning(effect.Effect):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/effect/burning.png")
 
+	# Initialize the mixer (so we can load a sound) and load the sound effect.
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effect = pygame.mixer.Sound("res/sounds/burning.ogg")
+
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
@@ -38,6 +42,9 @@ class Burning(effect.Effect):
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
+
+		# Play the sound effect.
+		Burning.sound_effect.play()
 
 		# If the parent is subclass of block, show an effect on top of the block.
 		if issubclass(self.parent.__class__, block.Block):

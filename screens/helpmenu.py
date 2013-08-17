@@ -10,6 +10,7 @@ import objects.powerup as powerup
 import objects.burning as burning
 import objects.freezing as freezing
 import objects.multiball as multiball
+import objects.charged as charged
 import objects.blocks.weak as weakblock
 import objects.blocks.normal as normalblock
 import objects.blocks.strong as strongblock
@@ -65,7 +66,7 @@ class HelpMenu:
 		self.all_menus = []
 
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
-		self.help_menu = gridmenu.GridMenu(7)
+		self.help_menu = gridmenu.GridMenu(8)
 		self.all_menus.append(self.help_menu)
 
 		# We setup and add all the necessary items to the help_menu.
@@ -107,6 +108,11 @@ class HelpMenu:
 		self.transition_method[temp_item] = self.setup_multiball_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
 
+		temp_item = imageitem.ImageItem("res/powerup/electricity.png")
+		self.info_about[temp_item] = self.show_electricity_info
+		self.transition_method[temp_item] = self.setup_electricity_info_transitions
+		self.help_menu.add(temp_item, self.view_info)
+
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 		self.help_menu.y = 9 * settings.GAME_SCALE
 
@@ -139,6 +145,7 @@ class HelpMenu:
 		self.setup_frost_info()
 		self.setup_doublespeed_info()
 		self.setup_multiball_info()
+		self.setup_electricity_info()
 
 		# Set the first item as the active information.
 		self.view_info(first_item)
@@ -624,6 +631,57 @@ class HelpMenu:
 		
 	def show_multiball_info(self, surface):
 		for info_text in self.multiball_info_texts:
+			info_text.draw(surface)
+
+	def setup_electricity_info(self):
+		self.electricity_info_texts = []
+
+		self.electricity_info_title_text = textitem.TextItem("Electricity", pygame.Color(255, 255, 255))
+		self.electricity_info_title_text.set_size(self.font_size)
+		self.electricity_info_title_text.x = (settings.SCREEN_WIDTH - self.electricity_info_title_text.get_width()) / 2
+		self.electricity_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.electricity_info_title_text.get_height()
+		self.electricity_info_texts.append(self.electricity_info_title_text)
+
+		self.electricity_info_text_1 = textitem.TextItem("This powerup makes the ball that touches it", pygame.Color(150, 150, 150))
+		self.electricity_info_text_1.set_size(self.font_size)
+		self.electricity_info_text_1.x = self.distance_from_screen_edge
+		self.electricity_info_text_1.y = self.electricity_info_title_text.y + (2 * self.electricity_info_text_1.get_height())
+		self.electricity_info_texts.append(self.electricity_info_text_1)
+
+		self.electricity_info_text_2 = textitem.TextItem("electrified for " + str(charged.Charged.duration / 1000) + " seconds", pygame.Color(255, 255, 255))
+		self.electricity_info_text_2.set_size(self.font_size)
+		self.electricity_info_text_2.x = self.distance_from_screen_edge
+		self.electricity_info_text_2.y = self.electricity_info_text_1.y + self.electricity_info_text_2.get_height()
+		self.electricity_info_texts.append(self.electricity_info_text_2)
+
+		self.electricity_info_text_3 = textitem.TextItem("When an electrified ball hits an enemy block", pygame.Color(150, 150, 150))
+		self.electricity_info_text_3.set_size(self.font_size)
+		self.electricity_info_text_3.x = self.distance_from_screen_edge
+		self.electricity_info_text_3.y = self.electricity_info_text_2.y + (2 * self.electricity_info_text_3.get_height())
+		self.electricity_info_texts.append(self.electricity_info_text_3)
+
+		self.electricity_info_text_4 = textitem.TextItem("that block and blocks around it takes damage", pygame.Color(255, 255, 255))
+		self.electricity_info_text_4.set_size(self.font_size)
+		self.electricity_info_text_4.x = self.distance_from_screen_edge
+		self.electricity_info_text_4.y = self.electricity_info_text_3.y + self.electricity_info_text_4.get_height()
+		self.electricity_info_texts.append(self.electricity_info_text_4)
+
+		self.electricity_info_text_5 = textitem.TextItem("After that the effect disappears", pygame.Color(150, 150, 150))
+		self.electricity_info_text_5.set_size(self.font_size)
+		self.electricity_info_text_5.x = self.distance_from_screen_edge
+		self.electricity_info_text_5.y = self.electricity_info_text_4.y + self.electricity_info_text_5.get_height()
+		self.electricity_info_texts.append(self.electricity_info_text_5)
+
+	def setup_electricity_info_transitions(self):
+		self.transitions.setup_single_item_transition(self.electricity_info_title_text, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.electricity_info_text_1, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.electricity_info_text_2, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.electricity_info_text_3, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.electricity_info_text_4, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.electricity_info_text_5, True, True, False, False)
+		
+	def show_electricity_info(self, surface):
+		for info_text in self.electricity_info_texts:
 			info_text.draw(surface)
 
 	def back(self, item):

@@ -80,7 +80,7 @@ class AboutMenu:
 		self.music_credits_game_author.x = (settings.SCREEN_WIDTH - self.music_credits_game_author.get_width()) / 2
 		self.music_credits_game_author.y = self.music_credits_game.y + self.music_credits_game_author.get_height()
 
-		self.sound_effect_credits = textitem.TextItem("Sound effects made using bfxr")
+		self.sound_effect_credits = textitem.TextItem("Sound effects mostly made using bfxr")
 		self.sound_effect_credits.set_size(font_size)
 		self.sound_effect_credits.x = (settings.SCREEN_WIDTH - self.sound_effect_credits.get_width()) / 2
 		self.sound_effect_credits.y = self.music_credits_game_author.y + (2 * self.sound_effect_credits.get_height())
