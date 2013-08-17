@@ -6,7 +6,6 @@ import pygame
 import objects.groups as groups
 import objects.ball as ball
 import objects.powerup as powerup
-import objects.timeout as timeout
 from pygame.locals import *
 import settings.settings as settings
 
@@ -62,7 +61,7 @@ class Player(pygame.sprite.Sprite):
 		self.powerup_group.empty()
 		self.effect_group.empty()
 		
-	def add_powerup(self, classname, duration):
+	def add_powerup(self, classname, effect):
 		# Determine what position to place the powerup at.
 		if self.x <= settings.SCREEN_WIDTH / 2:
 			# If position is on the left half of the screen, place the powerup after the item with the highest x value in the powerup group.
@@ -81,9 +80,9 @@ class Player(pygame.sprite.Sprite):
 			x = min_x
 			y = self.y
 
-		# Stores a powerup in our powerup group, and adds a timeout to it so it only exists for the given duration.
+		# Stores a powerup in our powerup group, and connects it to the effect so the powerup can be killed when the effect is killed.
 		temp_powerup = classname(x, y)
-		timeout.Timeout(temp_powerup, duration)
+		effect.displayed_powerups.append(temp_powerup)
 		self.powerup_group.add(temp_powerup)
 
 		# Change the last_powerup_group_size to match the current size of the group.

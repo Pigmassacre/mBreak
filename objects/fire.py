@@ -7,6 +7,7 @@ import random
 import math
 import other.useful as useful
 import objects.powerup as powerup
+import objects.timeout as timeout
 import objects.burning as burning
 import objects.timeout as timeout
 import objects.shadow as shadow
@@ -45,24 +46,29 @@ class Fire(powerup.Powerup):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
-		if settings.DEBUG_MODE:
-			print("Fire spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
-
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 		
-		# Add the effect to all the balls of the entity owner.
+		# Add the effect to all the balls of the entity owner. However, if the ball has timeout, make sure it cannot use that balls effect as
+		# the effect to connect to the displayed powerup.
 		for ball in entity.owner.ball_group:
-			# Create a burning effect to be added to the ball.
-			burning_effect = burning.Burning(ball)
+			has_timeout = False
+			for effect in ball.effect_group:
+				if effect.__class__ == timeout.Timeout:
+					burning.Burning(ball)
+					has_timeout = True
+					break
+			if not has_timeout:
+				# Create a burning effect to be added to the ball.
+				burning_effect = burning.Burning(ball)
 			
 		# Add this effect to the owner of the ball.
 		entity.owner.effect_group.add(burning_effect)
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(Fire, burning_effect.duration)
+		entity.owner.add_powerup(Fire, burning_effect)
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.

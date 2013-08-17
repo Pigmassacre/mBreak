@@ -29,6 +29,10 @@ class Effect(pygame.sprite.Sprite):
 
 		# We store self in the parents effect_group.
 		self.parent.effect_group.add(self)
+
+		# If we want, we can connect powerups to this effect that is killed when this effect is killed. Primarily used to 
+		# connect the powerups that are displayed on the player.
+		self.displayed_powerups = []
 		
 		# Store self in the main effect_group.
 		groups.Groups.effect_group.add(self)
@@ -46,19 +50,27 @@ class Effect(pygame.sprite.Sprite):
 		pass
 
 	def update(self, main_clock):
+		# Update the position of this effect, so it follows its parent.
 		self.rect.x = self.parent.rect.x + ((self.parent.rect.width - self.rect.width) / 2)
 		self.rect.y = self.parent.rect.y + ((self.parent.rect.height - self.rect.height) / 2)
 
 		self.time_passed += main_clock.get_time()
-
 		if self.time_passed >= self.duration:
-			self.kill()
-			self.on_kill()
+			self.destroy()
 
 	def draw(self, surface):
 		# If the image exists, we blit it to the surface.
 		if not self.image == None:
 			surface.blit(self.image, self.rect)
+
+	def destroy(self):
+		self.kill()
+
+		# Destroy all powerups that are connected to this effect.
+		for powerup in self.displayed_powerups:
+			powerup.destroy(False)
+
+		self.on_kill()
 
 	def on_kill(self):
 		pass

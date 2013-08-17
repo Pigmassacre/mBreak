@@ -43,15 +43,12 @@ class Powerup(pygame.sprite.Sprite):
 	def hit(self, entity):
 		self.destroy()
 
-		if settings.DEBUG_MODE:
-			print("Powerup hit!")
-
 	def destroy(self, play_sound = True):
 		self.kill()
 
 		# Destroy all effects attached to this powerup.
 		for effect in self.effect_group:
-			effect.kill()
+			effect.destroy()
 
 		# Play a random sound from the sound_effects list.
 		if play_sound:

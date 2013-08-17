@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import random
 import math
+import copy
 import other.useful as useful
 import objects.powerup as powerup
 import objects.shadow as shadow
@@ -42,9 +43,6 @@ class Multiball(powerup.Powerup):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
-		if settings.DEBUG_MODE:
-			print("Multiball spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
-
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
@@ -64,14 +62,14 @@ class Multiball(powerup.Powerup):
 			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, entity.owner)
 
 			# Add all the players effects to the ball.
-			temp_effect = None
+			#temp_effect = None
 			for effect in entity.owner.effect_group:
 				# Add this effect to the ball.
 				# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
-				temp_effect = effect.__class__(temp_ball, effect.duration - effect.time_passed)
+				effect.__class__(temp_ball, effect.duration - effect.time_passed)
 
 			# Create a timeout effect which is added to the ball.
-			timeout.Timeout(temp_ball, Multiball.duration)
+			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(Multiball, Multiball.duration)
+		entity.owner.add_powerup(Multiball, timeout_effect)

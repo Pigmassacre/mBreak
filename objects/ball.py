@@ -95,7 +95,7 @@ class Ball(pygame.sprite.Sprite):
 		self.kill()
 		self.shadow.kill()
 		for effect in self.effect_group:
-			effect.kill()
+			effect.destroy()
 
 	def update(self, main_clock):
 		self.collided = False
