@@ -4,24 +4,14 @@ __license__ = "All Rights Reserved"
 import pygame
 from pygame.locals import *
 
-# This function can take either a list of menus or a single menu as an argument.
-# It functions the same regardless, it just handles them both correctly.
 def traverse_menus(event, list_of_menus):
 	if event.type == KEYDOWN and event.key == K_RETURN:
-		# We check if the list_of_menus actually is a list or not.
-		if isinstance(list_of_menus, list):
-			# If it is a list, check through all menus in the list.
-			for a_menu in list_of_menus:
-				for item in a_menu.items:
-					# And for the first selected item we find, we call the matching function.
-					if item.selected:
-						a_menu.functions[item](item)
-		else:
-			# If it isn't a list, we assume it's just a simple menu. 
-			for item in list_of_menus.items:
+		# If it is a list, check through all menus in the list.
+		for a_menu in list_of_menus:
+			for item in a_menu.items:
 				# And for the first selected item we find, we call the matching function.
 				if item.selected:
-					list_of_menus.functions[item](item)
+					a_menu.functions[item](item)
 	elif event.type == KEYDOWN and event.key == K_LEFT:
 		# We try to traverse the menu to the left.
 		select_left_or_right(list_of_menus, True)
@@ -51,11 +41,8 @@ def select_left_or_right(list_of_menus, left):
 	# Find out if there if any of the possible items are in the same menu as the selected item. If they are
 	# we only care about those items.
 	same_menu_items = list(list_of_possible)
-	if isinstance(list_of_menus, list):
-		for a_menu in list_of_menus:
-			same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
-	else:
-		same_menu_items = filter(lambda x: x in list_of_menus.items, same_menu_items)
+	for a_menu in list_of_menus:
+		same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
 
 	# If there are any items left, we want to retain the item which has the least y-difference AND least x-difference.
 	if len(list_of_possible) > 0:
@@ -101,11 +88,8 @@ def select_up_or_down(list_of_menus, up):
 	# Find out if there if any of the possible items are in the same menu as the selected item. If they are
 	# we only care about those items.
 	same_menu_items = list(list_of_possible)
-	if isinstance(list_of_menus, list):
-		for a_menu in list_of_menus:
-			same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
-	else:
-		same_menu_items = filter(lambda x: x in list_of_menus.items, same_menu_items)
+	for a_menu in list_of_menus:
+		same_menu_items = filter(lambda x: x in a_menu.items, same_menu_items)
 
 	if len(list_of_possible) > 0:
 		if len(same_menu_items) == 0:
@@ -135,24 +119,22 @@ def select_up_or_down(list_of_menus, up):
 		selected_item.selected = False
 		list_of_possible[0].selected = True
 
+
 def get_selected_item(list_of_menus):
-	if isinstance(list_of_menus, list):
-		for a_menu in list_of_menus:
-			for item in a_menu.items:
-				if item.selected:
-					return item
-	else:
-		for item in list_of_menus.items:
+	"""
+	Returns the first selected item in the given list_of_menus.
+	"""
+	for a_menu in list_of_menus:
+		for item in a_menu.items:
 			if item.selected:
 				return item
 
 def fill_list_of_possible(list_of_menus):
+	"""
+	Returns a list that contains all the items in all the menus in list_of_menus.
+	"""
 	list_of_possible = []
-	if isinstance(list_of_menus, list):
-		for a_menu in list_of_menus:
-			for item in a_menu.items:
-				list_of_possible.append(item)
-	else:
-		for item in list_of_menus.items:
+	for a_menu in list_of_menus:
+		for item in a_menu.items:
 			list_of_possible.append(item)
 	return list_of_possible

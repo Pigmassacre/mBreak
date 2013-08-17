@@ -209,28 +209,8 @@ class MainMenu:
 						sys.exit()
 						pygame.quit()
 				else:
-					traversal.traverse_menus(event, self.active_menu[-1])
-					"""
-				elif event.type == KEYDOWN and event.key == K_RETURN:
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
-					for item in self.active_menu[-1].items:
-						if item.selected:
-							self.active_menu[-1].functions[item](item)
-							break
-				elif event.type == KEYDOWN and event.key == K_UP:
-					for item in self.active_menu[-1].items:
-						if item.selected:
-							if self.active_menu[-1].items.index(item) - 1 >= 0:
-								self.active_menu[-1].items[self.active_menu[-1].items.index(item) - 1].selected = True
-								item.selected = False
-								break
-				elif event.type == KEYDOWN and event.key == K_DOWN:
-					for item in self.active_menu[-1].items:
-						if item.selected:
-							if self.active_menu[-1].items.index(item) + 1 <= len(self.active_menu[-1].items) - 1:
-								self.active_menu[-1].items[self.active_menu[-1].items.index(item) + 1].selected = True
-								item.selected = False
-								break"""
+					# The traverse menus function wants a list of menus, so we simply give it a list of one menu!
+					traversal.traverse_menus(event, [self.active_menu[-1]])
 
 			# Move the logo to the desired position.
 			self.show_logo()
