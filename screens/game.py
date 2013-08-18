@@ -27,7 +27,7 @@ import settings.graphics as graphics
 import screens.background as background
 import screens.level as level
 
-# Import any needed game screens here.
+# We import any needed game screens here.
 import screens.gameover as gameover
 import screens.matchover as matchover
 import screens.countdown as countdown
@@ -100,7 +100,7 @@ class Game:
 		self.powerup_increase_spawn_rate = 4000
 
 		# This is the amount that all the spawn chances will increase by every powerup_increase_spawn_rate.
-		self.powerup_spawn_chance_increase = 0.02
+		self.powerup_spawn_chance_increase = 0.03
 
 		# The chance that a powerup will spawn when it should spawn.
 		self.powerup_spawn_chance = 0.3

@@ -83,7 +83,7 @@ LICENSES AND LEGAL STUFF:
 ################################################################################
 
 For now, the mBreak source is considered "All Rights Reserved".
-I am strongly considering open-sourcing it soon, however.
+I am strongly considering open-sourcing it soon, however. :)
 
 Below are the things that I haven't made myself.
 
