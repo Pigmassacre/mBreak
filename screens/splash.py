@@ -10,6 +10,7 @@ import other.useful as useful
 import gui.textitem as texitem
 import gui.logo as logo
 import settings.settings as settings
+import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens.intromenu as intromenu
@@ -97,6 +98,6 @@ class Splash:
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(settings.MAX_FPS)
+			self.main_clock.tick(graphics.MAX_FPS)
 
 		intromenu.IntroMenu(self.window_surface, self.main_clock)

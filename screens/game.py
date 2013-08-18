@@ -165,7 +165,7 @@ class Game:
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(settings.MAX_FPS)
+			self.main_clock.tick(graphics.MAX_FPS)
 
 		self.on_exit()
 

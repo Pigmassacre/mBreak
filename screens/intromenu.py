@@ -11,6 +11,7 @@ import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
 import settings.settings as settings
+import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens.mainmenu as mainmenu
@@ -100,7 +101,7 @@ class IntroMenu:
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(settings.MAX_FPS)
+			self.main_clock.tick(graphics.MAX_FPS)
 
 		# We're done, so continue to the main menu.
 		mainmenu.MainMenu(self.window_surface, self.main_clock, self.title_logo)

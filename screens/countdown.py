@@ -13,6 +13,7 @@ import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
 import settings.settings as settings
+import settings.graphics as graphics
 
 class Countdown:
 

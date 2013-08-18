@@ -3,7 +3,9 @@ import os
 import shutil
 
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-GAME_SCALE = 2
+# I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
+# whatever you want, of course.
+GAME_SCALE = 3
 
 # Screen width and height is the game window width and height.
 SCREEN_WIDTH = int(285 * GAME_SCALE)
@@ -20,7 +22,6 @@ LEVEL_MAX_Y = LEVEL_Y + LEVEL_HEIGHT
 WINDOW_CAPTION = "mBreak"
 BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (200, 200, 200)
-MAX_FPS = 60
 
 # Music settings
 TITLE_MUSIC = "res/music/sexxxy_bit_3!!!.xm"
@@ -42,7 +43,7 @@ DEBUG_MODE = True
 DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
 
 def load():
-	# Tries to load the player names from settings.txt.
+	# Tries to load the settings from settings.txt.
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
@@ -84,7 +85,7 @@ def load():
 		file.close()
 			
 def save():
-	# Tries to save the player names to settings.txt.
+	# Tries to save the settings to settings.txt.
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME

@@ -14,6 +14,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
+import settings.graphics as graphics
 
 # Import any needed game screens here.
 import screens
@@ -97,7 +98,7 @@ class PauseMenu:
 			pygame.display.update()
 			
 			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(settings.MAX_FPS)
+			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
