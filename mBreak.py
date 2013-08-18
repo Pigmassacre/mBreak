@@ -24,8 +24,14 @@ def main():
 	settings.load()
 	graphics.load()
 
+	# Display modes, these are by standard double buffering (for perfomance reasons) and hardware acceleration (works if fullscreen is enabled).
+	if graphics.FULLSCREEN:
+		display_modes = DOUBLEBUF | HWSURFACE | FULLSCREEN
+	else:
+		display_modes = DOUBLEBUF | HWSURFACE
+
 	# Setup the window surface to be used.
-	window_surface = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), DOUBLEBUF | HWSURFACE)
+	window_surface = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), display_modes)
 	
 	# Set the allowed events so we don't have to check for events that we don't listen to anyway.
 	pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])

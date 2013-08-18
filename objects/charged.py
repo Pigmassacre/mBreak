@@ -21,7 +21,7 @@ class Charged(effect.Effect):
 	damage_height = 16 * settings.GAME_SCALE
 	damage = 5
 	max_speed_reduction = 0.41 * settings.GAME_SCALE
-	particle_spawn_rate = 600
+	particle_spawn_rate = 450
 	particle_spawn_amount = 5
 	duration = 10000
 
@@ -44,7 +44,7 @@ class Charged(effect.Effect):
 		if hit_block.owner != self.parent.owner:
 			# Makes it so that we only play the sound effect once.
 			already_played_sound = False
-
+			self.spawn_particles(hit_block)
 			# Lets see if there are any additional blocks to damage.
 			for block in hit_block.owner.block_group:
 				# We check to see if any of their rects collide with damage_rect.
@@ -76,7 +76,7 @@ class Charged(effect.Effect):
 
 			# Spawn a random amount of particles.
 			self.spawn_particles(self)
-
+			
 	def spawn_particles(self, entity):
 		for _ in range(0, random.randrange(2, Charged.particle_spawn_amount)):
 			angle = random.uniform(0, 2 * math.pi)
@@ -84,4 +84,5 @@ class Charged(effect.Effect):
 			retardation = speed / 46.0
 			random_value = random.randint(225, 255)
 			color = pygame.Color(random_value, random_value, random.randint(0, 100))
-			particle.Particle(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2, self.rect.width / 3, self.rect.width / 3, angle, speed, retardation, color, 20)
+			random_size = random.randint(self.rect.width / 4, self.rect.width / 3)
+			particle.Particle(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2, random_size, random_size, angle, speed, retardation, color, 20)

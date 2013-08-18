@@ -5,6 +5,7 @@ SHADOWS = True
 PARTICLES = True
 TRACES = True
 BACKGROUND = True
+FULLSCREEN = False
 
 def load():
 	# Tries to load the graphics options from settings.txt.
@@ -12,6 +13,7 @@ def load():
 	global PARTICLES
 	global TRACES
 	global BACKGROUND
+	global FULLSCREEN
 
 	# Open and read the settings file line by line.
 	file = open("settings.txt", "r")
@@ -25,6 +27,8 @@ def load():
 				TRACES = bool(int(line.strip("traces").strip()))
 			elif "background" in line:
 				BACKGROUND = bool(int(line.strip("background").strip()))
+			elif "fullscreen" in line:
+				FULLSCREEN = bool(int(line.strip("fullscreen").strip()))
 	finally:
 		file.close()
 			
@@ -34,6 +38,7 @@ def save():
 	global PARTICLES
 	global TRACES
 	global BACKGROUND
+	global FULLSCREEN
 
 	# We use a temporary file to write to, so we don't corrupt our old file if the process fails.
 	temp_file = open("settings.txt.tmp", "w")
@@ -50,6 +55,8 @@ def save():
 				temp_file.write(line.replace(line.strip("traces").strip(), str(int(TRACES))))
 			elif "background" in line:
 				temp_file.write(line.replace(line.strip("background").strip(), str(int(BACKGROUND))))
+			elif "fullscreen" in line:
+				temp_file.write(line.replace(line.strip("fullscreen").strip(), str(int(FULLSCREEN))))
 			else:
 				temp_file.write(line)
 	finally:		

@@ -243,11 +243,11 @@ class Game:
 
 	def create_ball_left(self):
 		for paddle in self.player_one.paddle_group:
-			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), 0, self.player_one)
+			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), -math.pi / 8, self.player_one)
 
 	def create_ball_right(self):
 		for paddle in self.player_two.paddle_group:
-			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi, self.player_two)
+			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi / 8, self.player_two)
 
 	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.

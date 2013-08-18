@@ -56,7 +56,7 @@ class HelpMenu:
 		# This is a dictionary that contains information linked to certain imageitems.
 		self.info_about = {}
 
-		# This is a dictionary that maps transitions methods to certain imageitems.
+		# This is a dictionary that maps transitions methods to all all items.
 		self.transition_method = {}
 
 		# This contains the currently active function that displays the currently active information.
@@ -204,7 +204,7 @@ class HelpMenu:
 		self.start_info_title_text = textitem.TextItem("Starting the Game", pygame.Color(255, 255, 255))
 		self.start_info_title_text.set_size(self.font_size)
 		self.start_info_title_text.x = (settings.SCREEN_WIDTH - self.start_info_title_text.get_width()) / 2
-		self.start_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.start_info_title_text.get_height()
+		self.start_info_title_text.y = self.help_menu.y + self.help_menu.get_height() + self.start_info_title_text.get_height()
 		self.start_info_texts.append(self.start_info_title_text)
 
 		self.start_info_text_1 = textitem.TextItem("In order to start the game navigate to the start", pygame.Color(150, 150, 150))

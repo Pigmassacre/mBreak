@@ -53,11 +53,11 @@ class Multiball(powerup.Powerup):
 			if paddle.x < (settings.SCREEN_WIDTH / 2):
 				# If the paddle is on the left side, spawn ball on the right side of the paddle. 
 				x = paddle.x + paddle.width + 1
-				angle = 0
+				angle = -math.pi / 8
 			else:
 				# Otherwise spawn on the left side of the paddle.
 				x = paddle.x - paddle.width - 1
-				angle = math.pi
+				angle = math.pi / 8
 
 			# Create a ball and store it temporarily.
 			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, entity.owner)

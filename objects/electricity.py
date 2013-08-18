@@ -24,7 +24,7 @@ class Electricity(powerup.Powerup):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	particle_spawn_rate = 700
+	particle_spawn_rate = 550
 	particle_spawn_amount = 5
 
 	# Scale image to settings.GAME_SCALE.
@@ -74,4 +74,5 @@ class Electricity(powerup.Powerup):
 				retardation = speed / 46.0
 				random_value = random.randint(225, 255)
 				color = pygame.Color(random_value, random_value, random.randint(0, 100))
-				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 8, self.rect.width / 8, angle, speed, retardation, color, 20)
+				random_size = random.randint(self.rect.width / 8, self.rect.width / 6)
+				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, random_size, random_size, angle, speed, retardation, color, 20)

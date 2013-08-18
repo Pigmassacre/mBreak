@@ -59,8 +59,7 @@ class PauseMenu:
 		self.done = True
 
 	def maybe_quit(self, item):
-		# We call cleanup before we setup the transitions so that we cannot force the pause menu items to be in weird positions (it's an annoying bug).
-		self.pause_menu.cleanup()
+		# Setup the transitions so that if we return to the pause menu the items will transition.
 		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
 		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
