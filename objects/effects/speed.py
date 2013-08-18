@@ -1,11 +1,18 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
-import objects.effect as effect
+import objects.effects.effect as effect
 import settings.settings as settings
+
+"""
+
+This is the speed effect. It will call the update method of whatever entity it has set as parent. Since all "game objects"
+in the game has pygame.sprite.Sprite as it's base class, we can be sure that the update method always exists on whatever object
+we have set as parent. Well, if we make sure to only apply the speed effect to game objects, that is...
+
+"""
 
 class Speed(effect.Effect):
 

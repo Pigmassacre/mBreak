@@ -4,16 +4,22 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
-import other.useful as useful
 import settings.settings as settings
 import settings.graphics as graphics
 
-# Import any needed game screens here.
+# We start the splash screen after everything is setup, so we import it here.
 import screens.splash as splash
 
-def main():
-	""" The following parts are the ones that run first when booting up the game. """
+"""
 
+This is the module to run when you want to start the game. It takes care of loading the settings, creating a clock object,
+creating a window_surface and other such stuff.
+
+When everything is setup, it starts the splash screen.
+
+"""
+
+def main():
 	# Initiates the PyGame module.
 	pygame.init()
 
@@ -39,7 +45,7 @@ def main():
 	# Set the window caption.
 	pygame.display.set_caption(settings.WINDOW_CAPTION)
 
-	# Start the intro menu.
+	# Start the splash screen.
 	splash.Splash(window_surface, main_clock)
 
 # Start the game!

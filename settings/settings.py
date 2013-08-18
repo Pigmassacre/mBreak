@@ -2,6 +2,17 @@ import pygame.locals
 import os
 import shutil
 
+"""
+
+Contains various settings for the game. Some of these can be changed in settings.txt.
+
+Load, when called, will try to load the settings.txt file and read the settings from it and save those so the game
+can use them.
+
+Save on the other hand, will take the current values of the variables and try to save them to settings.txt
+
+"""
+
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.

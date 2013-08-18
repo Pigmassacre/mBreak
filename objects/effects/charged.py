@@ -1,15 +1,21 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import math
 import random
 import objects.groups as groups
-import objects.effect as effect
+import objects.effects.effect as effect
 import objects.blocks.block as block
 import objects.particle as particle
 import settings.settings as settings
+
+"""
+
+This is the "Charged" effect. When a ball carrying this effect hits an enemy block, that block and blocks around it take some extra damage.
+The effect is then destroyed.
+
+"""
 
 class Charged(effect.Effect):
 
@@ -42,9 +48,12 @@ class Charged(effect.Effect):
 	def on_hit_block(self, hit_block):
 		# If the hit block isn't one of the parents owners blocks...
 		if hit_block.owner != self.parent.owner:
-			# Makes it so that we only play the sound effect once.
+			# This makes it so that we only play the sound effect once.
 			already_played_sound = False
+
+			# We spawn a few extra particles for extra effect!
 			self.spawn_particles(hit_block)
+
 			# Lets see if there are any additional blocks to damage.
 			for block in hit_block.owner.block_group:
 				# We check to see if any of their rects collide with damage_rect.
@@ -78,6 +87,7 @@ class Charged(effect.Effect):
 			self.spawn_particles(self)
 			
 	def spawn_particles(self, entity):
+		# Spawns a few particles with random color, angle, speed and so on.
 		for _ in range(0, random.randrange(2, Charged.particle_spawn_amount)):
 			angle = random.uniform(0, 2 * math.pi)
 			speed = random.uniform(0.9 * settings.GAME_SCALE, 1.4 * settings.GAME_SCALE)

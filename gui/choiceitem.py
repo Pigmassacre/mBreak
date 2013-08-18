@@ -2,12 +2,18 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import math
 import copy
-import other.useful as useful
 import objects.shadow as shadow
-import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is an item that, much like the other items, can be displayed on its on or added to a menu. It can be selected and / or chosen, much
+like the other items. The thing about this item is that a font item is displayed in the middle of this item.
+
+This is used for allowing the players to select the amount of rounds the want to play.
+
+"""
 
 class ChoiceItem():
 
@@ -74,6 +80,7 @@ class ChoiceItem():
 		return self.rect.height
 
 	def draw(self, surface):
+		# Update the position of the rects.
 		self.rect.x = self.x
 		self.rect.y = self.y
 		self.selected_rect.x = self.x - (ChoiceItem.selected_border_size / 2.0)
@@ -83,13 +90,19 @@ class ChoiceItem():
 		self.shadow_rect.x = self.x + self.shadow_offset_x
 		self.shadow_rect.y = self.y + self.shadow_offset_y
 
+		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)
+
+		# Draw the color of the item.
 		surface.fill(self.color, self.rect)
 
 		if self.chosen:
+			# If the item is chosen, draw the chosen border.
 			surface.fill(self.chosen_border_color, self.chosen_rect)
 
 		if self.selected:
+			# If the item is selected, draw the selected border.
 			surface.fill(self.selected_border_color, self.selected_rect)
 
+		# Draw the font surface in the middle of this item.
 		surface.blit(self.font_surface, ((self.rect.x + (self.rect.width - self.font_surface.get_width()) / 2), self.rect.y + (self.rect.height - self.font_surface.get_height()) / 2))

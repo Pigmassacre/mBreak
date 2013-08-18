@@ -1,18 +1,31 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
 import math
 
+"""
+
+This module contains a few useful methods to deal with colors.
+
+"""
+
 def tint_surface(surface):
+	"""
+	Given a surface, returns the same surface tinted a bit darker.
+	"""
 	tint_color = pygame.Color(0, 0, 0, 200)
 	tint_surface = pygame.Surface((surface.get_width(), surface.get_height()), SRCALPHA)
 	tint_surface.fill(tint_color)
 	surface.blit(tint_surface, (0, 0))
 
-def blend_colors(old_color, blend_color, blend_alpha=False):
+def blend_colors(old_color, blend_color, blend_alpha = False):
+	"""
+	Given two colors, an old_color and a blend_color, this returns a new color that is the old_color blended
+	with the blend_color. If the optional blend_alpha parameter is set to True, the alpha value of both colors
+	is also blended.
+	"""
 	new_r = int(old_color.r * (blend_color.r / 255.0))
 	new_g = int(old_color.g * (blend_color.g / 255.0))
 	new_b = int(old_color.b * (blend_color.b / 255.0))
@@ -24,7 +37,11 @@ def blend_colors(old_color, blend_color, blend_alpha=False):
 
 	return pygame.Color(new_r, new_g, new_b, new_a)
 
-def colorize_image(image, new_color, blend_alpha=False):
+def colorize_image(image, new_color, blend_alpha = False):
+	"""
+	Given an image and a new_color, this method colors the image with the new_color.
+	If the optional parameter blend_alpha is True, the alpha value is blended too.
+	"""
 	# Unlock the surface so we can colorize it.
 	image.lock()
 

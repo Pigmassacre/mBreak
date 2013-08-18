@@ -1,16 +1,25 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
-from pygame.locals import *
+import pygame
 import gui.textitem as textitem
 import settings.settings as settings
 
+"""
+
+This class is a simple GUI-item that creates a textitem at a given (or default) position that can then be
+activated for a short duration by calling the start method. You must take care of drawing the toast yourself,
+but calling the update_and_draw method in your gameloop.
+
+"""
+
 class Toast:
 
+	# We default to positioning the toast in the top-left corner of the screen.
 	x = 0
 	y = 0
+
+	# Default color is red, since the toast is supposed to be a "warning" message.
 	text_color = pygame.Color(255, 0, 0)
 
 	def __init__(self, message, duration, main_clock):
@@ -23,7 +32,8 @@ class Toast:
 		# The toast is destroyed when time_passed equals duration.
 		self.duration = duration
 
-		# The toast keeps going until done is True.
+		# The toast keeps going until done is True. We start by setting done to True so the
+		# toast isn't shown.
 		self.done = True
 
 		# We load a TextItem to display the message.
@@ -39,6 +49,7 @@ class Toast:
 		return self.message.get_height()
 
 	def start(self):
+		# Essentially "resets" the toast.
 		self.done = False
 		self.time_passed = 0
 

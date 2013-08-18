@@ -4,16 +4,23 @@ __license__ = "All Rights Reserved"
 import pygame
 import random
 import math
-import other.useful as useful
-import objects.powerup as powerup
-import objects.charged as charged
+import objects.powerups.powerup as powerup
+import objects.effects.charged as charged
 import objects.shadow as shadow
 import objects.particle as particle
 import objects.ball as ball
 import objects.groups as groups
 import settings.settings as settings
 
+"""
+
+This is the Electricity effect. When picked up by a ball, it applies the "Charged" effect to that ball only.
+
+"""
+
 def convert():
+	# We put this here so the game-class can call this method to "preload" the image used for this powerup.
+	# I could probably put this in the constructor of the powerup, but I worry about performance so I make sure to only do it once.
 	Electricity.image.convert_alpha()
 
 class Electricity(powerup.Powerup):

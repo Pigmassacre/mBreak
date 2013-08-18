@@ -1,10 +1,16 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is the base class of all effects in the game. It takes care of alot of things, like updating the position of the effect
+and destroying the effect when the duration runs out. It also provides a few overridable methods.
+
+"""
 
 class Effect(pygame.sprite.Sprite):
 
@@ -56,6 +62,7 @@ class Effect(pygame.sprite.Sprite):
 
 		self.time_passed += main_clock.get_time()
 		if self.time_passed >= self.duration:
+			# When the duration runs out, we destroy ourselves.
 			self.destroy()
 
 	def draw(self, surface):

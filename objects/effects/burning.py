@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -7,9 +6,21 @@ import math
 import random
 import objects.blocks.block as block
 import objects.groups as groups
-import objects.effect as effect
+import objects.effects.effect as effect
 import objects.particle as particle
 import settings.settings as settings
+
+"""
+
+This is an effect that is applied by the Fire powerup. When applied to balls, those balls will spread the effect
+to enemy blocks (that is, enemies to the parent of the ball).
+
+When this effect is applied to a block, that block will take some damage per second. This only happens to entities
+that have the "health" attribute.
+
+This effect plays a sound effect when it is created.
+
+"""
 
 class Burning(effect.Effect):
 

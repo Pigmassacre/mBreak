@@ -2,12 +2,19 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import math
 import copy
-import other.useful as useful
 import objects.shadow as shadow
-import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is an item that, much like the other items, can be displayed by itself or added to a menu. This item can be
+selected and / or chosen, or unavailable. It displays differently depending on these values.
+
+The main point of this item is to allow the players to chose their own colors. An item of this type can be given
+any sort of color.
+
+"""
 
 class ColorItem():
 
@@ -59,6 +66,7 @@ class ColorItem():
 		return self.rect.height
 
 	def draw(self, surface):
+		# Updates the positions of the rects.
 		self.rect.x = self.x
 		self.rect.y = self.y
 		self.selected_rect.x = self.x - (ColorItem.selected_border_size / 2.0)
@@ -68,15 +76,20 @@ class ColorItem():
 		self.shadow_rect.x = self.x + self.shadow_offset_x
 		self.shadow_rect.y = self.y + self.shadow_offset_y
 
+		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)
 
 		if self.chosen:
+			# If we're chosen, draw the chosen border.
 			surface.fill(self.chosen_border_color, self.chosen_rect)
 
 		if self.selected:
+			# If we're selected, draw the selected border.
 			surface.fill(self.selected_border_color, self.selected_rect)
 
 		if self.unavailable:
+			# If we're unavailable, we draw the unavailable color.
 			surface.fill(self.unavailable_color, self.rect)
 		else:
+			# Otherwise, we draw our own color.
 			surface.fill(self.color, self.rect)

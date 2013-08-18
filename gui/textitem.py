@@ -6,6 +6,13 @@ import math
 import other.useful as useful
 import settings.settings as settings
 
+"""
+
+This is a class that is a pretty useful "wrapper" around pygame's font-module. It can be stored as an item in a menu,
+or simply used to display text. It has a quite a few extra surfaces and variables that allows it to function as a button in a menu.
+
+"""
+
 class TextItem:
 
 	# Initialize the font module.
@@ -27,13 +34,14 @@ class TextItem:
 	selected_on_color = pygame.Color(0, 255, 0)
 	off_color = pygame.Color(90, 0, 0)
 	selected_off_color = pygame.Color(255, 0, 0)
+
+	# This is the rate at which the textitem will blink if blink() is called once per frame.
 	blink_rate = 750
 
-	def __init__(self, text_value, font_color = pygame.Color(128, 128, 128), alpha_value = 255):
+	def __init__(self, text_value, font_color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y
-		self.font = TextItem.font
 		self.selected_font_color = TextItem.selected_color
 		self.selected = False
 		self.on_font_color = TextItem.on_color
@@ -43,11 +51,21 @@ class TextItem:
 		self.is_on_off = False
 		self.on = False
 		self.blink_rate = TextItem.blink_rate
+		self.font_size = TextItem.font_size
+		self.font_path = TextItem.font_path
 
 		# Set the given values.
 		self.text_value = text_value
 		self.font_color = font_color
 		self.alpha_value = alpha_value
+		self.size = size
+
+		# If no size was given, we default to the already loaded font object. If some size WAS given however,
+		# we load a new font object with the given size.
+		if self.size != None:
+			self.font = pygame.font.Font(self.font_path, self.size)
+		else:
+			self.font = TextItem.font
 
 		# Setup the shadow.
 		self.shadow_color = TextItem.shadow_color
@@ -104,7 +122,7 @@ class TextItem:
 		if not self.font_size == font_size:
 			temp_alpha = self.surface.get_alpha()
 			self.font_size = font_size
-			self.font = pygame.font.Font(self.font_path, self.font_size)
+			self.font = pygame.font.Font(self.font_path, font_size)
 			self.setup_surfaces()
 			if self.is_on_off:
 				self.setup_is_on_off(self.off_text_value, self.on)
@@ -116,10 +134,8 @@ class TextItem:
 		return self.font.size(self.text_value)[1]
 
 	def blink(self, time_passed):
-		"""
-		If called once per loop, switches the target surface alpha value between 255 and 0 every blink_rate.
-		The surface spends 2/3s of the time with alpha value 0 as with 255.
-		"""
+		# If called once per loop, switches the target surface alpha value between 255 and 0 every blink_rate.
+		# The surface spends 2/3s of the time with alpha value 0 as with 255.
 		if time_passed > self.blink_rate:
 			if self.surface.get_alpha() == 255:
 				self.surface.set_alpha(0)
@@ -130,6 +146,7 @@ class TextItem:
 				self.shadow_surface.set_alpha(255)
 				return 0
 		else:
+			# We return the time_passed so that the callers time_passed value can be updated.
 			return time_passed
 
 	def toggle_on_off(self):

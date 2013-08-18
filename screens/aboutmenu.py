@@ -13,19 +13,38 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
-
-# Import any needed game screens here.
 import screens
+
+"""
+
+An about menu, where credits are shown. Can be reached from the main menu.
+
+The only actions the user can take from here is to return to the main menu, which is done either with the ESCAPE key
+or the back button.
+
+NOTE!!!!
+
+For some reason, if you keep entering and leaving this menu (and the helpmenu) lots of times in a row, the game will crash
+with an "IOError: unable to read font filename". I haven't been able to fix this bug, and from what I understand it must
+have something to do with creating way too many font objects, and the garbage collector has no chance to keep up with
+destroying all objects. Or something. I really don't know, but luckily getting to this crash bug is a kind of inane process.
+
+I don't think anyone should ever go in and out of a menu repeatedly... But if they do, well, then I don't know what to do. :(
+
+This class can take an optional "menu_screen_instance" parameter, which if filled with a menu SCREEN instance, that menu screen instance
+will have its gameloop() method restarted when this screen ends.
+
+"""
 
 class AboutMenu:
 
-	def __init__(self, window_surface, main_clock, came_from_options = False):
+	def __init__(self, window_surface, main_clock, menu_screen_instance = None):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
-		# We also store wether or not we've come from the options menu in the main menu or not.
-		self.came_from_options = came_from_options
+		# If we've gotten a menu instance to return to, then save that.
+		self.menu_screen_instance = menu_screen_instance
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = screens.mainmenu.MainMenu
@@ -38,8 +57,10 @@ class AboutMenu:
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 
+		# We choose a smaller font size here for all the credits.
 		font_size = 6 * settings.GAME_SCALE
 
+		# Create and setup all the textitems.
 		self.pyganim_credits = textitem.TextItem("Pyganim is used for animating the mBreak logo")
 		self.pyganim_credits.set_size(font_size)
 		self.pyganim_credits.x = (settings.SCREEN_WIDTH - self.pyganim_credits.get_width()) / 2
@@ -80,7 +101,7 @@ class AboutMenu:
 		self.music_credits_game_author.x = (settings.SCREEN_WIDTH - self.music_credits_game_author.get_width()) / 2
 		self.music_credits_game_author.y = self.music_credits_game.y + self.music_credits_game_author.get_height()
 
-		self.sound_effect_credits = textitem.TextItem("Sound effects mostly made using bfxr")
+		self.sound_effect_credits = textitem.TextItem("Most sound effects made using bfxr")
 		self.sound_effect_credits.set_size(font_size)
 		self.sound_effect_credits.x = (settings.SCREEN_WIDTH - self.sound_effect_credits.get_width()) / 2
 		self.sound_effect_credits.y = self.music_credits_game_author.y + (2 * self.sound_effect_credits.get_height())
@@ -105,6 +126,7 @@ class AboutMenu:
 		self.made_by_info.x = (settings.SCREEN_WIDTH - self.made_by_info.get_width()) / 2
 		self.made_by_info.y = self.made_by_author.y - self.made_by_info.get_height()
 
+		# The scale of the left and right looking pigs at the bottom of the screen.
 		self.images_current_scale = 1 * settings.GAME_SCALE
 
 		self.image_left = pygame.image.load("res/splash/splash_bloody_left.png")
@@ -186,9 +208,11 @@ class AboutMenu:
 		# Handle all transitions.
 		self.transitions.update()
 
+		# Blit the two images to the window_surface, in the bottom left and bottom right of the screen.
 		self.window_surface.blit(self.image_left, (self.made_by_author.x - self.image_left.get_width() - self.made_by_author.get_height(), self.made_by_author.y - (self.image_left.get_height() / 2)))
 		self.window_surface.blit(self.image_right, (self.made_by_author.x + self.made_by_author.get_width() + self.made_by_author.get_height(), self.made_by_author.y - (self.image_left.get_height() / 2)))
 
+		# Draw all the textitems.
 		self.pyganim_credits.draw(self.window_surface)
 		self.pyganim_credits_author.draw(self.window_surface)
 		self.pyganim_credits_source_code.draw(self.window_surface)
@@ -205,6 +229,7 @@ class AboutMenu:
 
 		self.more_info_and_licenses.draw(self.window_surface)
 
+		# Update and draw the menus.
 		self.made_by_info.draw(self.window_surface)
 		self.made_by_author.draw(self.window_surface)
 
@@ -217,8 +242,11 @@ class AboutMenu:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.mainmenu.MainMenu:
-			# Start the mainmenu but make sure that we retain the menu history we had when we entered the help menu.
-			self.next_screen(self.window_surface, self.main_clock, None, self.came_from_options, self.__class__)
+			# If we have a main menu instance still going, then start that. Otherwise just start the main menu screen as normal.
+			if self.menu_screen_instance != None:
+				self.menu_screen_instance.gameloop()
+			else:
+				self.next_screen(self.window_surface, self.main_clock)
 		else:
 			# For any other screen we just call it using the normal variables.
 			self.next_screen(self.window_surface, self.main_clock)

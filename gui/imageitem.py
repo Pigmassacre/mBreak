@@ -2,12 +2,21 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import math
 import copy
-import other.useful as useful
 import objects.shadow as shadow
-import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is an item that, much like TextItem, can be displayed either by itself or added to a menu. It's a 
+filled rectangle with an image in the middle of it. It can, much like the other items, we selected and / or chosen.
+
+Arguably, all these items (ImageItem, TextItem etc.) should subclass some more generic Item class. However,
+while they share alot of the same names for the variables, they all differ so much that there's hardly any
+point in them subclassing item. I tried several times, but I couldn't for the life of me figure out what item
+should contain. I hope that this is OK.
+
+"""
 
 class ImageItem():
 
@@ -65,6 +74,7 @@ class ImageItem():
 		return self.rect.height
 
 	def draw(self, surface):
+		# Update the position of all the rects.
 		self.rect.x = self.x
 		self.rect.y = self.y
 		self.selected_rect.x = self.x - (ImageItem.selected_border_size / 2.0)
@@ -74,13 +84,17 @@ class ImageItem():
 		self.shadow_rect.x = self.x + self.shadow_offset_x
 		self.shadow_rect.y = self.y + self.shadow_offset_y
 
+		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)
 		surface.fill(self.color, self.rect)
 
+		# If chosen, draw the chosen border around the item.
 		if self.chosen:
 			surface.fill(self.chosen_border_color, self.chosen_rect)
 
+		# If selected, draw the selected border around the item.
 		if self.selected:
 			surface.fill(self.selected_border_color, self.selected_rect)
 
+		# Finally, blit the image to the given surface (on top of everything else drawn in here).
 		surface.blit(self.image, ((self.rect.x + (self.rect.width - self.image.get_width()) / 2), self.rect.y + (self.rect.height - self.image.get_height()) / 2))

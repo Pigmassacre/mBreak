@@ -5,10 +5,17 @@ import pygame
 import math
 import random
 import objects.groups as groups
-import objects.effect as effect
+import objects.effects.effect as effect
 import objects.paddle as paddle
 import objects.particle as particle
 import settings.settings as settings
+
+"""
+
+This is the Freezing effect. Balls that have this effect will spread it to enemy paddles, and paddles that have this effect
+will be frozen, having their max_speed lowered for a short duration.
+
+"""
 
 class Freezing(effect.Effect):
 
@@ -79,9 +86,6 @@ class Freezing(effect.Effect):
 				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 2, self.parent.rect.width / 2, angle, speed, retardation, color, 1)
 
 	def on_kill(self):
-		# We make sure to call the supermethod.
-		effect.Effect.on_kill(self)
-
 		# Restore the acceleration we removed from the parent.
 		if self.parent.__class__ == paddle.Paddle:
 			self.parent.max_speed += Freezing.max_speed_reduction

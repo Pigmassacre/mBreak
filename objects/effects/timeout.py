@@ -5,10 +5,17 @@ __license__ = "All Rights Reserved"
 import pygame
 import other.useful as useful
 import objects.ball as ball
-import objects.powerup as powerup
+import objects.powerups.powerup as powerup
 import objects.groups as groups
-import objects.effect as effect
+import objects.effects.effect as effect
 import settings.settings as settings
+
+"""
+
+This is the Timeout effect. When applied to an entity, it will call the destroy method of that entity (if it exists) when the duration
+of this effect runs out.
+
+"""
 
 class Timeout(effect.Effect):
 
@@ -35,15 +42,14 @@ class Timeout(effect.Effect):
 		self.rect.width = Timeout.width
 		self.rect.height = Timeout.height
 
-	def update(self, main_clock):
-		# We make sure to call the supermethod.
-		effect.Effect.update(self, main_clock)
-
 	def on_kill(self):
 		# When the timeout times out, we kill the parent the effect is attached to. If the parent is a powerup, we don't want
 		# any sound to play, so we make sure that doesn't happen.
-		if issubclass(self.parent.__class__, powerup.Powerup):
-			# Sending false to powerups destroy method will make it not play any sound.
-			self.parent.destroy(False)
-		else:
-			self.parent.destroy()
+
+		# We only do this to objects that actually have a .destroy() method.
+		if hasattr(self.parent, "destroy") and callable(getattr(self.parent, "destroy")):
+			if issubclass(self.parent.__class__, powerup.Powerup):
+				# Sending false to powerups destroy method will make it not play any sound.
+				self.parent.destroy(False)
+			else:
+				self.parent.destroy()

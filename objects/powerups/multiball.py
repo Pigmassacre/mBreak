@@ -1,22 +1,33 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import random
 import math
-import copy
-import other.useful as useful
-import objects.powerup as powerup
-import objects.charged as charged
+import objects.powerups.powerup as powerup
+import objects.effects.charged as charged
+import objects.effects.timeout as timeout
+import objects.effects.speed as speed
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
-import objects.timeout as timeout
-import objects.speed as speed
 import settings.settings as settings
 
+"""
+
+This is the Multiball powerup. When this powerup is hit by a ball, it spawns an extra ball for the parent of that ball.
+
+Balls spawned by Multiball get all the effects of the owner of the ball that hit the Multiball, EXCEPT for the Charged effect.
+That effect is special. ;)
+
+Balls spawned by Multiball powerups only last for a short amount of time. This is handled by attaching a timeout effect
+to the balls that are created by this powerup.
+
+"""
+
 def convert():
+	# We put this here so the game-class can call this method to "preload" the image used for this powerup.
+	# I could probably put this in the constructor of the powerup, but I worry about performance so I make sure to only do it once.
 	Multiball.image.convert_alpha()
 
 class Multiball(powerup.Powerup):

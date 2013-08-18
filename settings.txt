@@ -7,9 +7,9 @@ p1name		Player One
 p2name		Player Two
 
 # GRAPHICS
-shadows 	0
-particles 	0
-traces 		0
-background 	0
+shadows 	1
+particles 	1
+traces 		1
+background 	1
 fullscreen 	0
 maxfps		60

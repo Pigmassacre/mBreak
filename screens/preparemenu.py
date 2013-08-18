@@ -5,7 +5,7 @@ import pygame, sys
 from pygame.locals import *
 import other.debug as debug
 import objects.player as player
-import objects.powerup as powerup
+import objects.powerups.powerup as powerup
 import gui.textitem as textitem
 import gui.menu as menu
 import gui.gridmenu as gridmenu

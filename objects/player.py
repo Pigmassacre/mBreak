@@ -5,7 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import objects.groups as groups
 import objects.ball as ball
-import objects.powerup as powerup
+import objects.powerups.powerup as powerup
 from pygame.locals import *
 import settings.settings as settings
 

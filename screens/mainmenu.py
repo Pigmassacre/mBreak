@@ -3,29 +3,36 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-from libs import pyganim
-import math
-import random
 import other.debug as debug
-import other.useful as useful
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.menu as menu
 import gui.gridmenu as gridmenu
-import gui.coloritem as coloritem
 import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 
-# Import any needed game screens here.
+# These are the screens we can reach directly from the main menu, so we import them here.
 import screens.preparemenu as preparemenu
 import screens.helpmenu as helpmenu
 import screens.aboutmenu as aboutmenu
 
+"""
+
+This is the main menu of the game. From here, we can either continue to the preparation menu, we can change a few graphic options,
+or we can reach the help menu or the about menu. We can also quit the game, of course.
+
+The main menu is easily added upon. It has an active_menu object that makes sure that we only display and update/handle the currently active
+submenu.
+
+If either the quit button is activated or the ESCAPE key is pressed, we quit the game.
+
+"""
+
 class MainMenu:
 
-	def __init__(self, window_surface, main_clock, title_logo = None, return_to_options = False, returned_from = None):
+	def __init__(self, window_surface, main_clock, title_logo = None):
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
@@ -46,22 +53,6 @@ class MainMenu:
 
 		# Set the menu to actually display.
 		self.active_menu = [self.main_menu]
-		if return_to_options:
-			self.active_menu.append(self.options_menu)
-			if returned_from == helpmenu.HelpMenu:
-				for item in self.options_menu.items:
-					# An ugly hack to make sure that the help menu item is selected when we return from the help menu.
-					if item.text_value == "Help":
-						item.selected = True
-					else:
-						item.selected = False
-			elif returned_from == aboutmenu.AboutMenu:
-				for item in self.options_menu.items:
-					# And here to make sure that the about item is selected when we return from the about menu.
-					if item.text_value == "About":
-						item.selected = True
-					else:
-						item.selected = False
 
 		# Setup the menu transitions.
 		self.menu_transition = transition.Transition()
@@ -77,6 +68,7 @@ class MainMenu:
 		self.main_menu = self.setup_menu()
 		self.main_menu.add(textitem.TextItem("Start"), self.start)
 		self.main_menu.add(textitem.TextItem("Options"), self.options)
+		self.main_menu.add(textitem.TextItem("Help"), self.help)
 		self.main_menu.add(textitem.TextItem("Quit"), self.quit)
 		self.main_menu.items[0].selected = True
 
@@ -87,7 +79,6 @@ class MainMenu:
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
 		self.options_menu.add(textitem.TextItem("Graphics"), self.graphics)
-		self.options_menu.add(textitem.TextItem("Help"), self.help)
 		self.options_menu.add(textitem.TextItem("About"), self.about)
 		self.options_menu.add(textitem.TextItem("Back"), self.back)
 		self.options_menu.items[0].selected = True
@@ -149,6 +140,7 @@ class MainMenu:
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
+			# If the title_logo object doesn't exists, creates it and positions it.
 			self.title_logo = logo.Logo()
 			
 			self.title_logo.x = (settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2
@@ -156,21 +148,16 @@ class MainMenu:
 			
 			self.title_logo.play()
 		else:
+			# Otherwise, we just save the given title_logo object
 			self.title_logo = title_logo
 	
 	def setup_menu(self, x = settings.SCREEN_WIDTH / 2, y = settings.SCREEN_HEIGHT / 2):
+		# By default returns a menu that is positioned in the center of the screen.
 		return menu.Menu(x, y)
-
-	def setup_grid_menu(self):
-		x = settings.SCREEN_WIDTH / 2
-		y = settings.SCREEN_HEIGHT / 2
-
-		grid_menu = gridmenu.GridMenu(x, y)
-
-		return grid_menu
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
+			# We only care about loading and playing the music if it isn't already playing.
 			pygame.mixer.music.load(settings.TITLE_MUSIC)
 			pygame.mixer.music.play(-1)
 
@@ -186,12 +173,12 @@ class MainMenu:
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		
 	def quit(self, item):
+		# Sets next_screen to None so we just quit the game when the gameloop is over.
 		self.done = True
 		self.next_screen = None
 
 	def gameloop(self):
 		self.done = False
-
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(settings.BACKGROUND_COLOR)
@@ -232,12 +219,16 @@ class MainMenu:
 		self.on_exit()
 
 	def show_logo(self):
+		# Makes sure that the logo always moves to the desired posisition, and stays there.
 		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
 		self.title_logo.draw(self.window_surface)
 
 	def show_menu(self):
+		# Updates the menu transitions, and the currently active menu.
 		self.menu_transition.update()
 		self.active_menu[-1].update()
+
+		# We draw the currently active menu to the screen.
 		self.active_menu[-1].draw(self.window_surface)
 
 	def on_exit(self):
@@ -248,7 +239,10 @@ class MainMenu:
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == helpmenu.HelpMenu or self.next_screen == aboutmenu.AboutMenu:
-			# We start the help menu and make sure that we return to the options menu.
-			self.next_screen(self.window_surface, self.main_clock, True)
+			# We start the help screen or the about screen and send them a reference to this instance, so they can return to it later.
+			# We also setup the transitions, so when they return they transition in.
+			self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+			self.next_screen(self.window_surface, self.main_clock, self)
 		else:
+			# Else, we just start the next screen with the default parameters.
 			self.next_screen(self.window_surface, self.main_clock)

@@ -3,69 +3,84 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-from libs import pyganim
-import math
-import other.debug as debug
-import other.useful as useful
-import gui.textitem as texitem
-import gui.logo as logo
 import settings.settings as settings
 import settings.graphics as graphics
 
-# Import any needed game screens here.
+# We need to be able to proceed to the intromenu, so we import it.
 import screens.intromenu as intromenu
+
+"""
+
+This class takes care of displaying the Splash that is displayed when you start the game.
+It's nothing fancy, it just splits the splash image into two parts and moves them back and forth across the screen.
+They cross once, and the second time they're supposed to cross the join to form a complete image, revealing the mighty
+"Pigmassacre"! ;P
+
+"""
 
 class Splash:
 
+	# The splash image is loaded, scaled so it fits the SCREEN_HEIGHT and then split into two halves.
 	splash = pygame.image.load("res/splash/splash_color.png")
 	splash = pygame.transform.scale(splash, (settings.SCREEN_HEIGHT, settings.SCREEN_HEIGHT))
 	splash_top_half = splash.subsurface(pygame.Rect((0, 0), (splash.get_width(), splash.get_height() / 2)))
 	splash_bottom_half = splash.subsurface(pygame.Rect((0, (splash.get_height()) / 2), (splash.get_width(), splash.get_height() / 2)))
 
+	# These are the values that affect the movement of the splash images.
 	splash_time = 1750
 	top_half_speed = 10 * settings.GAME_SCALE
 	bottom_half_speed = -10 * settings.GAME_SCALE
 
+	# We use this instead of the standard background color (even if they happen to be the same) since we always want the background to
+	# be black here.
 	background_color = pygame.Color(0, 0, 0)
 
 	def __init__(self, window_surface, main_clock):
+		# Saves the given window_surface and main_clock to local variables. All screens do this.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
+		# This is the position that the full image has (it's in the middle of the screen).
 		self.x = (settings.SCREEN_WIDTH - Splash.splash.get_width()) / 2
 		self.y = (settings.SCREEN_HEIGHT - Splash.splash.get_height()) / 2
 
+		# These are the positions of the two halves at the start.
 		self.top_half_x = -Splash.splash_top_half.get_width()
 		self.top_half_y = 0
 		self.bottom_half_x = settings.SCREEN_WIDTH
 		self.bottom_half_y = (settings.SCREEN_HEIGHT / 2)
 
+		# We start by letting the top half to right, and the bottom half go left.
 		self.top_go_right = True
 		self.bottom_go_left = True
 
+		# These keep track of when both parts have completed their movements.
 		self.top_done = False
 		self.bottom_done = False
 
 		# Keeps track of how much time has passed.
 		self.time_passed = 0
 
+		# And finally we start the gameloop!
 		self.gameloop()
 
 	def gameloop(self):
+		# When done is True, the gameloop ends and the next screen is started.
 		self.done = False
-
 		while not self.done:
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(Splash.background_color)
 			
 			for event in pygame.event.get():
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
-					# If ENTER is pressed, proceed to the next screen, and end this loop.
+					# If ENTER or ESCAPE is pressed, we end this loop and proceed to the next screen.
 					self.done = True
 
+			# After a certain amount of time, the splash ends automatically.
 			if self.time_passed >= Splash.splash_time:
 				self.done = True
 
+			# The following code moves the top half.
 			if self.top_go_right:
 				self.top_half_x += Splash.top_half_speed
 			else:
@@ -77,6 +92,7 @@ class Splash:
 				self.top_half_x = (settings.SCREEN_WIDTH - Splash.splash_top_half.get_width()) / 2
 				self.top_done = True
 
+			# And the following moves the bottom half.
 			if self.bottom_go_left:
 				self.bottom_half_x += Splash.bottom_half_speed
 			else:
@@ -88,6 +104,7 @@ class Splash:
 				self.bottom_half_x = (settings.SCREEN_WIDTH - Splash.splash_bottom_half.get_width()) / 2
 				self.bottom_done = True
 
+			# And this takes care of displaying either the two bottom halves or the complete image.
 			if self.top_done and self.bottom_done:
 				self.time_passed += self.main_clock.get_time()
 				self.window_surface.blit(Splash.splash, (self.x, self.y))
@@ -95,9 +112,11 @@ class Splash:
 				self.window_surface.blit(Splash.splash_top_half, (self.top_half_x, self.top_half_y))
 				self.window_surface.blit(Splash.splash_bottom_half, (self.bottom_half_x, self.bottom_half_y))
 
+			# Of course, we have to update the screen so we see any of our changes.
 			pygame.display.update()
 			
-			# Finally, constrain the game to a set maximum amount of FPS.
+			# Finally, we constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(graphics.MAX_FPS)
 
+		# The gameloop is over, so we proceed to the intromenu!
 		intromenu.IntroMenu(self.window_surface, self.main_clock)

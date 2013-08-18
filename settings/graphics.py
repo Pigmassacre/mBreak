@@ -3,7 +3,12 @@ import shutil
 
 """
 
-Contains the graphical options on the game
+Contains the graphical options on the game. All of these can be changed in settings.txt.
+
+Load, when called, will try to load the settings.txt file and read the graphical options from it and save those so the game
+can use them.
+
+Save on the other hand, will take the current values of the variables and try to save them to settings.txt
 
 """
 
@@ -42,7 +47,6 @@ def load():
 				FULLSCREEN = bool(int(line.strip("fullscreen").strip()))
 			elif "maxfps" in line:
 				MAX_FPS = int(line.strip("maxfps").strip())
-				print(MAX_FPS)
 	finally:
 		file.close()
 			

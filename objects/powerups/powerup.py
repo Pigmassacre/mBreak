@@ -1,11 +1,17 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import random
 import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is the base class of all powerups. It handles stuff like position and destroying the powerup safely, for example.
+It also handles the sound effects that are played when the powerup is destroyed (picked up by a ball).
+
+"""
 
 class Powerup(pygame.sprite.Sprite):
 
@@ -17,6 +23,7 @@ class Powerup(pygame.sprite.Sprite):
 	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup3.ogg"))
 	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.ogg"))
 
+	# The standard width of all powerup image files. Each individual powerup can ofcourse be bigger/smaller, but this is the standard size.
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE
 
@@ -41,6 +48,7 @@ class Powerup(pygame.sprite.Sprite):
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def hit(self, entity):
+		# When hit, we destroy ourselves.
 		self.destroy()
 
 	def destroy(self, play_sound = True):

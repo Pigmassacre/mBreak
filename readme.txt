@@ -21,6 +21,8 @@ start the game.
 After the game has started and the intro animation has been shown, click the screen or press the ENTER button to 
 reach the main menu.
 
+(All menus in the game can either be navigated by using the mouse, or the arrow-keys and the ENTER button to confirm your choices)
+
 From the main menu, you can either start the game, go into an options menu or quit the game.
 
 If you go into the options menu, you can either continue to a menu where you can turn special graphical effects on or off,
