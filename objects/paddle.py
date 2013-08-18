@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -7,6 +6,14 @@ import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is the class that represents the paddles in the game. Paddles take care of their own movement (with the keys they should listen to
+provided by the player class). Paddles can only move within the game area, so they also they care of checking for collision with the 
+edges of the screen.
+
+"""
 
 def convert():
 	Paddle.image.convert()

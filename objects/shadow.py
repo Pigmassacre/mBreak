@@ -3,10 +3,20 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
-import math
 import other.useful as useful
 import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is the class that represents each shadow in the game. A shadow is connected to a parent, and we can
+easily choose wether or not we want to use an image to draw the shadow (probably more performance heavy than filling)
+or using the fill method to draw the shadow. The Game class takes care of drawing the shadow before the item the shadow
+is attached to, so it appears below it.
+
+It's trivial to add a shadow to any sprite in the game.
+
+"""
 
 class Shadow(pygame.sprite.Sprite):
 
@@ -30,7 +40,7 @@ class Shadow(pygame.sprite.Sprite):
 		self.offset_x = Shadow.offset_x
 		self.offset_y = Shadow.offset_y
 
-		# Store the variables used when timing out the shadow.
+		# Store the variables used when timing out the shadow. If set to linger, the shadow eventually fades away.
 		self.linger = linger
 		self.linger_time_left = Shadow.linger_time
 		self.alpha_step = Shadow.alpha_step
@@ -61,17 +71,24 @@ class Shadow(pygame.sprite.Sprite):
 		# Add self to the main shadow_group.
 		groups.Groups.shadow_group.add(self)
 
-	def blit_to(self, window_surface):
+	def blit_to(self, surface):
+		# Blits the shadow to the given surface.
 		if self.fill:
+			# If using fill, first we fill our own surface with the color, then we blit that surface to the given surface.
+			# This is to make the alpha value work (filling doesn't work with alpha otherwise).
 			self.surface.fill(self.color)
-			return window_surface.blit(self.surface, self.rect)
+			return surface.blit(self.surface, self.rect)
 		else:
-			return window_surface.blit(self.image, self.rect)
+			# If we're not using fill, we simply blit the image to the given surface.
+			return surface.blit(self.image, self.rect)
 
 	def update(self, main_clock):
+		# Check if we're supposed to linger.
 		if self.linger:
+			# If we're supposed to linger, check if there's any time left to linger.
 			self.linger_time_left = self.linger_time_left - main_clock.get_time()
 			if self.linger_time_left <= 0:
+				# The time is out, so we reduce our alpha to zero, or if it's already zero we kill ourself.
 				if self.color.a - self.alpha_step < 0:
 					self.kill()
 				else:

@@ -87,7 +87,9 @@ I am strongly considering open-sourcing it soon, however.
 
 Below are the things that I haven't made myself.
 
-The font used is 8-BIT WONDER.TTF made by Joiro Hatagaya. The license and readme for this font is in the fonts/ folder.
+The electricity.png image, used for the Electricity powerup, was drawn by my girlfriend, Anna Bjurbäck.
+
+The font used is 8-BIT WONDER.TTF, made by Joiro Hatagaya. The license and readme for this font is in the fonts/ folder.
 The license states: "Currently all my fonts are freeware."
 
 I think it's a really nice looking font. It lacks special characters though, so I have to make do without dots, commas and other
@@ -114,7 +116,7 @@ All sound effects except freezing.ogg made using www.bfxr.net.
 The Bfxr website states: "You have full rights to all sounds made with bfxr, and are free to use them for commercial purposes."
 The website is available at http://www.bfxr.net/
 
-freezing.ogg is taken from http://www.soundjay.com/ice-sound-effect.html.
+freezing.ogg is taken from http://www.soundjay.com/ice-sound-effect.html. (I simply cut off the file a little bit and converted it to .ogg)
 The soundjay license (which is available here: http://www.soundjay.com/tos.html) states:
 "You are allowed to use the sounds free of charge and royalty free in your projects (such as films, videos, games, presentations, animations, stage plays, radio plays, audio books, apps) be it for commercial or non-commercial purposes."
 

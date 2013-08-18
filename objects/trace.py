@@ -1,15 +1,23 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
-import math
 import copy
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
+
+"""
+
+This is the class that represents each trace in the game. Currently, only balls spawn traces (and only if the graphic options
+for traces is set to True). A trace is the same size as its parent, and will eventually fade away until it is no longer visible,
+at which point it will be killed.
+
+Any object which has a color and a rect can spawn a trace attached to it.
+
+"""
 
 class Trace(pygame.sprite.Sprite):
 
@@ -46,16 +54,18 @@ class Trace(pygame.sprite.Sprite):
 		# Add self to the main trace_group.
 		groups.Groups.trace_group.add(self)
 
-	def blit_to(self, window_surface):
+	def blit_to(self, surface):
+		# Blits self to the given surface.
 		self.surface.fill(self.color)
-		return window_surface.blit(self.surface, self.rect)
+		return surface.blit(self.surface, self.rect)
 
 	def destroy(self):
+		# Takes care of killing ourselves and our shadow.
 		self.kill()
 		self.shadow.kill()
 
 	def update(self):
-		# Update the alpha in the RGBA color value. If it gets to or under 0, kill self.
+		# Update the alpha in the RGBA color value. If it gets to or under 0, we kill ourself.
 		if self.alpha_step > 0:
 			if self.color.a - self.alpha_step < 0:
 				self.destroy()

@@ -1,13 +1,19 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 import objects.groups as groups
 import objects.ball as ball
 import objects.powerups.powerup as powerup
-from pygame.locals import *
 import settings.settings as settings
+
+"""
+
+This is the class that represents each player in the game. mBreak is currently designed with two players
+in mind, but it wouldn't take too much work to allow more players than that (not sure about how fun that
+would be though.. :P).
+
+"""
 
 class Player(pygame.sprite.Sprite):
 
@@ -22,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 		# The name is dislayed at the end of each match/game.
 		self.name = name
 
-		# Key up and down are, ofcourse, the keys that any paddles connected to this player will respond to.
+		# Key up and down are the keys that any paddles connected to this player will respond to.
 		self.key_up = key_up
 		self.key_down = key_down
 
@@ -41,7 +47,7 @@ class Player(pygame.sprite.Sprite):
 		# Store the player in the main player_group.
 		groups.Groups.player_group.add(self)
 
-		# Create a OrdereredUpdates group used to store and display the powerups currently on this player.
+		# Create a OrdereredUpdates group used to store and display the powerups (in order) currently on this player.
 		self.powerup_group = pygame.sprite.OrderedUpdates()
 
 		# This is used to determine if an item has been added or removed from the group.

@@ -6,19 +6,23 @@ from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
-import gui.logo as logo
 import gui.menu as menu
-import gui.gridmenu as gridmenu
-import gui.coloritem as coloritem
 import gui.transition as transition
 import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
-
-# Import any needed game screens here.
 import screens
 import screens.confirmationmenu as confirmationmenu
+
+"""
+
+This is the class that handles the pause menu. The pause menu is only available during gameplay (not in the menus), but technically
+it can be created from anywhere. Unless an option is chosen the pause menu runs indefinitely.
+
+The available options are "Resume" and "Quit". If Quit is chosen, a confirmation menu is shown to confirm the quit request.
+
+"""
 
 class PauseMenu:
 
@@ -36,7 +40,7 @@ class PauseMenu:
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = None
 
-		# Configure the GUI.
+		# Create, store and position the pause menu.
 		self.pause_menu = self.setup_pause_menu()
 		self.pause_menu.x = settings.SCREEN_WIDTH / 2
 		self.pause_menu.y = (settings.SCREEN_HEIGHT - self.pause_menu.get_height()) / 2
@@ -48,15 +52,18 @@ class PauseMenu:
 		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
 		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
 
+		# And finally, start the gameloop!
 		self.gameloop()
 
 	def setup_pause_menu(self):
+		# Creates and adds the items to the pause menu.
 		pause_menu = menu.Menu()
 		pause_menu.add(textitem.TextItem("Resume"), self.resume)
 		pause_menu.add(textitem.TextItem("Quit"), self.maybe_quit)
 		return pause_menu
 
 	def resume(self, item):
+		# Finished the gameloop, allowing the class that started this pausemenu to resume.
 		self.done = True
 
 	def maybe_quit(self, item):
@@ -66,13 +73,13 @@ class PauseMenu:
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
+		# We quit to the main menu, so we stop the music and set the next screen to the main menu.
 		pygame.mixer.music.stop()
 		self.done = True
 		self.next_screen = screens.mainmenu.MainMenu
 
 	def gameloop(self):
 		self.done = False
-
 		while not self.done:
 			# Begin every frame by blitting the background surface.
 			self.window_surface.blit(self.background_surface, (0, 0))
@@ -86,6 +93,7 @@ class PauseMenu:
 					# If the escape key is pressed, we resume the game.
 					self.resume(None)
 				else:
+					# Traversal handles key movement in menus!
 					traversal.traverse_menus(event, [self.pause_menu])
 
 			# Update and show the menu.
@@ -113,6 +121,8 @@ class PauseMenu:
 
 	def on_exit(self):
 		if not self.next_screen == None:
-			# Gameloop is over, so we clear all the groups of their contents.
+			# Gameloop is over, and since we're going to return to the main menu so we clear all the groups of their contents.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)
+
+		# Else, we do nothing. This resume to the gameloop where this pause menu was created.

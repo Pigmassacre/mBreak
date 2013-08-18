@@ -12,9 +12,14 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
-
-# Import any needed game screens here.
 import screens
+
+"""
+
+This is the screen that is displayed after amount of rounds that should be played have been played.
+It allows the players to either return to the main menu or go for a rematch.
+
+"""
 
 class GameOver:
 
@@ -97,11 +102,13 @@ class GameOver:
 		pygame.mixer.music.play()
 
 	def quit(self, item):
+		# When the quit button is activated, we want to return to the main menu.
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
 		pygame.mixer.music.stop()
 
 	def rematch(self, item):
+		# When the rematch button is actived, we want to start a new instance of Game.
 		pygame.mixer.music.stop()
 		self.done = True
 		self.next_screen = screens.game.Game
@@ -166,12 +173,15 @@ class GameOver:
 
 	def on_exit(self):
 		if self.next_screen == None:
+			# If no next_screen is specified, we quit.
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.game.Game:
+			# If a rematch was selected, we reset the score and start a new instance of Game.
 			self.score[self.player_one] = 0
 			self.score[self.player_two] = 0
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
 		else:
+			# If quit was selected, we empty all the groups and return to the main menu.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

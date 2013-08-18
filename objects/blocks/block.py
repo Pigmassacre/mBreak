@@ -4,12 +4,16 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import random
-import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
 import objects.particle as particle
-import gui.textitem as textitem
 import settings.settings as settings
+
+"""
+
+This is the base class of all blocks in the game. A block has health, and when that health reaches zero the block is destroyed.
+
+"""
 
 class Block(pygame.sprite.Sprite):
 

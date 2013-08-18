@@ -1,10 +1,17 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
 
+"""
+
+This module (and class) takes care of the groups used to store and update all the game objects while in-game.
+
+"""
+
 def empty_after_round():
+	# Empties all groups but the player group, so that when we want to return to the game again, the players are
+	# still intact.
 	Groups.ball_group.empty()
 	Groups.particle_group.empty()
 	Groups.block_group.empty()
@@ -15,6 +22,7 @@ def empty_after_round():
 	Groups.trace_group.empty()
 
 def empty_all():
+	# This empties ALL the groups, so this is called when we return to the main menu from the game.
 	Groups.player_group.empty()
 	empty_after_round()
 

@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
@@ -20,6 +19,7 @@ import objects.effects.speed as speed
 import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
+import objects.blocks.weak as block_weak
 import objects.groups as groups
 import gui.textitem as textitem
 import settings.settings as settings
@@ -32,6 +32,19 @@ import screens.gameover as gameover
 import screens.matchover as matchover
 import screens.countdown as countdown
 import screens.pausemenu as pausemenu
+
+"""
+
+This is the screen where the actual gameplay takes place. It uses the background module to draw the background, and the
+level module to create the blocks and paddles.
+
+It takes care of updating and drawing all the objects in the game, checking for the winner, spawning powerups and stuff like that.
+It also check for the ESCAPE key (for the pause menu) and the debug keys (for the debug functions).
+
+For each player, a list of all their currently active powerups are displayed in the top-left and bottom-right corner of the game, respectively.
+(The player class handles this, however.)
+
+"""
 
 class Game:
 
@@ -55,10 +68,14 @@ class Game:
 		# Convert all the objects to a more efficient format. We do this here as a "preloading" sort of measure.
 		block_normal.convert()
 		block_strong.convert()
+		block_weak.convert()
 		paddle.convert()
 		ball.convert()
 		multiball.convert()
 		doublespeed.convert()
+		fire.convert()
+		frost.convert()
+		electricity.convert()
 
 		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
 		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
@@ -97,12 +114,16 @@ class Game:
 		# If there is already a doublespeed powerup on the gamefield, this is the chance that any further will spawn.
 		self.powerup_second_speed_spawn_chance = 0.1
 
-		# Create the score texts.
+		# Create the score texts. These are only displayed when the amount of rounds is greater than 0.
 		item_side_padding = textitem.TextItem.font_size
+
+		# This is to more correctly align the two textitems so they are all equally far away from their respective sides.
+		# Magic value, I know, but without this the textitems look misaligned.
+		left_side_extra_padding = 3 * settings.GAME_SCALE
 
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
 		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_one_score_text.x = item_side_padding
+		self.player_one_score_text.x = item_side_padding + left_side_extra_padding
 		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
 
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
@@ -167,6 +188,7 @@ class Game:
 			# Finally, constrain the game to a set maximum amount of FPS.
 			self.main_clock.tick(graphics.MAX_FPS)
 
+		# The gameloop is over, so call the exit method.
 		self.on_exit()
 
 	def check_for_winner(self):
@@ -238,14 +260,17 @@ class Game:
 		return powerup_to_spawn(x, y)
 
 	def start_game(self):
+		# When the game starts, we spawn balls for both players.
 		self.create_ball_left()
 		self.create_ball_right()
 
 	def create_ball_left(self):
+		# Creates a ball for the left player.
 		for paddle in self.player_one.paddle_group:
 			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), -math.pi / 8, self.player_one)
 
 	def create_ball_right(self):
+		# Creates a ball for the right player.
 		for paddle in self.player_two.paddle_group:
 			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi / 8, self.player_two)
 

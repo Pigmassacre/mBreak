@@ -16,10 +16,19 @@ import gui.toast as toast
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
-
-# Import any needed game screens here.
 import screens.game as game
 import screens
+
+"""
+
+This class is the preparation screen that the players encounter before the game can start. Here they must choose their
+respective colors, and they can also pick the number of rounds they want to play. Two players cannot pick the same color,
+and this class handles this.
+
+This class is also responsible for creating the two player objects that are then passed around (until the game returns
+to the main menu).
+
+"""
 
 class PrepareMenu:
 
@@ -310,7 +319,7 @@ class PrepareMenu:
 			score[player_one] = 0
 			score[player_two] = 0
 
-			# And finally, we call the Game constructor!
+			# And finally, we start the game!
 			self.next_screen(self.window_surface, self.main_clock, player_one, player_two, self.number_of_rounds, score)
 		else:
 			# For any other screen we just call it using the normal variables.

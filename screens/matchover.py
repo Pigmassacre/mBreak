@@ -12,14 +12,21 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
-
-# Import any needed game screens here.
 import screens
 import screens.confirmationmenu as confirmationmenu
 
-class MatchOver:
+"""
 
-	tint_color = pygame.Color(255, 255, 255, 128)
+This is the screen that is displayed after a match is over, but there are still matches left to play.
+The screen gives the players the ability to either start the next match, or quit to the main menu.
+If the players chose the quit option, they have to confirm their choice via the confirmation menu.
+
+They can also view their score so far, see the number of rounds they have left, and last but not least:
+listen to the sweet, sweet after-game music! :) (MUSIC NOT MADE BY ME!)
+
+"""
+
+class MatchOver:
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done):
 		# Store the game variables.
@@ -51,11 +58,14 @@ class MatchOver:
 		# Setup and play music.
 		self.setup_music()
 
+		# And finally, start the gameloop!
 		self.gameloop()
 
 	def setup_menus(self):
+		# This is the distance from the screen edges to the GUI elements
 		item_side_padding = textitem.TextItem.font_size
 
+		# We setup and position all the needed textitems and menus.
 		self.rounds_left_text = textitem.TextItem("Rounds Left", pygame.Color(255, 255, 255))
 		self.rounds_left_text.x = (settings.SCREEN_WIDTH - self.rounds_left_text.get_width()) / 2
 		self.rounds_left_text.y = item_side_padding
@@ -96,11 +106,12 @@ class MatchOver:
 		self.next_match_menu.add(next_match_button, self.next_match)
 		self.all_menus.append(self.next_match_menu)
 
-		# Register all menus with each other.
+		# Register all menus with each other. This is for gui.traversals sake, so it knows that there are more than one menu to traverse upon.
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
 	def setup_transitions(self):
+		# Sets up the different transitions of all the items.
 		self.transitions = transition.Transition()
 		self.transitions.setup_single_item_transition(self.rounds_left_text, True, True, True, False)
 		self.transitions.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
@@ -112,18 +123,22 @@ class MatchOver:
 		self.transitions.setup_transition(self.next_match_menu, False, True, False, True)
 
 	def setup_music(self):
+		# Loads the after-game music and plays it, looping forever.
 		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
 		pygame.mixer.music.play(-1)
 
 	def maybe_quit(self, item):
+		# We ask the players if they REALLY want to quit, since they're in between matches.
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
+		# This is called if the players confirm the quit option.
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
 		pygame.mixer.music.stop()
 
 	def next_match(self, item):
+		# Stop the music and start a new instance of Game!
 		pygame.mixer.music.stop()
 		self.done = True
 		self.next_screen = screens.game.Game
@@ -143,6 +158,7 @@ class MatchOver:
 					# If the escape key is pressed, we do the same thing as the quit button.
 					self.maybe_quit(None)
 				else:
+					# The traversal module handles key movement between menus.
 					traversal.traverse_menus(event, self.all_menus)
 
 			# Update and draw all items.
@@ -164,19 +180,14 @@ class MatchOver:
 		# Handle the transitions and blit all items.
 		self.transitions.update()
 
-		# We update the menus first, so if the confirmationmenu is shown the screen is empty.
+		# We update the menus first, so if the confirmationmenu is shown the screen is empty of items and menus (other than the confirmation menu, ofc).
 		self.quit_menu.update()
 		self.next_match_menu.update()
-
-		# If the mouse cursor is above one menu, it unselect other menus.
-		if self.quit_menu.is_mouse_over_item(self.quit_menu.items[0], pygame.mouse.get_pos()):
-			self.next_match_menu.items[0].selected = False
-		elif self.next_match_menu.is_mouse_over_item(self.next_match_menu.items[0], pygame.mouse.get_pos()):
-			self.quit_menu.items[0].selected = False
 
 		self.quit_menu.draw(self.window_surface)
 		self.next_match_menu.draw(self.window_surface)
 
+		# Draw all the other textitems.
 		self.rounds_left_text.draw(self.window_surface)
 		self.rounds_left_number_text.draw(self.window_surface)
 
@@ -188,12 +199,13 @@ class MatchOver:
 
 	def on_exit(self):
 		if self.next_screen == None:
+			# If no screen is chosen, we simply quit.s
 			pygame.quit()
 			sys.exit()
 		elif self.next_screen == screens.game.Game:
-			# Next match is selected, so start game.
+			# Next match is selected, so we start Game.
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
 		else:
-			# Quit is selected, so return to the main menu.
+			# Quit is selected, so we return to the main menu.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

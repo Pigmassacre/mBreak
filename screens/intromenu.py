@@ -1,10 +1,8 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-from libs import pyganim
 import other.debug as debug
 import gui.textitem as textitem
 import gui.logo as logo

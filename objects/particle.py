@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -10,12 +9,19 @@ import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
 
+"""
+
+This is the class that handles each particle in the game. Particles can be easily created, and they handle their own movement
+and destruction.
+
+"""
+
 class Particle(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	shadow_blend_color = pygame.Color(100, 100, 100, 255)
 
-	def __init__(self, x, y, width, height, angle, speed, retardation, color, alpha_step=0):
+	def __init__(self, x, y, width, height, angle, speed, retardation, color, alpha_step = 0):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 		
@@ -48,6 +54,7 @@ class Particle(pygame.sprite.Sprite):
 		groups.Groups.particle_group.add(self)
 
 	def destroy(self):
+		# Takes care of killing both itself and the shadow.
 		self.kill()
 		self.shadow.kill()
 

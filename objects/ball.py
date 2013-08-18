@@ -13,7 +13,25 @@ import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
 
+"""
+
+This is the Ball class. Each ball created in the game uses this class. Balls take care of their own collision handling.
+Balls have a position in the game world, a rect used to handle drawing the ball and calculating the collisions, an image
+that is used when drawing the ball, an angle at which they are traveling and the speed they are traveling at.
+
+When a ball collides with either a block, another ball or a paddle (or the edges of the game area) they each ball is responsible
+for their own collision handling. I would argue the collision handling is very rigid, as I've played a few hundred games and haven't
+seen any odd side effects.
+
+Most of the code in this class is collision handling.
+
+Anyway, the code is commented pretty well, so read on if you're interested!
+
+"""
+
 def convert():
+	# Same here as with powerups, arguably this could be put in the constructor (as it's safe to call this method more than once)
+	# but I worry about performance (pygame uses SDL (not SDL 2.0) which uses the CPU for everything, so it's pretty performance heavy).
 	Ball.image.convert()
 
 class Ball(pygame.sprite.Sprite):
@@ -31,7 +49,7 @@ class Ball(pygame.sprite.Sprite):
 	speed = 1 * settings.GAME_SCALE
 	max_speed = 3 * settings.GAME_SCALE
 	damage = 10
-	spin_speed_strength = 0.05 # Not used, but exists for balancing purposes.
+	spin_speed_strength = 0.05 # Not used, but exists if I ever want to use it for balancing purposes.
 	spin_angle_strength = 0.09
 	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
@@ -98,6 +116,7 @@ class Ball(pygame.sprite.Sprite):
 			effect.destroy()
 
 	def update(self, main_clock):
+		# We assume we haven't collided with anything yet.
 		self.collided = False
 
 		# Check collision with paddles.
@@ -138,7 +157,7 @@ class Ball(pygame.sprite.Sprite):
 		elif self.angle < 0:
 			self.angle = (2 * math.pi) + self.angle
 
-		# Make sure that speed isn't over max_speed.
+		# We make sure that speed isn't over max_speed.
 		if self.speed > self.max_speed:
 			self.speed = self.max_speed
 
@@ -150,6 +169,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with x-edges.
 		if self.rect.x < settings.LEVEL_X:
+			# We hit the left wall.
 			self.hit_wall()
 
 			# Reverse angle on x-axis.
@@ -159,6 +179,7 @@ class Ball(pygame.sprite.Sprite):
 			self.x = settings.LEVEL_X
 			self.rect.x = self.x
 		elif self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
+			# We hit the right wall.
 			self.hit_wall()
 
 			# Reverse angle on x-axis.
@@ -170,6 +191,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Check collision with y-edges.
 		if self.rect.y < settings.LEVEL_Y:
+			# We hit the top wall.
 			self.hit_wall()
 
 			# Reverse angle on y-axis.
@@ -179,7 +201,9 @@ class Ball(pygame.sprite.Sprite):
 			self.y = settings.LEVEL_Y
 			self.rect.y = self.y
 		elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
+			# We hit the bottom wall.
 			self.hit_wall()
+
 			# Reverse angle on y-axis.
 			self.angle = -self.angle
 
@@ -187,9 +211,10 @@ class Ball(pygame.sprite.Sprite):
 			self.y = settings.LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y
 
-		# If it's time, spawn a trace.
+		# We check if it's time to spawn a trace.
 		self.trace_spawn_time += main_clock.get_time()
 		if self.trace_spawn_time >= Ball.trace_spawn_rate:
+			# It's time, so we spawn a trace (if the graphics options allows it).
 			if graphics.TRACES:
 				trace.Trace(self)
 				self.trace_spawn_time = 0
@@ -206,6 +231,7 @@ class Ball(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.on_hit_wall()
 
+		# Obviously we have collided with something, so we set collided to True.
 		self.collided = True
 
 	def calculate_spin(self, paddle):
@@ -239,6 +265,7 @@ class Ball(pygame.sprite.Sprite):
 		self.rect.y = self.y
 
 	def spawn_particles(self):
+		# Spawn a slightly random amount of particles.
 		for _ in range(0, Ball.particle_spawn_amount):
 			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
@@ -246,6 +273,8 @@ class Ball(pygame.sprite.Sprite):
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
 
 	def check_collision_paddles(self):
+		# This method is used to check if we've collided with any paddles. If a collision is detected, we
+		# also handle it here.
 		paddle_collide_list = pygame.sprite.spritecollide(self, groups.Groups.paddle_group, False)
 		for paddle in paddle_collide_list:
 			self.hit_paddle(paddle)
@@ -260,6 +289,7 @@ class Ball(pygame.sprite.Sprite):
 				else:
 					# The ball collides more with the top side than any other side.
 					if self.angle < math.pi:
+						# So we reverse the angle.
 						self.angle = -self.angle
 
 					# Place ball on top of the paddle.
@@ -275,6 +305,7 @@ class Ball(pygame.sprite.Sprite):
 				else:
 					# The ball collides more with the bottom side than any other side.
 					if self.angle > math.pi:
+						# So we reverse the angle.
 						self.angle = -self.angle
 
 					# Place ball beneath the paddle.
@@ -287,12 +318,14 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_right_side_of_paddle(paddle)
 
 	def hit_paddle(self, paddle):
+		# Spawn a few particles.
 		self.spawn_particles()
 
 		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
 
+		# We hit a paddle, so...
 		self.collided = True
 
 	def hit_left_side_of_paddle(self, paddle):
@@ -314,10 +347,11 @@ class Ball(pygame.sprite.Sprite):
 		self.place_right_of(paddle)
 
 	def check_collision_balls(self):
-		groups.Groups.ball_group.remove(self)
+		# This method is used to check for collision with other balls. If a collision is detected, it is also
+		# handled here.
+		groups.Groups.ball_group.remove(self) # We don't want to check for collisions against ourselves!
 		ball_collide_list = pygame.sprite.spritecollide(self, groups.Groups.ball_group, False)
 		for ball in ball_collide_list:
-			self.spawn_particles()
 			self.hit_ball(ball)
 			if self.rect.bottom >= ball.rect.top and self.rect.top < ball.rect.top:
 				# Top side of ball collided with. Compare with edges:
@@ -367,14 +401,25 @@ class Ball(pygame.sprite.Sprite):
 		groups.Groups.ball_group.add(self)
 
 	def hit_ball(self, ball):
+		self.spawn_particles()
+
 		# Tell all the effects that we've just hit another ball.
 		for effect in self.effect_group:
 			effect.on_hit_ball(ball)
 
+		# We just collided with another ball, so!
 		self.collided = True
 
 	def check_collision_blocks(self):
+		# This check for collision with blocks (and handles them if they are detected).
+		# Since movement in this game is done step by step (we do not use raytracing) it's possible
+		# for balls to collided with more blocks than they actually should've collided with.
+		# This method meticulously goes through every possible combination of blocks collided with
+		# and deals with each accordingly.
 		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
+
+		# This dictionary is used to store a side with each block we collided with. This is so we can
+		# handle each possible collision case later on.
 		block_information = {}
 		for block in blocks_collided_with:
 			# Determine what side of the block we've collided with.
@@ -473,6 +518,8 @@ class Ball(pygame.sprite.Sprite):
 				self.check_block_collisions(block_list[2], block_list[0], block_list[1], side_list[1])
 
 	def check_block_collisions(self, block_one, block_two, block_three, block_three_side):
+		# Given a different combination of block_one, two and three (and the side of block three) this figures out
+		# what blocks we've actually hit.
 		if block_three_side == "left":
 			self.hit_left_side_of_block(block_three)
 		else:
@@ -503,6 +550,7 @@ class Ball(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.on_hit_block(block)
 
+		# We just collided with a block, so we set collided to True.
 		self.collided = True
 
 	def hit_top_side_of_block(self, block):
@@ -542,6 +590,8 @@ class Ball(pygame.sprite.Sprite):
 		self.place_below(block)
 
 	def check_collision_powerups(self):
+		# Here we check if we've collided with any powerups. If we have, we simply tell that powerup that we just
+		# hit it. We don't need to do anything else, each powerup handles the rest.
 		powerup_collide_list = pygame.sprite.spritecollide(self, groups.Groups.powerup_group, False)
 		for powerup in powerup_collide_list:
 			powerup.hit(self)

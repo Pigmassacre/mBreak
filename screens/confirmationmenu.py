@@ -4,21 +4,26 @@ __license__ = "All Rights Reserved"
 import pygame, sys
 from pygame.locals import *
 import other.debug as debug
-import other.useful as useful
 import gui.textitem as textitem
-import gui.logo as logo
 import gui.menu as menu
-import gui.gridmenu as gridmenu
-import gui.coloritem as coloritem
 import gui.transition as transition
 import gui.traversal as traversal
-import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
 
-class ConfirmationMenu:
+"""
 
-	tint_color = pygame.Color(255, 255, 255, 128)
+This screen presents the user with a confirmation menu. The user can select between Yes or No.
+If Yes is selected, a given function will be called with a given function_argument.
+If No is selected, this screen does nothing, so the user is returned to the screen that created
+the confirmation menu.
+
+The window_surface given is copied and saved as a background_surface, so it looks like the menu
+is displayed on top of the screen that created the confirmation menu.
+
+"""
+
+class ConfirmationMenu:
 
 	def __init__(self, window_surface, main_clock, function_to_call, function_argument):
 		# Store the game variables.
@@ -72,16 +77,17 @@ class ConfirmationMenu:
 		self.transitions.setup_single_item_transition(self.confirmation_menu.items[1], True, True, False, True)
 
 	def accept(self, item):
+		# Ends the gameloop and sets accepted to True.
 		self.done = True
 		self.accepted = True
 
 	def refuse(self, item):
+		# Ends the gameloop but sets accepted to False.
 		self.done = True
 		self.accepted = False
 
 	def gameloop(self):
 		self.done = False
-
 		while not self.done:
 			# Begin every frame by blitting the background surface.
 			self.window_surface.blit(self.background_surface, (0, 0))

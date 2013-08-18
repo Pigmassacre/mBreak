@@ -1,5 +1,4 @@
 __author__ = "Olof Karlsson"
-__version__ = "0.1"
 __license__ = "All Rights Reserved"
 
 import pygame
@@ -9,7 +8,14 @@ import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
 
+"""
+
+This is a subclass of Block. It is the normal block, with 20 health it can by default take two enemy ball hits.
+
+"""
+
 def convert():
+	# Arguably this could be called in the constructor, but I worry about performance so I make sure to only call this once.
 	NormalBlock.image.convert()
 
 class NormalBlock(block.Block):

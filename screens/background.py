@@ -5,6 +5,15 @@ import pygame
 import settings.settings as settings
 import settings.graphics as graphics
 
+"""
+
+This class handles the background images in the game. It requires a folder_name, and in that folder it looks for a few images
+that is uses to build up the background. The images in the given folder must have names matching those below.
+
+In order to display the background images, simply call the draw method where you want to draw them.
+
+"""
+
 class Background:
 	
 	def __init__(self, folder_name):
