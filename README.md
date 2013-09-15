@@ -7,6 +7,8 @@ Coded for a summer course in Multimedia Programming with Python.
 
 ## Startup Instructions
 
+[Pygame](http://pygame.org/) is needed, so download and install that.
+
 This game requires [Pyganim](http://inventwithpython.com/pyganim/) library in order to function. This library is not included in this repo, so you need to download it yourself and place it in the libs/ folder.
 
 All graphics are drawn by me (except for the lightning powerup, which is drawn by Anna Bjurbäck), so therefore they are included in the repo. However, none of the music required is made by me, so therefore you have to download those songs yourself. The required songs are, together with their licenses are:
