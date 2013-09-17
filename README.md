@@ -1,7 +1,13 @@
 mBreak
 ======
 
-Multiplayer Breakout 'clone' in Python.
+Multiplayer Breakout 'clone' in Python. You know [Breakout](http://en.wikipedia.org/wiki/Breakout_(video_game\))? No? Perhaps you are more familiar with the name [Arkanoid](http://en.wikipedia.org/wiki/Arkanoid)? Well this game part those games, and part [Pong](http://en.wikipedia.org/wiki/Pong) (You DO know what Pong is, do you?).
+
+Still can't figure it out? I'll be more precise:<br/>
+The game is like Pong, in that two opponents knock a ball around with their respective bats. Only in mBreak each player has their own ball. There are also <i>powerups</i>. Yeaah, powerups! Who doesn't like powerups? Man, I do like me some powerups.
+Now, in Pong, the goal of the game is to make the ball touch your opponents wall (that's what it boils down to, anyway). Well, in mBreak the goal is for each player to destroy all of the opponents <b>blocks</b>. Much like in Breakout (or Arkanoid, whatever)!
+
+So, to put it simply: Imagine Pong, but more like Breakout.
 
 Coded for a summer course in Multimedia Programming with Python.
 
