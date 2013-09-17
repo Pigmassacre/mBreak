@@ -1,7 +1,7 @@
 mBreak
 ======
 
-Multiplayer Breakout clone in Python.
+Multiplayer Breakout 'clone' in Python.
 
 Coded for a summer course in Multimedia Programming with Python.
 
@@ -13,15 +13,21 @@ This game requires [Pyganim](http://inventwithpython.com/pyganim/) library in or
 
 All graphics are drawn by me (except for the lightning powerup, which is drawn by Anna Bjurb&auml;ck), so therefore they are included in the repo. However, none of the music required is made by me, so therefore you have to download those songs yourself. The required songs are, together with their licenses are:
 
-The title screen music is [sexxxy_bit_3!!!.xm](http://modarchive.org/index.php?request=view_by_moduleid&query=173084), made by Drozerix. Released under a [Public Domain](http://creativecommons.org/licenses/publicdomain/) license.
+You need to download any or all of the following mod-files (music files) yourself if you want the game to have any sort of music. You should, because these songs are awesome! Seriously. <i>Massive</i> cred to their authors.
 
-The music that plays during gameplay is [stardstm.mod](http://modarchive.org/index.php?request=view_by_moduleid&query=59344), made by Jester. Released under a  [Attribution Non-Commercial Share Alike](http://creativecommons.org/licenses/by-nc-sa/3.0/) license
+These are:
+* Title screen music: [sexxxy_bit_3!!!.xm](http://modarchive.org/index.php?request=view_by_moduleid&query=173084), made by Drozerix.
 
-The post-game music is [october_chip.xm](http://modarchive.org/index.php?request=view_by_moduleid&query=173084), made by Drozerix. Released under a [Public Domain](http://creativecommons.org/licenses/publicdomain/) license. 
+* Gameplay music: [stardstm.mod](http://modarchive.org/index.php?request=view_by_moduleid&query=59344), made by Jester.
 
-All music has to be placed under the res/music/ folder (if the folder doesn't exist, create it :P).
+* Post-game music: [october_chip.xm](http://modarchive.org/index.php?request=view_by_moduleid&query=173084), made by Drozerix. 
+
+So download all of these, and place them under the res/music/ folder (if the folder doesn't exist, create it :P).
 
 ## Legal stuff
+
+Both songs made by Drozerix are released under a [Public Domain](http://creativecommons.org/licenses/publicdomain/) license.<br/>
+The song by Jester is released under a [Attribution Non-Commercial Share Alike](http://creativecommons.org/licenses/by-nc-sa/3.0/) license.
 
 This project is released under the MIT license:
 
