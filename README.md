@@ -11,7 +11,7 @@ Coded for a summer course in Multimedia Programming with Python.
 
 This game requires [Pyganim](http://inventwithpython.com/pyganim/) library in order to function. This library is not included in this repo, so you need to download it yourself and place it in the libs/ folder.
 
-All graphics are drawn by me (except for the lightning powerup, which is drawn by Anna Bjurbäck), so therefore they are included in the repo. However, none of the music required is made by me, so therefore you have to download those songs yourself. The required songs are, together with their licenses are:
+All graphics are drawn by me (except for the lightning powerup, which is drawn by Anna Bjurb&auml;ck), so therefore they are included in the repo. However, none of the music required is made by me, so therefore you have to download those songs yourself. The required songs are, together with their licenses are:
 
 The title screen music is [sexxxy_bit_3!!!.xm](http://modarchive.org/index.php?request=view_by_moduleid&query=173084), made by Drozerix. Released under a [Public Domain](http://creativecommons.org/licenses/publicdomain/) license.
 
@@ -27,7 +27,7 @@ This project is released under the MIT license:
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Olof Karlsson
+Copyright &copy; 2013 Olof Karlsson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
