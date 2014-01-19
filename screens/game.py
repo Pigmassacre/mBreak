@@ -16,6 +16,7 @@ import objects.powerups.electricity as electricity
 import objects.powerups.fire as fire
 import objects.powerups.frost as frost
 import objects.effects.speed as speed
+import objects.effects.flash as flash
 import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
@@ -343,9 +344,15 @@ class Game:
 		# Draw the balls.
 		groups.Groups.ball_group.draw(self.window_surface)
 
-		# Draw the effects.
+		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:
-			effect.draw(self.window_surface)
+			if not effect.__class__ == flash.Flash:
+				effect.draw(self.window_surface)
+
+		# Draw the flash effects.
+		for effect in groups.Groups.effect_group:
+			if effect.__class__ == flash.Flash:
+				effect.draw(self.window_surface)
 
 		# Draw the particles.
 		if graphics.PARTICLES:

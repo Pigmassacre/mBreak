@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import math
 import random
 import objects.groups as groups
 import settings.settings as settings
@@ -27,7 +28,7 @@ class Powerup(pygame.sprite.Sprite):
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE
 
-	def __init__(self, x, y, width, height):
+	def __init__(self, x, y, width, height, bob = True):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -37,6 +38,11 @@ class Powerup(pygame.sprite.Sprite):
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
 		self.y = y
+		self.center_y = self.y
+
+		# Keep track of whether or not this powerup should bob.
+		self.bob = bob
+		self.start_time = pygame.time.get_ticks()
 
 		# Store self in the main powerup_group.
 		groups.Groups.powerup_group.add(self)
@@ -63,6 +69,10 @@ class Powerup(pygame.sprite.Sprite):
 			Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
 
 	def update(self, main_clock):
+		# Update the position according to the bob effect.
+		if self.bob:
+			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * 0.0075) * 1.5
+
 		# Update the rects position.
 		self.rect.x = self.x
 		self.rect.y = self.y
