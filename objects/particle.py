@@ -11,8 +11,10 @@ import settings.settings as settings
 
 """
 
-This is the class that handles each particle in the game. Particles can be easily created, and they handle their own movement
-and destruction.
+This is the Particle class. Particles can be easily created, and they handle their own movement and destruction.
+
+Particles are used throughout the game as eyecandy, basically. They surve no real purpose, except for looking pretty.
+And if I can say so myself, I think they add a lot to the look of the game. :)
 
 """
 

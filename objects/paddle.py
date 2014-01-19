@@ -9,9 +9,8 @@ import settings.settings as settings
 
 """
 
-This is the class that represents the paddles in the game. Paddles take care of their own movement (with the keys they should listen to
-provided by the player class). Paddles can only move within the game area, so they also they care of checking for collision with the 
-edges of the screen.
+This is the Paddle class. Paddles take care of their own movement (with the keys they should listen to provided by the player class).
+Since paddles can move within the game area, they detect and handle their own collision with the edges of the game area.
 
 """
 

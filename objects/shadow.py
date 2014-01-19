@@ -9,10 +9,9 @@ import settings.settings as settings
 
 """
 
-This is the class that represents each shadow in the game. A shadow is connected to a parent, and we can
-easily choose wether or not we want to use an image to draw the shadow (probably more performance heavy than filling)
-or using the fill method to draw the shadow. The Game class takes care of drawing the shadow before the item the shadow
-is attached to, so it appears below it.
+This is the Shadow class. A shadow is connected to a parent, and we can easily choose wether or not we want to use an 
+image to draw the shadow (probably more performance heavy than filling) or using the fill method to draw the shadow.
+The Game class takes care of drawing the shadow before the item the shadow is attached to, so it appears below it.
 
 It's trivial to add a shadow to any sprite in the game.
 
@@ -88,7 +87,7 @@ class Shadow(pygame.sprite.Sprite):
 			# If we're supposed to linger, check if there's any time left to linger.
 			self.linger_time_left = self.linger_time_left - main_clock.get_time()
 			if self.linger_time_left <= 0:
-				# The time is out, so we reduce our alpha to zero, or if it's already zero we kill ourself.
+				# The time is out, so we reduce our alpha to zero, or if it's already zero we destroy ourselves.
 				if self.color.a - self.alpha_step < 0:
 					self.kill()
 				else:

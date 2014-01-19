@@ -17,15 +17,14 @@ import settings.graphics as graphics
 
 This is the Ball class. Each ball created in the game uses this class. Balls take care of their own collision handling.
 Balls have a position in the game world, a rect used to handle drawing the ball and calculating the collisions, an image
-that is used when drawing the ball, an angle at which they are traveling and the speed they are traveling at.
+that is used when drawing the ball, an angle at which they are traveling and the speed they are traveling at. (The have more
+attributes than that, as you can see below).
 
 When a ball collides with either a block, another ball or a paddle (or the edges of the game area) they each ball is responsible
 for their own collision handling. I would argue the collision handling is very rigid, as I've played a few hundred games and haven't
 seen any odd side effects.
 
-Most of the code in this class is collision handling.
-
-Anyway, the code is commented pretty well, so read on if you're interested!
+Anyway, the code is commented pretty thoroughly, so read on if you're interested!
 
 """
 

@@ -4,9 +4,11 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import random
+import copy
 import objects.shadow as shadow
 import objects.groups as groups
 import objects.particle as particle
+import objects.effects.flash as flash
 import settings.settings as settings
 
 """
@@ -31,6 +33,11 @@ class Block(pygame.sprite.Sprite):
 	particle_spawn_amount = 4
 	particle_size = 0.75 * settings.GAME_SCALE
 	half_health_blend_color = pygame.Color(128, 128, 128)
+
+	# On hit effect values.
+	hit_effect_start_color = pygame.Color(255, 255, 255, 255)
+	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
+	hit_effect_tick_amount = 15
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
@@ -70,7 +77,10 @@ class Block(pygame.sprite.Sprite):
 		if self.health <= self.max_health / 2:
 			self.image = self.half_health_image
 
-		# Spawn some particles-
+		# Create a new on hit effect.
+		self.effect_group.add(flash.Flash(self, copy.copy(Block.hit_effect_start_color), copy.copy(Block.hit_effect_final_color), Block.hit_effect_tick_amount))
+
+		# Spawn some particles.
 		for _ in range(0, Block.particle_spawn_amount):
 			angle = random.uniform(0, math.pi)
 			speed = 5

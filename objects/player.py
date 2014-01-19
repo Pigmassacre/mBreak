@@ -9,9 +9,12 @@ import settings.settings as settings
 
 """
 
-This is the class that represents each player in the game. mBreak is currently designed with two players
-in mind, but it wouldn't take too much work to allow more players than that (not sure about how fun that
-would be though.. :P).
+This is the player class. mBreak is currently designed with two players in mind, but it wouldn't take too much work
+ to allow more players than that (not sure about how fun that would be though.. :P).
+
+Each player handles updating their own paddles, by sending the key_up and key_down variables to the update method of
+each of the paddle that the player owns. Currently both players only have one paddle, but it's trivial to add
+more than one.
 
 """
 

@@ -11,9 +11,9 @@ import settings.settings as settings
 
 """
 
-This is the class that represents each trace in the game. Currently, only balls spawn traces (and only if the graphic options
-for traces is set to True). A trace is the same size as its parent, and will eventually fade away until it is no longer visible,
-at which point it will be killed.
+This is the trace class. Currently, only balls spawn traces (and only if the graphic options for traces is set to True).
+A trace is the same size as its parent, and will eventually fade away until it is no longer visible, at which point 
+it will be destroyed.
 
 Any object which has a color and a rect can spawn a trace attached to it.
 
@@ -65,7 +65,7 @@ class Trace(pygame.sprite.Sprite):
 		self.shadow.kill()
 
 	def update(self):
-		# Update the alpha in the RGBA color value. If it gets to or under 0, we kill ourself.
+		# Update the alpha in the RGBA color value. If it gets to or under 0, we destroy ourselves.
 		if self.alpha_step > 0:
 			if self.color.a - self.alpha_step < 0:
 				self.destroy()
