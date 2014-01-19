@@ -113,6 +113,11 @@ class PrepareMenu:
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
+		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
+		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
+		self.not_all_colors_chosen_toast.x = (settings.SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
+		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
+
 		# We setup all menu transitions.
 		self.transitions = transition.Transition()
 		self.transitions.setup_transition(self.number_of_rounds_menu, True, True, False, False)
@@ -123,11 +128,6 @@ class PrepareMenu:
 		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
 		self.transitions.setup_transition(self.back_menu, True, False, False, True)
 		self.transitions.setup_transition(self.start_menu, False, True, False, True)
-
-		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
-		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
-		self.not_all_colors_chosen_toast.x = (settings.SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
-		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
 		# We setup and play music.
 		self.setup_music()
