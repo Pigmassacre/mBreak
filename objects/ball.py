@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import copy
 import math
 import random
 import other.useful as useful
@@ -9,6 +10,7 @@ import objects.paddle as paddle
 import objects.particle as particle
 import objects.trace as trace
 import objects.shadow as shadow
+import objects.effects.flash as flash
 import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
@@ -53,6 +55,11 @@ class Ball(pygame.sprite.Sprite):
 	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
+
+	# On hit effect values.
+	hit_effect_start_color = pygame.Color(255, 255, 255, 255)
+	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
+	hit_effect_tick_amount = 40
 
 	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -113,6 +120,10 @@ class Ball(pygame.sprite.Sprite):
 		self.shadow.kill()
 		for effect in self.effect_group:
 			effect.destroy()
+
+	def on_hit(self, other_object):
+		# Create a new on hit effect.
+		self.effect_group.add(flash.Flash(self, copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount))
 
 	def update(self, main_clock):
 		# We assume we haven't collided with anything yet.
@@ -320,6 +331,9 @@ class Ball(pygame.sprite.Sprite):
 		# Spawn a few particles.
 		self.spawn_particles()
 
+		# Tell the paddle that it has been hit.
+		paddle.on_hit(self)
+
 		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
@@ -336,6 +350,9 @@ class Ball(pygame.sprite.Sprite):
 		# Place ball to the left of the paddle.
 		self.place_left_of(paddle)
 
+		# Nudge paddle a tiny bit.
+		paddle.x += 4
+
 	def hit_right_side_of_paddle(self, paddle):
 		# Calculate spin, and then reverse angle.
 		self.calculate_spin(paddle)
@@ -344,6 +361,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Place ball to the right of the paddle.
 		self.place_right_of(paddle)
+
+		# Nudge paddle a tiny bit.
+		paddle.x -= 4
 
 	def check_collision_balls(self):
 		# This method is used to check for collision with other balls. If a collision is detected, it is also
@@ -401,6 +421,12 @@ class Ball(pygame.sprite.Sprite):
 
 	def hit_ball(self, ball):
 		self.spawn_particles()
+
+		# Tell self that we've been hit.
+		self.on_hit(ball)
+
+		# Tell the other ball that it has been hit.
+		ball.on_hit(self)
 
 		# Tell all the effects that we've just hit another ball.
 		for effect in self.effect_group:

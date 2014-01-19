@@ -2,8 +2,10 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import copy
 import other.useful as useful
 import objects.shadow as shadow
+import objects.effects.flash as flash
 import objects.groups as groups
 import settings.settings as settings
 
@@ -29,6 +31,15 @@ class Paddle(pygame.sprite.Sprite):
 	retardation = 2 * settings.GAME_SCALE
 	max_speed = 1.5 * settings.GAME_SCALE
 
+	# On hit effect values.
+	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
+	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
+	hit_effect_tick_amount = 22
+
+	# Used for hit effect on the paddle.
+	stabilize_speed = 0.45
+	max_nudge_distance = 6
+
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
@@ -42,6 +53,9 @@ class Paddle(pygame.sprite.Sprite):
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
 		self.y = y
+
+		# This is the actual desired x position of the paddle. Used for visual effects.
+		self.center_x = self.x
 
 		# The velocity at which the Paddle will be moved when it is updated.
 		self.velocity_y = 0
@@ -72,6 +86,10 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Create an effect group to handle effects on this paddle.
 		self.effect_group = pygame.sprite.Group()
+
+	def on_hit(self, other_object):
+		# Create a new on hit effect.
+		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
 
 	def update(self, key_up, key_down):
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
@@ -108,10 +126,24 @@ class Paddle(pygame.sprite.Sprite):
 		self.y = self.y + self.velocity_y
 		self.rect.y = self.y
 
-		# Move any effects on the paddle.
-		for effect in self.effect_group:
-			effect.rect.x = self.rect.x
-			effect.rect.y = self.rect.y
+		# Move paddle to it's center x.
+		if self.x > self.center_x:
+			if self.x > self.center_x + Paddle.max_nudge_distance:
+				self.x = self.center_x + Paddle.max_nudge_distance
+
+			if self.x - Paddle.stabilize_speed < self.center_x:
+				self.x = self.center_x
+			else:
+				self.x -= Paddle.stabilize_speed
+		else:
+			if self.x < self.center_x - Paddle.max_nudge_distance:
+				self.x = self.center_x - Paddle.max_nudge_distance
+
+			if self.x + Paddle.stabilize_speed > self.center_x:
+				self.x = self.center_x
+			else:
+				self.x += Paddle.stabilize_speed
+		self.rect.x = self.x
 
 		# Check collision with y-edges.
 		if self.rect.y < settings.LEVEL_Y:
@@ -122,3 +154,8 @@ class Paddle(pygame.sprite.Sprite):
 			# Constrain paddle to screen size.
 			self.y = settings.LEVEL_MAX_Y - self.rect.height
 			self.rect.y = self.y
+
+		# Move any effects on the paddle.
+		for effect in self.effect_group:
+			effect.rect.x = self.rect.x
+			effect.rect.y = self.rect.y

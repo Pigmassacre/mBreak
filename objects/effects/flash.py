@@ -16,7 +16,7 @@ class Flash(effect.Effect):
 
 	def __init__(self, parent, start_color, final_color, tick_amount):
 		# We start by calling the superconstructor.
-		effect.Effect.__init__(self, parent, 2000)
+		effect.Effect.__init__(self, parent, 1000)
 
 		self.parent = parent
 
@@ -42,12 +42,12 @@ class Flash(effect.Effect):
 			if (self.current_color.a + self.tick_amount) <= 255:
 				self.current_color.a += self.tick_amount
 			else:
-				self.current_color.a == 255
+				self.current_color.a == self.final_color.a
 		else:
 			if (self.current_color.a - self.tick_amount) >= 0:
 				self.current_color.a -= self.tick_amount
 			else:
-				self.current_color.a == 0
+				self.current_color.a == self.final_color.a
 
 		if self.current_color.a == self.final_color.a:
 			self.destroy()
