@@ -60,6 +60,9 @@ class Powerup(pygame.sprite.Sprite):
 		# We create a flash effect as a sort of spawn effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
+		# Play a random sound from the sound_effects list.
+		Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+
 		if settings.DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
