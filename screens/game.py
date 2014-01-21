@@ -89,7 +89,7 @@ class Game:
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 1, 2, 1)
+		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 2)
 
 		# The list of available powerups to spawn.
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity]

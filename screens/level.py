@@ -50,12 +50,12 @@ class Level:
 				temp_block_right.image = pygame.transform.flip(temp_block_right.image, True, False)
 
 		# Create a paddle for player one.
-		left_paddle_x = settings.LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_normal * block.Block.width) + (paddle.Paddle.width * 4)
+		left_paddle_x = settings.LEVEL_X + (amount_of_strong * block.Block.width) + (amount_of_normal * block.Block.width) + (amount_of_weak * block.Block.width) + (paddle.Paddle.width * 3)
 		left_paddle_y = (settings.LEVEL_Y + (settings.LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		player_one.paddle_group.add(paddle.Paddle(left_paddle_x, left_paddle_y, player_one))
 
 		# Create a paddle for player two.
-		right_paddle_x = settings.LEVEL_MAX_X - (amount_of_strong * block.Block.width) - (amount_of_normal * block.Block.width) - (paddle.Paddle.width * 5)
+		right_paddle_x = settings.LEVEL_MAX_X - (amount_of_strong * block.Block.width) - (amount_of_normal * block.Block.width) - (amount_of_weak * block.Block.width) - (paddle.Paddle.width * 4)
 		right_paddle_y = (settings.LEVEL_Y + (settings.LEVEL_MAX_Y- paddle.Paddle.height)) / 2.0
 		paddle_right = paddle.Paddle(right_paddle_x, right_paddle_y, player_two)
 		paddle_right.image = pygame.transform.flip(paddle_right.image, True, False)
