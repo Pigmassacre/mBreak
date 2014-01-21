@@ -26,7 +26,7 @@ class Effect(pygame.sprite.Sprite):
 
 		# Store the duration. The effect will be killed when time_passed is greater than duration.
 		self.duration = duration
-
+		
 		# Create the rect used for collision detection, position etc.
 		self.rect = pygame.rect.Rect(self.parent.rect.x, self.parent.rect.y, self.parent.rect.width, self.parent.rect.height)
 

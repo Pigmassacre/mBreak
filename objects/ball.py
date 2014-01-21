@@ -11,6 +11,7 @@ import objects.particle as particle
 import objects.trace as trace
 import objects.shadow as shadow
 import objects.effects.flash as flash
+import objects.dummy as dummy
 import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
@@ -57,9 +58,9 @@ class Ball(pygame.sprite.Sprite):
 	particle_spawn_amount = 3
 
 	# On hit effect values.
-	hit_effect_start_color = pygame.Color(255, 255, 255, 255)
+	hit_effect_start_color = pygame.Color(255, 255, 255, 150)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
-	hit_effect_tick_amount = 40
+	hit_effect_tick_amount = 8
 
 	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -122,8 +123,9 @@ class Ball(pygame.sprite.Sprite):
 			effect.destroy()
 
 	def on_hit(self, other_object):
-		# Create a new on hit effect.
-		self.effect_group.add(flash.Flash(self, copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount))
+		# Create a new dummy and add a on hit effect to that dummy.
+		effect_dummy = dummy.Dummy(1000, self.rect.x, self.rect.y, self.rect.width, self.rect.height)
+		effect_dummy.add_flash(copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount)
 
 	def update(self, main_clock):
 		# We assume we haven't collided with anything yet.
@@ -237,6 +239,9 @@ class Ball(pygame.sprite.Sprite):
 		# Spawn some particles.
 		self.spawn_particles()
 
+		# Tell ourselves that we have been hit.
+		self.on_hit(paddle)
+
 		# Tell all the effects that we've just hit a wall.
 		for effect in self.effect_group:
 			effect.on_hit_wall()
@@ -330,6 +335,9 @@ class Ball(pygame.sprite.Sprite):
 	def hit_paddle(self, paddle):
 		# Spawn a few particles.
 		self.spawn_particles()
+
+		# Tell ourselves that we have been hit.
+		self.on_hit(paddle)
 
 		# Tell the paddle that it has been hit.
 		paddle.on_hit(self)
@@ -564,6 +572,9 @@ class Ball(pygame.sprite.Sprite):
 	def hit_block(self, block):
 		# We've hit a block, so spawn a particle, damage that block and set collision to True.
 		self.spawn_particles()
+
+		# Tell ourselves that we have been hit.
+		self.on_hit(block)
 
 		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
 		if block.owner == self.owner:

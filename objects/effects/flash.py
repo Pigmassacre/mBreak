@@ -18,8 +18,6 @@ class Flash(effect.Effect):
 		# We start by calling the superconstructor.
 		effect.Effect.__init__(self, parent, 1000)
 
-		self.parent = parent
-
 		self.surface = pygame.Surface((self.parent.rect.width, self.parent.rect.height), pygame.locals.SRCALPHA)
 
 		self.start_color = start_color

@@ -20,6 +20,7 @@ def empty_after_round():
 	Groups.paddle_group.empty()
 	Groups.shadow_group.empty()
 	Groups.trace_group.empty()
+	Groups.dummy_group.empty()
 
 def empty_all():
 	# This empties ALL the groups, so this is called when we return to the main menu from the game.
@@ -54,4 +55,7 @@ class Groups:
 
 	# Define the group that contains all the shadows.
 	shadow_group = pygame.sprite.Group()
+
+	# Define the group that contains all the dummy objects.
+	dummy_group = pygame.sprite.Group()
 	

@@ -289,6 +289,9 @@ class Game:
 		# Update the blocks.
 		groups.Groups.block_group.update()
 
+		# Update the dummy objects.
+		groups.Groups.dummy_group.update(self.main_clock)
+
 		# Update the powerups.
 		groups.Groups.powerup_group.update(self.main_clock)
 

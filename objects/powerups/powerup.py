@@ -2,8 +2,10 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import copy
 import math
 import random
+import objects.effects.flash as flash
 import objects.groups as groups
 import settings.settings as settings
 
@@ -28,6 +30,11 @@ class Powerup(pygame.sprite.Sprite):
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE
 
+	# On hit effect values.
+	spawn_effect_start_color = pygame.Color(255, 255, 255, 255)
+	spawn_effect_final_color = pygame.Color(255, 255, 255, 0)
+	spawn_effect_tick_amount = 18
+
 	def __init__(self, x, y, width, height, bob = True):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
@@ -49,6 +56,9 @@ class Powerup(pygame.sprite.Sprite):
 
 		# We also create an effect_group ourselves, in case anyone wants to add any sort of effect to us.
 		self.effect_group = pygame.sprite.Group()
+
+		# We create a flash effect as a sort of spawn effect.
+		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
 		if settings.DEBUG_MODE:
 			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
