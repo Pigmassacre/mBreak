@@ -250,6 +250,12 @@ class Ball(pygame.sprite.Sprite):
 		self.collided = True
 
 	def calculate_spin(self, paddle):
+		#paddle_middle_point = paddle.y + (paddle.height / 2)
+		#if self.y + (self.height / 2) < paddle_middle_point:
+		#	self.angle = self.angle + (0.09 * (paddle_middle_point - self.y))
+		#else:
+		#	self.angle = self.angle - (0.09 * (paddle_middle_point - self.y))
+
 		# We determine the velocity of the paddle with regards to the game scale.
 		velocity_y = paddle.velocity_y / settings.GAME_SCALE
 

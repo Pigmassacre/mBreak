@@ -20,7 +20,7 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, name, key_up, key_down, color):
+	def __init__(self, x, y, name, key_up, key_down, color, ai = True):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -34,6 +34,9 @@ class Player(pygame.sprite.Sprite):
 		# Key up and down are the keys that any paddles connected to this player will respond to.
 		self.key_up = key_up
 		self.key_down = key_down
+
+		# Store whether or not this player is AI controlled or not.
+		self.ai = ai
 
 		# Create and store the paddle.
 		self.paddle_group = pygame.sprite.Group()

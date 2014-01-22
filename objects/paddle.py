@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import copy
+import math
 import other.useful as useful
 import objects.shadow as shadow
 import objects.effects.flash as flash
@@ -92,14 +93,93 @@ class Paddle(pygame.sprite.Sprite):
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
 
 	def update(self, key_up, key_down):
+		if self.owner.ai:
+			key_up_pressed = False
+			key_down_pressed = False
+
+			# Simple, stupid AI. Lol.
+			if self.x < settings.SCREEN_WIDTH / 2:
+				paddle_side_left = True
+			else:
+				paddle_side_left = False
+
+			focused_ball = None
+			min_x_distance = 99999
+			min_x_ball = None
+			min_y_distance = 99999
+			min_y_ball = None
+			for ball in groups.Groups.ball_group:
+				if focused_ball == None:
+					focused_ball = ball
+
+				if min_x_ball == None:
+					min_x_ball = ball
+
+				if min_y_ball == None:
+					min_y_ball = ball
+
+				if paddle_side_left:
+					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2:
+						if ball.x - self.x < min_x_distance:
+							min_x_distance = ball.x - self.x
+							min_x_ball = ball
+
+						if ball.y + (ball.height / 2) < self.y + (self.height / 2):
+							if self.y - ball.y < min_y_distance:
+								min_y_distance = self.y - ball.y
+								min_y_ball = ball
+						else:
+							if ball.y - self.y < min_y_distance:
+								min_y_distance = ball.y - self.y
+								min_y_ball = ball
+
+						if min_x_distance < min_y_distance:
+							focused_ball = min_x_ball
+						else:
+							focused_ball = min_x_ball # Doesnt actually care about y distance yet, TODO
+
+					if min_x_distance <= self.width:
+						focused_ball = None
+				else:
+					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2:
+						if self.x - ball.x < min_x_distance:
+							min_x_distance = self.x - ball.x
+							min_x_ball = ball
+
+						if ball.y + (ball.height / 2) < self.y + (self.height / 2):
+							if self.y - ball.y < min_y_distance:
+								min_y_distance = self.y - ball.y
+								min_y_ball = ball
+						else:
+							if ball.y - self.y < min_y_distance:
+								min_y_distance = ball.y - self.y
+								min_y_ball = ball
+
+						if min_x_distance < min_y_distance:
+							focused_ball = min_x_ball
+						else:
+							focused_ball = min_x_ball # Doesnt actually care about y distance yet, TODO
+
+					if min_x_distance <= -self.width:
+						focused_ball = None
+
+			if focused_ball != None:
+				if focused_ball.y + (focused_ball.height / 2) < self.y:
+					key_up_pressed = True
+				elif focused_ball.y + (focused_ball.height / 2) > self.y + self.height:
+					key_down_pressed = True
+		else:
+			key_up_pressed = pygame.key.get_pressed()[key_up]
+			key_down_pressed = pygame.key.get_pressed()[key_down]
+
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if max_speed is above zero, since if it is zero the paddle cannot move anyway.
 		if self.max_speed > 0:
-			if pygame.key.get_pressed()[key_up]:
+			if key_up_pressed:
 					self.velocity_y = self.velocity_y - self.acceleration
 					if self.velocity_y < -self.max_speed:
 						self.velocity_y = -self.max_speed
-			elif pygame.key.get_pressed()[key_down]:
+			elif key_down_pressed:
 					self.velocity_y = self.velocity_y + self.acceleration
 					if self.velocity_y > self.max_speed:
 						self.velocity_y = self.max_speed
