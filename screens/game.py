@@ -347,6 +347,11 @@ class Game:
 		# Draw the balls.
 		groups.Groups.ball_group.draw(self.window_surface)
 
+		# Draw debug information for AI.
+		if settings.DEBUG_MODE:
+			for paddle in groups.Groups.paddle_group:
+				paddle.debug_draw(self.window_surface)
+
 		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:
 			if not effect.__class__ == flash.Flash:

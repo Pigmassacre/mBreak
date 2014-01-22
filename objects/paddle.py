@@ -72,6 +72,12 @@ class Paddle(pygame.sprite.Sprite):
 		# Store the paddle in the owners paddle_group.
 		self.owner.paddle_group.add(self)
 
+		# AI variables.
+		self.focused_ball = None
+		self.min_x_distance = 99999
+		self.min_y_distance = 99999
+		self.min_distance = 99999
+
 		# Create the image attribute that is drawn to the surface.
 		self.image = Paddle.image.copy()
 
@@ -92,83 +98,72 @@ class Paddle(pygame.sprite.Sprite):
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
 
+	def debug_draw(self, surface):
+		if self.focused_ball != None and settings.DEBUG_MODE:
+			color = copy.copy(self.owner.color)
+			color.a = 128
+			surface.fill(color, pygame.Rect(self.focused_ball.rect.x - 2, self.focused_ball.y - 2, self.focused_ball.width + 4, self.focused_ball.height + 4))
+
+	def decide_which_ball(self, ball):
+		if self.owner.ai_difficulty >= 2:
+			# The higher the difficulty the smarter / cheatier the AI.
+			if math.fabs(self.x - ball.x) < self.min_x_distance:
+				self.min_x_distance = math.fabs(self.x - ball.x)
+				self.focused_ball = ball
+		else:
+			# Standard difficulty, no cheat. Simply seek out the ball with the least distance to
+			# the paddle, and move towards that ball.
+			self.min_x_distance = math.fabs(self.x - ball.x)
+			self.min_y_distance = math.fabs(self.y - ball.y)
+			if math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2)) < self.min_distance:
+				self.min_distance = math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2))
+				self.focused_ball = ball
+
 	def update(self, key_up, key_down):
+		# Very simple AI.
 		if self.owner.ai:
 			key_up_pressed = False
 			key_down_pressed = False
 
-			# Simple, stupid AI. Lol.
 			if self.x < settings.SCREEN_WIDTH / 2:
 				paddle_side_left = True
 			else:
 				paddle_side_left = False
 
-			focused_ball = None
-			min_x_distance = 99999
-			min_x_ball = None
-			min_y_distance = 99999
-			min_y_ball = None
+			# Reset the targeting variables.
+			self.focused_ball = None
+			self.min_x_distance = 99999
+			self.min_y_distance = 99999
+			self.min_distance = 99999
+
+			# Loop over every ball in the game, and figure out which ball to focus on.
 			for ball in groups.Groups.ball_group:
-				if focused_ball == None:
-					focused_ball = ball
-
-				if min_x_ball == None:
-					min_x_ball = ball
-
-				if min_y_ball == None:
-					min_y_ball = ball
+				if self.focused_ball == None:
+					self.focused_ball = ball
 
 				if paddle_side_left:
-					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2:
-						if ball.x - self.x < min_x_distance:
-							min_x_distance = ball.x - self.x
-							min_x_ball = ball
-
-						if ball.y + (ball.height / 2) < self.y + (self.height / 2):
-							if self.y - ball.y < min_y_distance:
-								min_y_distance = self.y - ball.y
-								min_y_ball = ball
-						else:
-							if ball.y - self.y < min_y_distance:
-								min_y_distance = ball.y - self.y
-								min_y_ball = ball
-
-						if min_x_distance < min_y_distance:
-							focused_ball = min_x_ball
-						else:
-							focused_ball = min_x_ball # Doesnt actually care about y distance yet, TODO
-
-					if min_x_distance <= self.width:
-						focused_ball = None
+					# If this is the left paddle, we only care about the balls that have an angle that points to
+					# the paddle, and balls that are on the right side of the paddle.
+					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and self.focused_ball.x >= self.x + (self.width / 2):
+						self.decide_which_ball(ball)
 				else:
-					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2:
-						if self.x - ball.x < min_x_distance:
-							min_x_distance = self.x - ball.x
-							min_x_ball = ball
+					# If this is the right paddle, we only care about balls to the left of this paddle (and balls
+					# that have an angle that points to the paddle).
+					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and self.focused_ball.x < self.x + (self.width / 2):
+						self.decide_which_ball(ball)
 
-						if ball.y + (ball.height / 2) < self.y + (self.height / 2):
-							if self.y - ball.y < min_y_distance:
-								min_y_distance = self.y - ball.y
-								min_y_ball = ball
-						else:
-							if ball.y - self.y < min_y_distance:
-								min_y_distance = ball.y - self.y
-								min_y_ball = ball
-
-						if min_x_distance < min_y_distance:
-							focused_ball = min_x_ball
-						else:
-							focused_ball = min_x_ball # Doesnt actually care about y distance yet, TODO
-
-					if min_x_distance <= -self.width:
-						focused_ball = None
-
-			if focused_ball != None:
-				if focused_ball.y + (focused_ball.height / 2) < self.y:
-					key_up_pressed = True
-				elif focused_ball.y + (focused_ball.height / 2) > self.y + self.height:
-					key_down_pressed = True
+			if self.focused_ball != None:
+				if self.owner.ai_difficulty > 2:
+					# If cheaty AI, teleport to ball.
+					self.y = self.focused_ball.y + (self.focused_ball.height / 2) - (self.height / 2)
+				else:
+					# If normal AI, move to ball.
+					if self.focused_ball.y + (self.focused_ball.height / 2) < self.y:
+						key_up_pressed = True
+					elif self.focused_ball.y + (self.focused_ball.height / 2) > self.y + self.height:
+						key_down_pressed = True
 		else:
+			# If no AI, we just check for key presses.
 			key_up_pressed = pygame.key.get_pressed()[key_up]
 			key_down_pressed = pygame.key.get_pressed()[key_down]
 

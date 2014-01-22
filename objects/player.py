@@ -20,7 +20,7 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, name, key_up, key_down, color, ai = True):
+	def __init__(self, x, y, name, key_up, key_down, color, ai = True, ai_difficulty = 1):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -37,6 +37,9 @@ class Player(pygame.sprite.Sprite):
 
 		# Store whether or not this player is AI controlled or not.
 		self.ai = ai
+
+		# Store the difficulty of the AI. A higher number equals a smarter/more cheaty AI.
+		self.ai_difficulty = ai_difficulty
 
 		# Create and store the paddle.
 		self.paddle_group = pygame.sprite.Group()
