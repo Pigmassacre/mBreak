@@ -138,22 +138,19 @@ class Paddle(pygame.sprite.Sprite):
 
 			# Loop over every ball in the game, and figure out which ball to focus on.
 			for ball in groups.Groups.ball_group:
-				if self.focused_ball == None:
-					self.focused_ball = ball
-
 				if paddle_side_left:
 					# If this is the left paddle, we only care about the balls that have an angle that points to
 					# the paddle, and balls that are on the right side of the paddle.
-					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and self.focused_ball.x >= self.x + (self.width / 2):
+					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and ball.x >= self.x + (self.width / 2):
 						self.decide_which_ball(ball)
 				else:
 					# If this is the right paddle, we only care about balls to the left of this paddle (and balls
 					# that have an angle that points to the paddle).
-					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and self.focused_ball.x < self.x + (self.width / 2):
+					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and ball.x < self.x + (self.width / 2):
 						self.decide_which_ball(ball)
 
 			if self.focused_ball != None:
-				if self.owner.ai_difficulty > 2:
+				if self.owner.ai_difficulty >= 2:
 					# If cheaty AI, teleport to ball.
 					self.y = self.focused_ball.y + (self.focused_ball.height / 2) - (self.height / 2)
 				else:

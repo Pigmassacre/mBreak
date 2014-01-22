@@ -30,6 +30,9 @@ class Powerup(pygame.sprite.Sprite):
 	width = 8 * settings.GAME_SCALE
 	height = 8 * settings.GAME_SCALE
 
+	# Used for how noticable the bob effect should be.
+	bob_factor = 0.5 * settings.GAME_SCALE
+
 	# On hit effect values.
 	spawn_effect_start_color = pygame.Color(255, 255, 255, 255)
 	spawn_effect_final_color = pygame.Color(255, 255, 255, 0)
@@ -84,7 +87,7 @@ class Powerup(pygame.sprite.Sprite):
 	def update(self, main_clock):
 		# Update the position according to the bob effect.
 		if self.bob:
-			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * 0.0075) * 1.5
+			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * 0.0075) * Powerup.bob_factor
 
 		# Update the rects position.
 		self.rect.x = self.x

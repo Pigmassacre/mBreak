@@ -11,6 +11,7 @@ import objects.particle as particle
 import objects.trace as trace
 import objects.shadow as shadow
 import objects.effects.flash as flash
+import objects.effects.stun as stun
 import objects.dummy as dummy
 import objects.groups as groups
 import settings.settings as settings
@@ -49,7 +50,11 @@ class Ball(pygame.sprite.Sprite):
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	speed = 1 * settings.GAME_SCALE
-	max_speed = 3 * settings.GAME_SCALE
+	smash_speed = 0.15 * settings.GAME_SCALE
+	smash_damage_factor = 1
+	smash_max_stack = 4
+	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
+	max_speed = 1.5 * settings.GAME_SCALE
 	damage = 10
 	spin_speed_strength = 0.05 # Not used, but exists if I ever want to use it for balancing purposes.
 	spin_angle_strength = 0.09
@@ -87,6 +92,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Set the speed variable.
 		self.speed = Ball.speed
+
+		# Store the current level of smash stack.
+		self.smash_stack = 0
 		
 		# Store the owner.
 		self.owner = owner
@@ -250,6 +258,12 @@ class Ball(pygame.sprite.Sprite):
 		self.collided = True
 
 	def calculate_spin(self, paddle):
+		# Add smash speed to ourselves.
+		self.speed += Ball.smash_speed
+
+		# Increase our smash stack.
+		self.smash_stack += 1
+
 		#paddle_middle_point = paddle.y + (paddle.height / 2)
 		#if self.y + (self.height / 2) < paddle_middle_point:
 		#	self.angle = self.angle + (0.09 * (paddle_middle_point - self.y))
@@ -342,11 +356,24 @@ class Ball(pygame.sprite.Sprite):
 		# Spawn a few particles.
 		self.spawn_particles()
 
+		# Calculate the spin.
+		self.calculate_spin(paddle)
+
 		# Tell ourselves that we have been hit.
 		self.on_hit(paddle)
 
 		# Tell the paddle that it has been hit.
 		paddle.on_hit(self)
+
+		# If smash stack is equal to max smash stack, stun the hit paddle.
+		if self.smash_stack == Ball.smash_max_stack:
+			self.effect_group.add(stun.Stun(self, 500))
+
+			# Remove smash speed.
+			self.speed = Ball.speed
+
+			# Then reset our smash stack.
+			self.smash_stack = 0
 
 		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
@@ -356,8 +383,7 @@ class Ball(pygame.sprite.Sprite):
 		self.collided = True
 
 	def hit_left_side_of_paddle(self, paddle):
-		# Calculate spin, and then reverse angle.
-		self.calculate_spin(paddle)
+		# Reverse angle.
 		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
 			self.angle = math.pi - self.angle
 
@@ -365,11 +391,10 @@ class Ball(pygame.sprite.Sprite):
 		self.place_left_of(paddle)
 
 		# Nudge paddle a tiny bit.
-		paddle.x += 4
+		paddle.x += Ball.paddle_nudge_distance
 
 	def hit_right_side_of_paddle(self, paddle):
-		# Calculate spin, and then reverse angle.
-		self.calculate_spin(paddle)
+		# Reverse angle.
 		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
 			self.angle = math.pi - self.angle
 
@@ -377,7 +402,7 @@ class Ball(pygame.sprite.Sprite):
 		self.place_right_of(paddle)
 
 		# Nudge paddle a tiny bit.
-		paddle.x -= 4
+		paddle.x -= Ball.paddle_nudge_distance
 
 	def check_collision_balls(self):
 		# This method is used to check for collision with other balls. If a collision is detected, it is also
@@ -435,6 +460,9 @@ class Ball(pygame.sprite.Sprite):
 
 	def hit_ball(self, ball):
 		self.spawn_particles()
+
+		# Remove smash speed.
+		self.speed = Ball.speed
 
 		# Tell self that we've been hit.
 		self.on_hit(ball)
@@ -582,15 +610,24 @@ class Ball(pygame.sprite.Sprite):
 		# Tell ourselves that we have been hit.
 		self.on_hit(block)
 
+		# Damage is increased the higher the speed is over the standard speed.
+		damage_dealt = Ball.damage * (self.speed / Ball.speed) * Ball.smash_damage_factor
+
 		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
 		if block.owner == self.owner:
-			block.on_hit(Ball.damage / 2.0)
+			block.on_hit(damage_dealt / 2.0)
 		else:
-			block.on_hit(Ball.damage)
+			block.on_hit(damage_dealt)
 
 		# Tell all the effects that we've just hit a block.
 		for effect in self.effect_group:
 			effect.on_hit_block(block)
+
+		# Remove smash speed.
+		self.speed = Ball.speed
+
+		# Reset our smash stack.
+		self.smash_stack = 0
 
 		# We just collided with a block, so we set collided to True.
 		self.collided = True
