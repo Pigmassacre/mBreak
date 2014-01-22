@@ -16,7 +16,7 @@ Save on the other hand, will take the current values of the variables and try to
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
-GAME_SCALE = 4
+GAME_SCALE = 3
 
 # Screen width and height is the game window width and height.
 SCREEN_WIDTH = int(285 * GAME_SCALE)

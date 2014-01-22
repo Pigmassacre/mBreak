@@ -76,7 +76,7 @@ class Player(pygame.sprite.Sprite):
 		self.powerup_group.empty()
 		self.effect_group.empty()
 		
-	def add_powerup(self, classname, effect):
+	def add_powerup(self, classname, effect = None):
 		# Determine what position to place the powerup at.
 		if self.x <= settings.SCREEN_WIDTH / 2:
 			# If position is on the left half of the screen, place the powerup after the item with the highest x value in the powerup group.
@@ -97,7 +97,8 @@ class Player(pygame.sprite.Sprite):
 
 		# Stores a powerup in our powerup group, and connects it to the effect so the powerup can be killed when the effect is killed.
 		temp_powerup = classname(x, y)
-		effect.displayed_powerups.append(temp_powerup)
+		if effect != None:
+			effect.displayed_powerups.append(temp_powerup)
 		self.powerup_group.add(temp_powerup)
 
 		# Change the last_powerup_group_size to match the current size of the group.

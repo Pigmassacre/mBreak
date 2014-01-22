@@ -50,9 +50,6 @@ class Ball(pygame.sprite.Sprite):
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	speed = 1 * settings.GAME_SCALE
-	smash_speed = 0.15 * settings.GAME_SCALE
-	smash_damage_factor = 1
-	smash_max_stack = 4
 	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
 	max_speed = 1.5 * settings.GAME_SCALE
 	damage = 10
@@ -61,6 +58,15 @@ class Ball(pygame.sprite.Sprite):
 	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
+
+	# Smash stuff.
+	smash_speed = 0.15 * settings.GAME_SCALE
+	smash_damage_factor = 1
+	smash_max_stack = 4
+	smash_effect_size_increase = 1 * settings.GAME_SCALE
+	smash_effect_start_color = pygame.Color(255, 255, 255, 255)
+	smash_effect_final_color = pygame.Color(255, 255, 255, 0)
+	smash_effect_tick_amount = 6
 
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 150)
@@ -264,12 +270,6 @@ class Ball(pygame.sprite.Sprite):
 		# Increase our smash stack.
 		self.smash_stack += 1
 
-		#paddle_middle_point = paddle.y + (paddle.height / 2)
-		#if self.y + (self.height / 2) < paddle_middle_point:
-		#	self.angle = self.angle + (0.09 * (paddle_middle_point - self.y))
-		#else:
-		#	self.angle = self.angle - (0.09 * (paddle_middle_point - self.y))
-
 		# We determine the velocity of the paddle with regards to the game scale.
 		velocity_y = paddle.velocity_y / settings.GAME_SCALE
 
@@ -352,6 +352,18 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of paddle collided with.
 				self.hit_right_side_of_paddle(paddle)
 
+	def remove_smash_effects(self):
+		# Remove all stun effects.
+		for effect in self.effect_group:
+			if effect.__class__ == stun.Stun:
+				effect.destroy()
+
+		# Remove smash speed.
+		self.speed = Ball.speed
+
+		# Then reset our smash stack.
+		self.smash_stack = 0
+
 	def hit_paddle(self, paddle):
 		# Spawn a few particles.
 		self.spawn_particles()
@@ -365,19 +377,16 @@ class Ball(pygame.sprite.Sprite):
 		# Tell the paddle that it has been hit.
 		paddle.on_hit(self)
 
-		# If smash stack is equal to max smash stack, stun the hit paddle.
-		if self.smash_stack == Ball.smash_max_stack:
-			self.effect_group.add(stun.Stun(self, 500))
-
-			# Remove smash speed.
-			self.speed = Ball.speed
-
-			# Then reset our smash stack.
-			self.smash_stack = 0
-
 		# Tell all the effects that we've just hit a paddle.
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
+
+		# If smash stack is equal to max smash stack, stun the hit paddle.
+		if self.smash_stack == Ball.smash_max_stack:
+			self.effect_group.add(stun.Stun(self, 750, self.remove_smash_effects))
+			
+			# Attach a new flash effect to the ball.
+			self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
 
 		# We hit a paddle, so...
 		self.collided = True
@@ -461,8 +470,7 @@ class Ball(pygame.sprite.Sprite):
 	def hit_ball(self, ball):
 		self.spawn_particles()
 
-		# Remove smash speed.
-		self.speed = Ball.speed
+		self.remove_smash_effects()
 
 		# Tell self that we've been hit.
 		self.on_hit(ball)

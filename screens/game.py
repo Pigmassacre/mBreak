@@ -15,6 +15,7 @@ import objects.powerups.doublespeed as doublespeed
 import objects.powerups.electricity as electricity
 import objects.powerups.fire as fire
 import objects.powerups.frost as frost
+import objects.powerups.rocket as rocket
 import objects.effects.speed as speed
 import objects.effects.flash as flash
 import objects.blocks.block as block
@@ -92,7 +93,8 @@ class Game:
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 2)
 
 		# The list of available powerups to spawn.
-		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity]
+		#self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket]
+		self.powerup_list = [rocket.Rocket]
 
 		# The rate at which powerups will perhaps be spawned.
 		self.powerup_spawn_rate = 6000
@@ -292,6 +294,9 @@ class Game:
 		# Update the dummy objects.
 		groups.Groups.dummy_group.update(self.main_clock)
 
+		# Update the projectiles.
+		groups.Groups.projectile_group.update(self.main_clock)
+
 		# Update the powerups.
 		groups.Groups.powerup_group.update(self.main_clock)
 
@@ -346,6 +351,9 @@ class Game:
 
 		# Draw the balls.
 		groups.Groups.ball_group.draw(self.window_surface)
+
+		# Draw the projectiles.
+		groups.Groups.projectile_group.draw(self.window_surface)
 
 		# Draw debug information for AI.
 		if settings.DEBUG_MODE:

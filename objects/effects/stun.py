@@ -19,7 +19,7 @@ A simple stun effect. Paddles effected by this effect have their speed reduced t
 class Stun(effect.Effect):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/effect/freezing.png")
+	image = pygame.image.load("res/effect/stun.png")
 
 	# Initialize the mixer (so we can load a sound) and load the sound effect.
 	pygame.mixer.init(44100, -16, 2, 2048)
@@ -35,7 +35,7 @@ class Stun(effect.Effect):
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, parent, paddle_stun_duration, duration = 6000):
+	def __init__(self, parent, paddle_stun_duration, on_kill_function = None, duration = 6000):
 		# We start by calling the superconstructor with the given duration value.
 		# If parent is a paddle, set the duration to the paddle stun duration.
 		if parent.__class__ == paddle.Paddle:
@@ -45,6 +45,9 @@ class Stun(effect.Effect):
 
 		# We store the given stun duration for paddles.
 		self.paddle_stun_duration = paddle_stun_duration
+
+		# Store the given on kill function.
+		self.on_kill_function = on_kill_function
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
@@ -90,3 +93,7 @@ class Stun(effect.Effect):
 		# Restore the max speed we removed from the parent.
 		if self.parent.__class__ == paddle.Paddle:
 			self.parent.max_speed += Stun.max_speed_reduction
+
+		# Run the given on kill function.
+		if self.on_kill_function != None:
+			self.on_kill_function()

@@ -333,7 +333,7 @@ class PrepareMenu:
 		name = settings.PLAYER_ONE_NAME
 		key_up = settings.PLAYER_ONE_KEY_UP
 		key_down = settings.PLAYER_ONE_KEY_DOWN
-		return player.Player(x, y, name, key_up, key_down, color, True, 1)
+		return player.Player(x, y, name, key_up, key_down, color, True, 2)
 
 	def create_player_two(self, color):
 		# Creates player two, and sets the position of the player to the bottom-right corner of the screen.
@@ -343,4 +343,4 @@ class PrepareMenu:
 		name = settings.PLAYER_TWO_NAME
 		key_up = settings.PLAYER_TWO_KEY_UP
 		key_down = settings.PLAYER_TWO_KEY_DOWN
-		return player.Player(x, y, name, key_up, key_down, color, True, 1)
+		return player.Player(x, y, name, key_up, key_down, color, True, 2)

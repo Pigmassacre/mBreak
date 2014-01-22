@@ -16,7 +16,7 @@ class Flash(effect.Effect):
 
 	def __init__(self, parent, start_color, final_color, tick_amount):
 		# We start by calling the superconstructor.
-		effect.Effect.__init__(self, parent, 1000)
+		effect.Effect.__init__(self, parent, 3000)
 
 		self.surface = pygame.Surface((self.parent.rect.width, self.parent.rect.height), pygame.locals.SRCALPHA)
 
