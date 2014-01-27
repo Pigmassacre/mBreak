@@ -158,19 +158,18 @@ class Paddle(pygame.sprite.Sprite):
 				if paddle_side_left:
 					# If this is the left paddle, we only care about the balls that have an angle that points to
 					# the paddle, and balls that are on the right side of the paddle.
-					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and ball.x >= self.x + (self.width / 2):
+					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and ball.x >= self.x + (self.width / 3):
 						self.decide_which_ball(ball)
 				else:
 					# If this is the right paddle, we only care about balls to the left of this paddle (and balls
 					# that have an angle that points to the paddle).
-					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and ball.x < self.x + (self.width / 2):
+					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and ball.x < self.x + (self.width / 3):
 						self.decide_which_ball(ball)
 
 			if self.focused_ball != None:
 				if self.focused_ball != self.old_focused_ball:
-					self.chosen_distance_from_center = random.uniform((self.y + self.height / 2) - self.y + self.focused_ball.height, (self.y + self.height / 2) - (self.y + self.height) - self.focused_ball.height)
+					self.chosen_distance_from_center = random.uniform((self.y + self.height / 2) - self.y + self.focused_ball.height, (self.y + self.height / 2) - (self.y + self.height) - self.focused_ball.height) / 2
 					print("chosen_distance_from_center " + str(self.chosen_distance_from_center))
-					print("height of paddle " + str(self.height))
 
 				if self.owner.ai_difficulty >= 2:
 					# If cheaty AI, teleport to ball.

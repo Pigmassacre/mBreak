@@ -96,25 +96,25 @@ class Game:
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket]
 
 		# The rate at which powerups will perhaps be spawned.
-		self.powerup_spawn_rate = 6000
+		self.powerup_spawn_rate = 5000
 
 		# After this amount of time has passed, the powerup spawn chance will be increased.
-		self.powerup_increase_spawn_rate = 4000
+		self.powerup_increase_spawn_rate = 3000
 
 		# This is the amount that all the spawn chances will increase by every powerup_increase_spawn_rate.
-		self.powerup_spawn_chance_increase = 0.03
+		self.powerup_spawn_chance_increase = 0.045
 
 		# The chance that a powerup will spawn when it should spawn.
-		self.powerup_spawn_chance = 0.3
+		self.powerup_spawn_chance = 0.375
 
 		# The chance that another powerup will spawn if a powerup actually spawns.
-		self.powerup_second_spawn_chance = 0.2
+		self.powerup_second_spawn_chance = 0.275
 
 		# The chance that a THIRD powerup will spawn if a second powerup actually spawns.
-		self.powerup_third_spawn_chance = 0.1
+		self.powerup_third_spawn_chance = 0.175
 
 		# If there is already a doublespeed powerup on the gamefield, this is the chance that any further will spawn.
-		self.powerup_second_speed_spawn_chance = 0.1
+		self.powerup_second_speed_spawn_chance = 0.05
 
 		# Create the score texts. These are only displayed when the amount of rounds is greater than 0.
 		item_side_padding = textitem.TextItem.font_size
