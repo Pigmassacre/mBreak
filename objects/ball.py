@@ -105,13 +105,23 @@ class Ball(pygame.sprite.Sprite):
 		# Store the owner.
 		self.owner = owner
 
-		# Create the image attribute that is drawn to the surface.
-		self.image = Ball.image.copy()
+		# Create one image attribute per player.
+		self.player_images = {}
+		for player in groups.Groups.player_group:
+			player_image = Ball.image.copy()
+			
+			# Colorize the image to the color of the player.
+			useful.colorize_image(player_image, player.color)
+			
+			# Finally, add this image to the list of player images.
+			self.player_images[player] = player_image
 
-		# Colorize the image. We save a reference to the parents color in our own variable, so  that 
-		# classes and modules that want to use our color do not have to call us.owner.color
+		# Create the image attribute that is drawn to the surface.
+		self.image = self.player_images[self.owner]
+
+		# We save a reference to the parents color in our own variable, so that classes and modules
+		# that want to use our color do not have to call us.owner.color.
 		self.color = self.owner.color
-		useful.colorize_image(self.image, self.color)
 
 		# If collided is True, the ball sound is played.
 		self.collided = False
@@ -140,6 +150,11 @@ class Ball(pygame.sprite.Sprite):
 		# Create a new dummy and add a on hit effect to that dummy.
 		effect_dummy = dummy.Dummy(1000, self.rect.x, self.rect.y, self.rect.width, self.rect.height)
 		effect_dummy.add_flash(copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount)
+
+	def change_owner(self, new_owner):
+		self.owner = new_owner
+		self.image = self.player_images[self.owner]
+		self.color = self.owner.color
 
 	def update(self, main_clock):
 		# We assume we haven't collided with anything yet.
@@ -273,6 +288,19 @@ class Ball(pygame.sprite.Sprite):
 		# We determine the velocity of the paddle with regards to the game scale.
 		velocity_y = paddle.velocity_y / settings.GAME_SCALE
 
+		paddle_center = paddle.y + paddle.height / 2
+		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
+		print("distance_from_paddle_center " + str(distance_from_paddle_center))
+		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
+		normalized_distance = (distance_from_paddle_center / max_distance)
+		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
+		print("normalized_distance " + str(normalized_distance))
+		if self.angle > math.pi / 2 and self.angle < (3 * math.pi) / 2:
+			self.angle = normalized_distance * max_angle_offset
+		else:
+			self.angle = math.pi - normalized_distance * max_angle_offset
+
+		'''
 		# Use the velocity to calculate the spin.
 		if self.angle <= (math.pi / 2):
 			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
@@ -282,6 +310,7 @@ class Ball(pygame.sprite.Sprite):
 			self.angle = self.angle + (velocity_y * Ball.spin_angle_strength)
 		elif self.angle <= (2 * math.pi):
 			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
+		'''
 
 	def place_left_of(self, other):
 		self.x = other.rect.left - self.rect.width - 1
@@ -387,6 +416,9 @@ class Ball(pygame.sprite.Sprite):
 			
 			# Attach a new flash effect to the ball.
 			self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
+
+		# Change the owner of the ball to the owner of the paddle.
+		self.change_owner(paddle.owner)
 
 		# We hit a paddle, so...
 		self.collided = True

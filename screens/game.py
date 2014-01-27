@@ -263,19 +263,31 @@ class Game:
 		return powerup_to_spawn(x, y)
 
 	def start_game(self):
-		# When the game starts, we spawn balls for both players.
-		self.create_ball_left()
-		self.create_ball_right()
+		# When the game starts, we randomly create a ball for either the left or the right player.
+		if random.choice([True, False]):
+			self.create_ball_left()
+		else:
+			self.create_ball_right()
 
 	def create_ball_left(self):
 		# Creates a ball for the left player.
-		for paddle in self.player_one.paddle_group:
-			ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), -math.pi / 8, self.player_one)
+		x = settings.LEVEL_X + (settings.LEVEL_WIDTH + ball.Ball.width) / 2
+		y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT + ball.Ball.height) / 2
+		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
+		ball.Ball(x, y, random_angle, self.player_one)
+
+		#for paddle in self.player_one.paddle_group:
+		#	ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), -math.pi / 8, self.player_one)
 
 	def create_ball_right(self):
 		# Creates a ball for the right player.
-		for paddle in self.player_two.paddle_group:
-			ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi / 8, self.player_two)
+		x = settings.LEVEL_X + (settings.LEVEL_WIDTH + ball.Ball.width) / 2
+		y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT + ball.Ball.height) / 2
+		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
+		ball.Ball(x, y, math.pi + random_angle, self.player_two)
+
+		#for paddle in self.player_two.paddle_group:
+		#	ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi / 8, self.player_two)
 
 	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.

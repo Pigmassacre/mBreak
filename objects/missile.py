@@ -45,7 +45,7 @@ class Missile(pygame.sprite.Sprite):
 	damage = 10
 
 	# These variables affect how the missile homes to its target.
-	angle_correction = 0.1
+	angle_correction = 0.2
 	max_speed = 2 * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
