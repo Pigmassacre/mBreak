@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import random
 import copy
 import math
 import other.useful as useful
@@ -28,9 +29,9 @@ class Paddle(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	acceleration = 0.75 * settings.GAME_SCALE
+	acceleration = 0.5 * settings.GAME_SCALE
 	retardation = 2 * settings.GAME_SCALE
-	max_speed = 1.5 * settings.GAME_SCALE
+	max_speed = 2 * settings.GAME_SCALE
 
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
@@ -74,6 +75,8 @@ class Paddle(pygame.sprite.Sprite):
 
 		# AI variables.
 		self.focused_ball = None
+		self.old_focused_ball = None
+		self.chosen_distance_from_center = 0
 		self.min_x_distance = 99999
 		self.min_y_distance = 99999
 		self.min_distance = 99999
@@ -150,15 +153,24 @@ class Paddle(pygame.sprite.Sprite):
 						self.decide_which_ball(ball)
 
 			if self.focused_ball != None:
+				if self.focused_ball != self.old_focused_ball:
+					self.chosen_distance_from_center = random.uniform((self.y + self.height / 2) - self.y + self.focused_ball.height, (self.y + self.height / 2) - (self.y + self.height) - self.focused_ball.height)
+					print("chosen_distance_from_center " + str(self.chosen_distance_from_center))
+					print("height of paddle " + str(self.height))
+
 				if self.owner.ai_difficulty >= 2:
 					# If cheaty AI, teleport to ball.
 					self.y = self.focused_ball.y + (self.focused_ball.height / 2) - (self.height / 2)
 				else:
 					# If normal AI, move to ball.
-					if self.focused_ball.y + (self.focused_ball.height / 2) < self.y:
-						key_up_pressed = True
-					elif self.focused_ball.y + (self.focused_ball.height / 2) > self.y + self.height:
-						key_down_pressed = True
+					if self.focused_ball.y + self.chosen_distance_from_center < self.y + self.height / 2:
+						if self.focused_ball.y < self.y + self.height / 3:
+							key_up_pressed = True
+					elif self.focused_ball.y + self.chosen_distance_from_center > self.y + self.height / 2:
+						if self.focused_ball.y > self.y + self.height - self.height / 3:
+							key_down_pressed = True
+
+			self.old_focused_ball = self.focused_ball
 		else:
 			# If no AI, we just check for key presses.
 			key_up_pressed = pygame.key.get_pressed()[key_up]

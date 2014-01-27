@@ -45,7 +45,8 @@ class Missile(pygame.sprite.Sprite):
 	damage = 10
 
 	# These variables affect how the missile homes to its target.
-	angle_correction = 0.2
+	angle_correction = 0.01
+	angle_correction_rate = 0.005
 	max_speed = 2 * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
@@ -123,6 +124,10 @@ class Missile(pygame.sprite.Sprite):
 		# Tell the block that we've hit it.
 		block.on_hit(Missile.damage)
 
+		# Spawn some particles.
+		self.spawn_destroy_particles()
+
+	def spawn_destroy_particles(self):
 		# Spawn a random amount of particles.
 		for _ in range(0, random.randrange(Missile.hit_particle_min_amount, Missile.hit_particle_max_amount)):
 			angle = self.angle + math.pi
@@ -138,6 +143,22 @@ class Missile(pygame.sprite.Sprite):
 		for block in blocks_collide_list:
 			if block == self.target:
 				self.on_hit_block(block)
+
+		# If the target is already destroyed, choose a new target.
+		if self.target.health <= 0 or self.target == None:
+			# Create a list of all available blocks to target.
+			block_list = []
+			for player in groups.Groups.player_group:
+				if player != self.owner:
+					block_list = player.block_group.sprites()
+
+			# If the list is not empty, set a random block as the target.
+			if block_list:
+				self.target = random.choice(block_list)
+			else:
+				# If the list is empty, simply destroy ourselves.
+				self.destroy()
+				self.spawn_destroy_particles()
 
 		# Keep angle between pi and -pi.
 		if self.angle > math.pi:
@@ -161,8 +182,13 @@ class Missile(pygame.sprite.Sprite):
 
 		# Correct our own angle so it's closer to the target.
 		self.angle += relative_angle_to_target * self.angle_correction
+
 		# Update the speed according to the acceleration.
 		self.speed += self.acceleration
+
+		# Make sure speed doesn't go over max speed.
+		if self.speed > self.max_speed:
+			self.speed = self.max_speed
 
 		# Move the missile with speed in consideration.
 		self.x = self.x + (math.cos(self.angle) * self.speed)
@@ -179,6 +205,9 @@ class Missile(pygame.sprite.Sprite):
 
 		# Rotate the image to the angle, in degrees.
 		self.rotate_image(-self.image_angle)
+
+		# Improve the angle correction.
+		self.angle_correction += self.angle_correction_rate
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()

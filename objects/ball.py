@@ -152,9 +152,10 @@ class Ball(pygame.sprite.Sprite):
 		effect_dummy.add_flash(copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount)
 
 	def change_owner(self, new_owner):
-		self.owner = new_owner
-		self.image = self.player_images[self.owner]
-		self.color = self.owner.color
+		if new_owner != self.owner:
+			self.owner = new_owner
+			self.image = self.player_images[self.owner]
+			self.color = self.owner.color
 
 	def update(self, main_clock):
 		# We assume we haven't collided with anything yet.
@@ -278,39 +279,12 @@ class Ball(pygame.sprite.Sprite):
 		# Obviously we have collided with something, so we set collided to True.
 		self.collided = True
 
-	def calculate_spin(self, paddle):
+	def calculate_smash(self, paddle):
 		# Add smash speed to ourselves.
 		self.speed += Ball.smash_speed
 
 		# Increase our smash stack.
 		self.smash_stack += 1
-
-		# We determine the velocity of the paddle with regards to the game scale.
-		velocity_y = paddle.velocity_y / settings.GAME_SCALE
-
-		paddle_center = paddle.y + paddle.height / 2
-		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
-		print("distance_from_paddle_center " + str(distance_from_paddle_center))
-		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
-		normalized_distance = (distance_from_paddle_center / max_distance)
-		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
-		print("normalized_distance " + str(normalized_distance))
-		if self.angle > math.pi / 2 and self.angle < (3 * math.pi) / 2:
-			self.angle = normalized_distance * max_angle_offset
-		else:
-			self.angle = math.pi - normalized_distance * max_angle_offset
-
-		'''
-		# Use the velocity to calculate the spin.
-		if self.angle <= (math.pi / 2):
-			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
-		elif self.angle <= math.pi:
-			self.angle = self.angle + (velocity_y * Ball.spin_angle_strength)
-		elif self.angle <= (3 * math.pi) / 2:
-			self.angle = self.angle + (velocity_y * Ball.spin_angle_strength)
-		elif self.angle <= (2 * math.pi):
-			self.angle = self.angle - (velocity_y * Ball.spin_angle_strength)
-		'''
 
 	def place_left_of(self, other):
 		self.x = other.rect.left - self.rect.width - 1
@@ -398,7 +372,7 @@ class Ball(pygame.sprite.Sprite):
 		self.spawn_particles()
 
 		# Calculate the spin.
-		self.calculate_spin(paddle)
+		self.calculate_smash(paddle)
 
 		# Tell ourselves that we have been hit.
 		self.on_hit(paddle)
@@ -424,6 +398,14 @@ class Ball(pygame.sprite.Sprite):
 		self.collided = True
 
 	def hit_left_side_of_paddle(self, paddle):
+		# Calculate the new angle of the ball.
+		paddle_center = paddle.y + paddle.height / 2
+		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
+		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
+		normalized_distance = (distance_from_paddle_center / max_distance)
+		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
+		self.angle = math.pi - normalized_distance * max_angle_offset
+
 		# Reverse angle.
 		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
 			self.angle = math.pi - self.angle
@@ -435,6 +417,14 @@ class Ball(pygame.sprite.Sprite):
 		paddle.x += Ball.paddle_nudge_distance
 
 	def hit_right_side_of_paddle(self, paddle):
+		# Calculate the new angle of the ball.
+		paddle_center = paddle.y + paddle.height / 2
+		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
+		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
+		normalized_distance = (distance_from_paddle_center / max_distance)
+		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
+		self.angle = normalized_distance * max_angle_offset
+
 		# Reverse angle.
 		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
 			self.angle = math.pi - self.angle

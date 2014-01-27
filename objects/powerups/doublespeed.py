@@ -42,7 +42,7 @@ class DoubleSpeed(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, DoubleSpeed.width, DoubleSpeed.height)
+		powerup.Powerup.__init__(self, x, y, DoubleSpeed.width, DoubleSpeed.height, False)
 
 		# Load the image file.
 		self.image = DoubleSpeed.image.copy()
@@ -50,26 +50,21 @@ class DoubleSpeed(powerup.Powerup):
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
 
+	def create_effect(self, entity):
+		return speed.Speed(entity, DoubleSpeed.duration)
+
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# Add the effect to all the balls of the entity owner. However, if the ball has timeout, make sure it cannot use that balls effect as
-		# the effect to connect to the displayed powerup.
-		for ball in entity.owner.ball_group:
-			has_timeout = False
-			for effect in ball.effect_group:
-				if effect.__class__ == timeout.Timeout:
-					speed.Speed(ball, DoubleSpeed.duration)
-					has_timeout = True
-					break
-			if not has_timeout:
-				# Create a speed effect to be added to the ball.
-				speed_effect = speed.Speed(ball, DoubleSpeed.duration)
+		# Create a speed effect to be added to the ball.
+		created_effect = self.create_effect(entity)
 
 		# Add this effect to the owner of the ball.
-		entity.owner.effect_group.add(speed_effect)
+		entity.owner.effect_group.add(created_effect)
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(DoubleSpeed, speed_effect)
+		entity.owner.add_powerup(self.__class__, created_effect)
+
+		#self.share_effect(entity, timeout.Timeout, self.create_effect)

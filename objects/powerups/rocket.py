@@ -42,7 +42,7 @@ class Rocket(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Rocket.width, Rocket.height)
+		powerup.Powerup.__init__(self, x, y, Rocket.width, Rocket.height, False)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
@@ -58,11 +58,11 @@ class Rocket(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# Select a random block from the enemy of the entity.
+		# Create a list of all available blocks to target.
 		block_list = []
 		for player in groups.Groups.player_group:
 			if player != entity.owner:
 				block_list = player.block_group.sprites()
 
-		# Create a missile that homes in on that block.
+		# Create a missile that homes in on a random block in the block list.
 		the_missile = missile.Missile(entity.x, entity.y, random.uniform(0, math.pi), Rocket.missile_speed, Rocket.missile_acceleration, entity.owner, random.choice(block_list))

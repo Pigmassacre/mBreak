@@ -20,7 +20,7 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, name, key_up, key_down, color, ai = True, ai_difficulty = 1):
+	def __init__(self, x, y, name, key_up, key_down, color, ai = False, ai_difficulty = 1):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
