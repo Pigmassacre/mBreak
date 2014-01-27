@@ -19,16 +19,21 @@ Since paddles can move within the game area, they detect and handle their own co
 """
 
 def convert():
-	Paddle.image.convert()
+	Paddle.top_image.convert()
+	Paddle.middle_image.convert()
+	Paddle.bottom_image.convert()
 
 class Paddle(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/paddle/paddle.png")
+	#image = pygame.image.load("res/paddle/paddle.png")
+	top_image = pygame.image.load("res/paddle/paddle_top.png")
+	middle_image = pygame.image.load("res/paddle/paddle_middle.png")
+	bottom_image = pygame.image.load("res/paddle/paddle_bottom.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = middle_image.get_width() * settings.GAME_SCALE
+	height = 16 * settings.GAME_SCALE
 	acceleration = 0.5 * settings.GAME_SCALE
 	retardation = 2 * settings.GAME_SCALE
 	max_speed = 2 * settings.GAME_SCALE
@@ -42,8 +47,10 @@ class Paddle(pygame.sprite.Sprite):
 	stabilize_speed = 0.45
 	max_nudge_distance = 6
 
-	# Scale image to settings.GAME_SCALE.
-	image = pygame.transform.scale(image, (width, height))
+	# Scale the images to settings.GAME_SCALE.
+	top_image = pygame.transform.scale(top_image, (top_image.get_width() * settings.GAME_SCALE, top_image.get_height() * settings.GAME_SCALE))
+	middle_image = pygame.transform.scale(middle_image, (middle_image.get_width() * settings.GAME_SCALE, middle_image.get_height() * settings.GAME_SCALE))
+	bottom_image = pygame.transform.scale(bottom_image, (bottom_image.get_width() * settings.GAME_SCALE, bottom_image.get_height() * settings.GAME_SCALE))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
@@ -82,7 +89,14 @@ class Paddle(pygame.sprite.Sprite):
 		self.min_distance = 99999
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = Paddle.image.copy()
+		self.image = pygame.Surface((Paddle.width, Paddle.height))
+		
+		self.image.blit(Paddle.top_image, (0, 0))
+
+		for i in range(Paddle.top_image.get_height(), Paddle.height - Paddle.bottom_image.get_height()):
+			self.image.blit(Paddle.middle_image, (0, i))
+
+		self.image.blit(Paddle.bottom_image, (0, Paddle.height - Paddle.bottom_image.get_height()))
 
 		# Colorize the image.
 		useful.colorize_image(self.image, self.owner.color)
