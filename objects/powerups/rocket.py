@@ -66,6 +66,3 @@ class Rocket(powerup.Powerup):
 
 		# Create a missile that homes in on that block.
 		the_missile = missile.Missile(entity.x, entity.y, random.uniform(0, math.pi), Rocket.missile_speed, Rocket.missile_acceleration, entity.owner, random.choice(block_list))
-
-		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(Rocket, the_missile)

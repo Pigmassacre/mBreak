@@ -30,8 +30,16 @@ class Missile(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	particle_spawn_rate = 65
-	particle_spawn_amount = 4
+	particle_spawn_rate = 25
+	particle_spawn_amount = 5
+	particle_width = height / 6
+	particle_height = height / 6
+
+	# These particles are spawned when the missile hits its target.
+	hit_particle_min_amount = 12
+	hit_particle_max_amount = 18
+	hit_particle_min_speed = 2 * settings.GAME_SCALE
+	hit_particle_max_speed = 3 * settings.GAME_SCALE
 
 	# The amount of damage the missile deals to a hit block.
 	damage = 10
@@ -75,15 +83,14 @@ class Missile(pygame.sprite.Sprite):
 		# Load the image file.
 		self.image = Missile.image.copy()
 
-		# Rotate it to the given angle.
-		old_center = self.rect.center
-		self.image = pygame.transform.rotate(self.image, self.angle * (180 / math.pi))
-		self.rect = self.image.get_rect()
-		self.rect.center = old_center
-		print("AT START ANGLE IS " + str(self.angle))
-
 		# Store the original, unrotated version of the image.
 		self.original_image = self.image.copy()
+
+		# Store the angle to rotate the image separately.
+		self.image_angle = self.angle
+
+		# Rotate it to the given angle.
+		self.rotate_image(self.image_angle * (180 / math.pi))
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -95,6 +102,12 @@ class Missile(pygame.sprite.Sprite):
 		# connect the powerups that are displayed on the player.
 		self.displayed_powerups = []
 
+	def rotate_image(self, angle):
+		old_center = self.rect.center
+		self.image = pygame.transform.rotate(self.original_image, angle)
+		self.rect = self.image.get_rect()
+		self.rect.center = old_center
+
 	def destroy(self):
 		self.kill()
 		self.shadow.kill()
@@ -103,13 +116,28 @@ class Missile(pygame.sprite.Sprite):
 		for powerup in self.displayed_powerups:
 			powerup.destroy(False)
 
+	def on_hit_block(self, block):
+		# Destroy ourselves.
+		self.destroy()
+
+		# Tell the block that we've hit it.
+		block.on_hit(Missile.damage)
+
+		# Spawn a random amount of particles.
+		for _ in range(0, random.randrange(Missile.hit_particle_min_amount, Missile.hit_particle_max_amount)):
+			angle = self.angle + math.pi
+			angle += random.uniform(math.pi - (math.pi / 16), math.pi + (math.pi / 16))
+			speed = random.uniform(Missile.hit_particle_min_speed, Missile.hit_particle_max_speed)
+			retardation = speed / 24.0
+			color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
+			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)
+
 	def update(self, main_clock):
 		# Check if we have collided with the target block.
 		blocks_collide_list = pygame.sprite.spritecollide(self, self.target.owner.block_group, False)
 		for block in blocks_collide_list:
 			if block == self.target:
-				self.destroy()
-				self.target.on_hit(Missile.damage)
+				self.on_hit_block(block)
 
 		# Keep angle between pi and -pi.
 		if self.angle > math.pi:
@@ -125,14 +153,14 @@ class Missile(pygame.sprite.Sprite):
 		# Calculate the relative angle to target.
 		relative_angle_to_target = angle_to_target - self.angle
 
-		# Correct our own angle so it's closer to the target.
+		# Map relative angle to -pi <= angle <= +pi.
 		if relative_angle_to_target > math.pi:
 			relative_angle_to_target -= math.pi * 2
 		elif relative_angle_to_target < -math.pi:
 			relative_angle_to_target += math.pi * 2
 
+		# Correct our own angle so it's closer to the target.
 		self.angle += relative_angle_to_target * self.angle_correction
-		print("now angle is " + str(self.angle))
 		# Update the speed according to the acceleration.
 		self.speed += self.acceleration
 
@@ -141,12 +169,16 @@ class Missile(pygame.sprite.Sprite):
 		self.y = self.y + (math.sin(self.angle) * self.speed)
 		self.rect.x = self.x
 		self.rect.y = self.y
-		
-		# Rotate the image to the angle.
-		old_center = self.rect.center
-		self.image = pygame.transform.rotate(self.original_image, (self.angle + math.pi) * (180 / math.pi)) # WTF DOES NOT WORK OMG
-		self.rect = self.image.get_rect()
-		self.rect.center = old_center
+
+		# Convert the angle to degrees.
+		if self.angle < 0:
+			self.image_angle = self.angle * (180 / math.pi) + 360
+		else:
+			self.image_angle = self.angle * (180 / math.pi)
+		self.image_angle += 90
+
+		# Rotate the image to the angle, in degrees.
+		self.rotate_image(-self.image_angle)
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()
@@ -156,8 +188,8 @@ class Missile(pygame.sprite.Sprite):
 
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(1, Missile.particle_spawn_amount)):
-				angle = self.angle + random.uniform(math.pi - (math.pi / 32), math.pi + (math.pi / 32))
-				speed = random.uniform(0.75 * settings.GAME_SCALE, 0.9 * settings.GAME_SCALE)
+				angle = self.angle + random.uniform(math.pi - (math.pi / 24), math.pi + (math.pi / 24))
+				speed = random.uniform(0.65 * settings.GAME_SCALE, 1.1 * settings.GAME_SCALE)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
-				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.height / 6, self.rect.height / 6, angle, speed, retardation, color, 5)
+				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)

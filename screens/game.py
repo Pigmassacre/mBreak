@@ -353,7 +353,12 @@ class Game:
 		groups.Groups.ball_group.draw(self.window_surface)
 
 		# Draw the projectiles.
-		groups.Groups.projectile_group.draw(self.window_surface)
+		for projectile in groups.Groups.projectile_group:
+			if (not projectile.x + projectile.width < settings.LEVEL_X or 
+				not projectile.x > settings.LEVEL_MAX_X or 
+				not projectile.y + projectile.height < settings.LEVEL_Y or 
+				not projectile.y > settings.LEVEL_MAX_Y):
+				groups.Groups.projectile_group.draw(self.window_surface)
 
 		# Draw debug information for AI.
 		if settings.DEBUG_MODE:
