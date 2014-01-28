@@ -6,6 +6,8 @@ import random
 import math
 import objects.powerups.powerup as powerup
 import objects.effects.charged as charged
+import objects.effects.enlarged as enlarged
+import objects.effects.reduced as reduced
 import objects.effects.timeout as timeout
 import objects.effects.speed as speed
 import objects.shadow as shadow
@@ -74,11 +76,10 @@ class Multiball(powerup.Powerup):
 			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, entity.owner)
 
 			# Add all the players effects to the ball.
-			#temp_effect = None
 			for effect in entity.owner.effect_group:
-				# Add this effect to the ball. Make sure we don't spread the charged effect.
-				# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
-				if effect.__class__ != charged.Charged:
+				# Add this effect to the ball. Make sure we don't spread the charged, enlarged or reduced effect.
+				if effect.__class__ != charged.Charged and effect.__class__ != enlarged.Enlarged and effect.__class__ != reduced.Reduced:
+					# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
 					effect.__class__(temp_ball, effect.duration - effect.time_passed)
 
 			# Create a timeout effect which is added to the ball.

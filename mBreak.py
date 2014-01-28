@@ -30,7 +30,7 @@ def main():
 	settings.load()
 	graphics.load()
 
-	# Display modes, these are by standard double buffering (for perfomance reasons) and hardware acceleration (works if fullscreen is enabled).
+	# Display modes, these are by standard double buffering (for performance reasons) and hardware acceleration (works if fullscreen is enabled).
 	if graphics.FULLSCREEN:
 		display_modes = DOUBLEBUF | HWSURFACE | FULLSCREEN
 	else:

@@ -16,6 +16,8 @@ import objects.powerups.electricity as electricity
 import objects.powerups.fire as fire
 import objects.powerups.frost as frost
 import objects.powerups.rocket as rocket
+import objects.powerups.enlarger as enlarger
+import objects.powerups.reducer as reducer
 import objects.effects.speed as speed
 import objects.effects.flash as flash
 import objects.blocks.block as block
@@ -93,7 +95,7 @@ class Game:
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 2)
 
 		# The list of available powerups to spawn.
-		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket]
+		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
 
 		# The rate at which powerups will perhaps be spawned.
 		self.powerup_spawn_rate = 5000
@@ -365,11 +367,11 @@ class Game:
 
 		# Draw the projectiles.
 		for projectile in groups.Groups.projectile_group:
-			if (not projectile.x + projectile.width < settings.LEVEL_X or 
-				not projectile.x > settings.LEVEL_MAX_X or 
-				not projectile.y + projectile.height < settings.LEVEL_Y or 
-				not projectile.y > settings.LEVEL_MAX_Y):
-				groups.Groups.projectile_group.draw(self.window_surface)
+			if not (projectile.x + projectile.width < settings.LEVEL_X or 
+				projectile.x > settings.LEVEL_MAX_X or 
+				projectile.y + projectile.height < settings.LEVEL_Y or 
+				projectile.y > settings.LEVEL_MAX_Y):
+				self.window_surface.blit(projectile.image, projectile.rect)
 
 		# Draw debug information for AI.
 		if settings.DEBUG_MODE:

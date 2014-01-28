@@ -24,6 +24,14 @@ def convert():
 
 class Missile(pygame.sprite.Sprite):
 
+	# Initialize the mixer (so we can load a sound) and load the sound effects.
+	pygame.mixer.init(44100, -16, 2, 2048)
+	sound_effects = []
+	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion1.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion2.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion3.ogg"))
+	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion4.ogg"))
+
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/powerup/missile.png")
 
@@ -116,6 +124,9 @@ class Missile(pygame.sprite.Sprite):
 		# Destroy all powerups that are connected to this missile.
 		for powerup in self.displayed_powerups:
 			powerup.destroy(False)
+
+		# Play a random sound from the sound_effects list.
+		Missile.sound_effects[random.randrange(0, len(Missile.sound_effects))].play()
 
 	def on_hit_block(self, block):
 		# Destroy ourselves.

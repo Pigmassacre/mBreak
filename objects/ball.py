@@ -50,14 +50,15 @@ class Ball(pygame.sprite.Sprite):
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	speed = 1 * settings.GAME_SCALE
-	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
 	max_speed = 1.5 * settings.GAME_SCALE
-	damage = 10
-	spin_speed_strength = 0.05 # Not used, but exists if I ever want to use it for balancing purposes.
-	spin_angle_strength = 0.09
+	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
 	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
+
+	# Damage stuff.
+	damage = 10
+	damage_dealt_to_own_blocks = 0.25
 
 	# Smash stuff.
 	smash_speed = 0.15 * settings.GAME_SCALE
@@ -645,7 +646,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
 		if block.owner == self.owner:
-			block.on_hit(damage_dealt / 2.0)
+			block.on_hit(damage_dealt * Ball.damage_dealt_to_own_blocks)
 		else:
 			block.on_hit(damage_dealt)
 

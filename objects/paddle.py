@@ -88,21 +88,8 @@ class Paddle(pygame.sprite.Sprite):
 		self.min_y_distance = 99999
 		self.min_distance = 99999
 
-		# Create the image attribute that is drawn to the surface.
-		self.image = pygame.Surface((Paddle.width, Paddle.height))
-		
-		self.image.blit(Paddle.top_image, (0, 0))
-
-		for i in range(Paddle.top_image.get_height(), Paddle.height - Paddle.bottom_image.get_height()):
-			self.image.blit(Paddle.middle_image, (0, i))
-
-		self.image.blit(Paddle.bottom_image, (0, Paddle.height - Paddle.bottom_image.get_height()))
-
-		# Colorize the image.
-		useful.colorize_image(self.image, self.owner.color)
-
-		# Create a shadow.
-		self.shadow = shadow.Shadow(self)
+		# Set the size of the paddle. This takes care of storing the image attribute and coloring it.
+		self.set_size(Paddle.width, Paddle.height)
 
 		# Add self to to owners paddle_group and main paddle_group.
 		self.owner.paddle_group.add(self)
@@ -110,6 +97,38 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Create an effect group to handle effects on this paddle.
 		self.effect_group = pygame.sprite.Group()
+
+	def set_size(self, new_width, new_height):
+		# Set the rect size.
+		self.rect.width = new_width
+		self.rect.height = new_height
+
+		if hasattr(self, 'image'):
+			# Resize the current image.
+			self.image = pygame.transform.scale(self.image, (new_width, new_height))
+		else:
+			# Create the image attribute that is drawn to the surface.
+			self.image = pygame.Surface((new_width, new_height))
+		
+		# Blit the top part.
+		self.image.blit(Paddle.top_image, (0, 0))
+
+		# Blit the middle parts.
+		for i in range(Paddle.top_image.get_height(), new_height - Paddle.bottom_image.get_height()):
+			self.image.blit(Paddle.middle_image, (0, i))
+
+		# Blit the bottom part.
+		self.image.blit(Paddle.bottom_image, (0, new_height - Paddle.bottom_image.get_height()))
+
+		# Color the image.
+		useful.colorize_image(self.image, self.owner.color)
+
+		# If the shadow already exists, kill it first.
+		if hasattr(self, 'shadow'):
+			self.shadow.kill()
+
+		# Then, create a (new) shadow.
+		self.shadow = shadow.Shadow(self)
 
 	def on_hit(self, other_object):
 		# Create a new on hit effect.
