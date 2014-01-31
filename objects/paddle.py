@@ -38,6 +38,9 @@ class Paddle(pygame.sprite.Sprite):
 	retardation = 2 * settings.GAME_SCALE
 	max_speed = 2 * settings.GAME_SCALE
 
+	max_height = height * 2
+	min_height = height / 4
+
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
@@ -62,6 +65,10 @@ class Paddle(pygame.sprite.Sprite):
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
 		self.y = y
+
+		# We store the max and min height of the paddle, for easy access by other classes.
+		self.max_height = Paddle.max_height
+		self.min_height = Paddle.min_height
 
 		# This is the actual desired x position of the paddle. Used for visual effects.
 		self.center_x = self.x
@@ -121,6 +128,7 @@ class Paddle(pygame.sprite.Sprite):
 		self.image.blit(Paddle.bottom_image, (0, new_height - Paddle.bottom_image.get_height()))
 
 		# Color the image.
+		print("owner color " + str(self.owner.color))
 		useful.colorize_image(self.image, self.owner.color)
 
 		# If the shadow already exists, kill it first.

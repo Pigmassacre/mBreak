@@ -42,7 +42,7 @@ def colorize_image(image, new_color, blend_alpha = False):
 	Given an image and a new_color, this method colors the image with the new_color.
 	If the optional parameter blend_alpha is True, the alpha value is blended too.
 	"""
-	# Unlock the surface so we can colorize it.
+	# Lock the surface so we can colorize it.
 	image.lock()
 
 	# Work through the pixelarray.
@@ -60,5 +60,5 @@ def colorize_image(image, new_color, blend_alpha = False):
 			final_color = pygame.Color(after_blend_color.b, after_blend_color.g, after_blend_color.r, after_blend_color.a)
 			pixelarray[x, y] = final_color
 
-	# We're done, so lock the surface again.
+	# We're done, so unlock the surface again.
 	image.unlock()

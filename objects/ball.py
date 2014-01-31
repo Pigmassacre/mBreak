@@ -576,15 +576,19 @@ class Ball(pygame.sprite.Sprite):
 				# Check if we've hit the top side of either block.
 				if "top" in side_list:
 					self.hit_top_side_of_block(block_list[0])
+					self.hit_block(block_list[1])
 				elif "bottom" in side_list:
 					self.hit_bottom_side_of_block(block_list[0])
+					self.hit_block(block_list[1])
 			# Are the two blocks hit above/below each other?
 			elif block_list[0].x == block_list[1].x:
 				# Check what side we've hit, and act accordingly.
 				if "left" in side_list:
 					self.hit_left_side_of_block(block_list[0])
+					self.hit_block(block_list[1])
 				elif "right" in side_list:
 					self.hit_right_side_of_block(block_list[0])
+					self.hit_block(block_list[1])
 			# Are the two blocks hit diagonal of each other?
 			else:
 				for block, side in block_information.iteritems():
