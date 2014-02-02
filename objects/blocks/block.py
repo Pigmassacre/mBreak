@@ -74,9 +74,6 @@ class Block(pygame.sprite.Sprite):
 		# Reduce the health.
 		self.health = self.health - damage
 
-		if settings.DEBUG_MODE:
-			print("Damage taken: " + str(damage))
-
 		if self.health <= self.max_health / 2:
 			self.image = self.half_health_image
 

@@ -92,16 +92,16 @@ class Game:
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 2)
+		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
 
 		# The list of available powerups to spawn.
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
 
 		# The rate at which powerups will perhaps be spawned.
-		self.powerup_spawn_rate = 5000
+		self.powerup_spawn_rate = 4000
 
 		# After this amount of time has passed, the powerup spawn chance will be increased.
-		self.powerup_increase_spawn_rate = 3000
+		self.powerup_increase_spawn_rate = 3250
 
 		# This is the amount that all the spawn chances will increase by every powerup_increase_spawn_rate.
 		self.powerup_spawn_chance_increase = 0.045
@@ -212,9 +212,7 @@ class Game:
 			self.powerup_spawn_chance += self.powerup_spawn_chance_increase
 			self.powerup_second_spawn_chance += self.powerup_spawn_chance_increase
 			self.powerup_third_spawn_chance += self.powerup_spawn_chance_increase
-
-			# The second speed chance increases slighty slower.
-			self.powerup_second_speed_spawn_chance += self.powerup_spawn_chance_increase / 3.0
+			self.powerup_second_speed_spawn_chance += self.powerup_spawn_chance_increase
 
 			# Finally, reset the timer.
 			self.powerup_increase_spawn_time = 0

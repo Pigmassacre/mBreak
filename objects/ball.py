@@ -49,10 +49,11 @@ class Ball(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	speed = 1 * settings.GAME_SCALE
-	max_speed = 1.5 * settings.GAME_SCALE
+	speed = 1.5 * settings.GAME_SCALE
+	max_speed = 5.0 * settings.GAME_SCALE
+	speed_step = 0.75 * settings.GAME_SCALE
 	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
-	least_allowed_vertical_angle = 0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
+	least_allowed_vertical_angle = 0.32#0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
 
@@ -61,7 +62,7 @@ class Ball(pygame.sprite.Sprite):
 	damage_dealt_to_own_blocks = 0.25
 
 	# Smash stuff.
-	smash_speed = 0.15 * settings.GAME_SCALE
+	smash_speed = 0.33 * settings.GAME_SCALE
 	smash_damage_factor = 1
 	smash_max_stack = 4
 	smash_effect_size_increase = 1 * settings.GAME_SCALE
@@ -99,6 +100,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# Set the speed variable.
 		self.speed = Ball.speed
+		self.tick_speed = self.speed
 
 		# Store the current level of smash stack.
 		self.smash_stack = 0
@@ -162,97 +164,112 @@ class Ball(pygame.sprite.Sprite):
 		# We assume we haven't collided with anything yet.
 		self.collided = False
 
-		# Check collision with paddles.
-		self.check_collision_paddles()
-				
-		# Check collision with other balls.
-		self.check_collision_balls()
-
-		# Check collision with blocks.
-		self.check_collision_blocks()
-
-		# Check collision with powerups.
-		self.check_collision_powerups()
-
-		# Here we check if the angle of the ball is in the restricted areas. We do this to make sure that the balls don't get stuck
-		# bouncing up and down in the middle of the gamefield, since that makes for a very boring game.
-		if self.angle > (math.pi / 2) - Ball.least_allowed_vertical_angle and self.angle < (math.pi / 2) + Ball.least_allowed_vertical_angle:
-			if self.angle > (math.pi / 2):
-				self.angle = (math.pi / 2) + Ball.least_allowed_vertical_angle
-			elif self.angle < (math.pi / 2):
-				self.angle = (math.pi / 2) - Ball.least_allowed_vertical_angle
+		speed_handled = 0
+		while speed_handled < self.speed:
+			# Setup the speed values to use for this iteration.
+			if self.speed - speed_handled >= Ball.speed_step:
+				self.tick_speed = Ball.speed_step
 			else:
-				# If the angle is EXACTLY pi/2, we just randomly decide what angle to "nudge" the ball to.
-				self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
-		elif self.angle > ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle and self.angle < ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle:			
-			if self.angle > ((3 * math.pi) / 2):
-				self.angle = ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle
-			elif self.angle < ((3 * math.pi) / 2):
-				self.angle = ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle
-			else:
-				# If the angle is EXACTLY 3pi/2, we just randomly decide what angle to "nudge" the ball to.
-				self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
+				self.tick_speed = self.speed - speed_handled
 
-		# Constrain angle to 0 < angle < 2pi. Even though angles over 2pi or under 0 work fine when translating the angles to x and y positions, 
-		# such angles mess with our ability to calculate other stuff. So we just make sure that the angle is between 0 and 2pi.
-		if self.angle > (2 * math.pi):
-			self.angle = self.angle - (2 * math.pi)
-		elif self.angle < 0:
-			self.angle = (2 * math.pi) + self.angle
+			# Check collision with paddles.
+			self.check_collision_paddles()
+					
+			# Check collision with other balls.
+			self.check_collision_balls()
 
-		# We make sure that speed isn't over max_speed.
-		if self.speed > self.max_speed:
-			self.speed = self.max_speed
+			# Check collision with blocks.
+			self.check_collision_blocks()
 
-		# Move the ball with speed in consideration.
-		self.x = self.x + (math.cos(self.angle) * self.speed)
-		self.y = self.y + (math.sin(self.angle) * self.speed)
-		self.rect.x = self.x
-		self.rect.y = self.y
+			# Check collision with powerups.
+			self.check_collision_powerups()
 
-		# Check collision with x-edges.
-		if self.rect.x < settings.LEVEL_X:
-			# We hit the left wall.
-			self.hit_wall()
+			# Here we check if the angle of the ball is in the restricted areas. We do this to make sure that the balls don't get stuck
+			# bouncing up and down in the middle of the gamefield, since that makes for a very boring game.
+			if self.angle > (math.pi / 2) - Ball.least_allowed_vertical_angle and self.angle < (math.pi / 2) + Ball.least_allowed_vertical_angle:
+				if self.angle > (math.pi / 2):
+					self.angle = (math.pi / 2) + Ball.least_allowed_vertical_angle
+				elif self.angle < (math.pi / 2):
+					self.angle = (math.pi / 2) - Ball.least_allowed_vertical_angle
+				else:
+					# If the angle is EXACTLY pi/2, we just randomly decide what angle to "nudge" the ball to.
+					self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
+			elif self.angle > ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle and self.angle < ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle:			
+				if self.angle > ((3 * math.pi) / 2):
+					self.angle = ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle
+				elif self.angle < ((3 * math.pi) / 2):
+					self.angle = ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle
+				else:
+					# If the angle is EXACTLY 3pi/2, we just randomly decide what angle to "nudge" the ball to.
+					self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
 
-			# Reverse angle on x-axis.
-			self.angle = math.pi - self.angle
+			# Constrain angle to 0 < angle < 2pi. Even though angles over 2pi or under 0 work fine when translating the angles to x and y positions, 
+			# such angles mess with our ability to calculate other stuff. So we just make sure that the angle is between 0 and 2pi.
+			if self.angle > (2 * math.pi):
+				self.angle = self.angle - (2 * math.pi)
+			elif self.angle < 0:
+				self.angle = (2 * math.pi) + self.angle
 
-			# Constrain ball to screen size.
-			self.x = settings.LEVEL_X
+			# We make sure that speed isn't over max_speed.
+			if self.speed > self.max_speed:
+				self.speed = self.max_speed
+
+			# Move the ball with speed in consideration.
+			self.x = self.x + (math.cos(self.angle) * self.tick_speed)
+			self.y = self.y + (math.sin(self.angle) * self.tick_speed)
 			self.rect.x = self.x
-		elif self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
-			# We hit the right wall.
-			self.hit_wall()
-
-			# Reverse angle on x-axis.
-			self.angle = math.pi - self.angle
-
-			# Constrain ball to screen size.
-			self.x = settings.LEVEL_MAX_X - self.rect.width			
-			self.rect.x = self.x
-
-		# Check collision with y-edges.
-		if self.rect.y < settings.LEVEL_Y:
-			# We hit the top wall.
-			self.hit_wall()
-
-			# Reverse angle on y-axis.
-			self.angle = -self.angle
-
-			# Constrain ball to screen size.
-			self.y = settings.LEVEL_Y
 			self.rect.y = self.y
-		elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
-			# We hit the bottom wall.
-			self.hit_wall()
 
-			# Reverse angle on y-axis.
-			self.angle = -self.angle
+			# Check collision with x-edges.
+			if self.rect.x < settings.LEVEL_X:
+				# We hit the left wall.
+				self.hit_wall()
 
-			# Constrain ball to screen size.
-			self.y = settings.LEVEL_MAX_Y - self.rect.height
-			self.rect.y = self.y
+				# Reverse angle on x-axis.
+				self.angle = math.pi - self.angle
+
+				# Constrain ball to screen size.
+				self.x = settings.LEVEL_X
+				self.rect.x = self.x
+			elif self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
+				# We hit the right wall.
+				self.hit_wall()
+
+				# Reverse angle on x-axis.
+				self.angle = math.pi - self.angle
+
+				# Constrain ball to screen size.
+				self.x = settings.LEVEL_MAX_X - self.rect.width			
+				self.rect.x = self.x
+
+			# Check collision with y-edges.
+			if self.rect.y < settings.LEVEL_Y:
+				# We hit the top wall.
+				self.hit_wall()
+
+				# Reverse angle on y-axis.
+				self.angle = -self.angle
+
+				# Constrain ball to screen size.
+				self.y = settings.LEVEL_Y
+				self.rect.y = self.y
+			elif self.rect.y + self.rect.height > settings.LEVEL_MAX_Y:
+				# We hit the bottom wall.
+				self.hit_wall()
+
+				# Reverse angle on y-axis.
+				self.angle = -self.angle
+
+				# Constrain ball to screen size.
+				self.y = settings.LEVEL_MAX_Y - self.rect.height
+				self.rect.y = self.y
+
+			# If we have collided with anything, play the sound effect.
+			if self.collided:
+				Ball.sound_effect.play()
+
+			# Increase the amount of speed that we've handled this turn.
+			speed_handled += self.tick_speed
 
 		# We check if it's time to spawn a trace.
 		self.trace_spawn_time += main_clock.get_time()
@@ -261,10 +278,6 @@ class Ball(pygame.sprite.Sprite):
 			if graphics.TRACES:
 				trace.Trace(self)
 				self.trace_spawn_time = 0
-
-		# If we have collided with anything, play the sound effect.
-		if self.collided:
-			Ball.sound_effect.play()
 
 	def hit_wall(self):
 		# Spawn some particles.
@@ -550,6 +563,9 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				block_information[block] = "right"
 
+		if len(block_information) > 3:
+			print("block_information len " + str(len(block_information)))
+
 		# If we've only hit one block, we don't need to check so much. Just check which side we've collided with and act accordingly.
 		if len(block_information) == 1:
 			# Check what side we've hit that block and act accordingly.
@@ -618,6 +634,18 @@ class Ball(pygame.sprite.Sprite):
 				self.check_block_collisions(block_list[1], block_list[2], block_list[0], side_list[0])
 			elif block_list[2].y == block_list[0].y:
 				self.check_block_collisions(block_list[2], block_list[0], block_list[1], side_list[1])
+		elif len(block_information) > 3:
+			least_x_distance = 999999
+			least_y_distance = 999999
+			for block, side in block_information.iteritems():
+				if abs(block.x - self.x) < least_x_distance:
+					least_x_distance = block.x - self.x
+
+				if abs(block.y - self.y) < least_y_distance:
+					least_y_distance = block.y - self.y
+
+			self.x += least_x_distance
+			self.y += least_y_distance
 
 	def check_block_collisions(self, block_one, block_two, block_three, block_three_side):
 		# Given a different combination of block_one, two and three (and the side of block three) this figures out

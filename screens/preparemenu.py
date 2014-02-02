@@ -345,4 +345,4 @@ class PrepareMenu:
 		name = settings.PLAYER_TWO_NAME
 		key_up = settings.PLAYER_TWO_KEY_UP
 		key_down = settings.PLAYER_TWO_KEY_DOWN
-		return player.Player(x, y, name, key_up, key_down, color, False, 1)
+		return player.Player(x, y, name, key_up, key_down, color, True, 1)
