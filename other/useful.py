@@ -37,7 +37,7 @@ def blend_colors(old_color, blend_color, blend_alpha = False):
 
 	return pygame.Color(new_r, new_g, new_b, new_a)
 
-def colorize_image(image, new_color, blend_alpha = False):
+def colorize_image(image, new_color, blend_alpha = False, bgr = True):
 	"""
 	Given an image and a new_color, this method colors the image with the new_color.
 	If the optional parameter blend_alpha is True, the alpha value is blended too.
@@ -55,9 +55,13 @@ def colorize_image(image, new_color, blend_alpha = False):
 			# Blend the colors.
 			after_blend_color = blend_colors(current_color, new_color, blend_alpha)
 
-			# Map the new color the the pixelarray. For some reason, pixelarray apparently reverses the color after colorizing.
-			# So we reverse the color order before adding it to the current pixel. (BGRA, instead of RGBA as it should be...)
-			final_color = pygame.Color(after_blend_color.b, after_blend_color.g, after_blend_color.r, after_blend_color.a)
+			# Map the new color the the pixelarray.
+			if bgr:
+				# For some reason, pixelarray apparently reverses the color after colorizing.
+				# So we reverse the color order before adding it to the current pixel. (BGRA, instead of RGBA as it should be...)
+				final_color = pygame.Color(after_blend_color.b, after_blend_color.g, after_blend_color.r, after_blend_color.a)
+			else:
+				final_color = pygame.Color(after_blend_color.r, after_blend_color.g, after_blend_color.b, after_blend_color.a)	
 			pixelarray[x, y] = final_color
 
 	# We're done, so unlock the surface again.

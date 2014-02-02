@@ -51,7 +51,8 @@ PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 
 # Enables various debug information.
 DEBUG_MODE = True
-DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
+#DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
+DEBUG_FONT = "fonts/ADDLG___.TTF"
 
 def load():
 	# Tries to load the settings from settings.txt.

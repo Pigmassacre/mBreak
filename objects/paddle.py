@@ -95,6 +95,11 @@ class Paddle(pygame.sprite.Sprite):
 		self.min_y_distance = 99999
 		self.min_distance = 99999
 
+		# Color the images.
+		#useful.colorize_image(Paddle.top_image, copy.copy(self.owner.color), False, False)
+		#useful.colorize_image(Paddle.middle_image, copy.copy(self.owner.color), False, False)
+		#useful.colorize_image(Paddle.bottom_image, copy.copy(self.owner.color), False, False)
+
 		# Set the size of the paddle. This takes care of storing the image attribute and coloring it.
 		self.set_size(Paddle.width, Paddle.height)
 
@@ -127,9 +132,7 @@ class Paddle(pygame.sprite.Sprite):
 		# Blit the bottom part.
 		self.image.blit(Paddle.bottom_image, (0, new_height - Paddle.bottom_image.get_height()))
 
-		# Color the image.
-		print("owner color " + str(self.owner.color))
-		useful.colorize_image(self.image, self.owner.color)
+		useful.colorize_image(self.image, copy.copy(self.owner.color), False, False)
 
 		# If the shadow already exists, kill it first.
 		if hasattr(self, 'shadow'):

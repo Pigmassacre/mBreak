@@ -64,3 +64,6 @@ class Enlarged(effect.Effect):
 
 			# Save the height left we've yet to apply.
 			self.unapplied_size -= self.parent.rect.height - previous_height
+
+			# Now, make sure that the position of the middle of the paddle isn't changed.
+			self.parent.y -= (Enlarged.size_increase - self.unapplied_size) / 2

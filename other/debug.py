@@ -27,8 +27,8 @@ It also contains a debug class used to display the FPS counter in the top-left c
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
-	#powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
-	powerup_list = [reducer.Reducer]
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+	#powerup_list = [reducer.Reducer]
 	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
 	return random.choice(powerup_list)(x, y)
@@ -57,9 +57,8 @@ class Debug:
 	pygame.font.init()
 
 	# Default variables go here.
-	font_path = "fonts/8-BIT WONDER.TTF"
 	font_size = 9 * settings.GAME_SCALE
-	font = pygame.font.Font(font_path, font_size)
+	font = pygame.font.Font(settings.DEBUG_FONT, font_size)
 	font_color = (255, 255, 255)
 	x = font_size
 	y = font_size
