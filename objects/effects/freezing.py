@@ -67,16 +67,16 @@ class Freezing(effect.Effect):
 			# Store the image that we use to create the final image.
 			self.freezing_image = Freezing.image.copy()
 
-			# Set the rects width and height to the standard values.
-			self.rect.width = self.parent.width
-			self.rect.height = self.parent.height
-
 			# Create the final image.
 			self.create_final_image()
 
 	def create_final_image(self):
-		for x in range(0, int(math.ceil(self.parent.width / self.freezing_image.get_width()))):
-			for y in range(0, int(math.ceil(self.parent.height / self.freezing_image.get_height()))):
+		# Set the rects width and height to the standard values.
+		self.rect.width = self.parent.width
+		self.rect.height = self.parent.height
+		
+		for x in range(0, int(math.ceil(self.parent.width / float(self.freezing_image.get_width())))):
+			for y in range(0, int(math.ceil(self.parent.height / float(self.freezing_image.get_height())))):
 				self.image.blit(self.freezing_image, (self.freezing_image.get_width() * x, self.freezing_image.get_height() * y))
 
 	def on_hit_paddle(self, hit_paddle):

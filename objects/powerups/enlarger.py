@@ -3,14 +3,14 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import objects.powerups.powerup as powerup
-import objects.effects.enlarged as enlarged
+import objects.effects.sizechange as sizechange
 import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
 
 """
 
-This is the Enlarger powerup. When picked up by a ball, it applies a "enlarged" effect to the paddles of the current owner of that ball.
+This is the Enlarger powerup. When picked up by a ball, it applies a "sizechange" effect to the paddles of the current owner of that ball.
 
 """
 
@@ -31,6 +31,9 @@ class Enlarger(powerup.Powerup):
 	# The amount of time the effect will last.
 	duration = 7500
 
+	# The size that the effect will change the paddle by.
+	size_change = 3 * settings.GAME_SCALE
+
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
@@ -45,14 +48,14 @@ class Enlarger(powerup.Powerup):
 		self.shadow = shadow.Shadow(self)
 
 	def create_effect(self, entity):
-		return enlarged.Enlarged(entity, Enlarger.duration)
+		return sizechange.SizeChange(entity, Enlarger.duration, Enlarger.size_change)
 
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# Create a enlarged effect to be added to the paddles of the owner of the entity.
+		# Create a sizechange effect to be added to the paddles of the owner of the entity.
 		for paddle in entity.owner.paddle_group:
 			created_effect = self.create_effect(paddle)
 

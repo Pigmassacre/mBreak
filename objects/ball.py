@@ -149,7 +149,7 @@ class Ball(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.destroy()
 
-	def on_hit(self, other_object):
+	def on_hit(self):
 		# Create a new dummy and add a on hit effect to that dummy.
 		effect_dummy = dummy.Dummy(1000, self.rect.x, self.rect.y, self.rect.width, self.rect.height)
 		effect_dummy.add_flash(copy.copy(Ball.hit_effect_start_color), copy.copy(Ball.hit_effect_final_color), Ball.hit_effect_tick_amount)
@@ -284,7 +284,7 @@ class Ball(pygame.sprite.Sprite):
 		self.spawn_particles()
 
 		# Tell ourselves that we have been hit.
-		self.on_hit(paddle)
+		self.on_hit()
 
 		# Tell all the effects that we've just hit a wall.
 		for effect in self.effect_group:
@@ -389,7 +389,7 @@ class Ball(pygame.sprite.Sprite):
 		self.calculate_smash(paddle)
 
 		# Tell ourselves that we have been hit.
-		self.on_hit(paddle)
+		self.on_hit()
 
 		# Tell the paddle that it has been hit.
 		paddle.on_hit(self)
@@ -508,10 +508,10 @@ class Ball(pygame.sprite.Sprite):
 		self.spawn_particles()
 
 		# Tell self that we've been hit.
-		self.on_hit(ball)
+		self.on_hit()
 
 		# Tell the other ball that it has been hit.
-		ball.on_hit(self)
+		ball.on_hit()
 
 		# Tell all the effects that we've just hit another ball.
 		for effect in self.effect_group:
@@ -666,11 +666,11 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_top_side_of_block(block_two)
 
 	def hit_block(self, block):
-		# We've hit a block, so spawn a particle, damage that block and set collision to True.
+		# We've hit a block, so we do a bunch of things. First, spawn a few particles.
 		self.spawn_particles()
 
 		# Tell ourselves that we have been hit.
-		self.on_hit(block)
+		self.on_hit()
 
 		# Damage is increased the higher the speed is over the standard speed.
 		damage_dealt = Ball.damage * (self.speed / Ball.speed) * Ball.smash_damage_factor

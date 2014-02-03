@@ -58,6 +58,6 @@ class Flash(effect.Effect):
 	def draw(self, surface):
 		# Draw the flash effect with the current color.
 		self.surface.fill(self.current_color)
-	
+		
 		# This is to make the alpha value work (filling doesn't work with alpha otherwise).
 		return surface.blit(self.surface, self.parent.rect)

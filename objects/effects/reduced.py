@@ -43,10 +43,17 @@ class Reduced(effect.Effect):
 
 	def on_kill(self):
 		# Reduce the size of the paddle by the size we decreased it.
-		self.parent.set_size(self.parent.rect.width, self.parent.rect.height + (Reduced.size_decrease - self.unapplied_size))
+		previous_height = self.parent.rect.height
+		if self.parent.rect.height + (Reduced.size_decrease - self.unapplied_size) < self.parent.max_height:
+			self.parent.set_size(self.parent.rect.width, self.parent.rect.height + (Reduced.size_decrease - self.unapplied_size))
+		else:
+			self.parent.set_size(self.parent.rect.width, self.parent.max_height)
+		
+		# Save the difference in size after resizing the paddle.
+		size_difference = self.parent.rect.height - previous_height
 
 		# Now, make sure that the position of the middle of the paddle isn't changed.
-		self.parent.y -= (Reduced.size_decrease - self.unapplied_size) / 2
+		self.parent.y += size_difference / 2
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.

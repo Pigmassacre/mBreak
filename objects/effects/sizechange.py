@@ -14,9 +14,6 @@ This is the SizeChange effect. When applied to a paddle, it changes the vertical
 
 class SizeChange(effect.Effect):
 
-	# This is the amount of vertical height that the effect adds to paddles.
-	#size_change = 3 * settings.GAME_SCALE
-
 	def __init__(self, parent, duration, size_change):
 		# We start by calling the superconstructor.
 		effect.Effect.__init__(self, parent, duration)
@@ -48,11 +45,13 @@ class SizeChange(effect.Effect):
 		self.parent.y -= (self.size_change - self.unapplied_size) / 2
 
 	def on_kill(self):
+		applied_size = self.size_change - self.unapplied_size
+
 		# Reduce the size of the paddle by the size we changed it.
 		previous_height = self.parent.rect.height
-		if self.parent.rect.height - (self.size_change - self.unapplied_size) > self.parent.min_height and self.parent.rect.height - (self.size_change - self.unapplied_size) < self.parent.max_height:
-			self.parent.set_size(self.parent.rect.width, self.parent.rect.height - (self.size_change - self.unapplied_size))
-		elif self.parent.rect.height - (self.size_change - self.unapplied_size) <= self.parent.min_height:
+		if self.parent.rect.height - applied_size > self.parent.min_height and self.parent.rect.height - applied_size < self.parent.max_height:
+			self.parent.set_size(self.parent.rect.width, self.parent.rect.height - applied_size)
+		elif self.parent.rect.height - applied_size <= self.parent.min_height:
 			# If we would change the size of the paddle to or over max_height, simply change to max height.
 			self.parent.set_size(self.parent.rect.width, self.parent.min_height)
 		else:
@@ -60,7 +59,7 @@ class SizeChange(effect.Effect):
 			self.parent.set_size(self.parent.rect.width, self.parent.max_height)
 		
 		# Save the difference in size after resizing the paddle.
-		size_difference = self.parent.rect.height - previous_height
+		size_difference = previous_height - self.parent.rect.height
 
 		# Now, make sure that the position of the middle of the paddle isn't changed.
 		self.parent.y += size_difference / 2
