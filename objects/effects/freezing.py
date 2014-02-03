@@ -50,16 +50,34 @@ class Freezing(effect.Effect):
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
 
+		# If the parent is paddle, this will be changed to true. For easy access in update method.
+		self.parent_is_paddle = False
+
 		# If the parent is a paddle, prevent movement and show an effect on top of the paddle.
 		if self.parent.__class__ == paddle.Paddle:
+			# Store that we're on a paddle, so that we can quickly access this later.
+			self.parent_is_paddle = True
+
+			# Reduce the max speed of the parent.
 			self.parent.max_speed -= Freezing.max_speed_reduction
 
-			# Create the image attribute that is drawn to the surface.
-			self.image = Freezing.image.copy()
+			# Create the image attribute that is drawn over the parent surface.
+			self.image = pygame.surface.Surface((self.parent.rect.width, self.parent.rect.height), pygame.locals.SRCALPHA)
+
+			# Store the image that we use to create the final image.
+			self.freezing_image = Freezing.image.copy()
 
 			# Set the rects width and height to the standard values.
-			self.rect.width = Freezing.width
-			self.rect.height = Freezing.height
+			self.rect.width = self.parent.width
+			self.rect.height = self.parent.height
+
+			# Create the final image.
+			self.create_final_image()
+
+	def create_final_image(self):
+		for x in range(0, int(math.ceil(self.parent.width / self.freezing_image.get_width()))):
+			for y in range(0, int(math.ceil(self.parent.height / self.freezing_image.get_height()))):
+				self.image.blit(self.freezing_image, (self.freezing_image.get_width() * x, self.freezing_image.get_height() * y))
 
 	def on_hit_paddle(self, hit_paddle):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
@@ -70,6 +88,12 @@ class Freezing(effect.Effect):
 	def update(self, main_clock):
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
+
+		# We make sure that our size matches the parent.
+		if self.parent_is_paddle:
+			if self.parent.rect.width != self.image.get_width() or self.parent.rect.height != self.image.get_height():
+				self.image = pygame.transform.scale(self.image, (self.parent.width, self.parent.height))
+				self.create_final_image()
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()

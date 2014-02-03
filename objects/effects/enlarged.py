@@ -29,15 +29,15 @@ class Enlarged(effect.Effect):
 
 		# Then, we increase the size of the parent.
 		previous_height = self.parent.rect.height
-		if not self.parent.rect.height + Enlarged.size_increase > self.parent.max_height:
+		if self.parent.rect.height + Enlarged.size_increase < self.parent.max_height:
 			self.parent.set_size(self.parent.rect.width, self.parent.rect.height + Enlarged.size_increase)
 		else:
-			# If we would increase the size of the paddle over max_height, simply increase to max height.
+			# If we would increase the size of the paddle to or over max_height, simply increase to max height.
 			self.parent.set_size(self.parent.rect.width, self.parent.max_height)
-
+		
 		# Save the height left we've yet to apply.
 		self.unapplied_size -= self.parent.rect.height - previous_height
-
+		
 		# Now, make sure that the position of the middle of the paddle isn't changed.
 		self.parent.y -= (Enlarged.size_increase - self.unapplied_size) / 2
 
@@ -54,16 +54,18 @@ class Enlarged(effect.Effect):
 
 		# Check if we can increase the height of the paddle.
 		previous_height = self.parent.rect.height
+		previous_unapplied_size = self.unapplied_size
 		if self.unapplied_size > 0:
 			# Increase the height of the paddle.
-			if not self.parent.rect.height + self.unapplied_size > self.parent.max_height:
+			if self.parent.rect.height + self.unapplied_size < self.parent.max_height:
 				self.parent.set_size(self.parent.rect.width, self.parent.rect.height + self.unapplied_size)
 			elif self.parent.rect.height != self.parent.max_height:
-				# If we would increase the size of the paddle over max_height, simply increase to max height.
+				# If we would increase the size of the paddle to or over max_height, simply increase to max height.
 				self.parent.set_size(self.parent.rect.width, self.parent.max_height)
 
 			# Save the height left we've yet to apply.
 			self.unapplied_size -= self.parent.rect.height - previous_height
-
+			
 			# Now, make sure that the position of the middle of the paddle isn't changed.
-			self.parent.y -= (Enlarged.size_increase - self.unapplied_size) / 2
+			if self.unapplied_size != previous_unapplied_size:
+				self.parent.y -= (Enlarged.size_increase - self.unapplied_size) / 2

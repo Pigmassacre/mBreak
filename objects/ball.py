@@ -62,9 +62,9 @@ class Ball(pygame.sprite.Sprite):
 	damage_dealt_to_own_blocks = 0.25
 
 	# Smash stuff.
-	smash_speed = 0.33 * settings.GAME_SCALE
+	smash_speed = 0.19 * settings.GAME_SCALE
 	smash_damage_factor = 1
-	smash_max_stack = 4
+	smash_max_stack = 12
 	smash_effect_size_increase = 1 * settings.GAME_SCALE
 	smash_effect_start_color = pygame.Color(255, 255, 255, 255)
 	smash_effect_final_color = pygame.Color(255, 255, 255, 0)
@@ -399,11 +399,11 @@ class Ball(pygame.sprite.Sprite):
 			effect.on_hit_paddle(paddle)
 
 		# If smash stack is equal to max smash stack, stun the hit paddle.
-		if self.smash_stack == Ball.smash_max_stack:
-			self.effect_group.add(stun.Stun(self, 750, self.remove_smash_effects))
-			
-			# Attach a new flash effect to the ball.
-			self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
+		#if self.smash_stack > Ball.smash_max_stack / 2:
+		#self.effect_group.add(stun.Stun(self, self.smash_stack * 50))
+		
+		# Attach a new flash effect to the ball.
+		#self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
 
 		# Change the owner of the ball to the owner of the paddle.
 		self.change_owner(paddle.owner)
@@ -504,9 +504,8 @@ class Ball(pygame.sprite.Sprite):
 		groups.Groups.ball_group.add(self)
 
 	def hit_ball(self, ball):
+		# Spawn some particles.
 		self.spawn_particles()
-
-		self.remove_smash_effects()
 
 		# Tell self that we've been hit.
 		self.on_hit(ball)
@@ -686,11 +685,8 @@ class Ball(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.on_hit_block(block)
 
-		# Remove smash speed.
-		self.speed = Ball.speed
-
-		# Reset our smash stack.
-		self.smash_stack = 0
+		# Remove all smash effects.
+		self.remove_smash_effects()
 
 		# We just collided with a block, so we set collided to True.
 		self.collided = True

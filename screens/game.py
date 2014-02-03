@@ -360,6 +360,11 @@ class Game:
 			for trace in groups.Groups.trace_group:
 				trace.blit_to(self.window_surface)
 
+		# Draw debug information for AI.
+		if settings.DEBUG_MODE:
+			for paddle in groups.Groups.paddle_group:
+				paddle.debug_draw(self.window_surface)
+
 		# Draw the balls.
 		groups.Groups.ball_group.draw(self.window_surface)
 
@@ -370,11 +375,6 @@ class Game:
 				projectile.y + projectile.height < settings.LEVEL_Y or 
 				projectile.y > settings.LEVEL_MAX_Y):
 				self.window_surface.blit(projectile.image, projectile.rect)
-
-		# Draw debug information for AI.
-		if settings.DEBUG_MODE:
-			for paddle in groups.Groups.paddle_group:
-				paddle.debug_draw(self.window_surface)
 
 		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:

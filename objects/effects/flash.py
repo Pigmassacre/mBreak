@@ -34,6 +34,10 @@ class Flash(effect.Effect):
 	def update(self, main_clock):
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
+
+		# We make sure that our size matches the parent.
+		if self.parent.rect.width != self.surface.get_width() or self.parent.rect.height != self.surface.get_height():
+			self.surface = pygame.transform.scale(self.surface, (self.parent.width, self.parent.height))
 		
 		# We update the current color.
 		if self.add:
@@ -47,6 +51,7 @@ class Flash(effect.Effect):
 			else:
 				self.current_color.a == self.final_color.a
 
+		# If we've reached our final color, we destroy ourselves.
 		if self.current_color.a == self.final_color.a:
 			self.destroy()
 

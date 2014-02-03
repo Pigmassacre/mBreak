@@ -33,7 +33,7 @@ class Paddle(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = middle_image.get_width() * settings.GAME_SCALE
-	height = 16 * settings.GAME_SCALE
+	height = 32 * settings.GAME_SCALE
 	acceleration = 0.5 * settings.GAME_SCALE
 	retardation = 2 * settings.GAME_SCALE
 	max_speed = 2 * settings.GAME_SCALE

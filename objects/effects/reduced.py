@@ -29,10 +29,10 @@ class Reduced(effect.Effect):
 
 		# Then, we decrease the size of the parent.
 		previous_height = self.parent.rect.height
-		if not self.parent.rect.height - Reduced.size_decrease < self.parent.min_height:
+		if self.parent.rect.height - Reduced.size_decrease > self.parent.min_height:
 			self.parent.set_size(self.parent.rect.width, self.parent.rect.height - Reduced.size_decrease)
 		else:
-			# If we would decrease the size of the paddle over min_height, simply decrease to min height.
+			# If we would decrease the size of the paddle to or under min_height, simply decrease to min height.
 			self.parent.set_size(self.parent.rect.width, self.parent.min_height)
 
 		# Save the height left we've yet to apply.
@@ -54,16 +54,18 @@ class Reduced(effect.Effect):
 
 		# Check if we can decrease the height of the paddle.
 		previous_height = self.parent.rect.height
+		previous_unapplied_size = self.unapplied_size
 		if self.unapplied_size > 0:
 			# decrease the height of the paddle.
-			if not self.parent.rect.height - self.unapplied_size < self.parent.min_height:
+			if self.parent.rect.height - self.unapplied_size > self.parent.min_height:
 				self.parent.set_size(self.parent.rect.width, self.parent.rect.height - self.unapplied_size)
 			elif self.parent.rect.height != self.parent.min_height:
-				# If we would decrease the size of the paddle over min_height, simply decrease to min height.
+				# If we would decrease the size of the paddle to or under min_height, simply decrease to min height.
 				self.parent.set_size(self.parent.rect.width, self.parent.min_height)
 
 			# Save the height left we've yet to apply.
 			self.unapplied_size -= previous_height - self.parent.rect.height
 
 			# Now, make sure that the position of the middle of the paddle isn't changed.
-			self.parent.y += (Reduced.size_decrease - self.unapplied_size) / 2
+			if self.unapplied_size != previous_unapplied_size:
+				self.parent.y += (Reduced.size_decrease - self.unapplied_size) / 2
