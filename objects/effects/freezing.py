@@ -72,8 +72,8 @@ class Freezing(effect.Effect):
 
 	def create_final_image(self):
 		# Set the rects width and height to the standard values.
-		self.rect.width = self.parent.width
-		self.rect.height = self.parent.height
+		self.rect.width = self.parent.rect.width
+		self.rect.height = self.parent.rect.height
 		
 		for x in range(0, int(math.ceil(self.parent.width / float(self.freezing_image.get_width())))):
 			for y in range(0, int(math.ceil(self.parent.height / float(self.freezing_image.get_height())))):
@@ -86,14 +86,14 @@ class Freezing(effect.Effect):
 			Freezing.sound_effect.play()
 
 	def update(self, main_clock):
-		# We make sure to call the supermethod.
-		effect.Effect.update(self, main_clock)
-
 		# We make sure that our size matches the parent.
 		if self.parent_is_paddle:
 			if self.parent.rect.width != self.image.get_width() or self.parent.rect.height != self.image.get_height():
-				self.image = pygame.transform.scale(self.image, (self.parent.width, self.parent.height))
+				self.image = pygame.transform.scale(self.image, (self.parent.rect.width, self.parent.rect.height))
 				self.create_final_image()
+
+		# We make sure to call the supermethod.
+		effect.Effect.update(self, main_clock)
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()
