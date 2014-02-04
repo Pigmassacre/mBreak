@@ -42,6 +42,9 @@ class Paddle(pygame.sprite.Sprite):
 	max_height = 32 * settings.GAME_SCALE
 	min_height = 4 * settings.GAME_SCALE
 
+	max_width = width
+	min_width = width
+
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
@@ -71,6 +74,10 @@ class Paddle(pygame.sprite.Sprite):
 		self.max_height = Paddle.max_height
 		self.min_height = Paddle.min_height
 
+		# We store the actual height that can go beyond max or min height.
+		self.actual_width = self.rect.width
+		self.actual_height = self.rect.height
+
 		# This is the actual desired x position of the paddle. Used for visual effects.
 		self.center_x = self.x
 
@@ -96,11 +103,6 @@ class Paddle(pygame.sprite.Sprite):
 		self.min_y_distance = 99999
 		self.min_distance = 99999
 
-		# Color the images.
-		#useful.colorize_image(Paddle.top_image, copy.copy(self.owner.color), False, False)
-		#useful.colorize_image(Paddle.middle_image, copy.copy(self.owner.color), False, False)
-		#useful.colorize_image(Paddle.bottom_image, copy.copy(self.owner.color), False, False)
-
 		# Set the size of the paddle. This takes care of storing the image attribute and coloring it.
 		self.set_size(Paddle.width, Paddle.height)
 
@@ -112,30 +114,50 @@ class Paddle(pygame.sprite.Sprite):
 		self.effect_group = pygame.sprite.Group()
 
 	def set_size(self, new_width, new_height):
-		# Make sure the position of the paddle isn't changed.
-		self.x -= (new_width - self.rect.width) / 2.0
-		self.y -= (new_height - self.rect.height) / 2.0
+		# Set the actual width and height to the new width and height.
+		self.actual_width = new_width
+		self.actual_height = new_height
 
-		# Set the rect size.
-		self.rect.width = new_width
-		self.rect.height = new_height
+		# Temporarily store the old width and height, used for positioning the paddle later.
+		old_width = self.rect.width
+		old_height = self.rect.height
+
+		# Change the rect width.
+		if self.actual_width > self.max_width:
+			self.rect.width = self.max_width
+		elif self.actual_width < self.min_width:
+			self.rect.width = self.min_width
+		else:
+			self.rect.width = self.actual_width
+
+		# Change the rect height.
+		if self.actual_height > self.max_height:
+			self.rect.height = self.max_height
+		elif self.actual_height < self.min_height:
+			self.rect.height = self.min_height
+		else:
+			self.rect.height = self.actual_height
+
+		# Make sure the position of the paddle isn't changed.
+		self.x += (old_width - self.rect.width) / 2.0
+		self.y += (old_height - self.rect.height) / 2.0
 
 		if hasattr(self, 'image'):
 			# Resize the current image.
-			self.image = pygame.transform.scale(self.image, (new_width, new_height))
+			self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
 		else:
 			# Create the image attribute that is drawn to the surface.
-			self.image = pygame.Surface((new_width, new_height))
+			self.image = pygame.Surface((self.rect.width, self.rect.height))
 		
 		# Blit the top part.
 		self.image.blit(Paddle.top_image, (0, 0))
 
 		# Blit the middle parts.
-		for i in range(Paddle.top_image.get_height(), new_height - Paddle.bottom_image.get_height()):
+		for i in range(Paddle.top_image.get_height(), self.rect.height - Paddle.bottom_image.get_height()):
 			self.image.blit(Paddle.middle_image, (0, i))
 
 		# Blit the bottom part.
-		self.image.blit(Paddle.bottom_image, (0, new_height - Paddle.bottom_image.get_height()))
+		self.image.blit(Paddle.bottom_image, (0, self.rect.height - Paddle.bottom_image.get_height()))
 
 		useful.colorize_image(self.image, copy.copy(self.owner.color), False, False)
 
@@ -145,6 +167,9 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Then, create a (new) shadow.
 		self.shadow = shadow.Shadow(self)
+
+	def add_size(self, added_width, added_height):
+		self.set_size(self.actual_width + added_width, self.actual_height + added_height)
 
 	def on_hit(self, other_object):
 		# Create a new on hit effect.

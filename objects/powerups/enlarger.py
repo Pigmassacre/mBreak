@@ -32,7 +32,7 @@ class Enlarger(powerup.Powerup):
 	duration = 7500
 
 	# The size that the effect will change the paddle by.
-	size_change = 3 * settings.GAME_SCALE
+	size_change = 4 * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
