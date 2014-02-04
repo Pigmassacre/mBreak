@@ -195,7 +195,7 @@ class Missile(pygame.sprite.Sprite):
 		self.angle += relative_angle_to_target * self.angle_correction * main_clock.delta_time
 
 		# Update the speed according to the acceleration.
-		self.speed += self.acceleration
+		self.speed += self.acceleration * main_clock.time_scale
 
 		# Make sure speed doesn't go over max speed.
 		if self.speed > self.max_speed:

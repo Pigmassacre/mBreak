@@ -403,7 +403,7 @@ class Ball(pygame.sprite.Sprite):
 		#self.effect_group.add(stun.Stun(self, self.smash_stack * 50))
 		
 		# Attach a new flash effect to the ball.
-		#self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
+		self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
 
 		# Change the owner of the ball to the owner of the paddle.
 		self.change_owner(paddle.owner)

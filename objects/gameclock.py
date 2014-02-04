@@ -14,12 +14,15 @@ class GameClock():
 		# We store the game speed.
 		self.time_scale = GameClock.default_time_scale
 
+		# We also store the default time scale, for easy access.
+		self.default_time_scale = GameClock.default_time_scale
+
 		# We store the delta time in seconds. Updated whenever .tick() is called.
 		self.delta_time = 0
 
 	def tick(self, framerate = 0):
 		delta_time_ms = self.clock.tick(framerate) * self.time_scale
-		self.delta_time = (delta_time_ms / 1000.0) * self.time_scale
+		self.delta_time = (delta_time_ms / 1000.0)
 		return delta_time_ms
 
 	def tick_busy_loop(self, framerate = 0):

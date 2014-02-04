@@ -312,9 +312,7 @@ class PrepareMenu:
 		elif self.next_screen == game.Game:
 			# If we're going to start the game, we first create both players.
 			player_one = self.create_player_one(self.player_one_color)
-			print("player one color: " + str(player_one.color))
 			player_two = self.create_player_two(self.player_two_color)
-			print("player two color: " + str(player_two.color))
 
 			# We also create and setup the score.
 			score = {}

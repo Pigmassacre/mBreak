@@ -169,6 +169,7 @@ class Game:
 					pygame.quit()
 				if countdown_screen.done:
 					if event.type == KEYDOWN and event.key == K_ESCAPE:
+						self.main_clock.time_scale = 1
 						pausemenu.PauseMenu(self.window_surface, self.main_clock)
 					if settings.DEBUG_MODE:
 						if event.type == KEYDOWN and event.key == K_l:
@@ -275,9 +276,6 @@ class Game:
 		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
 		ball.Ball(x, y, random_angle, self.player_one)
 
-		#for paddle in self.player_one.paddle_group:
-		#	ball.Ball(paddle.x + paddle.width + 1, paddle.y + (paddle.height / 2), -math.pi / 8, self.player_one)
-
 	def create_ball_right(self):
 		# Creates a ball for the right player.
 		x = settings.LEVEL_X + (settings.LEVEL_WIDTH + ball.Ball.width) / 2
@@ -285,13 +283,17 @@ class Game:
 		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
 		ball.Ball(x, y, math.pi + random_angle, self.player_two)
 
-		#for paddle in self.player_two.paddle_group:
-		#	ball.Ball(paddle.x - paddle.width - 1, paddle.y + (paddle.height / 2), math.pi / 8, self.player_two)
-
 	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
 		if settings.DEBUG_MODE and countdown_screen.done:
-			debug.update(self.player_one, self.player_two)
+			debug.update(self.player_one, self.player_two, self.main_clock)
+		"""
+		self.main_clock.time_scale = self.main_clock.default_time_scale
+		for ball in groups.Groups.ball_group:
+			for block in groups.Groups.block_group:
+				if ball.owner != block.owner:
+					if math.sqrt(math.pow(math.fabs(ball.x - block.x), 2) + math.pow(math.fabs(ball.y - block.y), 2)) < 20 * settings.GAME_SCALE:
+						self.main_clock.time_scale = 0.25"""
 
 		# Update the players.
 		groups.Groups.player_group.update(self.main_clock)
@@ -404,6 +406,9 @@ class Game:
 			debug.Debug.display(self.window_surface, self.main_clock)
 
 	def on_exit(self):
+		# Restore the time scale.
+		self.main_clock.time_scale = self.main_clock.default_time_scale
+
 		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
 		self.player_one.empty_groups()
 		self.player_two.empty_groups()

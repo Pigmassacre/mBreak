@@ -23,7 +23,7 @@ class Trace(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	shadow_blend_color = pygame.Color(100, 100, 100, 255)
-	alpha_step = 960
+	alpha_step = 16 * settings.GAME_FPS
 
 	def __init__(self, parent):
 		# We start by calling the superconstructor.

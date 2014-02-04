@@ -62,7 +62,7 @@ class Particle(pygame.sprite.Sprite):
 
 	def update(self, main_clock):
 		# Update speed, and kill self if speed gets to or under 0.
-		self.speed -= self.retardation
+		self.speed -= self.retardation * main_clock.time_scale
 		if self.speed <= 0:
 			self.kill()
 		

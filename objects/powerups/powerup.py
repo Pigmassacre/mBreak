@@ -112,7 +112,7 @@ class Powerup(pygame.sprite.Sprite):
 	def update(self, main_clock):
 		# Update the position according to the bob effect.
 		if self.bob:
-			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * 0.0075) * Powerup.bob_factor
+			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * main_clock.time_scale * 0.0075) * Powerup.bob_factor
 
 		# Update the rects position.
 		self.rect.x = self.x

@@ -45,11 +45,17 @@ def create_ball_right(player_right):
 		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
 		temp_ball = ball.Ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
 
-def update(player_left, player_right):
+def update(player_left, player_right, main_clock):
 	# When hold, the space button spawns balls every frame.
 	if pygame.key.get_pressed()[K_SPACE]:
 		create_ball_left(player_left)
 		create_ball_right(player_right)
+
+	if pygame.key.get_pressed()[K_t]:
+		change_time_scale(main_clock)
+
+def change_time_scale(main_clock):
+	main_clock.time_scale = random.uniform(0, 3)
 
 class Debug:
 
