@@ -41,15 +41,15 @@ class Flash(effect.Effect):
 		
 		# We update the current color.
 		if self.add:
-			if (self.current_color.a + self.tick_amount) <= 255:
+			if (self.current_color.a + self.tick_amount) < self.final_color.a:
 				self.current_color.a += self.tick_amount
 			else:
-				self.current_color.a == self.final_color.a
+				self.current_color.a = self.final_color.a
 		else:
-			if (self.current_color.a - self.tick_amount) >= 0:
+			if (self.current_color.a - self.tick_amount) > self.final_color.a:
 				self.current_color.a -= self.tick_amount
 			else:
-				self.current_color.a == self.final_color.a
+				self.current_color.a = self.final_color.a
 
 		# If we've reached our final color, we destroy ourselves.
 		if self.current_color.a == self.final_color.a:
