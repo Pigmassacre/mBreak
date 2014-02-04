@@ -29,7 +29,7 @@ class Stun(effect.Effect):
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	max_speed_reduction = 100 * settings.GAME_SCALE
-	particle_spawn_rate = 120
+	particle_spawn_rate = 125
 	particle_spawn_amount = 5
 
 	# Scale image to settings.GAME_SCALE.
@@ -98,13 +98,13 @@ class Stun(effect.Effect):
 			self.particle_spawn_time = 0
 
 			# Spawn a random amount of particles.
-			for _ in range(0, random.randrange(0, Stun.particle_spawn_amount)):
+			for _ in range(0, random.randrange(2, Stun.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.6 * settings.GAME_SCALE, 0.35 * settings.GAME_SCALE)
+				speed = random.uniform(0.6 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 25.0
 				color_value = random.randint(100, 250)
 				color = pygame.Color(color_value, color_value, color_value)
-				particle.Particle(self.parent.x + self.parent.rect.width / 3, self.parent.y + self.parent.rect.height / 3, self.parent.rect.width / 3, self.parent.rect.width / 3, angle, speed, retardation, color, 1)
+				particle.Particle(self.parent.x + self.parent.rect.width / 3, self.parent.y + self.parent.rect.height / 3, self.parent.rect.width / 3, self.parent.rect.width / 3, angle, speed, retardation, color, 1 * settings.GAME_FPS)
 
 	def on_kill(self):
 		# Restore the max speed we removed from the parent.

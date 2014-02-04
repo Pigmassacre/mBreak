@@ -161,7 +161,7 @@ class Game:
 		while not self.done:
 			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
 			self.main_clock.tick(graphics.MAX_FPS)
-			
+
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					# If the window is closed, the game is shut down.
@@ -294,7 +294,7 @@ class Game:
 			debug.update(self.player_one, self.player_two)
 
 		# Update the players.
-		groups.Groups.player_group.update()
+		groups.Groups.player_group.update(self.main_clock)
 
 		# Update the balls.
 		groups.Groups.ball_group.update(self.main_clock)
@@ -325,11 +325,11 @@ class Game:
 		
 		# Update the particles.
 		if graphics.PARTICLES:
-			groups.Groups.particle_group.update()
+			groups.Groups.particle_group.update(self.main_clock)
 
 		# Update the traces.
 		if graphics.TRACES:
-			groups.Groups.trace_group.update()
+			groups.Groups.trace_group.update(self.main_clock)
 		
 		# Update the shadows.
 		if graphics.SHADOWS:

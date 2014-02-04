@@ -23,7 +23,7 @@ class Shadow(pygame.sprite.Sprite):
 	offset_x = 1 * settings.GAME_SCALE
 	offset_y = 2 * settings.GAME_SCALE
 	linger_time = 1500
-	alpha_step = 50
+	alpha_step = 50 * settings.GAME_FPS
 
 	def __init__(self, parent, color = pygame.Color(0, 0, 0, 128), linger = False, fill = False):
 		# We start by calling the superconstructor.
@@ -88,10 +88,10 @@ class Shadow(pygame.sprite.Sprite):
 			self.linger_time_left = self.linger_time_left - main_clock.get_time()
 			if self.linger_time_left <= 0:
 				# The time is out, so we reduce our alpha to zero, or if it's already zero we destroy ourselves.
-				if self.color.a - self.alpha_step < 0:
+				if self.color.a - int(self.alpha_step * main_clock.delta_time) < 0:
 					self.kill()
 				else:
-					self.color.a = self.color.a - self.alpha_step
+					self.color.a -= int(self.alpha_step * main_clock.delta_time)
 
 		# Move the shadow so it's under its parent.
 		self.x = self.parent.x + self.offset_x

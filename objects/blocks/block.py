@@ -37,7 +37,7 @@ class Block(pygame.sprite.Sprite):
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 255)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
-	hit_effect_tick_amount = 15
+	hit_effect_tick_amount = 15 * settings.GAME_FPS
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
@@ -83,9 +83,9 @@ class Block(pygame.sprite.Sprite):
 		# Spawn some particles.
 		for _ in range(0, Block.particle_spawn_amount):
 			angle = random.uniform(0, math.pi)
-			speed = 5
-			retardation = 0.25
-			alpha_step = 5
+			speed = 5 * settings.GAME_FPS
+			retardation = 0.25 * settings.GAME_FPS
+			alpha_step = 5 * settings.GAME_FPS
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
 
 	def update(self):

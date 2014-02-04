@@ -49,31 +49,31 @@ class Ball(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	speed = 1.5 * settings.GAME_SCALE
-	max_speed = 5.0 * settings.GAME_SCALE
-	speed_step = 0.75 * settings.GAME_SCALE
+	speed = 1.5 * settings.GAME_FPS * settings.GAME_SCALE
+	max_speed = 5 * settings.GAME_FPS * settings.GAME_SCALE
+	speed_step = 0.75 * settings.GAME_FPS * settings.GAME_SCALE
 	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
-	least_allowed_vertical_angle = 0.32#0.21 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
+	least_allowed_vertical_angle = 0.32 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 32
 	particle_spawn_amount = 3
 
 	# Damage stuff.
 	damage = 10
-	damage_dealt_to_own_blocks = 0.25
+	damage_percentage_dealt_to_own_blocks = 0.25
 
 	# Smash stuff.
-	smash_speed = 0.19 * settings.GAME_SCALE
+	smash_speed = 0.2 * settings.GAME_FPS * settings.GAME_SCALE
 	smash_damage_factor = 1
 	smash_max_stack = 12
 	smash_effect_size_increase = 1 * settings.GAME_SCALE
 	smash_effect_start_color = pygame.Color(255, 255, 255, 255)
 	smash_effect_final_color = pygame.Color(255, 255, 255, 0)
-	smash_effect_tick_amount = 6
+	smash_effect_tick_amount = 6 * settings.GAME_FPS
 
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 150)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
-	hit_effect_tick_amount = 8
+	hit_effect_tick_amount = 8 * settings.GAME_FPS
 
 	# Scale image to match the game scale.
 	image = pygame.transform.scale(image, (width, height))
@@ -215,8 +215,8 @@ class Ball(pygame.sprite.Sprite):
 				self.speed = self.max_speed
 
 			# Move the ball with speed in consideration.
-			self.x = self.x + (math.cos(self.angle) * self.tick_speed)
-			self.y = self.y + (math.sin(self.angle) * self.tick_speed)
+			self.x = self.x + (math.cos(self.angle) * self.tick_speed * main_clock.delta_time)
+			self.y = self.y + (math.sin(self.angle) * self.tick_speed * main_clock.delta_time)
 			self.rect.x = self.x
 			self.rect.y = self.y
 
@@ -321,7 +321,7 @@ class Ball(pygame.sprite.Sprite):
 		for _ in range(0, Ball.particle_spawn_amount):
 			angle = self.angle + random.uniform(-0.20, 0.20)
 			retardation = self.speed / 24.0
-			alpha_step = 5
+			alpha_step = 5 * settings.GAME_FPS
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
 
 	def check_collision_paddles(self):
@@ -677,7 +677,7 @@ class Ball(pygame.sprite.Sprite):
 
 		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
 		if block.owner == self.owner:
-			block.on_hit(damage_dealt * Ball.damage_dealt_to_own_blocks)
+			block.on_hit(damage_dealt * Ball.damage_percentage_dealt_to_own_blocks)
 		else:
 			block.on_hit(damage_dealt)
 

@@ -66,5 +66,3 @@ class DoubleSpeed(powerup.Powerup):
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
 		entity.owner.add_powerup(self.__class__, created_effect)
-
-		#self.share_effect(entity, timeout.Timeout, self.create_effect)

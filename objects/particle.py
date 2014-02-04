@@ -60,22 +60,22 @@ class Particle(pygame.sprite.Sprite):
 		self.kill()
 		self.shadow.kill()
 
-	def update(self):
+	def update(self, main_clock):
 		# Update speed, and kill self if speed gets to or under 0.
-		self.speed = self.speed - self.retardation
+		self.speed -= self.retardation
 		if self.speed <= 0:
 			self.kill()
 		
 		# Update the alpha in the RGBA color value. If it gets to or under 0, kill self.
 		if self.alpha_step > 0:
-			if self.color.a - self.alpha_step < 0:
+			if self.color.a - int(self.alpha_step * main_clock.delta_time) < 0:
 				self.kill()
 			else:
-				self.color.a = self.color.a - self.alpha_step
+				self.color.a -= int(self.alpha_step * main_clock.delta_time)
 
 		# Finally, move the particle with speed in consideration.
-		self.x = self.x + (math.cos(self.angle) * self.speed)
-		self.y = self.y + (math.sin(self.angle) * self.speed)
+		self.x = self.x + (math.cos(self.angle) * self.speed * main_clock.delta_time)
+		self.y = self.y + (math.sin(self.angle) * self.speed * main_clock.delta_time)
 		self.rect.x = self.x
 		self.rect.y = self.y
 

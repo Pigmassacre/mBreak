@@ -35,9 +35,9 @@ class Paddle(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = middle_image.get_width() * settings.GAME_SCALE
 	height = 18 * settings.GAME_SCALE
-	acceleration = 0.5 * settings.GAME_SCALE
-	retardation = 2 * settings.GAME_SCALE
-	max_speed = 2 * settings.GAME_SCALE
+	acceleration = 0.5 * settings.GAME_FPS * settings.GAME_SCALE
+	retardation = 2 * settings.GAME_FPS * settings.GAME_SCALE
+	max_speed = 2 * settings.GAME_FPS * settings.GAME_SCALE
 
 	max_height = 32 * settings.GAME_SCALE
 	min_height = 4 * settings.GAME_SCALE
@@ -48,11 +48,11 @@ class Paddle(pygame.sprite.Sprite):
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
-	hit_effect_tick_amount = 22
+	hit_effect_tick_amount = 22 * settings.GAME_FPS
 
 	# Used for hit effect on the paddle.
-	stabilize_speed = 0.45
-	max_nudge_distance = 6
+	stabilize_speed = 0.45 * settings.GAME_FPS * settings.GAME_SCALE
+	max_nudge_distance = 2 * settings.GAME_SCALE
 
 	# Scale the images to settings.GAME_SCALE.
 	top_image = pygame.transform.scale(top_image, (top_image.get_width() * settings.GAME_SCALE, top_image.get_height() * settings.GAME_SCALE))
@@ -179,7 +179,7 @@ class Paddle(pygame.sprite.Sprite):
 		if self.focused_ball != None and settings.DEBUG_MODE:
 			color = copy.copy(self.owner.color)
 			color.a = 128
-			surface.fill(color, pygame.Rect(self.focused_ball.rect.x - 2, self.focused_ball.y - 2, self.focused_ball.width + 4, self.focused_ball.height + 4))
+			surface.fill(color, pygame.Rect(self.focused_ball.rect.x - 1 * settings.GAME_SCALE, self.focused_ball.y - 1 * settings.GAME_SCALE, self.focused_ball.width + 2 * settings.GAME_SCALE, self.focused_ball.height + 2 * settings.GAME_SCALE))
 
 	def decide_which_ball(self, ball):
 		if self.owner.ai_difficulty >= 2:
@@ -202,7 +202,7 @@ class Paddle(pygame.sprite.Sprite):
 
 				self.focused_ball = ball
 
-	def update(self, key_up, key_down):
+	def update(self, key_up, key_down, main_clock):
 		# Very simple AI.
 		if self.owner.ai:
 			key_up_pressed = False
@@ -258,34 +258,34 @@ class Paddle(pygame.sprite.Sprite):
 		# However, we only move the paddle if max_speed is above zero, since if it is zero the paddle cannot move anyway.
 		if self.max_speed > 0:
 			if key_up_pressed:
-					self.velocity_y = self.velocity_y - self.acceleration
+					self.velocity_y -= self.acceleration
 					if self.velocity_y < -self.max_speed:
 						self.velocity_y = -self.max_speed
 			elif key_down_pressed:
-					self.velocity_y = self.velocity_y + self.acceleration
+					self.velocity_y += self.acceleration
 					if self.velocity_y > self.max_speed:
 						self.velocity_y = self.max_speed
 			elif self.velocity_y > 0:
-				self.velocity_y = self.velocity_y - self.retardation
+				self.velocity_y -= self.retardation
 				if self.velocity_y < 0:
 					self.velocity_y = 0
 			elif self.velocity_y < 0:
-				self.velocity_y = self.velocity_y + self.retardation
+				self.velocity_y += self.retardation
 				if self.velocity_y > 0:
 					self.velocity_y = 0
 		else:
 			# If max_speed is zero, we still want to reduce our velocity.
 			if self.velocity_y > 0:
-				self.velocity_y = self.velocity_y - self.retardation
+				self.velocity_y -= self.retardation
 				if self.velocity_y < 0:
 					self.velocity_y = 0
 			elif self.velocity_y < 0:
-				self.velocity_y = self.velocity_y + self.retardation
+				self.velocity_y += self.retardation
 				if self.velocity_y > 0:
 					self.velocity_y = 0
 
 		# Move the paddle according to its velocity.
-		self.y = self.y + self.velocity_y
+		self.y += self.velocity_y * main_clock.delta_time
 		self.rect.y = self.y
 
 		# Move paddle to it's center x.
@@ -293,18 +293,18 @@ class Paddle(pygame.sprite.Sprite):
 			if self.x > self.center_x + Paddle.max_nudge_distance:
 				self.x = self.center_x + Paddle.max_nudge_distance
 
-			if self.x - Paddle.stabilize_speed < self.center_x:
+			if self.x - Paddle.stabilize_speed * main_clock.delta_time < self.center_x:
 				self.x = self.center_x
 			else:
-				self.x -= Paddle.stabilize_speed
+				self.x -= Paddle.stabilize_speed * main_clock.delta_time
 		else:
 			if self.x < self.center_x - Paddle.max_nudge_distance:
 				self.x = self.center_x - Paddle.max_nudge_distance
 
-			if self.x + Paddle.stabilize_speed > self.center_x:
+			if self.x + Paddle.stabilize_speed * main_clock.delta_time > self.center_x:
 				self.x = self.center_x
 			else:
-				self.x += Paddle.stabilize_speed
+				self.x += Paddle.stabilize_speed * main_clock.delta_time
 		self.rect.x = self.x
 
 		# Check collision with y-edges.

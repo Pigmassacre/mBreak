@@ -26,7 +26,7 @@ class Charged(effect.Effect):
 	damage_width = 16 * settings.GAME_SCALE
 	damage_height = 16 * settings.GAME_SCALE
 	damage = 5
-	max_speed_reduction = 0.41 * settings.GAME_SCALE
+	max_speed_reduction = 0.41 * settings.GAME_FPS * settings.GAME_SCALE
 	particle_spawn_rate = 450
 	particle_spawn_amount = 5
 	duration = 10000
@@ -90,9 +90,9 @@ class Charged(effect.Effect):
 		# Spawns a few particles with random color, angle, speed and so on.
 		for _ in range(0, random.randrange(2, Charged.particle_spawn_amount)):
 			angle = random.uniform(0, 2 * math.pi)
-			speed = random.uniform(0.9 * settings.GAME_SCALE, 1.4 * settings.GAME_SCALE)
+			speed = random.uniform(0.9 * settings.GAME_FPS * settings.GAME_SCALE, 1.4 * settings.GAME_FPS * settings.GAME_SCALE)
 			retardation = speed / 46.0
 			random_value = random.randint(225, 255)
 			color = pygame.Color(random_value, random_value, random.randint(0, 100))
 			random_size = random.randint(self.rect.width / 4, self.rect.width / 3)
-			particle.Particle(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2, random_size, random_size, angle, speed, retardation, color, 20)
+			particle.Particle(self.rect.x + self.rect.width / 2, self.rect.y + self.rect.height / 2, random_size, random_size, angle, speed, retardation, color, 20 * settings.GAME_FPS)

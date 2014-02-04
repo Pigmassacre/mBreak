@@ -36,7 +36,8 @@ class Burning(effect.Effect):
 	height = image.get_height() * settings.GAME_SCALE
 	damage_per_second = 1.0
 	particle_spawn_rate = 100
-	particle_spawn_amount = 3
+	particle_least_spawn_amount = 2
+	particle_maximum_spawn_amount = 4
 	duration = 10000
 
 	# Scale image to settings.GAME_SCALE.
@@ -86,9 +87,9 @@ class Burning(effect.Effect):
 			self.particle_spawn_time = 0
 
 			# Spawn a random amount of particles.
-			for _ in range(0, random.randrange(1, Burning.particle_spawn_amount)):
+			for _ in range(0, random.randrange(Burning.particle_least_spawn_amount, Burning.particle_maximum_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.75 * settings.GAME_SCALE, 0.9 * settings.GAME_SCALE)
+				speed = random.uniform(0.75 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
-				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 5)
+				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 4, self.parent.rect.width / 4, angle, speed, retardation, color, 5 * settings.GAME_FPS)

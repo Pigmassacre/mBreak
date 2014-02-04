@@ -103,7 +103,7 @@ class Player(pygame.sprite.Sprite):
 		# Change the last_powerup_group_size to match the current size of the group.
 		self.last_powerup_group_size = len(self.powerup_group)
 
-	def update(self):
+	def update(self, main_clock):
 		# We check if any object has been removed from the powerup group.
 		if len(self.powerup_group) < self.last_powerup_group_size:
 			# We use this to position the powerups.
@@ -131,4 +131,4 @@ class Player(pygame.sprite.Sprite):
 			self.last_powerup_group_size = len(self.powerup_group)
 
 		# Update paddles. The player takes care of this in order to send correct keys to the it's own paddles.
-		self.paddle_group.update(self.key_up, self.key_down)
+		self.paddle_group.update(self.key_up, self.key_down, main_clock)

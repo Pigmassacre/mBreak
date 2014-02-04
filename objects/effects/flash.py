@@ -41,13 +41,13 @@ class Flash(effect.Effect):
 		
 		# We update the current color.
 		if self.add:
-			if (self.current_color.a + self.tick_amount) < self.final_color.a:
-				self.current_color.a += self.tick_amount
+			if (self.current_color.a + int(self.tick_amount * main_clock.delta_time)) < self.final_color.a:
+				self.current_color.a += int(self.tick_amount * main_clock.delta_time)
 			else:
 				self.current_color.a = self.final_color.a
 		else:
-			if (self.current_color.a - self.tick_amount) > self.final_color.a:
-				self.current_color.a -= self.tick_amount
+			if (self.current_color.a - int(self.tick_amount * main_clock.delta_time)) > self.final_color.a:
+				self.current_color.a -= int(self.tick_amount * main_clock.delta_time)
 			else:
 				self.current_color.a = self.final_color.a
 

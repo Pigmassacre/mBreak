@@ -36,7 +36,7 @@ class Powerup(pygame.sprite.Sprite):
 	# On hit effect values.
 	spawn_effect_start_color = pygame.Color(255, 255, 255, 255)
 	spawn_effect_final_color = pygame.Color(255, 255, 255, 0)
-	spawn_effect_tick_amount = 18
+	spawn_effect_tick_amount = 18 * settings.GAME_FPS
 
 	def __init__(self, x, y, width, height, shareable = True, bob = True):
 		# We start by calling the superconstructor.
@@ -69,9 +69,6 @@ class Powerup(pygame.sprite.Sprite):
 
 		# Play a random sound from the sound_effects list.
 		Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
-
-		if settings.DEBUG_MODE:
-			print("Powerup spawned @ (" + str(self.rect.x) + ", " + str(self.rect.y) + ")")
 
 	def share_effect(self, entity, timeout_class, effect_creation_function):
 		created_effect = None

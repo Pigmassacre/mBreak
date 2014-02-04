@@ -23,7 +23,7 @@ class Trace(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	shadow_blend_color = pygame.Color(100, 100, 100, 255)
-	alpha_step = 16
+	alpha_step = 960
 
 	def __init__(self, parent):
 		# We start by calling the superconstructor.
@@ -64,14 +64,14 @@ class Trace(pygame.sprite.Sprite):
 		self.kill()
 		self.shadow.kill()
 
-	def update(self):
+	def update(self, main_clock):
 		# Update the alpha in the RGBA color value. If it gets to or under 0, we destroy ourselves.
-		if self.alpha_step > 0:
-			if self.color.a - self.alpha_step < 0:
+		if Trace.alpha_step > 0:
+			if self.color.a - int(Trace.alpha_step * main_clock.delta_time) < 0:
 				self.destroy()
 			else:
-				self.color.a = self.color.a - Trace.alpha_step
-				self.shadow.color.a = self.shadow.color.a - Trace.alpha_step
+				self.color.a = self.color.a - int(Trace.alpha_step * main_clock.delta_time)
+				self.shadow.color.a = self.shadow.color.a - int(Trace.alpha_step * main_clock.delta_time)
 
 		# Kill the trace if it is no longer in the visible game area.
 		if self.rect.x + self.rect.width <= settings.LEVEL_X:

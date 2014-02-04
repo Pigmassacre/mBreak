@@ -34,8 +34,8 @@ class Rocket(powerup.Powerup):
 	particle_spawn_amount = 3
 
 	# Missile spawn values.
-	missile_speed = 1 * settings.GAME_SCALE
-	missile_acceleration = 0.05 * settings.GAME_SCALE
+	missile_speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
+	missile_acceleration = 0.025 * settings.GAME_FPS * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
