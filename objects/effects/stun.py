@@ -56,12 +56,23 @@ class Stun(effect.Effect):
 		if self.parent.__class__ == paddle.Paddle:
 			self.parent.max_speed -= Stun.max_speed_reduction
 
-			# Create the image attribute that is drawn to the surface.
-			self.image = Stun.image.copy()
+			# Create the image attribute that is drawn over the parent surface.
+			self.image = pygame.surface.Surface((self.parent.rect.width, self.parent.rect.height), pygame.locals.SRCALPHA)
 
-			# Set the rects width and height to the standard values.
-			self.rect.width = Stun.width
-			self.rect.height = Stun.height
+			# Store the image that we use to create the final image.
+			self.stun_image = Stun.image.copy()
+
+			# Create the final image.
+			self.create_final_image()
+			
+	def create_final_image(self):
+		# Set the rects width and height to the standard values.
+		self.rect.width = self.parent.rect.width
+		self.rect.height = self.parent.rect.height
+		
+		for x in range(0, int(math.ceil(self.parent.width / float(self.stun_image.get_width())))):
+			for y in range(0, int(math.ceil(self.parent.height / float(self.stun_image.get_height())))):
+				self.image.blit(self.stun_image, (self.stun_image.get_width() * x, self.stun_image.get_height() * y))
 
 	def on_hit_paddle(self, hit_paddle):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
@@ -71,6 +82,12 @@ class Stun(effect.Effect):
 			self.destroy()
 
 	def update(self, main_clock):
+		# We make sure that our size matches the parent.
+		if self.parent_is_paddle:
+			if self.parent.rect.width != self.image.get_width() or self.parent.rect.height != self.image.get_height():
+				self.image = pygame.transform.scale(self.image, (self.parent.rect.width, self.parent.rect.height))
+				self.create_final_image()
+
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
 

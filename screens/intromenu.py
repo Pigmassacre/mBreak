@@ -94,7 +94,6 @@ class IntroMenu:
 
 			# We draw the logo.
 			self.title_logo.draw(self.window_surface)
-
 			
 			# Calls the blink method of the title_message object, which will hide the title_message at regular intervals, essentially
 			# making it "blink".

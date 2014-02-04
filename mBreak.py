@@ -5,6 +5,7 @@ __license__ = "All Rights Reserved"
 import pygame
 from pygame.locals import *
 import settings.settings as settings
+import objects.gameclock as gameclock
 import settings.graphics as graphics
 
 # We start the splash screen after everything is setup, so we import it here.
@@ -24,7 +25,8 @@ def main():
 	pygame.init()
 
 	# Instantiates a PyGame Clock.
-	main_clock = pygame.time.Clock()
+	#main_clock = pygame.time.Clock()
+	main_clock = gameclock.GameClock()
 
 	# Load the settings.
 	settings.load()
