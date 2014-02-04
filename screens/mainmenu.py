@@ -43,8 +43,8 @@ class MainMenu:
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
-		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 2 * settings.GAME_SCALE
+		self.logo_transition = transition.Transition(self.main_clock)
+		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
@@ -55,7 +55,7 @@ class MainMenu:
 		self.active_menu = [self.main_menu]
 
 		# Setup the menu transitions.
-		self.menu_transition = transition.Transition()
+		self.menu_transition = transition.Transition(self.main_clock)
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 		# Setup and play music.
@@ -180,6 +180,9 @@ class MainMenu:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
@@ -210,10 +213,8 @@ class MainMenu:
 				# Display various debug information.
 				debug.Debug.display(self.window_surface, self.main_clock)
 
+			# Update the display, of course.
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

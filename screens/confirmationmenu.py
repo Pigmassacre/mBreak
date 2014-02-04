@@ -71,7 +71,7 @@ class ConfirmationMenu:
 		self.confirmation_text.y = self.confirmation_menu.y - (2 * self.confirmation_text.get_height())
 
 	def setup_transitions(self):
-		self.transitions = transition.Transition()
+		self.transitions = transition.Transition(self.main_clock)
 		self.transitions.setup_single_item_transition(self.confirmation_text, True, True, True, False)
 		self.transitions.setup_single_item_transition(self.confirmation_menu.items[0], True, True, False, False)
 		self.transitions.setup_single_item_transition(self.confirmation_menu.items[1], True, True, False, True)
@@ -89,6 +89,9 @@ class ConfirmationMenu:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Begin every frame by blitting the background surface.
 			self.window_surface.blit(self.background_surface, (0, 0))
 			
@@ -111,9 +114,6 @@ class ConfirmationMenu:
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

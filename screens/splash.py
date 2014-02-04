@@ -28,8 +28,8 @@ class Splash:
 
 	# These are the values that affect the movement of the splash images.
 	splash_time = 1750
-	top_half_speed = 10 * settings.GAME_SCALE
-	bottom_half_speed = -10 * settings.GAME_SCALE
+	top_half_speed = 600 * settings.GAME_SCALE
+	bottom_half_speed = -600 * settings.GAME_SCALE
 
 	# We use this instead of the standard background color (even if they happen to be the same) since we always want the background to
 	# be black here.
@@ -68,6 +68,9 @@ class Splash:
 		# When done is True, the gameloop ends and the next screen is started.
 		self.done = False
 		while not self.done:
+			# Finally, we constrain the game to a set maximum amount of FPS.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(Splash.background_color)
 			
@@ -75,16 +78,16 @@ class Splash:
 				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
 					# If ENTER or ESCAPE is pressed, we end this loop and proceed to the next screen.
 					self.done = True
-
+			
 			# After a certain amount of time, the splash ends automatically.
 			if self.time_passed >= Splash.splash_time:
 				self.done = True
 
 			# The following code moves the top half.
 			if self.top_go_right:
-				self.top_half_x += Splash.top_half_speed
+				self.top_half_x += Splash.top_half_speed * self.main_clock.delta_time
 			else:
-				self.top_half_x -= Splash.top_half_speed
+				self.top_half_x -= Splash.top_half_speed * self.main_clock.delta_time
 
 			if self.top_half_x > (2 * settings.SCREEN_WIDTH) - Splash.splash_top_half.get_width():
 				self.top_go_right = False
@@ -94,9 +97,9 @@ class Splash:
 
 			# And the following moves the bottom half.
 			if self.bottom_go_left:
-				self.bottom_half_x += Splash.bottom_half_speed
+				self.bottom_half_x += Splash.bottom_half_speed * self.main_clock.delta_time
 			else:
-				self.bottom_half_x -= Splash.bottom_half_speed
+				self.bottom_half_x -= Splash.bottom_half_speed * self.main_clock.delta_time
 
 			if self.bottom_half_x < -settings.SCREEN_WIDTH:
 				self.bottom_go_left = False
@@ -114,9 +117,6 @@ class Splash:
 
 			# Of course, we have to update the screen so we see any of our changes.
 			pygame.display.update()
-			
-			# Finally, we constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we proceed to the intromenu!
 		intromenu.IntroMenu(self.window_surface, self.main_clock)

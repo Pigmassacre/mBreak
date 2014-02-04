@@ -87,7 +87,7 @@ class GameOver:
 			a_menu.register_other_menus(self.all_menus)
 
 		# Setup the menu transitions.
-		self.transitions = transition.Transition()
+		self.transitions = transition.Transition(self.main_clock)
 		self.transitions.setup_single_item_transition(self.winning_player_text, True, True, True, False)
 		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
 		self.transitions.setup_transition(self.rematch_menu, False, True, False, True)
@@ -116,6 +116,9 @@ class GameOver:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.blit(self.background_surface, (0, 0))
 
@@ -140,9 +143,6 @@ class GameOver:
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

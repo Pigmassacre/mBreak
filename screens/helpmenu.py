@@ -143,8 +143,8 @@ class HelpMenu:
 			a_menu.register_other_menus(self.all_menus)
 
 		# We setup all menu transitions.
-		self.transitions = transition.Transition()
-		self.transitions.speed = 20 * settings.GAME_SCALE
+		self.transitions = transition.Transition(self.main_clock)
+		self.transitions.speed = 1200 * settings.GAME_SCALE
 		self.transitions.setup_transition(self.help_menu, True, True, True, False)
 		self.transitions.setup_transition(self.back_menu, True, True, False, False)
 
@@ -695,6 +695,9 @@ class HelpMenu:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
@@ -719,9 +722,6 @@ class HelpMenu:
 
 			# We have to update the display if we want anything we just did to actually display.
 			pygame.display.update()
-			
-			# Finally, we constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

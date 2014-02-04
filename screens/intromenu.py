@@ -80,6 +80,9 @@ class IntroMenu:
 		# When done is True, the gameloop ends and the next screen is started.
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
@@ -109,9 +112,6 @@ class IntroMenu:
 
 			# Update the display, of course.
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# We're done, so continue to the main menu.
 		mainmenu.MainMenu(self.window_surface, self.main_clock, self.title_logo)

@@ -21,9 +21,9 @@ However, there's no harm in having multiple instances if you want to given them 
 class Transition:
 
 	# The standard speed value, used unless changed for the instance of this class.
-	speed = 14 * settings.GAME_SCALE
+	speed = 840 * settings.GAME_SCALE
 
-	def __init__(self):
+	def __init__(self, main_clock):
 		# The speed at which each item moves.
 		self.speed = Transition.speed
 
@@ -32,6 +32,9 @@ class Transition:
 
 		# This is used to store all the start positions of each item.
 		self.start_positions = {}
+
+		# Store the clock to be used when calculating movement.
+		self.main_clock = main_clock
 
 	def add_items(self, menu_to_add):
 		"""
@@ -164,23 +167,23 @@ class Transition:
 		which can be changed at any time the user wants.
 		"""
 		if position[0] < item.x:
-			if (item.x - self.speed) < position[0]:
+			if (item.x - self.speed * self.main_clock.delta_time) < position[0]:
 				item.x = position[0]
 			else:
-				item.x -= self.speed
+				item.x -= self.speed * self.main_clock.delta_time
 		elif position[0] > item.x:
-			if (item.x + self.speed) > position[0]:
+			if (item.x + self.speed * self.main_clock.delta_time) > position[0]:
 				item.x = position[0]
 			else:
-				item.x += self.speed
+				item.x += self.speed * self.main_clock.delta_time
 
 		if position[1] < item.y:
-			if (item.y - self.speed) < position[1]:
+			if (item.y - self.speed * self.main_clock.delta_time) < position[1]:
 				item.y = position[1]
 			else:
-				item.y -= self.speed
+				item.y -= self.speed * self.main_clock.delta_time
 		elif position[1] > item.y:
-			if (item.y + self.speed) > position[1]:
+			if (item.y + self.speed * self.main_clock.delta_time) > position[1]:
 				item.y = position[1]
 			else:
-				item.y += self.speed
+				item.y += self.speed * self.main_clock.delta_time

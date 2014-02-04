@@ -50,7 +50,7 @@ class Missile(pygame.sprite.Sprite):
 	hit_particle_max_speed = 3 * settings.GAME_SCALE
 
 	# The amount of damage the missile deals to a hit block.
-	damage = 10
+	damage = 20
 
 	# These variables affect how the missile homes to its target.
 	angle_correction = 0.01

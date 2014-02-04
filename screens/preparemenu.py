@@ -119,7 +119,7 @@ class PrepareMenu:
 		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
 		# We setup all menu transitions.
-		self.transitions = transition.Transition()
+		self.transitions = transition.Transition(self.main_clock)
 		self.transitions.setup_transition(self.number_of_rounds_menu, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
 		self.transitions.setup_transition(self.color_menu_one, True, False, False, True)
@@ -239,6 +239,9 @@ class PrepareMenu:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.fill(settings.BACKGROUND_COLOR)
 			
@@ -267,9 +270,6 @@ class PrepareMenu:
 
 			# We have to update the display if we want anything we just did to actually display.
 			pygame.display.update()
-			
-			# Finally, we constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

@@ -48,7 +48,7 @@ class PauseMenu:
 		self.pause_menu.items[0].selected = True
 
 		# Setup the menu transitions.
-		self.transitions = transition.Transition()
+		self.transitions = transition.Transition(self.main_clock)
 		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
 		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
 
@@ -81,6 +81,9 @@ class PauseMenu:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Begin every frame by blitting the background surface.
 			self.window_surface.blit(self.background_surface, (0, 0))
 			
@@ -104,9 +107,6 @@ class PauseMenu:
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()

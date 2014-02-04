@@ -112,7 +112,7 @@ class MatchOver:
 
 	def setup_transitions(self):
 		# Sets up the different transitions of all the items.
-		self.transitions = transition.Transition()
+		self.transitions = transition.Transition(self.main_clock)
 		self.transitions.setup_single_item_transition(self.rounds_left_text, True, True, True, False)
 		self.transitions.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
 		self.transitions.setup_single_item_transition(self.player_one_score_text, True, False, False, False)
@@ -146,6 +146,9 @@ class MatchOver:
 	def gameloop(self):
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+
 			# Every frame begins by filling the whole screen with the background color.
 			self.window_surface.blit(self.background_surface, (0, 0))
 
@@ -170,9 +173,6 @@ class MatchOver:
 
 			pygame.display.update()
 			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
-
 		# The gameloop is over, so we either start the next screen or quit the game.
 		self.on_exit()
 

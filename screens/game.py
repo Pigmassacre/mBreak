@@ -159,6 +159,9 @@ class Game:
 
 		self.done = False
 		while not self.done:
+			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
+			self.main_clock.tick(graphics.MAX_FPS)
+			
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					# If the window is closed, the game is shut down.
@@ -185,12 +188,9 @@ class Game:
 			
 			# Only update the countdown screen if it is not finished.
 			if not countdown_screen.done:
-				countdown_screen.update_and_draw(self.window_surface)
+				countdown_screen.update_and_draw(self.window_surface, self.main_clock)
 
 			pygame.display.update()
-			
-			# Finally, constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
 
 		# The gameloop is over, so call the exit method.
 		self.on_exit()

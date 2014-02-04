@@ -136,8 +136,8 @@ class AboutMenu:
 		self.image_right = pygame.transform.scale(self.image_right, (self.image_right.get_width() * self.images_current_scale, self.image_right.get_height() * self.images_current_scale))
 
 		# We setup all menu transitions.
-		self.transitions = transition.Transition()
-		self.transitions.speed = 20 * settings.GAME_SCALE
+		self.transitions = transition.Transition(self.main_clock)
+		self.transitions.speed = 1200 * settings.GAME_SCALE
 		self.transitions.setup_transition(self.back_menu, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.pyganim_credits, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.pyganim_credits_source_code, True, True, False, False)

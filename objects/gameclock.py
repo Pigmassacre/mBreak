@@ -2,42 +2,36 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import objects.groups as groups
-import settings.settings as settings
-
-"""
-
-This is the base class of all effects in the game. It takes care of alot of things, like updating the position of the effect
-and destroying the effect when the duration runs out. It also provides a few overridable methods.
-
-"""
 
 class GameClock():
 
-	default_game_speed = 1
+	default_time_scale = 1
 
 	def __init__(self):
 		# We start by creating a default pygame clock.
 		self.clock = pygame.time.Clock()
 
 		# We store the game speed.
-		self.game_speed = GameClock.default_game_speed
+		self.time_scale = GameClock.default_time_scale
+
+		# We store the delta time in seconds. Updated whenever .tick() is called.
+		self.delta_time = 0
 
 	def tick(self, framerate = 0):
-		return self.clock.tick(framerate)
+		delta_time_ms = self.clock.tick(framerate) * self.time_scale
+		self.delta_time = (delta_time_ms / 1000.0) * self.time_scale
+		return delta_time_ms
 
 	def tick_busy_loop(self, framerate = 0):
 		return self.clock.tick_busy_loop(framerate)
 
 	def get_time(self):
-		# Returns the time passed between two ticks, modified by game_speed.
-		actual_time = self.clock.get_time()
-		return actual_time * self.game_speed
+		# Returns the time passed between two ticks, modified by time_scale.
+		return self.clock.get_time() * self.time_scale
 
 	def get_rawtime(self):
-		# Returns the time passed between two ticks, modified by game_speed.
-		actual_time = self.clock.get_rawtime()
-		return actual_time * self.game_speed
+		# Returns the time passed between two ticks, modified by time_scale.
+		return self.clock.get_rawtime() * self.time_scale
 
 	def get_fps(self):
 		return self.clock.get_fps()	
