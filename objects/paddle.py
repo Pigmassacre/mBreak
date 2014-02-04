@@ -8,6 +8,7 @@ import math
 import other.useful as useful
 import objects.shadow as shadow
 import objects.effects.flash as flash
+import objects.effects.speed as speed
 import objects.groups as groups
 import settings.settings as settings
 
@@ -33,13 +34,13 @@ class Paddle(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = middle_image.get_width() * settings.GAME_SCALE
-	height = 20 * settings.GAME_SCALE
+	height = 18 * settings.GAME_SCALE
 	acceleration = 0.5 * settings.GAME_SCALE
 	retardation = 2 * settings.GAME_SCALE
 	max_speed = 2 * settings.GAME_SCALE
 
-	max_height = height * 2
-	min_height = height / 4
+	max_height = 32 * settings.GAME_SCALE
+	min_height = 4 * settings.GAME_SCALE
 
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 160)
@@ -111,6 +112,10 @@ class Paddle(pygame.sprite.Sprite):
 		self.effect_group = pygame.sprite.Group()
 
 	def set_size(self, new_width, new_height):
+		# Make sure the position of the paddle isn't changed.
+		self.x -= (new_width - self.rect.width) / 2.0
+		self.y -= (new_height - self.rect.height) / 2.0
+
 		# Set the rect size.
 		self.rect.width = new_width
 		self.rect.height = new_height
@@ -164,6 +169,12 @@ class Paddle(pygame.sprite.Sprite):
 			self.min_y_distance = math.fabs(self.y - ball.y)
 			if math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2)) < self.min_distance:
 				self.min_distance = math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2))
+
+				# For each speed effect on the ball, we halve the distance to it (since each speed effect doubles it's speed)
+				for effect in ball.effect_group:
+					if effect.__class__ == speed.Speed:
+						self.min_distance = self.min_distance / 2
+
 				self.focused_ball = ball
 
 	def update(self, key_up, key_down):
@@ -199,7 +210,6 @@ class Paddle(pygame.sprite.Sprite):
 			if self.focused_ball != None:
 				if self.focused_ball != self.old_focused_ball:
 					self.chosen_distance_from_center = random.uniform((self.y + self.height / 2) - self.y + self.focused_ball.height, (self.y + self.height / 2) - (self.y + self.height) - self.focused_ball.height) / 2
-					print("chosen_distance_from_center " + str(self.chosen_distance_from_center))
 
 				if self.owner.ai_difficulty >= 2:
 					# If cheaty AI, teleport to ball.
