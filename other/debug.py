@@ -55,7 +55,7 @@ def update(player_left, player_right, main_clock):
 		change_time_scale(main_clock)
 
 def change_time_scale(main_clock):
-	main_clock.time_scale = random.uniform(0, 3)
+	main_clock.time_scale = random.uniform(0, 2)
 
 class Debug:
 

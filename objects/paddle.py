@@ -51,8 +51,8 @@ class Paddle(pygame.sprite.Sprite):
 	hit_effect_tick_amount = 22 * settings.GAME_FPS
 
 	# Used for hit effect on the paddle.
-	stabilize_speed = 0.45 * settings.GAME_FPS * settings.GAME_SCALE
-	max_nudge_distance = 2 * settings.GAME_SCALE
+	stabilize_speed = 0.1 * settings.GAME_FPS * settings.GAME_SCALE
+	max_nudge_distance = 2.5 * settings.GAME_SCALE
 
 	# Scale the images to settings.GAME_SCALE.
 	top_image = pygame.transform.scale(top_image, (top_image.get_width() * settings.GAME_SCALE, top_image.get_height() * settings.GAME_SCALE))
