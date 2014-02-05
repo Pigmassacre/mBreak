@@ -161,7 +161,7 @@ class Missile(pygame.sprite.Sprite):
 		for block in blocks_collide_list:
 			if block == self.target:
 				self.on_hit_block(block)
-				camera.shake(400, 1.5 * settings.GAME_SCALE)
+				camera.shake(350, 1 * settings.GAME_SCALE)
 
 		# If the target is already destroyed, choose a new target.
 		if self.target.health <= 0 or self.target == None:

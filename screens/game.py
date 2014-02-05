@@ -298,11 +298,14 @@ class Game:
 							distance = math.sqrt(math.pow(math.fabs((entity.x + entity.width / 2) - (block.x + block.width / 2)), 2) + math.pow(math.fabs((entity.y + entity.height / 2) - (block.y + block.height / 2)), 2))
 							if distance < least_distance:
 								least_distance = distance
-							if least_distance < 25 * settings.GAME_SCALE:
-								self.main_clock.time_scale = math.pow(least_distance / (25 * settings.GAME_SCALE), 5)
-								if self.main_clock.time_scale < 0.04:
-									self.main_clock.time_scale = 0.04
-								print(str(self.main_clock.time_scale))
+
+								if least_distance < 25 * settings.GAME_SCALE:
+									self.main_clock.time_scale = math.pow(least_distance / (25 * settings.GAME_SCALE), 5)
+									if self.main_clock.time_scale < 0.04:
+										self.main_clock.time_scale = 0.04
+
+									#self.camera.origin_x = (entity.x + (entity.width / 2.0)) - (settings.SCREEN_WIDTH / 2)
+									#self.camera.origin_y = (entity.y + (entity.height / 2.0)) - (settings.SCREEN_HEIGHT / 2)		
 		return least_distance								
 
 	def update(self, countdown_screen):
@@ -313,12 +316,11 @@ class Game:
 		# Slows down time if a ball is close to the last remaining enemy blocks.
 		self.main_clock.time_scale = self.main_clock.default_time_scale
 		
+		self.camera.origin_x = 0
+		self.camera.origin_y = 0
 		least_distance = 999999
 		least_distance = self.calculate_time_dilation(groups.Groups.ball_group, least_distance)
 		least_distance = self.calculate_time_dilation(groups.Groups.projectile_group, least_distance)
-
-		#self.camera.origin_x = math.sin(pygame.time.get_ticks() * 0.005) * 5 * settings.GAME_SCALE
-		#self.camera.origin_y = math.sin(1 + pygame.time.get_ticks() * 0.005) * 10 * settings.GAME_SCALE
 
 		# Update the players.
 		groups.Groups.player_group.update(self.main_clock)
@@ -427,7 +429,7 @@ class Game:
 		# Draw the particles.
 		if graphics.PARTICLES:
 			for particle in groups.Groups.particle_group:
-				self.window_surface.fill(particle.color, particle.rect)
+				self.window_surface.fill(particle.color, (particle.rect.x - self.camera.x, particle.rect.y - self.camera.y, particle.rect.width, particle.rect.height))
 
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface, self.camera)
