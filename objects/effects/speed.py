@@ -24,5 +24,6 @@ class Speed(effect.Effect):
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
 
-		# To simulate double speed and make sure that all collisions are handled, we simply call the parents update method.
-		self.parent.update(main_clock)
+		if self.parent.owner == self.real_owner:
+			# To simulate double speed and make sure that all collisions are handled, we simply call the parents update method.
+			self.parent.update(main_clock)

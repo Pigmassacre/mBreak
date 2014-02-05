@@ -98,11 +98,11 @@ class Missile(pygame.sprite.Sprite):
 		# Store the angle to rotate the image separately.
 		self.image_angle = self.angle
 
-		# Rotate it to the given angle.
-		self.rotate_image(self.image_angle * (180 / math.pi))
-
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
+
+		# Rotate it to the given angle.
+		self.rotate_image(self.image_angle * (180 / math.pi))
 
 		# Add self to the projectile group.
 		groups.Groups.projectile_group.add(self)
@@ -112,10 +112,17 @@ class Missile(pygame.sprite.Sprite):
 		self.displayed_powerups = []
 
 	def rotate_image(self, angle):
+		# Rotate image.
 		old_center = self.rect.center
 		self.image = pygame.transform.rotate(self.original_image, angle)
 		self.rect = self.image.get_rect()
 		self.rect.center = old_center
+
+		# Rotate shadow.
+		old_center = self.shadow.rect.center
+		self.shadow.image = pygame.transform.rotate(self.shadow.original_image, angle)
+		self.shadow.rect = self.shadow.image.get_rect()
+		self.shadow.rect.center = old_center
 
 	def destroy(self):
 		self.kill()

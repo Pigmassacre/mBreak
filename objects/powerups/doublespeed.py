@@ -58,11 +58,4 @@ class DoubleSpeed(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# Create a speed effect to be added to the ball.
-		created_effect = self.create_effect(entity)
-
-		# Add this effect to the owner of the ball.
-		entity.owner.effect_group.add(created_effect)
-
-		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(self.__class__, created_effect)
+		self.share_effect(entity, timeout.Timeout, self.create_effect)

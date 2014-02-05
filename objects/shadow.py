@@ -63,6 +63,9 @@ class Shadow(pygame.sprite.Sprite):
 			# Convert to alpha and apply the alpha value.
 			self.image.convert_alpha()
 			self.image.set_alpha(self.color.a)
+
+			# Store a copy of this image as the original image. Used when rotating the shadow.
+			self.original_image = self.image.copy()
 		else:
 			# If using fill instead of image, create a new surface to handle alpha.
 			self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)

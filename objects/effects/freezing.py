@@ -81,9 +81,10 @@ class Freezing(effect.Effect):
 
 	def on_hit_paddle(self, hit_paddle):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
-		if not self.parent.owner == hit_paddle.owner:
-			Freezing(hit_paddle, Freezing.paddle_freezing_duration)
-			Freezing.sound_effect.play()
+		if self.parent.owner == self.real_owner:
+			if not self.parent.owner == hit_paddle.owner:
+				Freezing(hit_paddle, Freezing.paddle_freezing_duration)
+				Freezing.sound_effect.play()
 
 	def update(self, main_clock):
 		# We make sure that our size matches the parent.
@@ -95,19 +96,20 @@ class Freezing(effect.Effect):
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
 
-		# If it's time, spawn particles.
-		self.particle_spawn_time += main_clock.get_time()
-		if self.particle_spawn_time >= Freezing.particle_spawn_rate:
-			# Reset the particle spawn time.
-			self.particle_spawn_time = 0
+		if self.parent.owner == self.real_owner:
+			# If it's time, spawn particles.
+			self.particle_spawn_time += main_clock.get_time()
+			if self.particle_spawn_time >= Freezing.particle_spawn_rate:
+				# Reset the particle spawn time.
+				self.particle_spawn_time = 0
 
-			# Spawn a random amount of particles.
-			for _ in range(0, random.randrange(0, Freezing.particle_spawn_amount)):
-				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.2 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
-				retardation = speed / 76.0
-				color = pygame.Color(random.randint(0, 50), random.randint(125, 255), random.randint(220, 255))
-				particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 2, self.parent.rect.width / 2, angle, speed, retardation, color, 1 * settings.GAME_FPS)
+				# Spawn a random amount of particles.
+				for _ in range(0, random.randrange(0, Freezing.particle_spawn_amount)):
+					angle = random.uniform(0, 2 * math.pi)
+					speed = random.uniform(0.2 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
+					retardation = speed / 76.0
+					color = pygame.Color(random.randint(0, 50), random.randint(125, 255), random.randint(220, 255))
+					particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, self.parent.rect.width / 2, self.parent.rect.width / 2, angle, speed, retardation, color, 1 * settings.GAME_FPS)
 
 	def on_kill(self):
 		# Restore the acceleration we removed from the parent.

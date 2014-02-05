@@ -178,6 +178,8 @@ class Game:
 							debug.create_ball_right(self.player_two)
 						elif event.type == KEYDOWN and event.key == K_p:
 							debug.create_powerup()
+						elif event.type == KEYDOWN and event.key == K_t:
+							debug.change_time_scale(self.main_clock)
 
 			self.check_for_winner()
 
@@ -287,13 +289,16 @@ class Game:
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
 		if settings.DEBUG_MODE and countdown_screen.done:
 			debug.update(self.player_one, self.player_two, self.main_clock)
-		"""
+		
+		# Slows down time if a ball is close to the last remaining enemy blocks.
 		self.main_clock.time_scale = self.main_clock.default_time_scale
 		for ball in groups.Groups.ball_group:
-			for block in groups.Groups.block_group:
-				if ball.owner != block.owner:
-					if math.sqrt(math.pow(math.fabs(ball.x - block.x), 2) + math.pow(math.fabs(ball.y - block.y), 2)) < 20 * settings.GAME_SCALE:
-						self.main_clock.time_scale = 0.25"""
+			for player in groups.Groups.player_group:
+				if ball.owner != player:
+					if len(player.block_group) <= 2:
+						for block in player.block_group:
+							if math.sqrt(math.pow(math.fabs(ball.x - block.x), 2) + math.pow(math.fabs(ball.y - block.y), 2)) < 20 * settings.GAME_SCALE:
+								self.main_clock.time_scale = 0.05
 
 		# Update the players.
 		groups.Groups.player_group.update(self.main_clock)

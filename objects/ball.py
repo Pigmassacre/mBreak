@@ -68,7 +68,7 @@ class Ball(pygame.sprite.Sprite):
 	smash_effect_size_increase = 1 * settings.GAME_SCALE
 	smash_effect_start_color = pygame.Color(255, 255, 255, 255)
 	smash_effect_final_color = pygame.Color(255, 255, 255, 0)
-	smash_effect_tick_amount = 6 * settings.GAME_FPS
+	smash_effect_tick_amount = 10 * settings.GAME_FPS
 
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 150)

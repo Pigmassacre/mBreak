@@ -21,6 +21,12 @@ class Effect(pygame.sprite.Sprite):
 		# Store the parent.
 		self.parent = parent
 
+		# Store the "real" owner of this effect.
+		if hasattr(self.parent, "owner"):
+			self.real_owner = self.parent.owner
+		else:
+			self.real_owner = None
+
 		# We store the amount of time passed. When time passed is greater than timeout time, the parent is killed.
 		self.time_passed = 0
 

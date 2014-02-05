@@ -46,28 +46,29 @@ class Charged(effect.Effect):
 		self.damage_rect = pygame.rect.Rect(self.rect.x + ((self.rect.width - self.damage_width) / 2), self.rect.y + ((self.rect.height - self.damage_height) / 2), self.damage_width, self.damage_height)
 
 	def on_hit_block(self, hit_block):
-		# If the hit block isn't one of the parents owners blocks...
-		if hit_block.owner != self.parent.owner:
-			# This makes it so that we only play the sound effect once.
-			already_played_sound = False
+		if self.parent.owner == self.real_owner:
+			# If the hit block isn't one of the parents owners blocks...
+			if hit_block.owner != self.parent.owner:
+				# This makes it so that we only play the sound effect once.
+				already_played_sound = False
 
-			# We spawn a few extra particles for extra effect!
-			self.spawn_particles(hit_block)
+				# We spawn a few extra particles for extra effect!
+				self.spawn_particles(hit_block)
 
-			# Lets see if there are any additional blocks to damage.
-			for block in hit_block.owner.block_group:
-				# We check to see if any of their rects collide with damage_rect.
-				if self.damage_rect.colliderect(block.rect):
-					# It does, so we damage that block and spawn some particles.
-					block.on_hit(Charged.damage)
-					self.spawn_particles(block)
-					# Play the sound effect if we should.
-					if not already_played_sound:
-						Charged.sound_effect.play()
-						already_played_sound = True
+				# Lets see if there are any additional blocks to damage.
+				for block in hit_block.owner.block_group:
+					# We check to see if any of their rects collide with damage_rect.
+					if self.damage_rect.colliderect(block.rect):
+						# It does, so we damage that block and spawn some particles.
+						block.on_hit(Charged.damage)
+						self.spawn_particles(block)
+						# Play the sound effect if we should.
+						if not already_played_sound:
+							Charged.sound_effect.play()
+							already_played_sound = True
 
-			# Finally, we destroy the effect, since we just want it to be able to discharge once.
-			self.destroy()
+				# Finally, we destroy the effect, since we just want it to be able to discharge once.
+				self.destroy()
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.
@@ -77,14 +78,15 @@ class Charged(effect.Effect):
 		self.damage_rect.x = self.rect.x + ((self.rect.width - self.damage_width) / 2)
 		self.damage_rect.y = self.rect.y + ((self.rect.height - self.damage_height) / 2)
 
-		# If it's time, spawn particles.
-		self.particle_spawn_time += main_clock.get_time()
-		if self.particle_spawn_time >= Charged.particle_spawn_rate:
-			# Reset the particle spawn time.
-			self.particle_spawn_time = 0
+		if self.parent.owner == self.real_owner:
+			# If it's time, spawn particles.
+			self.particle_spawn_time += main_clock.get_time()
+			if self.particle_spawn_time >= Charged.particle_spawn_rate:
+				# Reset the particle spawn time.
+				self.particle_spawn_time = 0
 
-			# Spawn a random amount of particles.
-			self.spawn_particles(self)
+				# Spawn a random amount of particles.
+				self.spawn_particles(self)
 			
 	def spawn_particles(self, entity):
 		# Spawns a few particles with random color, angle, speed and so on.

@@ -70,12 +70,12 @@ class Powerup(pygame.sprite.Sprite):
 		# Play a random sound from the sound_effects list.
 		Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
 
-	def share_effect(self, entity, timeout_class, effect_creation_function):
+	def share_effect(self, entity, timeout_class, effect_creation_function, *args):
 		created_effect = None
 
-		# Add the effect to all the balls of the entity owner. However, if the ball has timeout, make sure it cannot use that balls effect as
+		# Add the effect to all the balls. However, if the ball has timeout, make sure it cannot use that balls effect as
 		# the effect to connect to the displayed powerup.
-		for ball in entity.owner.ball_group:
+		for ball in groups.Groups.ball_group:
 			has_timeout = False
 			for effect in ball.effect_group:
 				if effect.__class__ == timeout_class:
@@ -83,8 +83,11 @@ class Powerup(pygame.sprite.Sprite):
 					has_timeout = True
 					break
 			if not has_timeout:
-				# Create a speed effect to be added to the ball.
-				created_effect = effect_creation_function(ball)
+				# Create the effect for the ball.
+				if args:
+					created_effect = effect_creation_function(ball, args)
+				else:
+					created_effect = effect_creation_function(ball)
 
 		if created_effect != None:
 			# Add this effect to the owner of the ball.

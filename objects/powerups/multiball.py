@@ -8,7 +8,7 @@ import objects.powerups.powerup as powerup
 import objects.effects.charged as charged
 import objects.effects.sizechange as sizechange
 import objects.effects.timeout as timeout
-import objects.effects.speed as speed
+import objects.effects.flash as flash
 import objects.shadow as shadow
 import objects.ball as ball
 import objects.groups as groups
@@ -74,12 +74,13 @@ class Multiball(powerup.Powerup):
 			# Create a ball and store it temporarily.
 			temp_ball = ball.Ball(x, paddle.y + (paddle.height / 2), angle, entity.owner)
 
-			# Add all the players effects to the ball.
-			for effect in entity.owner.effect_group:
-				# Add this effect to the ball. Make sure we don't spread the charged, sizechange or reduced effect.
-				if effect.__class__ != charged.Charged and effect.__class__ != sizechange.SizeChange:
-					# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
-					effect.__class__(temp_ball, effect.duration - effect.time_passed)
+			# Add all the currently active effects to the ball.
+			for player in groups.Groups.player_group:
+				for effect in player.effect_group:
+					# Add this effect to the ball. Make sure we don't spread the charged, sizechange, flash, timeout or sizechange effect.
+					if effect.__class__ != charged.Charged and effect.__class__ != sizechange.SizeChange and effect.__class__ != flash.Flash and effect.__class__ != timeout.Timeout:
+						# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
+						effect.__class__(temp_ball, effect.duration - effect.time_passed)
 
 			# Create a timeout effect which is added to the ball.
 			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)
