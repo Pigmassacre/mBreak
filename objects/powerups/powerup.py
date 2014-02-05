@@ -79,16 +79,24 @@ class Powerup(pygame.sprite.Sprite):
 			has_timeout = False
 			for effect in ball.effect_group:
 				if effect.__class__ == timeout_class:
-					effect_creation_function(ball)
+					print("has timeout")
+					# Create the effect for the ball.
+					if args:
+						an_effect = effect_creation_function(ball, args)
+					else:
+						an_effect = effect_creation_function(ball)
+					an_effect.real_owner = entity.owner
 					has_timeout = True
 					break
 			if not has_timeout:
+				print("does not have timeout")
 				# Create the effect for the ball.
 				if args:
 					created_effect = effect_creation_function(ball, args)
 				else:
 					created_effect = effect_creation_function(ball)
-
+				created_effect.real_owner = entity.owner
+					
 		if created_effect != None:
 			# Add this effect to the owner of the ball.
 			entity.owner.effect_group.add(created_effect)
