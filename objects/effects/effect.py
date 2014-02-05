@@ -71,10 +71,10 @@ class Effect(pygame.sprite.Sprite):
 			# When the duration runs out, we destroy ourselves.
 			self.destroy()
 
-	def draw(self, surface):
+	def draw(self, surface, camera):
 		# If the image exists, we blit it to the surface.
 		if not self.image == None:
-			surface.blit(self.image, self.rect)
+			surface.blit(self.image, (self.rect.x - camera.x, self.rect.y - camera.y))
 
 	def destroy(self):
 		self.kill()

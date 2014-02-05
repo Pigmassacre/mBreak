@@ -42,19 +42,19 @@ class Background:
 		self.wall_vertical_left_rect = pygame.Rect(settings.LEVEL_X - self.wall_vertical.get_width(), settings.LEVEL_Y, self.wall_vertical.get_width(), self.wall_vertical.get_height())
 		self.wall_vertical_right_rect = pygame.Rect(settings.LEVEL_MAX_X, settings.LEVEL_Y, self.wall_vertical.get_width(), self.wall_vertical.get_height())
 
-	def draw(self, surface):
+	def draw(self, surface, camera):
 		# We either blit the background images or fill the rects, depending on graphics.BACKGROUND.
 		if graphics.BACKGROUND:
-			surface.blit(self.wall_horizontal, (settings.LEVEL_X, settings.LEVEL_Y - self.wall_horizontal.get_height()))
-			surface.blit(self.wall_horizontal, (settings.LEVEL_X, settings.LEVEL_MAX_Y))
-			surface.blit(self.wall_vertical, (settings.LEVEL_X - self.wall_vertical.get_width(), settings.LEVEL_Y))
-			surface.blit(self.wall_vertical, (settings.LEVEL_MAX_X, settings.LEVEL_Y))
-			surface.blit(self.corner_top_left, (settings.LEVEL_X - self.wall_vertical.get_width(), settings.LEVEL_Y - self.wall_horizontal.get_height()))
-			surface.blit(self.corner_top_left, (settings.LEVEL_MAX_X, settings.LEVEL_MAX_Y))
-			surface.blit(self.corner_top_right, (settings.LEVEL_MAX_X, settings.LEVEL_Y - self.wall_horizontal.get_height()))
-			surface.blit(self.corner_top_right, (settings.LEVEL_X - self.wall_vertical.get_width(), settings.LEVEL_MAX_Y))
+			surface.blit(self.wall_horizontal, (settings.LEVEL_X - camera.x, settings.LEVEL_Y - camera.y - self.wall_horizontal.get_height()))
+			surface.blit(self.wall_horizontal, (settings.LEVEL_X - camera.x, settings.LEVEL_MAX_Y - camera.y))
+			surface.blit(self.wall_vertical, (settings.LEVEL_X - camera.x - self.wall_vertical.get_width(), settings.LEVEL_Y - camera.y))
+			surface.blit(self.wall_vertical, (settings.LEVEL_MAX_X - camera.x, settings.LEVEL_Y - camera.y))
+			surface.blit(self.corner_top_left, (settings.LEVEL_X - camera.x - self.wall_vertical.get_width(), settings.LEVEL_Y - camera.y - self.wall_horizontal.get_height()))
+			surface.blit(self.corner_top_left, (settings.LEVEL_MAX_X - camera.x, settings.LEVEL_MAX_Y - camera.y))
+			surface.blit(self.corner_top_right, (settings.LEVEL_MAX_X - camera.x, settings.LEVEL_Y - camera.y - self.wall_horizontal.get_height()))
+			surface.blit(self.corner_top_right, (settings.LEVEL_X - camera.x - self.wall_vertical.get_width(), settings.LEVEL_MAX_Y - camera.y))
 		else:
-			surface.fill(settings.BORDER_COLOR, self.wall_horizontal_top_rect)
-			surface.fill(settings.BORDER_COLOR, self.wall_horizontal_bottom_rect)
-			surface.fill(settings.BORDER_COLOR, self.wall_vertical_left_rect)
-			surface.fill(settings.BORDER_COLOR, self.wall_vertical_right_rect)
+			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_top_rect.x - camera.x, self.wall_horizontal_top_rect.y - camera.y))
+			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_bottom_rect.x - camera.x, self.wall_horizontal_bottom_rect.y - camera.y))
+			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_left_rect.x - camera.x, self.wall_vertical_left_rect.y - camera.y))
+			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_right_rect.x - camera.x, self.wall_vertical_top_rect.y - camera.y))

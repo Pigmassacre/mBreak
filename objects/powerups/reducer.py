@@ -39,7 +39,7 @@ class Reducer(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Reducer.width, Reducer.height, False)
+		powerup.Powerup.__init__(self, x, y, Reducer.width, Reducer.height)
 
 		# Load the image file.
 		self.image = Reducer.image.copy()

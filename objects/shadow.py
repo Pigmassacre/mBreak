@@ -73,16 +73,16 @@ class Shadow(pygame.sprite.Sprite):
 		# Add self to the main shadow_group.
 		groups.Groups.shadow_group.add(self)
 
-	def blit_to(self, surface):
+	def blit_to(self, surface, camera):
 		# Blits the shadow to the given surface.
 		if self.fill:
 			# If using fill, first we fill our own surface with the color, then we blit that surface to the given surface.
 			# This is to make the alpha value work (filling doesn't work with alpha otherwise).
 			self.surface.fill(self.color)
-			return surface.blit(self.surface, self.rect)
+			return surface.blit(self.surface, (self.rect.x - camera.x, self.rect.y - camera.y))
 		else:
 			# If we're not using fill, we simply blit the image to the given surface.
-			return surface.blit(self.image, self.rect)
+			return surface.blit(self.image, (self.rect.x - camera.x, self.rect.y - camera.y))
 
 	def update(self, main_clock):
 		# Check if we're supposed to linger.

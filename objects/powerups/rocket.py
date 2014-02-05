@@ -42,7 +42,7 @@ class Rocket(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Rocket.width, Rocket.height, False)
+		powerup.Powerup.__init__(self, x, y, Rocket.width, Rocket.height)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0

@@ -41,7 +41,7 @@ class Frost(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Frost.width, Frost.height, False)
+		powerup.Powerup.__init__(self, x, y, Frost.width, Frost.height)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0

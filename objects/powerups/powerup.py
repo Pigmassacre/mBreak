@@ -38,7 +38,7 @@ class Powerup(pygame.sprite.Sprite):
 	spawn_effect_final_color = pygame.Color(255, 255, 255, 0)
 	spawn_effect_tick_amount = 18 * settings.GAME_FPS
 
-	def __init__(self, x, y, width, height, shareable = True, bob = True):
+	def __init__(self, x, y, width, height):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -50,12 +50,11 @@ class Powerup(pygame.sprite.Sprite):
 		self.y = y
 		self.center_y = self.y
 
-		# Keep track of whether or not this powerup is "shareable", that is, should the effect apply to all
-		# balls of owner of the ball that hits this powerup?
-		self.shareable = shareable
+		# Keep track of whether or not this is a "display" powerup.
+		self.is_display = False
 
 		# Keep track of whether or not this powerup should bob.
-		self.bob = bob
+		self.bob = True
 		self.start_time = pygame.time.get_ticks()
 
 		# Store self in the main powerup_group.
@@ -79,7 +78,6 @@ class Powerup(pygame.sprite.Sprite):
 			has_timeout = False
 			for effect in ball.effect_group:
 				if effect.__class__ == timeout_class:
-					print("has timeout")
 					# Create the effect for the ball.
 					if args:
 						an_effect = effect_creation_function(ball, args)
@@ -89,7 +87,6 @@ class Powerup(pygame.sprite.Sprite):
 					has_timeout = True
 					break
 			if not has_timeout:
-				print("does not have timeout")
 				# Create the effect for the ball.
 				if args:
 					created_effect = effect_creation_function(ball, args)
@@ -103,7 +100,6 @@ class Powerup(pygame.sprite.Sprite):
 
 			# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
 			entity.owner.add_powerup(self.__class__, created_effect)
-
 
 	def hit(self, entity):
 		# When hit, we destroy ourselves.

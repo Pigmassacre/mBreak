@@ -54,10 +54,10 @@ class Trace(pygame.sprite.Sprite):
 		# Add self to the main trace_group.
 		groups.Groups.trace_group.add(self)
 
-	def blit_to(self, surface):
+	def blit_to(self, surface, camera):
 		# Blits self to the given surface.
 		self.surface.fill(self.color)
-		return surface.blit(self.surface, self.rect)
+		return surface.blit(self.surface, (self.rect.x - camera.x, self.rect.y - camera.y))
 
 	def destroy(self):
 		# Takes care of killing ourselves and our shadow.

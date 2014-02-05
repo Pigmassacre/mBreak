@@ -42,7 +42,7 @@ class Fire(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Fire.width, Fire.height, False)
+		powerup.Powerup.__init__(self, x, y, Fire.width, Fire.height)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0

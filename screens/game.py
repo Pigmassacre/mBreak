@@ -24,6 +24,7 @@ import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
 import objects.blocks.weak as block_weak
+import objects.camera as camera
 import objects.groups as groups
 import gui.textitem as textitem
 import settings.settings as settings
@@ -84,6 +85,9 @@ class Game:
 		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
 		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
 		self.game_background = background.Background("planks")
+
+		# Create and store a camera
+		self.camera = camera.Camera(0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 
 		# Store player one.
 		self.player_one = player_one
@@ -285,6 +289,22 @@ class Game:
 		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
 		ball.Ball(x, y, math.pi + random_angle, self.player_two)
 
+	def calculate_time_dilation(self, group, least_distance):
+		for entity in group:
+			for player in groups.Groups.player_group:
+				if entity.owner != player:
+					if len(player.block_group) <= 2:
+						for block in player.block_group:
+							distance = math.sqrt(math.pow(math.fabs((entity.x + entity.width / 2) - (block.x + block.width / 2)), 2) + math.pow(math.fabs((entity.y + entity.height / 2) - (block.y + block.height / 2)), 2))
+							if distance < least_distance:
+								least_distance = distance
+							if least_distance < 25 * settings.GAME_SCALE:
+								self.main_clock.time_scale = math.pow(least_distance / (25 * settings.GAME_SCALE), 5)
+								if self.main_clock.time_scale < 0.04:
+									self.main_clock.time_scale = 0.04
+								print(str(self.main_clock.time_scale))
+		return least_distance								
+
 	def update(self, countdown_screen):
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
 		if settings.DEBUG_MODE and countdown_screen.done:
@@ -292,13 +312,13 @@ class Game:
 		
 		# Slows down time if a ball is close to the last remaining enemy blocks.
 		self.main_clock.time_scale = self.main_clock.default_time_scale
-		for ball in groups.Groups.ball_group:
-			for player in groups.Groups.player_group:
-				if ball.owner != player:
-					if len(player.block_group) <= 2:
-						for block in player.block_group:
-							if math.sqrt(math.pow(math.fabs(ball.x - block.x), 2) + math.pow(math.fabs(ball.y - block.y), 2)) < 20 * settings.GAME_SCALE:
-								self.main_clock.time_scale = 0.05
+		
+		least_distance = 999999
+		least_distance = self.calculate_time_dilation(groups.Groups.ball_group, least_distance)
+		least_distance = self.calculate_time_dilation(groups.Groups.projectile_group, least_distance)
+
+		#self.camera.origin_x = math.sin(pygame.time.get_ticks() * 0.005) * 5 * settings.GAME_SCALE
+		#self.camera.origin_y = math.sin(1 + pygame.time.get_ticks() * 0.005) * 10 * settings.GAME_SCALE
 
 		# Update the players.
 		groups.Groups.player_group.update(self.main_clock)
@@ -313,7 +333,7 @@ class Game:
 		groups.Groups.dummy_group.update(self.main_clock)
 
 		# Update the projectiles.
-		groups.Groups.projectile_group.update(self.main_clock)
+		groups.Groups.projectile_group.update(self.main_clock, self.camera)
 
 		# Update the powerups.
 		groups.Groups.powerup_group.update(self.main_clock)
@@ -342,38 +362,49 @@ class Game:
 		if graphics.SHADOWS:
 			groups.Groups.shadow_group.update(self.main_clock)
 
+		# Update the camera.
+		self.camera.update(self.main_clock)
+
+	def blit_with_camera(self, group, surface, camera):
+		for entity in group:
+			self.window_surface.blit(entity.image, (entity.rect.x - camera.x, entity.rect.y - camera.y))
+
 	def draw(self):
 		# Begin a frame by blitting the background to the window_surface.
 		self.window_surface.fill(settings.BACKGROUND_COLOR)
 		if graphics.BACKGROUND:
-			self.window_surface.blit(self.game_background.floor_surface, (settings.LEVEL_X, settings.LEVEL_Y))
+			self.window_surface.blit(self.game_background.floor_surface, (settings.LEVEL_X - self.camera.x, settings.LEVEL_Y - self.camera.y))
 
 		# Draw the shadows.
 		if graphics.SHADOWS:
 			for shadow in groups.Groups.shadow_group:
-				shadow.blit_to(self.window_surface)
+				shadow.blit_to(self.window_surface, self.camera)
 
 		# Draw the blocks.
-		groups.Groups.block_group.draw(self.window_surface)
+		self.blit_with_camera(groups.Groups.block_group, self.window_surface, self.camera)
 
 		# Draw the paddles.
-		groups.Groups.paddle_group.draw(self.window_surface)
+		self.blit_with_camera(groups.Groups.paddle_group, self.window_surface, self.camera)
 
 		# Draw the powerups.
-		groups.Groups.powerup_group.draw(self.window_surface)
+		for powerup in groups.Groups.powerup_group:
+			if powerup.is_display:
+				self.window_surface.blit(powerup.image, powerup.rect)
+			else:
+				self.window_surface.blit(powerup.image, (powerup.rect.x - self.camera.x, powerup.rect.y - self.camera.y))
 
 		# Draw the traces.
 		if graphics.TRACES:
 			for trace in groups.Groups.trace_group:
-				trace.blit_to(self.window_surface)
+				trace.blit_to(self.window_surface, self.camera)
 
 		# Draw debug information for AI.
 		if settings.DEBUG_MODE:
 			for paddle in groups.Groups.paddle_group:
-				paddle.debug_draw(self.window_surface)
+				paddle.debug_draw(self.window_surface, self.camera)
 
 		# Draw the balls.
-		groups.Groups.ball_group.draw(self.window_surface)
+		self.blit_with_camera(groups.Groups.ball_group, self.window_surface, self.camera)
 
 		# Draw the projectiles.
 		for projectile in groups.Groups.projectile_group:
@@ -381,17 +412,17 @@ class Game:
 				projectile.x > settings.LEVEL_MAX_X or 
 				projectile.y + projectile.height < settings.LEVEL_Y or 
 				projectile.y > settings.LEVEL_MAX_Y):
-				self.window_surface.blit(projectile.image, projectile.rect)
+				self.window_surface.blit(projectile.image, (projectile.rect.x - self.camera.x, projectile.rect.y - self.camera.y))
 
 		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:
 			if not effect.__class__ == flash.Flash:
-				effect.draw(self.window_surface)
+				effect.draw(self.window_surface, self.camera)
 
 		# Draw the flash effects.
 		for effect in groups.Groups.effect_group:
 			if effect.__class__ == flash.Flash:
-				effect.draw(self.window_surface)
+				effect.draw(self.window_surface, self.camera)
 
 		# Draw the particles.
 		if graphics.PARTICLES:
@@ -399,7 +430,7 @@ class Game:
 				self.window_surface.fill(particle.color, particle.rect)
 
 		# Draw the background walls and overlying area.	
-		self.game_background.draw(self.window_surface)
+		self.game_background.draw(self.window_surface, self.camera)
 
 		# Draw the scores if we're playing more than one round.
 		if self.number_of_rounds > 1:

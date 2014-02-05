@@ -42,7 +42,7 @@ class DoubleSpeed(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, DoubleSpeed.width, DoubleSpeed.height, False)
+		powerup.Powerup.__init__(self, x, y, DoubleSpeed.width, DoubleSpeed.height)
 
 		# Load the image file.
 		self.image = DoubleSpeed.image.copy()

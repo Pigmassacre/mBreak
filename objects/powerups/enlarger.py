@@ -39,7 +39,7 @@ class Enlarger(powerup.Powerup):
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Enlarger.width, Enlarger.height, False)
+		powerup.Powerup.__init__(self, x, y, Enlarger.width, Enlarger.height)
 
 		# Load the image file.
 		self.image = Enlarger.image.copy()

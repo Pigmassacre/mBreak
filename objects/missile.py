@@ -155,12 +155,13 @@ class Missile(pygame.sprite.Sprite):
 			color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)
 
-	def update(self, main_clock):
+	def update(self, main_clock, camera):
 		# Check if we have collided with the target block.
 		blocks_collide_list = pygame.sprite.spritecollide(self, self.target.owner.block_group, False)
 		for block in blocks_collide_list:
 			if block == self.target:
 				self.on_hit_block(block)
+				camera.shake(400, 1.5 * settings.GAME_SCALE)
 
 		# If the target is already destroyed, choose a new target.
 		if self.target.health <= 0 or self.target == None:

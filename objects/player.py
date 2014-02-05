@@ -97,6 +97,7 @@ class Player(pygame.sprite.Sprite):
 
 		# Stores a powerup in our powerup group, and connects it to the effect so the powerup can be killed when the effect is killed.
 		temp_powerup = classname(x, y)
+		temp_powerup.is_display = True
 		effect.displayed_powerups.append(temp_powerup)
 		self.powerup_group.add(temp_powerup)
 

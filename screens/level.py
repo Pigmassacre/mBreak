@@ -26,7 +26,7 @@ class Level:
 		self.amount_of_strong = amount_of_strong
 		self.amount_of_normal = amount_of_normal
 		self.amount_of_weak = amount_of_weak
-		amount_of_rows = settings.LEVEL_HEIGHT / block.Block.height #  - (block.Block.height * 2)
+		amount_of_rows = settings.LEVEL_HEIGHT / block.Block.height # - (block.Block.height * 2)
 
 		# Create and place the given amount of strong blocks.
 		for x in range(0, amount_of_strong):
