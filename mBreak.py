@@ -25,7 +25,6 @@ def main():
 	pygame.init()
 
 	# Instantiates a PyGame Clock.
-	#main_clock = pygame.time.Clock()
 	main_clock = gameclock.GameClock()
 
 	# Load the settings.

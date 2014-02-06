@@ -16,15 +16,15 @@ Save on the other hand, will take the current values of the variables and try to
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
-GAME_SCALE = 3
+GAME_SCALE = 4
 
 # This is the amount of ticks that the game will be designed to work with. When the game runs at any other FPS than this, delta time calculations
 # will make sure that the game still plays as if the game ran at 60 FPS.
 GAME_FPS = 60
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = int(285 * GAME_SCALE)
-SCREEN_HEIGHT = int(160 * GAME_SCALE)
+SCREEN_WIDTH = 1366 #int(285 * GAME_SCALE)
+SCREEN_HEIGHT = 768 #int(160 * GAME_SCALE)
 
 # Level width and height is the actual level width and height. Level x and y is the position in the base area that the level is placed in.
 LEVEL_WIDTH = 176 * GAME_SCALE
@@ -55,7 +55,6 @@ PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 
 # Enables various debug information.
 DEBUG_MODE = True
-#DEBUG_FONT = "fonts/8-BIT WONDER.TTF"
 DEBUG_FONT = "fonts/ADDLG___.TTF"
 
 def load():
@@ -63,6 +62,8 @@ def load():
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
+	global SCREEN_WIDTH
+	global SCREEN_HEIGHT
 
 	try:
 		# This will raise an OSError if the file doesn't exist.
@@ -83,7 +84,8 @@ def load():
 		file.write("shadows 	1\n")
 		file.write("particles 	1\n")
 		file.write("traces 		1\n")
-		file.write("background 	1")
+		file.write("background 	1\n")
+		file.write("resolution	1366x768")
 		file.close()
 
 	# We open and read the settings file line by line.
@@ -97,6 +99,10 @@ def load():
 				PLAYER_ONE_NAME = line.strip("p1name").strip()
 			elif "p2name" in line:
 				PLAYER_TWO_NAME = line.strip("p2name").strip()
+			elif "resolution" in line:
+				resolution = line.strip("resolution").strip().split("x")
+				SCREEN_WIDTH = int(resolution[0])
+				SCREEN_HEIGHT = int(resolution[1])
 	finally:
 		file.close()
 			
