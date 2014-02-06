@@ -203,6 +203,53 @@ class HelpMenu:
 		# At last, return the matching function in the info_about dictionary about the item.
 		return self.info_about[item]		
 
+	def setup_info_screen(self, file_path):
+		info_texts = []
+
+		file = open(file_path, "r")
+
+		try:
+			previous_info_text = None
+			odd = True
+			line_number = 1
+
+			for line in file:
+				if odd:
+					color = pygame.Color(255, 255, 255)
+				else:
+					color = pygame.Color(150, 150, 150)
+
+				info_text = textitem.TextItem(line, color, 255, self.font_size)
+
+				if line_number == 1:
+					info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
+					info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
+				elif line_number == 2:
+					info_text.x = self.distance_from_screen_edge
+					info_text.y = previous_info_text.y + (2 * info_text.get_height())
+				else:
+					info_text.x = self.distance_from_screen_edge
+					info_text.y = previous_info_text.y + info_text.get_height()
+
+				info_texts.append(info_text)
+
+				previous_info_text = info_text
+
+				odd = not odd
+				line_number += 1
+		except IOError:
+			print("IOError when reading file.")
+		except:
+			print("Error when generating info text.")
+		finally:
+			file.close()
+
+		return info_texts
+
+	def show_info(self, info_texts, surface):
+		for info_text in info_texts:
+			info_text.draw(surface)
+
 	# All these setup_stuff_info and transitions methods are used to setup all the necessary information surface that are then displayed when the
 	# appropriate help_menu item is selected.
 	# I wish I didn't have to cram everything into this super-sized file... Atleast this "blob-file" is only for one purpose.
@@ -210,67 +257,56 @@ class HelpMenu:
 		self.start_info_texts = []
 
 		self.start_info_title_text = textitem.TextItem("Starting the Game", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_title_text.set_size(self.font_size)
 		self.start_info_title_text.x = (settings.SCREEN_WIDTH - self.start_info_title_text.get_width()) / 2
 		self.start_info_title_text.y = self.help_menu.y + self.help_menu.get_height() + self.start_info_title_text.get_height()
 		self.start_info_texts.append(self.start_info_title_text)
 
 		self.start_info_text_1 = textitem.TextItem("In order to start the game navigate to the start", pygame.Color(150, 150, 150), 255, self.font_size)
-		#self.start_info_text_1.set_size(self.font_size)
 		self.start_info_text_1.x = self.distance_from_screen_edge
 		self.start_info_text_1.y = self.start_info_title_text.y + (2 * self.start_info_text_1.get_height())
 		self.start_info_texts.append(self.start_info_text_1)
 
 		self.start_info_text_2 = textitem.TextItem("button in the main menu and press the enter key", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_text_2.set_size(self.font_size)
 		self.start_info_text_2.x = self.distance_from_screen_edge
 		self.start_info_text_2.y = self.start_info_text_1.y + self.start_info_text_2.get_height()
 		self.start_info_texts.append(self.start_info_text_2)
 
 		self.start_info_text_3 = textitem.TextItem("or click it with your left mouse button", pygame.Color(150, 150, 150), 255, self.font_size)
-		#self.start_info_text_3.set_size(self.font_size)
 		self.start_info_text_3.x = self.distance_from_screen_edge
 		self.start_info_text_3.y = self.start_info_text_2.y + self.start_info_text_3.get_height()
 		self.start_info_texts.append(self.start_info_text_3)
 
 		self.start_info_text_4 = textitem.TextItem("After that you will reach a preparation menu", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_text_4.set_size(self.font_size)
 		self.start_info_text_4.x = self.distance_from_screen_edge
 		self.start_info_text_4.y = self.start_info_text_3.y + (2 * self.start_info_text_4.get_height())
 		self.start_info_texts.append(self.start_info_text_4)
 
 		self.start_info_text_5 = textitem.TextItem("Here you must choose " + settings.PLAYER_ONE_NAME + "s color", pygame.Color(150, 150, 150), 255, self.font_size)
-		#self.start_info_text_5.set_size(self.font_size)
 		self.start_info_text_5.x = self.distance_from_screen_edge
 		self.start_info_text_5.y = self.start_info_text_4.y + self.start_info_text_5.get_height()
 		self.start_info_texts.append(self.start_info_text_5)
 
 		self.start_info_text_6 = textitem.TextItem("and " + settings.PLAYER_TWO_NAME + "s color", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_text_6.set_size(self.font_size)
 		self.start_info_text_6.x = self.distance_from_screen_edge
 		self.start_info_text_6.y = self.start_info_text_5.y + self.start_info_text_6.get_height()
 		self.start_info_texts.append(self.start_info_text_6)
 
 		self.start_info_text_7 = textitem.TextItem("You can also choose the amount of rounds you will", pygame.Color(150, 150, 150), 255, self.font_size)
-		#self.start_info_text_7.set_size(self.font_size)
 		self.start_info_text_7.x = self.distance_from_screen_edge
 		self.start_info_text_7.y = self.start_info_text_6.y + (2 * self.start_info_text_7.get_height())
 		self.start_info_texts.append(self.start_info_text_7)
 
 		self.start_info_text_8 = textitem.TextItem("play for", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_text_8.set_size(self.font_size)
 		self.start_info_text_8.x = self.distance_from_screen_edge
 		self.start_info_text_8.y = self.start_info_text_7.y + self.start_info_text_8.get_height()
 		self.start_info_texts.append(self.start_info_text_8)
 
 		self.start_info_text_9 = textitem.TextItem("The buttons at the top of this screen tell you more", pygame.Color(150, 150, 150), 255, self.font_size)
-		#self.start_info_text_9.set_size(self.font_size)
 		self.start_info_text_9.x = self.distance_from_screen_edge
 		self.start_info_text_9.y = self.start_info_text_8.y + (2 * self.start_info_text_9.get_height())
 		self.start_info_texts.append(self.start_info_text_9)
 
 		self.start_info_text_10 = textitem.TextItem("Go ahead and click on one", pygame.Color(255, 255, 255), 255, self.font_size)
-		#self.start_info_text_10.set_size(self.font_size)
 		self.start_info_text_10.x = self.distance_from_screen_edge
 		self.start_info_text_10.y = self.start_info_text_9.y + self.start_info_text_10.get_height()
 		self.start_info_texts.append(self.start_info_text_10)
