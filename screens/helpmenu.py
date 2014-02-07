@@ -64,26 +64,42 @@ class HelpMenu:
 
 		# This is a dictionary that contains information linked to certain imageitems.
 		self.info_about = {}
+		self.info = {}
 
 		# This is a dictionary that maps transitions methods to all all items.
 		self.transition_method = {}
 
 		# This contains the currently active function that displays the currently active information.
-		self.active_info = self.show_ball_info
+		self.active_info = None
+
+		# We setup the info items.
+		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
+		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
+		self.font_size = 6 * settings.GAME_SCALE
+		"""self.setup_start_info()
+		self.setup_ball_info()
+		self.setup_block_info()
+		self.setup_paddle_info()
+		self.setup_fire_info()
+		self.setup_frost_info()
+		self.setup_doublespeed_info()
+		self.setup_multiball_info()
+		self.setup_electricity_info()"""
 
 		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
 		self.all_menus = []
 
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
 		self.help_menu = gridmenu.GridMenu(9)
+		self.help_menu.y = 9 * settings.GAME_SCALE
 		self.all_menus.append(self.help_menu)
 
 		# We setup and add all the necessary items to the help_menu.
 		first_item = imageitem.ImageItem("res/help/questionmark.png")
-		self.info_about[first_item] = self.show_start_info
-		self.transition_method[first_item] = self.setup_start_info_transitions
 		self.help_menu.add(first_item, self.view_info)
+		self.info[first_item] = self.setup_info("screens/helpdata/help.json")
 
+		"""
 		temp_item = imageitem.ImageItem("res/ball/ball.png")
 		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0)) # We color this item, since otherwise it would be just gray.
 		self.info_about[temp_item] = self.show_ball_info
@@ -125,10 +141,9 @@ class HelpMenu:
 		temp_item = imageitem.ImageItem("res/powerup/electricity.png")
 		self.info_about[temp_item] = self.show_electricity_info
 		self.transition_method[temp_item] = self.setup_electricity_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
+		self.help_menu.add(temp_item, self.view_info)"""
 
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
-		self.help_menu.y = 9 * settings.GAME_SCALE
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
@@ -145,23 +160,9 @@ class HelpMenu:
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.speed = 1200 * settings.GAME_SCALE
+		self.transitions.speed = 20 * settings.GAME_FPS * settings.GAME_SCALE
 		self.transitions.setup_transition(self.help_menu, True, True, True, False)
 		self.transitions.setup_transition(self.back_menu, True, True, False, False)
-
-		# We setup the info items.
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
-		self.amount_of_characters_that_fit_on_screen = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2)) / textitem.TextItem("W").get_width()
-		self.font_size = 6 * settings.GAME_SCALE
-		self.setup_start_info()
-		self.setup_ball_info()
-		self.setup_block_info()
-		self.setup_paddle_info()
-		self.setup_fire_info()
-		self.setup_frost_info()
-		self.setup_doublespeed_info()
-		self.setup_multiball_info()
-		self.setup_electricity_info()
 
 		# Set the first item as the active information.
 		self.view_info(first_item)
@@ -183,7 +184,7 @@ class HelpMenu:
 		self.active_info = self.choose_active_info(item, self.help_menu)
 
 		# Setup the transitions for that info.
-		self.transition_method[item]()
+		self.setup_info_transitions(self.active_info)
 
 	def choose_active_info(self, item, grid_menu):
 		# Figure out what item is the chosen item.
@@ -202,8 +203,8 @@ class HelpMenu:
 			chosen_item.chosen = False
 			item.chosen = True
 
-		# At last, return the matching function in the info_about dictionary about the item.
-		return self.info_about[item]		
+		# At last, return the matching information in the info dictionary.
+		return self.info[item]
 
 	def setup_info(self, file_path):
 		info_texts = []
@@ -215,23 +216,24 @@ class HelpMenu:
 		except IOError:
 			print("IOError when reading .json file.")		
 		finally:
-			file.close()
+			json_file.close()
 
 		if "title" in parsed_json:
 			info_text = textitem.TextItem(parsed_json["title"], pygame.Color(255, 255, 255), 255, self.font_size)
 			info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
 			info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
 			info_texts.append(info_text)
+			previous_info_text = info_text
 
 		if "body" in parsed_json:
 			body = parsed_json["body"]
 
-			previous_info_text = None
 			odd = True
 			first_line = True
 
-			while len(body[:self.amount_of_characters_that_fit_on_screen + 1]) != 0:
-				line = body[:self.amount_of_characters_that_fit_on_screen + 1]
+			wrapped_body = useful.wrap_multi_line(body, textitem.TextItem.font, 1270)
+
+			for line in wrapped_body:
 
 				if odd:
 					color = pygame.Color(255, 255, 255)
@@ -243,22 +245,28 @@ class HelpMenu:
 				if first_line:
 					info_text.x = self.distance_from_screen_edge
 					info_text.y = previous_info_text.y + (2 * info_text.get_height())
+					first_line = False
 				else:
 					info_text.x = self.distance_from_screen_edge
 					info_text.y = previous_info_text.y + info_text.get_height()
 
+				info_texts.append(info_text)
 				previous_info_text = info_text
 
 				odd = not odd
 
-				body = body[self.amount_of_characters_that_fit_on_screen:]		
-
 		return info_texts
 
-	def show_info(self, info_texts, surface):
-		for info_text in info_texts:
-			info_text.draw(surface)
+	def setup_info_transitions(self, info_texts):
+		for item in info_texts:
+			self.transitions.setup_single_item_transition(item, True, True, False, False)
 
+	def show_info(self, info_texts, surface):
+		#print("drawing")
+		for info_text in info_texts:
+			#print(str(info_text.x) + " " + str(info_text.y))
+			info_text.draw(surface)
+	"""
 	# All these setup_stuff_info and transitions methods are used to setup all the necessary information surface that are then displayed when the
 	# appropriate help_menu item is selected.
 	# I wish I didn't have to cram everything into this super-sized file... Atleast this "blob-file" is only for one purpose.
@@ -730,7 +738,7 @@ class HelpMenu:
 		
 	def show_electricity_info(self, surface):
 		for info_text in self.electricity_info_texts:
-			info_text.draw(surface)
+			info_text.draw(surface)"""
 
 	def back(self, item):
 		# Simply moves back to the main menu.
@@ -780,7 +788,7 @@ class HelpMenu:
 		self.help_menu.draw(self.window_surface)
 
 		# Update and show the active information.
-		self.active_info(self.window_surface)
+		self.show_info(self.active_info, self.window_surface)
 
 		self.back_menu.update()
 		self.back_menu.draw(self.window_surface)
