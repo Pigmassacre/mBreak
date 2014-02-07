@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 from pygame.locals import *
+import objects.camera as camera
 import settings.settings as settings
 import objects.gameclock as gameclock
 import settings.graphics as graphics
@@ -39,6 +40,9 @@ def main():
 
 	# Setup the window surface to be used.
 	window_surface = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), display_modes)
+
+	# Initialize the camera.
+	camera.create_camera(0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 	
 	# Set the allowed events so we don't have to check for events that we don't listen to anyway.
 	pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])

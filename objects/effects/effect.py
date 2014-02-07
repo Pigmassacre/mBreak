@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import objects.camera as camera
 import objects.groups as groups
 import settings.settings as settings
 
@@ -71,10 +72,10 @@ class Effect(pygame.sprite.Sprite):
 			# When the duration runs out, we destroy ourselves.
 			self.destroy()
 
-	def draw(self, surface, camera):
+	def draw(self, surface):
 		# If the image exists, we blit it to the surface.
 		if not self.image == None:
-			surface.blit(self.image, (self.rect.x - camera.x, self.rect.y - camera.y))
+			surface.blit(self.image, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y))
 
 	def destroy(self):
 		self.kill()

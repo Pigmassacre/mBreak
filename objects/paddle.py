@@ -6,6 +6,7 @@ import random
 import copy
 import math
 import other.useful as useful
+import objects.camera as camera
 import objects.shadow as shadow
 import objects.effects.flash as flash
 import objects.effects.speed as speed
@@ -183,11 +184,11 @@ class Paddle(pygame.sprite.Sprite):
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
 
-	def debug_draw(self, surface, camera):
+	def debug_draw(self, surface):
 		if self.focused_ball != None and settings.DEBUG_MODE:
 			color = copy.copy(self.owner.color)
 			color.a = 128
-			surface.fill(color, pygame.Rect(self.focused_ball.rect.x - 1 * settings.GAME_SCALE - camera.x, self.focused_ball.y - 1 * settings.GAME_SCALE - camera.y, self.focused_ball.width + 2 * settings.GAME_SCALE, self.focused_ball.height + 2 * settings.GAME_SCALE))
+			surface.fill(color, pygame.Rect(self.focused_ball.rect.x - 1 * settings.GAME_SCALE - camera.CAMERA.x, self.focused_ball.y - 1 * settings.GAME_SCALE - camera.CAMERA.y, self.focused_ball.width + 2 * settings.GAME_SCALE, self.focused_ball.height + 2 * settings.GAME_SCALE))
 
 	def decide_which_ball(self, ball):
 		if self.owner.ai_difficulty >= 2:

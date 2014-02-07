@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import objects.camera as camera
 import objects.groups as groups
 import objects.effects.effect as effect
 import settings.settings as settings
@@ -55,9 +56,9 @@ class Flash(effect.Effect):
 		if self.current_color.a == self.final_color.a:
 			self.destroy()
 
-	def draw(self, surface, camera):
+	def draw(self, surface):
 		# Draw the flash effect with the current color.
 		self.surface.fill(self.current_color)
 		
 		# This is to make the alpha value work (filling doesn't work with alpha otherwise).
-		return surface.blit(self.surface, (self.parent.rect.x - camera.x, self.parent.rect.y - camera.y))
+		return surface.blit(self.surface, (self.parent.rect.x - camera.CAMERA.x, self.parent.rect.y - camera.CAMERA.y))

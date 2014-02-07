@@ -6,6 +6,12 @@ import math
 import random
 import settings.settings as settings
 
+CAMERA = None
+
+def create_camera(x, y, width, height):
+	global CAMERA
+	CAMERA = Camera(x, y, width, height)
+
 class Camera():
 
 	def __init__(self, x, y, width, height):
@@ -32,8 +38,8 @@ class Camera():
 		if self.shake_time_left > 0:
 			self.shake_time_left -= main_clock.get_time()
 
-			self.shake_x_nudge = random.uniform(-1, 1) * self.shake_intensity
-			self.shake_y_nudge = random.uniform(-1, 1) * self.shake_intensity
+			self.shake_x_nudge = random.uniform(-1, 1) * self.shake_intensity * settings.GAME_SCALE
+			self.shake_y_nudge = random.uniform(-1, 1) * self.shake_intensity * settings.GAME_SCALE
 		else:
 			self.shake_x_nudge = 0
 			self.shake_y_nudge = 0

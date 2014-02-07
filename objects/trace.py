@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 from pygame.locals import *
 import copy
+import objects.camera as camera
 import other.useful as useful
 import objects.shadow as shadow
 import objects.groups as groups
@@ -54,10 +55,10 @@ class Trace(pygame.sprite.Sprite):
 		# Add self to the main trace_group.
 		groups.Groups.trace_group.add(self)
 
-	def blit_to(self, surface, camera):
+	def blit_to(self, surface):
 		# Blits self to the given surface.
 		self.surface.fill(self.color)
-		return surface.blit(self.surface, (self.rect.x - camera.x, self.rect.y - camera.y))
+		return surface.blit(self.surface, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y))
 
 	def destroy(self):
 		# Takes care of killing ourselves and our shadow.
