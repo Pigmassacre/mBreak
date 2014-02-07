@@ -175,6 +175,13 @@ class Game:
 					if event.type == KEYDOWN and event.key == K_ESCAPE:
 						self.main_clock.time_scale = 1
 						pausemenu.PauseMenu(self.window_surface, self.main_clock)
+					# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
+					for player in groups.Groups.player_group:
+						for paddle in player.paddle_group:
+							if event.type == KEYDOWN and event.key == player.key_unleash_charge:
+								paddle.key_unleash_charge_pressed = True
+							if event.type == KEYUP and event.key == player.key_unleash_charge:
+								paddle.key_unleash_charge_pressed = False
 					if settings.DEBUG_MODE:
 						if event.type == KEYDOWN and event.key == K_l:
 							debug.create_ball_left(self.player_one)

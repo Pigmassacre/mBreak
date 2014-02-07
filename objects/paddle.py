@@ -84,6 +84,9 @@ class Paddle(pygame.sprite.Sprite):
 		# The velocity at which the Paddle will be moved when it is updated.
 		self.velocity_y = 0
 
+		# This value can be "spent" to create powerup effects. The higher the charge value, the more / more powerful effects will be created.
+		self.charge = 0
+
 		# These values affect the velocity of the paddle.
 		self.acceleration = Paddle.acceleration
 		self.retardation = Paddle.retardation
@@ -94,6 +97,11 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Store the paddle in the owners paddle_group.
 		self.owner.paddle_group.add(self)
+
+		# Store the whether or not keys are held down for this paddle.
+		self.key_up_pressed = False
+		self.key_down_pressed = False
+		self.key_unleash_charge_pressed = False
 
 		# AI variables.
 		self.focused_ball = None
@@ -202,11 +210,11 @@ class Paddle(pygame.sprite.Sprite):
 
 				self.focused_ball = ball
 
-	def update(self, key_up, key_down, main_clock):
+	def update(self, key_up, key_down, key_unleash_charge, main_clock):
 		# Very simple AI.
 		if self.owner.ai:
-			key_up_pressed = False
-			key_down_pressed = False
+			self.key_up_pressed = False
+			self.key_down_pressed = False
 
 			if self.x < settings.SCREEN_WIDTH / 2:
 				paddle_side_left = True
@@ -243,25 +251,29 @@ class Paddle(pygame.sprite.Sprite):
 					# If normal AI, move to ball.
 					if self.focused_ball.y + self.chosen_distance_from_center < self.y + self.height / 2:
 						if self.focused_ball.y < self.y + self.height / 3:
-							key_up_pressed = True
+							self.key_up_pressed = True
 					elif self.focused_ball.y + self.chosen_distance_from_center > self.y + self.height / 2:
 						if self.focused_ball.y > self.y + self.height - self.height / 3:
-							key_down_pressed = True
+							self.key_down_pressed = True
 
 			self.old_focused_ball = self.focused_ball
 		else:
 			# If no AI, we just check for key presses.
-			key_up_pressed = pygame.key.get_pressed()[key_up]
-			key_down_pressed = pygame.key.get_pressed()[key_down]
+			self.key_up_pressed = pygame.key.get_pressed()[key_up]
+			self.key_down_pressed = pygame.key.get_pressed()[key_down]
+
+		if self.key_unleash_charge_pressed:
+			# Unleash hell, or smth.
+			pass
 
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if max_speed is above zero, since if it is zero the paddle cannot move anyway.
 		if self.max_speed > 0:
-			if key_up_pressed:
+			if self.key_up_pressed:
 					self.velocity_y -= self.acceleration
 					if self.velocity_y < -self.max_speed:
 						self.velocity_y = -self.max_speed
-			elif key_down_pressed:
+			elif self.key_down_pressed:
 					self.velocity_y += self.acceleration
 					if self.velocity_y > self.max_speed:
 						self.velocity_y = self.max_speed
@@ -321,3 +333,6 @@ class Paddle(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.rect.x = self.rect.x
 			effect.rect.y = self.rect.y
+
+	def unleash_charge(self):
+		pass

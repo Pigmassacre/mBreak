@@ -11,7 +11,6 @@ shadows 	1
 particles 	1
 traces 		1
 background 	1
-fullscreen 	1
+fullscreen 	0
 maxfps		60
-resolution 	1366x768
-gamescale	1
+esolution 	1366x768

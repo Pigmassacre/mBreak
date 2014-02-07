@@ -79,12 +79,9 @@ class Multiball(powerup.Powerup):
 				for effect in player.effect_group:
 					# Add this effect to the ball. Make sure we don't spread the charged, sizechange, flash or timeout effect.
 					if effect.__class__ != charged.Charged and effect.__class__ != sizechange.SizeChange and effect.__class__ != flash.Flash and effect.__class__ != timeout.Timeout:
-						print("effect is " + str(effect))
 						# We want to make sure that the added effects ends exactly when the parent effect ends, so we set its duration to duration - time_passed.
 						copied_effect = effect.__class__(temp_ball, effect.duration - effect.time_passed)
-						print("real owner is first " + str(copied_effect.real_owner.name))
 						copied_effect.real_owner = player
-						print("real owner is now " + str(player.name))
 
 			# Create a timeout effect which is added to the ball.
 			timeout_effect = timeout.Timeout(temp_ball, Multiball.duration)

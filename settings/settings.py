@@ -16,15 +16,15 @@ Save on the other hand, will take the current values of the variables and try to
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
-GAME_SCALE = 4
+GAME_SCALE = 3
 
 # This is the amount of ticks that the game will be designed to work with. When the game runs at any other FPS than this, delta time calculations
 # will make sure that the game still plays as if the game ran at 60 FPS.
 GAME_FPS = 60
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = 1366 #int(285 * GAME_SCALE)
-SCREEN_HEIGHT = 768 #int(160 * GAME_SCALE)
+SCREEN_WIDTH = int(285 * GAME_SCALE)
+SCREEN_HEIGHT = int(160 * GAME_SCALE)
 
 # Level width and height is the actual level width and height. Level x and y is the position in the base area that the level is placed in.
 LEVEL_WIDTH = 176 * GAME_SCALE
@@ -47,11 +47,13 @@ AFTER_GAME_MUSIC = "res/music/october_chip.xm"
 PLAYER_ONE_NAME = "One"
 PLAYER_ONE_KEY_UP = pygame.locals.K_w
 PLAYER_ONE_KEY_DOWN = pygame.locals.K_s
+PLAYER_ONE_KEY_UNLEASH_CHARGE = pygame.locals.K_r
 
 # Player Two settings.
 PLAYER_TWO_NAME = "Two"
 PLAYER_TWO_KEY_UP = pygame.locals.K_UP
 PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
+PLAYER_TWO_KEY_UNLEASH_CHARGE = pygame.locals.K_RSHIFT
 
 # Enables various debug information.
 DEBUG_MODE = True
@@ -85,7 +87,7 @@ def load():
 		file.write("particles 	1\n")
 		file.write("traces 		1\n")
 		file.write("background 	1\n")
-		file.write("resolution	1366x768")
+		file.write("resolution	855x480")
 		file.close()
 
 	# We open and read the settings file line by line.
