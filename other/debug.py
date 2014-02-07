@@ -55,12 +55,12 @@ def update(player_left, player_right, main_clock):
 		create_powerup()
 
 def change_time_scale(main_clock):
-	if main_clock.default_time_scale != 0.01:
+	"""if main_clock.default_time_scale != 0.01:
 		main_clock.default_time_scale = 0.01
 	else:
-		main_clock.default_time_scale = 1
+		main_clock.default_time_scale = 1"""
 
-	#main_clock.default_time_scale = random.uniform(0, 2)
+	main_clock.default_time_scale = random.uniform(0, 2)
 
 class Debug:
 

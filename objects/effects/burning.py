@@ -38,13 +38,19 @@ class Burning(effect.Effect):
 	particle_spawn_rate = 100
 	particle_least_spawn_amount = 2
 	particle_maximum_spawn_amount = 4
+	duration = 5000
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, parent, duration = 5000):
-		# We start by calling the superconstructor with the given duration value.
-		effect.Effect.__init__(self, parent, duration)
+	def __init__(self, parent, duration = None):
+ 		# We check if a duration has been given.
+ 		if not duration == None:
+ 			# We start by calling the superconstructor with the given duration value.
+ 			effect.Effect.__init__(self, parent, duration)
+ 		else:
+ 			# We start by calling the superconstructor with the standard duration value.
+ 			effect.Effect.__init__(self, parent, Burning.duration)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0

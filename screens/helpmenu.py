@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import json
 from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
@@ -150,6 +151,7 @@ class HelpMenu:
 
 		# We setup the info items.
 		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
+		self.amount_of_characters_that_fit_on_screen = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2)) / textitem.TextItem("W").get_width()
 		self.font_size = 6 * settings.GAME_SCALE
 		self.setup_start_info()
 		self.setup_ball_info()
@@ -203,17 +205,34 @@ class HelpMenu:
 		# At last, return the matching function in the info_about dictionary about the item.
 		return self.info_about[item]		
 
-	def setup_info_screen(self, file_path):
+	def setup_info(self, file_path):
 		info_texts = []
 
-		file = open(file_path, "r")
-
+		# Parse the JSON file.
+		json_file = open(file_path, "r")
 		try:
+			parsed_json = json.load(json_file)
+		except IOError:
+			print("IOError when reading .json file.")		
+		finally:
+			file.close()
+
+		if "title" in parsed_json:
+			info_text = textitem.TextItem(parsed_json["title"], pygame.Color(255, 255, 255), 255, self.font_size)
+			info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
+			info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
+			info_texts.append(info_text)
+
+		if "body" in parsed_json:
+			body = parsed_json["body"]
+
 			previous_info_text = None
 			odd = True
-			line_number = 1
+			first_line = True
 
-			for line in file:
+			while len(body[:self.amount_of_characters_that_fit_on_screen + 1]) != 0:
+				line = body[:self.amount_of_characters_that_fit_on_screen + 1]
+
 				if odd:
 					color = pygame.Color(255, 255, 255)
 				else:
@@ -221,28 +240,18 @@ class HelpMenu:
 
 				info_text = textitem.TextItem(line, color, 255, self.font_size)
 
-				if line_number == 1:
-					info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
-					info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
-				elif line_number == 2:
+				if first_line:
 					info_text.x = self.distance_from_screen_edge
 					info_text.y = previous_info_text.y + (2 * info_text.get_height())
 				else:
 					info_text.x = self.distance_from_screen_edge
 					info_text.y = previous_info_text.y + info_text.get_height()
 
-				info_texts.append(info_text)
-
 				previous_info_text = info_text
 
 				odd = not odd
-				line_number += 1
-		except IOError:
-			print("IOError when reading file.")
-		except:
-			print("Error when generating info text.")
-		finally:
-			file.close()
+
+				body = body[self.amount_of_characters_that_fit_on_screen:]		
 
 		return info_texts
 
