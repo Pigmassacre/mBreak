@@ -23,26 +23,46 @@ class Camera():
 		self.origin_x = self.x
 		self.origin_y = self.y
 
-		self.shake_time_left = 0
-		self.shake_duration = 0
-		self.shake_intensity = 0
-		self.shake_x_nudge = 0
-		self.shake_y_nudge = 0
+		self.shake_group = pygame.sprite.Group()
 
 	def shake(self, duration, intensity):
-		self.shake_time_left = duration
-		self.shake_duration = duration
-		self.shake_intensity = intensity
+		self.shake_group.add(CameraShake(self, duration, intensity))
 
 	def update(self, main_clock):
-		if self.shake_time_left > 0:
-			self.shake_time_left -= main_clock.get_time()
+		self.x = self.origin_x
+		self.y = self.origin_y
+		
+		self.shake_group.update(main_clock)
 
-			self.shake_x_nudge = random.uniform(-1, 1) * self.shake_intensity * settings.GAME_SCALE
-			self.shake_y_nudge = random.uniform(-1, 1) * self.shake_intensity * settings.GAME_SCALE
+class CameraShake(pygame.sprite.Sprite):
+
+	def __init__(self, camera, duration, intensity):
+		pygame.sprite.Sprite.__init__(self)
+
+		self.camera = camera
+		self.time_left = duration
+		self.intensity = intensity
+		self.time_passed = 0
+
+		self.x_shake_amount = 0
+		self.y_shake_amount = 0
+
+	def update(self, main_clock):
+		if self.time_left > 0:
+			self.time_passed += main_clock.delta_time
+			
+			# Only shake GAME_FPS amount of times per second. (If time_scale slows down, we shake less often).
+			if self.time_passed > (1 / float(settings.GAME_FPS)):
+				self.x_shake_amount = random.uniform(-1, 1) * self.intensity * settings.GAME_SCALE
+				self.y_shake_amount = random.uniform(-1, 1) * self.intensity * settings.GAME_SCALE
+
+				# Reset time passed to 0, since we've just shook the screen.
+				self.time_passed = 0
+
+			# Offset the cameras position by the last set shake amount.
+			self.camera.x += self.x_shake_amount
+			self.camera.y += self.y_shake_amount
 		else:
-			self.shake_x_nudge = 0
-			self.shake_y_nudge = 0
+			self.kill()
 
-		self.x = self.origin_x + self.shake_x_nudge
-		self.y = self.origin_y + self.shake_y_nudge
+		self.time_left -= main_clock.get_time()

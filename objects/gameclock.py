@@ -33,7 +33,7 @@ class GameClock():
 		return self.clock.get_time() * self.time_scale
 
 	def get_rawtime(self):
-		# Returns the time passed between two ticks, modified by time_scale.
+		# Returns the raw time passed between two ticks, modified by time_scale.
 		return self.clock.get_rawtime() * self.time_scale
 
 	def get_fps(self):

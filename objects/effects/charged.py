@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import random
+import objects.camera as camera
 import objects.groups as groups
 import objects.effects.effect as effect
 import objects.blocks.block as block
@@ -43,8 +44,11 @@ class Charged(effect.Effect):
 		if self.parent.owner == self.real_owner:
 			# If the hit block isn't one of the parents owners blocks...
 			if hit_block.owner != self.parent.owner:
-				# This makes it so that we only play the sound effect once.
-				already_played_sound = False
+				# Play the sound effect.
+				Charged.sound_effect.play()
+
+				# Shake the camera a little bit.
+				camera.CAMERA.shake(250, 0.5)
 
 				# We spawn a few extra particles for extra effect!
 				self.spawn_particles(hit_block)
@@ -56,10 +60,6 @@ class Charged(effect.Effect):
 						# It does, so we damage that block and spawn some particles.
 						block.on_hit(Charged.damage)
 						self.spawn_particles(block)
-						# Play the sound effect if we should.
-						if not already_played_sound:
-							Charged.sound_effect.play()
-							already_played_sound = True
 
 				# Finally, we destroy the effect, since we just want it to be able to discharge once.
 				self.destroy()

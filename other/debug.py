@@ -27,8 +27,8 @@ It also contains a debug class used to display the FPS counter in the top-left c
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
-	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
-	#powerup_list = [rocket.Rocket]
+	#powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+	powerup_list = [rocket.Rocket, electricity.Electricity]
 	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
 	return random.choice(powerup_list)(x, y)
@@ -55,7 +55,12 @@ def update(player_left, player_right, main_clock):
 		create_powerup()
 
 def change_time_scale(main_clock):
-	main_clock.default_time_scale = random.uniform(0, 2)
+	if main_clock.default_time_scale != 0.01:
+		main_clock.default_time_scale = 0.01
+	else:
+		main_clock.default_time_scale = 1
+
+	#main_clock.default_time_scale = random.uniform(0, 2)
 
 class Debug:
 
