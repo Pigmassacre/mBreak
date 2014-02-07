@@ -33,20 +33,14 @@ class Freezing(effect.Effect):
 	paddle_freezing_duration = 1100
 	particle_spawn_rate = 600
 	particle_spawn_amount = 2
-	duration = 10000
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, parent, duration = None):
-		# We check if a duration has been given.
-		if not duration == None:
-			# We start by calling the superconstructor with the given duration value.
-			effect.Effect.__init__(self, parent, duration)
-		else:
-			# We start by calling the superconstructor with the standard duration value.
-			effect.Effect.__init__(self, parent, Freezing.duration)
-
+	def __init__(self, parent, duration = 10000):
+		# We start by calling the superconstructor with the given duration value.
+		effect.Effect.__init__(self, parent, duration)
+		
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
 

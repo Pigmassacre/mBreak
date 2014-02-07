@@ -34,23 +34,17 @@ class Burning(effect.Effect):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	damage_per_second = 1.0
+	damage_per_second = 2.0
 	particle_spawn_rate = 100
 	particle_least_spawn_amount = 2
 	particle_maximum_spawn_amount = 4
-	duration = 10000
 
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, parent, duration = None):
-		# We check if a duration has been given.
-		if not duration == None:
-			# We start by calling the superconstructor with the given duration value.
-			effect.Effect.__init__(self, parent, duration)
-		else:
-			# We start by calling the superconstructor with the standard duration value.
-			effect.Effect.__init__(self, parent, Burning.duration)
+	def __init__(self, parent, duration = 5000):
+		# We start by calling the superconstructor with the given duration value.
+		effect.Effect.__init__(self, parent, duration)
 
 		# When this reaches particle_spawn_rate, a particle is spawned.
 		self.particle_spawn_time = 0
@@ -80,7 +74,7 @@ class Burning(effect.Effect):
 		if self.parent.owner == self.real_owner:
 			# If the parent has health, deal damage to it.
 			if hasattr(self.parent, "health"):
-				self.parent.health -= Burning.damage_per_second / main_clock.get_time()
+				self.parent.health -= Burning.damage_per_second * main_clock.delta_time
 
 			# If it's time, spawn particles.
 			self.particle_spawn_time += main_clock.get_time()
