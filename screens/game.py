@@ -326,6 +326,9 @@ class Game:
 		# Update the players.
 		groups.Groups.player_group.update(self.main_clock)
 
+		# Update the paddles.
+		groups.Groups.paddle_group.update(self.main_clock)
+
 		# Update the balls.
 		groups.Groups.ball_group.update(self.main_clock)
 

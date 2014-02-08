@@ -37,6 +37,9 @@ class PrepareMenu:
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
+		# These are the connected and active joysticks.
+		self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = game.Game
 		self.player_one_color = None
@@ -311,8 +314,16 @@ class PrepareMenu:
 			sys.exit()
 		elif self.next_screen == game.Game:
 			# If we're going to start the game, we first create both players.
-			player_one = self.create_player_one(self.player_one_color)
-			player_two = self.create_player_two(self.player_two_color)
+			joystick_count = pygame.joystick.get_count()
+			if joystick_count == 0:
+				player_one = self.create_player_one(self.player_one_color)
+				player_two = self.create_player_two(self.player_two_color)
+			elif joystick_count == 1:
+				player_one = self.create_player_one(self.player_one_color, gamepad_id = 0)
+				player_two = self.create_player_two(self.player_two_color)
+			elif joystick_count == 2:
+				player_one = self.create_player_one(self.player_one_color, gamepad_id = 0)
+				player_two = self.create_player_two(self.player_two_color, gamepad_id = 1)
 
 			# We also create and setup the score.
 			score = {}
@@ -325,7 +336,7 @@ class PrepareMenu:
 			# For any other screen we just call it using the normal variables.
 			self.next_screen(self.window_surface, self.main_clock)
 
-	def create_player_one(self, color):
+	def create_player_one(self, color, **kwargs):
 		# Creates player one, and sets the position of the player to the top-left corner of the screen.
 		# This is where the powerups the player collects will display.
 		x = powerup.Powerup.width / 2
@@ -334,9 +345,12 @@ class PrepareMenu:
 		key_up = settings.PLAYER_ONE_KEY_UP
 		key_down = settings.PLAYER_ONE_KEY_DOWN
 		key_unleash_charge = settings.PLAYER_ONE_KEY_UNLEASH_CHARGE
-		return player.Player(x, y, name, key_up, key_down, key_unleash_charge, color, False, 1)
+		joy_unleash_charge = settings.PLAYER_ONE_JOY_UNLEASH_CHARGE
+		
+		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, kwargs.get("gamepad_id", None), color, False, 1)
+		return player_one
 
-	def create_player_two(self, color):
+	def create_player_two(self, color, **kwargs):
 		# Creates player two, and sets the position of the player to the bottom-right corner of the screen.
 		# This is where the powerups the player collects will display.
 		x = settings.SCREEN_WIDTH - (powerup.Powerup.width / 2) - powerup.Powerup.width
@@ -345,4 +359,7 @@ class PrepareMenu:
 		key_up = settings.PLAYER_TWO_KEY_UP
 		key_down = settings.PLAYER_TWO_KEY_DOWN
 		key_unleash_charge = settings.PLAYER_TWO_KEY_UNLEASH_CHARGE
-		return player.Player(x, y, name, key_up, key_down, key_unleash_charge, color, True, 1)
+		joy_unleash_charge = settings.PLAYER_TWO_JOY_UNLEASH_CHARGE
+
+		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, kwargs.get("gamepad_id", None), color, True, 1)
+		return player_two

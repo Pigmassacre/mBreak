@@ -48,12 +48,14 @@ PLAYER_ONE_NAME = "One"
 PLAYER_ONE_KEY_UP = pygame.locals.K_w
 PLAYER_ONE_KEY_DOWN = pygame.locals.K_s
 PLAYER_ONE_KEY_UNLEASH_CHARGE = pygame.locals.K_r
+PLAYER_ONE_JOY_UNLEASH_CHARGE = 2
 
 # Player Two settings.
 PLAYER_TWO_NAME = "Two"
 PLAYER_TWO_KEY_UP = pygame.locals.K_UP
 PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 PLAYER_TWO_KEY_UNLEASH_CHARGE = pygame.locals.K_RSHIFT
+PLAYER_TWO_JOY_UNLEASH_CHARGE = 2
 
 # Enables various debug information.
 DEBUG_MODE = True

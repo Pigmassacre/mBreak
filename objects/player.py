@@ -20,7 +20,7 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, name, key_up, key_down, key_unleash_charge, color, ai = False, ai_difficulty = 1):
+	def __init__(self, x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, gamepad_id, color, ai = False, ai_difficulty = 1):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -35,6 +35,14 @@ class Player(pygame.sprite.Sprite):
 		self.key_up = key_up
 		self.key_down = key_down
 		self.key_unleash_charge = key_unleash_charge
+		self.joy_unleash_charge = joy_unleash_charge
+
+		# Store the number of the gamepad that controls this player.
+		self.gamepad_id = gamepad_id
+		self.joystick = None
+		if not self.gamepad_id is None:
+			self.joystick = pygame.joystick.Joystick(self.gamepad_id)
+			self.joystick.init()
 
 		# Store whether or not this player is AI controlled or not.
 		self.ai = ai
@@ -130,7 +138,8 @@ class Player(pygame.sprite.Sprite):
 				previous_powerup = a_powerup
 
 			# Finally, change the last_powerup_group_size to match the current size.
-			self.last_powerup_group_size = len(self.powerup_group)
+			self.last_powerup_group_size = len(self.powerup_group)		
 
-		# Update paddles. The player takes care of this in order to send correct keys to the it's own paddles.
-		self.paddle_group.update(self.key_up, self.key_down, self.key_unleash_charge, main_clock)
+	def handle_events(self, event):
+		# Work on this later...
+		pass

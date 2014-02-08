@@ -211,7 +211,7 @@ class Paddle(pygame.sprite.Sprite):
 
 				self.focused_ball = ball
 
-	def update(self, key_up, key_down, key_unleash_charge, main_clock):
+	def update(self,  main_clock):
 		# Very simple AI.
 		if self.owner.ai:
 			self.key_up_pressed = False
@@ -260,12 +260,12 @@ class Paddle(pygame.sprite.Sprite):
 			self.old_focused_ball = self.focused_ball
 		else:
 			# If no AI, we just check for key presses.
-			self.key_up_pressed = pygame.key.get_pressed()[key_up]
-			self.key_down_pressed = pygame.key.get_pressed()[key_down]
-
-		if self.key_unleash_charge_pressed:
-			# Unleash hell, or smth.
-			pass
+			if not self.owner.gamepad_id is None:
+				self.key_up_pressed = (self.owner.joystick.get_axis(1) <= -0.25) or (self.owner.joystick.get_hat(0)[1] == -1)
+				self.key_down_pressed = (self.owner.joystick.get_axis(1) >= 0.25) or (self.owner.joystick.get_hat(0)[1] == 1)
+			else:
+				self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
+				self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
 
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if max_speed is above zero, since if it is zero the paddle cannot move anyway.
