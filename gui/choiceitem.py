@@ -21,7 +21,7 @@ class ChoiceItem():
 	pygame.font.init()
 
 	# The standard text values are stored here, such as standard font, font size and so on.
-	font_path = "fonts/8-BIT WONDER.TTF"
+	font_path = "fonts/ADDLG___.TTF"
 	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(font_path, font_size)
 

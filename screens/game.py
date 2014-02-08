@@ -55,9 +55,8 @@ For each player, a list of all their currently active powerups are displayed in 
 class Game(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done = 0):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# The next screen to be started when gameloop ends.
 		self.next_screen = gameover.GameOver

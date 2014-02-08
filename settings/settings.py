@@ -16,7 +16,7 @@ Save on the other hand, will take the current values of the variables and try to
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
-GAME_SCALE = 4
+GAME_SCALE = 3
 
 # This is the amount of ticks that the game will be designed to work with. When the game runs at any other FPS than this, delta time calculations
 # will make sure that the game still plays as if the game ran at 60 FPS.

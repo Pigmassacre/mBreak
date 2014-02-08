@@ -263,7 +263,8 @@ class Paddle(pygame.sprite.Sprite):
 			if not self.owner.gamepad_id is None:
 				self.key_up_pressed = (self.owner.joystick.get_axis(1) <= -0.25) or (self.owner.joystick.get_hat(0)[1] == -1)
 				self.key_down_pressed = (self.owner.joystick.get_axis(1) >= 0.25) or (self.owner.joystick.get_hat(0)[1] == 1)
-			else:
+			
+			if not self.key_up_pressed and not self.key_down_pressed:
 				self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
 				self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
 
