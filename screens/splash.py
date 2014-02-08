@@ -75,8 +75,11 @@ class Splash:
 			self.window_surface.fill(Splash.background_color)
 			
 			for event in pygame.event.get():
-				if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == KEYDOWN and event.key == K_RETURN):
-					# If ENTER or ESCAPE is pressed, we end this loop and proceed to the next screen.
+				if (event.type == QUIT or 
+				   (event.type == KEYDOWN and event.key == K_ESCAPE) or 
+				   (event.type == KEYDOWN and event.key == K_RETURN) or
+				   (event.type == JOYBUTTONDOWN and (event.button == 0 or event.button == 1 or event.button == 2 or event.button == 3 or event.button == 9))):
+					# If ENTER or ESCAPE or joystick button 2 (X on PS controller) is pressed, we end this loop and proceed to the next screen.
 					self.done = True
 			
 			# After a certain amount of time, the splash ends automatically.

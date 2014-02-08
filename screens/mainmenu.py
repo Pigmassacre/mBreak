@@ -191,7 +191,7 @@ class MainMenu:
 					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
-				elif event.type == KEYDOWN and event.key == K_ESCAPE:
+				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
 					# If the escape key is pressed, we go back a level in the menu system. If we're at the lowest level, we quit.
 					if len(self.active_menu) > 1:
 						self.back(None)

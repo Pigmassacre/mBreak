@@ -43,9 +43,16 @@ def main():
 
 	# Initialize the camera.
 	camera.create_camera(0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
+
+	# Initialize the joystick module.
+	pygame.joystick.init()
+
+	# Initialize the available joysticks.
+	for joystick in ([pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]):
+		joystick.init()
 	
 	# Set the allowed events so we don't have to check for events that we don't listen to anyway.
-	pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
+	pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP, JOYAXISMOTION, JOYBUTTONDOWN, JOYBUTTONUP])
 
 	# Set the window caption.
 	pygame.display.set_caption(settings.WINDOW_CAPTION)

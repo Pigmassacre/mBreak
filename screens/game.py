@@ -168,10 +168,12 @@ class Game:
 					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
+				
+				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 9):
+					self.main_clock.time_scale = 1
+					pausemenu.PauseMenu(self.window_surface, self.main_clock)
+
 				if countdown_screen.done:
-					if event.type == KEYDOWN and event.key == K_ESCAPE:
-						self.main_clock.time_scale = 1
-						pausemenu.PauseMenu(self.window_surface, self.main_clock)
 					# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
 					for player in groups.Groups.player_group:
 						for paddle in player.paddle_group:

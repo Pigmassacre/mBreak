@@ -12,6 +12,9 @@ This module contains a few useful methods to deal with colors.
 
 """
  
+ # Shamelessly stolen from http://www.pygame.org/wiki/TextWrapping
+ # It doesn't say who the author is, so, eh, thanks to her/him for
+ # saving me some headache!
 def truncline(text, font, maxwidth):
     real=len(text)       
     stext=text           

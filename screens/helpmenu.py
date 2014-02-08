@@ -74,7 +74,7 @@ class HelpMenu:
 
 		# We setup the info items.
 		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
-		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
+		self.max_width_of_text_line = 420 * settings.GAME_SCALE #(settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
 		self.font_size = 6 * settings.GAME_SCALE
 		"""self.setup_start_info()
 		self.setup_ball_info()
@@ -99,13 +99,12 @@ class HelpMenu:
 		self.help_menu.add(first_item, self.view_info)
 		self.info[first_item] = self.setup_info("screens/helpdata/help.json")
 
-		"""
 		temp_item = imageitem.ImageItem("res/ball/ball.png")
 		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0)) # We color this item, since otherwise it would be just gray.
-		self.info_about[temp_item] = self.show_ball_info
-		self.transition_method[temp_item] = self.setup_ball_info_transitions
 		self.help_menu.add(temp_item, self.view_info)
+		self.info[temp_item] = self.setup_info("screens/helpdata/ball.json")
 
+		"""
 		temp_item = imageitem.ImageItem("res/block/block.png")
 		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0)) # Same here.
 		self.info_about[temp_item] = self.show_block_info
@@ -231,7 +230,7 @@ class HelpMenu:
 			odd = True
 			first_line = True
 
-			wrapped_body = useful.wrap_multi_line(body, textitem.TextItem.font, 1270)
+			wrapped_body = useful.wrap_multi_line(body, textitem.TextItem.font, self.max_width_of_text_line)
 
 			for line in wrapped_body:
 
@@ -262,136 +261,9 @@ class HelpMenu:
 			self.transitions.setup_single_item_transition(item, True, True, False, False)
 
 	def show_info(self, info_texts, surface):
-		#print("drawing")
 		for info_text in info_texts:
-			#print(str(info_text.x) + " " + str(info_text.y))
 			info_text.draw(surface)
 	"""
-	# All these setup_stuff_info and transitions methods are used to setup all the necessary information surface that are then displayed when the
-	# appropriate help_menu item is selected.
-	# I wish I didn't have to cram everything into this super-sized file... Atleast this "blob-file" is only for one purpose.
-	def setup_start_info(self):
-		self.start_info_texts = []
-
-		self.start_info_title_text = textitem.TextItem("Starting the Game", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_title_text.x = (settings.SCREEN_WIDTH - self.start_info_title_text.get_width()) / 2
-		self.start_info_title_text.y = self.help_menu.y + self.help_menu.get_height() + self.start_info_title_text.get_height()
-		self.start_info_texts.append(self.start_info_title_text)
-
-		self.start_info_text_1 = textitem.TextItem("In order to start the game navigate to the start", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.start_info_text_1.x = self.distance_from_screen_edge
-		self.start_info_text_1.y = self.start_info_title_text.y + (2 * self.start_info_text_1.get_height())
-		self.start_info_texts.append(self.start_info_text_1)
-
-		self.start_info_text_2 = textitem.TextItem("button in the main menu and press the enter key", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_text_2.x = self.distance_from_screen_edge
-		self.start_info_text_2.y = self.start_info_text_1.y + self.start_info_text_2.get_height()
-		self.start_info_texts.append(self.start_info_text_2)
-
-		self.start_info_text_3 = textitem.TextItem("or click it with your left mouse button", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.start_info_text_3.x = self.distance_from_screen_edge
-		self.start_info_text_3.y = self.start_info_text_2.y + self.start_info_text_3.get_height()
-		self.start_info_texts.append(self.start_info_text_3)
-
-		self.start_info_text_4 = textitem.TextItem("After that you will reach a preparation menu", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_text_4.x = self.distance_from_screen_edge
-		self.start_info_text_4.y = self.start_info_text_3.y + (2 * self.start_info_text_4.get_height())
-		self.start_info_texts.append(self.start_info_text_4)
-
-		self.start_info_text_5 = textitem.TextItem("Here you must choose " + settings.PLAYER_ONE_NAME + "s color", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.start_info_text_5.x = self.distance_from_screen_edge
-		self.start_info_text_5.y = self.start_info_text_4.y + self.start_info_text_5.get_height()
-		self.start_info_texts.append(self.start_info_text_5)
-
-		self.start_info_text_6 = textitem.TextItem("and " + settings.PLAYER_TWO_NAME + "s color", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_text_6.x = self.distance_from_screen_edge
-		self.start_info_text_6.y = self.start_info_text_5.y + self.start_info_text_6.get_height()
-		self.start_info_texts.append(self.start_info_text_6)
-
-		self.start_info_text_7 = textitem.TextItem("You can also choose the amount of rounds you will", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.start_info_text_7.x = self.distance_from_screen_edge
-		self.start_info_text_7.y = self.start_info_text_6.y + (2 * self.start_info_text_7.get_height())
-		self.start_info_texts.append(self.start_info_text_7)
-
-		self.start_info_text_8 = textitem.TextItem("play for", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_text_8.x = self.distance_from_screen_edge
-		self.start_info_text_8.y = self.start_info_text_7.y + self.start_info_text_8.get_height()
-		self.start_info_texts.append(self.start_info_text_8)
-
-		self.start_info_text_9 = textitem.TextItem("The buttons at the top of this screen tell you more", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.start_info_text_9.x = self.distance_from_screen_edge
-		self.start_info_text_9.y = self.start_info_text_8.y + (2 * self.start_info_text_9.get_height())
-		self.start_info_texts.append(self.start_info_text_9)
-
-		self.start_info_text_10 = textitem.TextItem("Go ahead and click on one", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.start_info_text_10.x = self.distance_from_screen_edge
-		self.start_info_text_10.y = self.start_info_text_9.y + self.start_info_text_10.get_height()
-		self.start_info_texts.append(self.start_info_text_10)
-
-	def setup_start_info_transitions(self):
-		for item in self.start_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-
-	def show_start_info(self, surface):
-		for info_text in self.start_info_texts:
-			info_text.draw(surface)
-
-	def setup_ball_info(self):
-		self.ball_info_texts = []
-
-		self.ball_info_title_text = textitem.TextItem("Ball", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.ball_info_title_text.x = (settings.SCREEN_WIDTH - self.ball_info_title_text.get_width()) / 2
-		self.ball_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.ball_info_title_text.get_height()
-		self.ball_info_texts.append(self.ball_info_title_text)
-
-		self.ball_info_text_1 = textitem.TextItem("Both players start the game with one ball each", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.ball_info_text_1.x = self.distance_from_screen_edge
-		self.ball_info_text_1.y = self.ball_info_title_text.y + (2 * self.ball_info_text_1.get_height())
-		self.ball_info_texts.append(self.ball_info_text_1)
-
-		self.ball_info_text_2 = textitem.TextItem("Your goal is to destroy your opponents blocks", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.ball_info_text_2.x = self.distance_from_screen_edge
-		self.ball_info_text_2.y = self.ball_info_text_1.y + self.ball_info_text_2.get_height()
-		self.ball_info_texts.append(self.ball_info_text_2)
-
-		self.ball_info_text_3 = textitem.TextItem("while defending your blocks with your paddle", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.ball_info_text_3.x = self.distance_from_screen_edge
-		self.ball_info_text_3.y = self.ball_info_text_2.y + self.ball_info_text_3.get_height()
-		self.ball_info_texts.append(self.ball_info_text_3)
-
-		self.ball_info_text_4 = textitem.TextItem("Balls will deal 10 damage to blocks they hit", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.ball_info_text_4.x = self.distance_from_screen_edge
-		self.ball_info_text_4.y = self.ball_info_text_3.y + (2 * self.ball_info_text_4.get_height())
-		self.ball_info_texts.append(self.ball_info_text_4)
-
-		self.ball_info_text_5 = textitem.TextItem("Your own balls will damage your own blocks", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.ball_info_text_5.x = self.distance_from_screen_edge
-		self.ball_info_text_5.y = self.ball_info_text_4.y + self.ball_info_text_5.get_height()
-		self.ball_info_texts.append(self.ball_info_text_5)
-
-		self.ball_info_text_6 = textitem.TextItem("but only for half the normal damage", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.ball_info_text_6.x = self.distance_from_screen_edge
-		self.ball_info_text_6.y = self.ball_info_text_5.y + self.ball_info_text_6.get_height()
-		self.ball_info_texts.append(self.ball_info_text_6)
-
-		self.ball_info_text_7 = textitem.TextItem("Balls can acquire powerups by touching them", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.ball_info_text_7.x = self.distance_from_screen_edge
-		self.ball_info_text_7.y = self.ball_info_text_6.y + (2 * self.ball_info_text_7.get_height())
-		self.ball_info_texts.append(self.ball_info_text_7)
-
-		self.ball_info_text_8 = textitem.TextItem("Most powerups acquired will affect all your balls", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.ball_info_text_8.x = self.distance_from_screen_edge
-		self.ball_info_text_8.y = self.ball_info_text_7.y + self.ball_info_text_8.get_height()
-		self.ball_info_texts.append(self.ball_info_text_8)
-
-	def setup_ball_info_transitions(self):
-		for item in self.ball_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-
-	def show_ball_info(self, surface):
-		for info_text in self.ball_info_texts:
-			info_text.draw(surface)
-
 	def setup_block_info(self):
 		self.block_info_texts = []
 
@@ -760,7 +632,7 @@ class HelpMenu:
 					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
-				elif event.type == KEYDOWN and event.key == K_ESCAPE:
+				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
 					# If the escape key is pressed, we go back to the main menu.
 					self.back(None)
 				else:
