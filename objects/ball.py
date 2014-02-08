@@ -147,7 +147,6 @@ class Ball(pygame.sprite.Sprite):
 		self.kill()
 		self.shadow.kill()
 		for effect in self.effect_group:
-			print("destroying effect")
 			effect.destroy()
 
 	def on_hit(self):

@@ -21,8 +21,8 @@ class Level:
 	
 	def __init__(self, player_one, player_two, amount_of_strong, amount_of_normal, amount_of_weak):
 		# These variables are used to construct the level out of blocks.
-		distance_to_blocks_from_left_wall = block.Block.width * 2
-		distance_to_blocks_from_right_wall = distance_to_blocks_from_left_wall + block.Block.width
+		distance_to_blocks_from_left_wall = 0#block.Block.width * 2
+		distance_to_blocks_from_right_wall = block.Block.width#distance_to_blocks_from_left_wall + block.Block.width
 		self.amount_of_strong = amount_of_strong
 		self.amount_of_normal = amount_of_normal
 		self.amount_of_weak = amount_of_weak

@@ -51,44 +51,51 @@ class Countdown:
 		self.countdown_go_speed = 780 * settings.GAME_SCALE
 		self.countdown_go_slow_speed = 78 * settings.GAME_SCALE
 
+		# This is the surface that is actually drawn when the draw method is called.
+		self.active_surface = self.countdown_ready
+
 		# When this is false, the update_and_draw method displays the countdown.
 		self.done = False
 
-	def update_and_draw(self, surface, main_clock):
+	def update(self):
 		if not self.done:
 			# If we're not done yet, increment the time passed.
 			self.time_passed += self.main_clock.get_time()
 			if self.time_passed > self.time_to_countdown and self.time_passed < self.time_to_countdown + self.countdown_ready_time:
 				# If it's time to display the ready text, position it and do so.
 				if self.countdown_ready.x < self.countdown_ready_desired_x:
-					if (self.countdown_ready.x + self.countdown_ready_speed * main_clock.delta_time) > self.countdown_ready_desired_x:
+					if (self.countdown_ready.x + self.countdown_ready_speed * self.main_clock.delta_time) > self.countdown_ready_desired_x:
 						self.countdown_ready.x = self.countdown_ready_desired_x
 					else:
-						self.countdown_ready.x += self.countdown_ready_speed * main_clock.delta_time
+						self.countdown_ready.x += self.countdown_ready_speed * self.main_clock.delta_time
 				elif self.countdown_ready.x >= (self.countdown_ready_desired_x + self.countdown_ready.get_width()):
-						self.countdown_ready.x += self.countdown_ready_speed * main_clock.delta_time
+						self.countdown_ready.x += self.countdown_ready_speed * self.main_clock.delta_time
 				else:
-					if (self.countdown_ready.x + self.countdown_ready_slow_speed * main_clock.delta_time) > (self.countdown_ready_desired_x + self.countdown_ready.get_width()):
+					if (self.countdown_ready.x + self.countdown_ready_slow_speed * self.main_clock.delta_time) > (self.countdown_ready_desired_x + self.countdown_ready.get_width()):
 						self.countdown_ready.x = self.countdown_ready_desired_x + self.countdown_ready.get_width()
 					else:
-						self.countdown_ready.x += self.countdown_ready_slow_speed * main_clock.delta_time
-				self.countdown_ready.draw(surface)
+						self.countdown_ready.x += self.countdown_ready_slow_speed * self.main_clock.delta_time
+				self.active_surface = self.countdown_ready
 			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time and self.time_passed < self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				# If it's time to display the GO text, position it and do so.
 				if self.countdown_go.x < self.countdown_go_desired_x:
-					if (self.countdown_go.x + self.countdown_go_speed * main_clock.delta_time) > self.countdown_go_desired_x:
+					if (self.countdown_go.x + self.countdown_go_speed * self.main_clock.delta_time) > self.countdown_go_desired_x:
 						self.countdown_go.x = self.countdown_go_desired_x
 					else:
-						self.countdown_go.x += self.countdown_go_speed * main_clock.delta_time
+						self.countdown_go.x += self.countdown_go_speed * self.main_clock.delta_time
 				elif self.countdown_go.x >= (self.countdown_go_desired_x + self.countdown_go.get_width()):
-						self.countdown_go.x += self.countdown_go_speed * main_clock.delta_time
+						self.countdown_go.x += self.countdown_go_speed * self.main_clock.delta_time
 				else:
-					if (self.countdown_go.x + self.countdown_go_slow_speed * main_clock.delta_time) > (self.countdown_go_desired_x + self.countdown_go.get_width()):
+					if (self.countdown_go.x + self.countdown_go_slow_speed * self.main_clock.delta_time) > (self.countdown_go_desired_x + self.countdown_go.get_width()):
 						self.countdown_go.x = self.countdown_go_desired_x + self.countdown_go.get_width()
 					else:
-						self.countdown_go.x += self.countdown_go_slow_speed * main_clock.delta_time
-				self.countdown_go.draw(surface)
+						self.countdown_go.x += self.countdown_go_slow_speed * self.main_clock.delta_time
+				self.active_surface = self.countdown_go
 			elif self.time_passed > self.time_to_countdown + self.countdown_ready_time + self.countdown_go_time:
 				# Okay, the countdown is over. Set done to True and call the given function.
 				self.done = True
 				self.function_to_call()
+
+	def draw(self, surface):
+		if not self.done:
+			self.active_surface.draw(surface)

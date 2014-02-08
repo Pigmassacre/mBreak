@@ -31,6 +31,7 @@ import settings.settings as settings
 import settings.graphics as graphics
 import screens.background as background
 import screens.level as level
+import screens.scene as scene
 
 # We import any needed game screens here.
 import screens.gameover as gameover
@@ -51,7 +52,7 @@ For each player, a list of all their currently active powerups are displayed in 
 
 """
 
-class Game:
+class Game(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done = 0):
 		# Store the game variables.
@@ -93,7 +94,7 @@ class Game:
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
+		self.game_level = level.Level(self.player_one, self.player_two, 1, 2, 1)
 
 		# The list of available powerups to spawn.
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
@@ -139,6 +140,15 @@ class Game:
 		# We setup and play music.
 		self.setup_music()
 
+		# When this reaches powerup_spawn_rate, a powerup has a chance to spawn.
+		self.powerup_spawn_time = 0
+
+		# When this reaches powerup_increase_spawn_rate, the chance for powerups to spawn will be increased.
+		self.powerup_increase_spawn_time = 0
+
+		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
+		self.countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
+
 		# And finally, start the gameloop!
 		self.gameloop()
 
@@ -147,66 +157,6 @@ class Game:
 			# We only care about loading and playing the music if it isn't already playing.
 			pygame.mixer.music.load(settings.GAME_MUSIC)
 			pygame.mixer.music.play(-1)
-
-	def gameloop(self):
-		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
-		countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
-
-		# When this reaches powerup_spawn_rate, a powerup has a chance to spawn.
-		self.powerup_spawn_time = 0
-
-		# When this reaches powerup_increase_spawn_rate, the chance for powerups to spawn will be increased.
-		self.powerup_increase_spawn_time = 0
-
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
-
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 9):
-					self.main_clock.time_scale = 1
-					pausemenu.PauseMenu(self.window_surface, self.main_clock)
-
-				if countdown_screen.done:
-					# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
-					for player in groups.Groups.player_group:
-						for paddle in player.paddle_group:
-							if event.type == KEYDOWN and event.key == player.key_unleash_charge:
-								paddle.key_unleash_charge_pressed = True
-							if event.type == KEYUP and event.key == player.key_unleash_charge:
-								paddle.key_unleash_charge_pressed = False
-					if settings.DEBUG_MODE:
-						if event.type == KEYDOWN and event.key == K_l:
-							debug.create_ball_left(self.player_one)
-						elif event.type == KEYDOWN and event.key == K_r:
-							debug.create_ball_right(self.player_two)
-						elif event.type == KEYDOWN and event.key == K_p:
-							debug.create_powerup()
-						elif event.type == KEYDOWN and event.key == K_t:
-							debug.change_time_scale(self.main_clock)
-
-			self.check_for_winner()
-
-			self.try_to_spawn_powerups()
-
-			self.update(countdown_screen)
-
-			self.draw()
-			
-			# Only update the countdown screen if it is not finished.
-			if not countdown_screen.done:
-				countdown_screen.update_and_draw(self.window_surface, self.main_clock)
-
-			pygame.display.update()
-
-		# The gameloop is over, so call the exit method.
-		self.on_exit()
 
 	def check_for_winner(self):
 		# Detect if a player has won or not.
@@ -311,9 +261,39 @@ class Game:
 	
 		return least_distance								
 
-	def update(self, countdown_screen):
+	def event(self, event):
+		# If the ESCAPE key or the START button on a joypad is pressed, we pause the game.
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 9):
+			self.main_clock.time_scale = 1
+			pausemenu.PauseMenu(self.window_surface, self.main_clock)
+
+		if self.countdown_screen.done:
+			# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
+			for player in groups.Groups.player_group:
+				for paddle in player.paddle_group:
+					if event.type == KEYDOWN and event.key == player.key_unleash_charge:
+						paddle.key_unleash_charge_pressed = True
+					if event.type == KEYUP and event.key == player.key_unleash_charge:
+						paddle.key_unleash_charge_pressed = False
+			if settings.DEBUG_MODE:
+				if event.type == KEYDOWN and event.key == K_l:
+					debug.create_ball_left(self.player_one)
+				elif event.type == KEYDOWN and event.key == K_r:
+					debug.create_ball_right(self.player_two)
+				elif event.type == KEYDOWN and event.key == K_p:
+					debug.create_powerup()
+				elif event.type == KEYDOWN and event.key == K_t:
+					debug.change_time_scale(self.main_clock)
+
+	def update(self):
+		# First, we check if any player has won.
+		self.check_for_winner()
+
+		# Then, we try to spawn some powerups.
+		self.try_to_spawn_powerups()
+
 		# If debug mode is enabled, allow certain commands. This is all done in the debug module.
-		if settings.DEBUG_MODE and countdown_screen.done:
+		if settings.DEBUG_MODE and self.countdown_screen.done:
 			debug.update(self.player_one, self.player_two, self.main_clock)
 		
 		# Slows down time if a ball is close to the last remaining enemy blocks.
@@ -370,6 +350,9 @@ class Game:
 
 		# Update the camera.
 		camera.CAMERA.update(self.main_clock)
+
+		# At last, we update the countdown_screen.
+		self.countdown_screen.update()
 
 	def blit_with_camera(self, group, surface):
 		for entity in group:
@@ -446,6 +429,9 @@ class Game:
 		if settings.DEBUG_MODE:
 			# Display various debug information.
 			debug.Debug.display(self.window_surface, self.main_clock)
+
+		# Finally, draw the countdown screen. It doesn't draw itself if it is finished, so.
+		self.countdown_screen.draw(self.window_surface)
 
 	def on_exit(self):
 		# Restore the time scale.
