@@ -149,6 +149,9 @@ class Game(scene.Scene):
 		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
 		self.countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
 
+		# We also hide the cursor.
+		pygame.mouse.set_visible(False)
+
 		# And finally, start the gameloop!
 		self.gameloop()
 
@@ -265,7 +268,9 @@ class Game(scene.Scene):
 		# If the ESCAPE key or the START button on a joypad is pressed, we pause the game.
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 9):
 			self.main_clock.time_scale = 1
+			pygame.mouse.set_visible(True)
 			pausemenu.PauseMenu(self.window_surface, self.main_clock)
+			pygame.mouse.set_visible(False)
 
 		if self.countdown_screen.done:
 			# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
