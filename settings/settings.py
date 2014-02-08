@@ -16,7 +16,7 @@ Save on the other hand, will take the current values of the variables and try to
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
-GAME_SCALE = 3
+GAME_SCALE = 4
 
 # This is the amount of ticks that the game will be designed to work with. When the game runs at any other FPS than this, delta time calculations
 # will make sure that the game still plays as if the game ran at 60 FPS.
@@ -68,6 +68,10 @@ def load():
 	global PLAYER_TWO_NAME
 	global SCREEN_WIDTH
 	global SCREEN_HEIGHT
+	global LEVEL_X
+	global LEVEL_Y
+	global LEVEL_MAX_X
+	global LEVEL_MAX_Y
 
 	try:
 		# This will raise an OSError if the file doesn't exist.
@@ -110,6 +114,12 @@ def load():
 	finally:
 		file.close()
 			
+	# Now, set values that depend on values loaded here.
+	LEVEL_X = (SCREEN_WIDTH - LEVEL_WIDTH) / 2 
+	LEVEL_Y = (SCREEN_HEIGHT - LEVEL_HEIGHT) / 2
+	LEVEL_MAX_X = LEVEL_X + LEVEL_WIDTH
+	LEVEL_MAX_Y = LEVEL_Y + LEVEL_HEIGHT
+
 def save():
 	# Tries to save the settings to settings.txt.
 	global DEBUG_MODE

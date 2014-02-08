@@ -151,9 +151,9 @@ class MainMenu:
 			# Otherwise, we just save the given title_logo object
 			self.title_logo = title_logo
 	
-	def setup_menu(self, x = settings.SCREEN_WIDTH / 2, y = settings.SCREEN_HEIGHT / 2):
-		# By default returns a menu that is positioned in the center of the screen.
-		return menu.Menu(x, y)
+	def setup_menu(self):
+		# Returns a menu that is positioned in the center of the screen.
+		return menu.Menu(settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():

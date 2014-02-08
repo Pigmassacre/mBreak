@@ -74,8 +74,9 @@ class HelpMenu:
 
 		# We setup the info items.
 		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
-		self.max_width_of_text_line = 420 * settings.GAME_SCALE #(settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
 		self.font_size = 6 * settings.GAME_SCALE
+		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
+
 		"""self.setup_start_info()
 		self.setup_ball_info()
 		self.setup_block_info()
@@ -230,7 +231,7 @@ class HelpMenu:
 			odd = True
 			first_line = True
 
-			wrapped_body = useful.wrap_multi_line(body, textitem.TextItem.font, self.max_width_of_text_line)
+			wrapped_body = useful.wrap_multi_line(body, pygame.font.Font(textitem.TextItem.font_path, self.font_size), self.max_width_of_text_line)
 
 			for line in wrapped_body:
 

@@ -46,7 +46,7 @@ class Splash:
 
 		# These are the positions of the two halves at the start.
 		self.top_half_x = -Splash.splash_top_half.get_width()
-		self.top_half_y = 0
+		self.top_half_y = (settings.SCREEN_HEIGHT - Splash.splash.get_height()) / 2
 		self.bottom_half_x = settings.SCREEN_WIDTH
 		self.bottom_half_y = (settings.SCREEN_HEIGHT / 2)
 
