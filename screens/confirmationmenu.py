@@ -10,6 +10,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 
 """
 
@@ -23,12 +24,11 @@ is displayed on top of the screen that created the confirmation menu.
 
 """
 
-class ConfirmationMenu:
+class ConfirmationMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, function_to_call, function_argument):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# This is the function that will be called if the dialog is accepted.
 		self.function_to_call = function_to_call
@@ -40,7 +40,7 @@ class ConfirmationMenu:
 		self.accepted = False
 
 		# Tint the window surface and set it as the background surface.
-		self.background_surface = window_surface.copy()
+		self.background_surface = self.window_surface.copy()
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = None
@@ -86,47 +86,28 @@ class ConfirmationMenu:
 		self.done = True
 		self.accepted = False
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we call refuse.
+			self.refuse(None)
+		else:
+			traversal.traverse_menus(event, [self.confirmation_menu])
 
-			# Begin every frame by blitting the background surface.
-			self.window_surface.blit(self.background_surface, (0, 0))
-			
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we call refuse.
-					self.refuse(None)
-				else:
-					traversal.traverse_menus(event, [self.confirmation_menu])
-
-			# Update and show the menu.
-			self.show_menu()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			pygame.display.update()
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_menu(self):
+	def update(self):
 		# Handle all transitions.
 		self.transitions.update()
+
+		# Update the confirmation menu.
+		self.confirmation_menu.update()
+
+	def draw(self):
+		# Begin every frame by blitting the background surface.
+		self.window_surface.blit(self.background_surface, (0, 0))		
 
 		# Draw the confirmation text.
 		self.confirmation_text.draw(self.window_surface)
 
-		# Update and draw the confirmation menu.
-		self.confirmation_menu.update()
+		# Draw the confirmation menu.
 		self.confirmation_menu.draw(self.window_surface)
 
 	def on_exit(self):

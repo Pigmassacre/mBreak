@@ -12,8 +12,9 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
-import screens
+import screens.scene as scene
 import screens.confirmationmenu as confirmationmenu
+import screens
 
 """
 
@@ -26,12 +27,11 @@ listen to the sweet, sweet after-game music! :) (MUSIC NOT MADE BY ME!)
 
 """
 
-class MatchOver:
+class MatchOver(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# Tint the window surface and set it as the background surface.
 		self.background_surface = window_surface.copy()
@@ -127,8 +127,10 @@ class MatchOver:
 		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
 		pygame.mixer.music.play(-1)
 
-	def maybe_quit(self, item):
-		# We ask the players if they REALLY want to quit, since they're in between matches.
+	def maybe_quit(self, item = None):
+		# We ask the players if they REALLY want to quit, since they're in between matches. Also, we make sure that the confirmation
+		# menu gets a clean window_surface.
+		self.window_surface.blit(self.background_surface, (0, 0))
 		confirmationmenu.ConfirmationMenu(self.window_surface, self.main_clock, self.quit, item)
 
 	def quit(self, item):
@@ -143,40 +145,15 @@ class MatchOver:
 		self.done = True
 		self.next_screen = screens.game.Game
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we do the same thing as the quit button.
+			self.maybe_quit()
+		else:
+			# The traversal module handles key movement between menus.
+			traversal.traverse_menus(event, self.all_menus)
 
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.blit(self.background_surface, (0, 0))
-
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we do the same thing as the quit button.
-					self.maybe_quit(None)
-				else:
-					# The traversal module handles key movement between menus.
-					traversal.traverse_menus(event, self.all_menus)
-
-			# Update and draw all items.
-			self.update_and_draw()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			pygame.display.update()
-			
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def update_and_draw(self):
+	def update(self):
 		# Handle the transitions and blit all items.
 		self.transitions.update()
 
@@ -184,6 +161,11 @@ class MatchOver:
 		self.quit_menu.update()
 		self.next_match_menu.update()
 
+	def draw(self):
+		# Every frame begins by filling the whole screen with the background color.
+		self.window_surface.blit(self.background_surface, (0, 0))
+
+		# Draw the menus.
 		self.quit_menu.draw(self.window_surface)
 		self.next_match_menu.draw(self.window_surface)
 
@@ -198,11 +180,7 @@ class MatchOver:
 		self.player_two_score_text.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == None:
-			# If no screen is chosen, we simply quit.s
-			pygame.quit()
-			sys.exit()
-		elif self.next_screen == screens.game.Game:
+		if self.next_screen == screens.game.Game:
 			# Next match is selected, so we start Game.
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
 		else:

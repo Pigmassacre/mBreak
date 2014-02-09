@@ -179,11 +179,11 @@ class Paddle(pygame.sprite.Sprite):
 	def on_hit(self, entity):
 		# If hit by an enemy ball, we increase our owners energy.
 		if entity.owner != self.owner:
-			print(str(self.owner.energy))
 			if self.owner.energy + self.owner.energy_increase_on_hit < self.owner.max_energy:
 				self.owner.energy += self.owner.energy_increase_on_hit
 			else:
 				self.owner.energy = self.owner.max_energy
+			print(str(self.owner.name) + "'s energy level: " + str(self.owner.energy))
 
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))

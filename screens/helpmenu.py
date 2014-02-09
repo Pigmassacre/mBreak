@@ -23,6 +23,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 
 # We import any needed game screens here.
 import screens
@@ -49,12 +50,11 @@ This class can take an optional "menu_screen_instance" parameter, which if fille
 will have its gameloop() method restarted when this screen ends.
 
 """
-class HelpMenu:
+class HelpMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, menu_screen_instance = None):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# If we've gotten a main menu instance to return to, then save that.
 		self.menu_screen_instance = menu_screen_instance
@@ -72,7 +72,7 @@ class HelpMenu:
 		# This contains the currently active function that displays the currently active information.
 		self.active_info = None
 
-		# We setup the info items.
+		# This information is used to format the help texts.
 		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
 		self.font_size = 6 * settings.GAME_SCALE
 		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
@@ -180,11 +180,13 @@ class HelpMenu:
 			pygame.mixer.music.play(-1)
 
 	def view_info(self, item):
-		# Set the active info to the one chosen by the user.
-		self.active_info = self.choose_active_info(item, self.help_menu)
+		# Unless the chosen info is the same as the currently active info, set the active info to the one chosen by the user.
+		new_active_info = self.choose_active_info(item, self.help_menu)
+		if self.active_info != new_active_info:
+			self.active_info = new_active_info
 
-		# Setup the transitions for that info.
-		self.setup_info_transitions(self.active_info)
+			# Setup the transitions for that info.
+			self.setup_info_transitions(self.active_info)
 
 	def choose_active_info(self, item, grid_menu):
 		# Figure out what item is the chosen item.
@@ -613,57 +615,39 @@ class HelpMenu:
 		for info_text in self.electricity_info_texts:
 			info_text.draw(surface)"""
 
-	def back(self, item):
+	def back(self, item = None):
 		# Simply moves back to the main menu.
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we go back to the main menu.
+			self.back()
+		else:
+			traversal.traverse_menus(event, self.all_menus)
 
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(settings.BACKGROUND_COLOR)
-			
-			# We then check for any events.
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we go back to the main menu.
-					self.back(None)
-				else:
-					traversal.traverse_menus(event, self.all_menus)
-
-			# We update and draw the menu and the information.
-			self.show_menu_and_info()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			# We have to update the display if we want anything we just did to actually display.
-			pygame.display.update()
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_menu_and_info(self):
+	def update(self):
 		# Handle all transitions.
 		self.transitions.update()
 
-		# Update and show the gridmenu.
-		self.help_menu.update()
+		# Update the help menu.
+		self.help_menu.update()	
+
+		# Update the back meenu.
+		self.back_menu.update()	
+
+	def draw(self):
+		# Every frame begins by filling the whole screen with the background color.
+		self.window_surface.fill(settings.BACKGROUND_COLOR)
+
+		# Draw the help menu.
 		self.help_menu.draw(self.window_surface)
 
-		# Update and show the active information.
+		# Draw the active information.
 		self.show_info(self.active_info, self.window_surface)
 
-		self.back_menu.update()
+		# Draw the back menu.
 		self.back_menu.draw(self.window_surface)
 
 	def on_exit(self):

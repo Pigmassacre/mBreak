@@ -137,19 +137,20 @@ class Player(pygame.sprite.Sprite):
 			the_missile = missile.Missile(paddle.x + (paddle.width / 2) - (missile.Missile.width / 2), paddle.y + (paddle.height / 2) - (missile.Missile.height / 2), random.uniform(0, 2*math.pi), self, random.choice(block_list))
 			the_missile.acceleration *= random.uniform(1.5, 3)
 
+	def unleash_energy(self):
+		print(str(self.name) + "'s energy level: " + str(self.energy))
+		if self.energy >= 20:
+			print("unleash_energy")
+			# Set how many missiles to spawn.
+			self.missiles_to_spawn += self.energy / 20
+
+			self.spawn_missile()
+			self.missiles_to_spawn -= 1
+
+			# Reduce our energy to 0.
+			self.energy = 0
+
 	def update(self, main_clock):
-		# We check if the unleash energy button has been pressed. If it has, we determine what effect to unleash!
-		if self.unleash_energy_pressed:
-			if self.energy >= 20:
-				# Set how many missiles to spawn.
-				self.missiles_to_spawn += self.energy / 20
-
-				self.spawn_missile()
-				self.missiles_to_spawn -= 1
-
-				# Reduce our energy to 0.
-				self.energy = 0
-
 		# Check if we're to spawn a missile.
 		if self.missiles_to_spawn > 0:
 			self.time_passed += main_clock.get_time()

@@ -53,13 +53,15 @@ class Toast:
 		self.done = False
 		self.time_passed = 0
 
-	def update_and_draw(self, surface):
+	def update(self):
 		if not self.done:
 			self.message.x = self.x
 			self.message.y = self.y
 
 			self.time_passed += self.main_clock.get_time()
-			if self.time_passed <= self.duration:
-				self.message.draw(surface)
-			else:
+			if self.time_passed > self.duration:
 				self.done = True
+
+	def draw(self, surface):
+		if self.time_passed <= self.duration and not self.done:
+			self.message.draw(surface)

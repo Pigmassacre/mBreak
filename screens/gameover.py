@@ -12,6 +12,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 import screens
 
 """
@@ -21,14 +22,13 @@ It allows the players to either return to the main menu or go for a rematch.
 
 """
 
-class GameOver:
+class GameOver(scene.Scene):
 
 	tint_color = pygame.Color(255, 255, 255, 128)
 
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# Tint the window surface and set it as the background surface.
 		self.background_surface = window_surface.copy()
@@ -113,70 +113,37 @@ class GameOver:
 		self.done = True
 		self.next_screen = screens.game.Game
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we go back to the main menu.
+			self.quit(None)
+		else:
+			traversal.traverse_menus(event, self.all_menus)
 
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.blit(self.background_surface, (0, 0))
-
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we go back to the main menu.
-					self.next_screen = screens.mainmenu.MainMenu
-					self.done = True
-				else:
-					traversal.traverse_menus(event, self.all_menus)
-
-			self.show_player_text()
-
-			self.show_menu()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			pygame.display.update()
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_player_text(self):
-		self.winning_player_text.draw(self.window_surface)
-
-	def show_menu(self):
+	def update(self):
 		# Update all transitions.
 		self.transitions.update()
-
-		# Draw the winning players name.
-		self.winning_player_text.draw(self.window_surface)
 
 		# Update the menus.
 		self.quit_menu.update()
 		self.rematch_menu.update()
+		
+	def draw(self):
+		# Every frame begins by blitting the background surface.
+		self.window_surface.blit(self.background_surface, (0, 0))
 
-		# If the mouse cursor is above one menu, it unselect other menus.
-		if self.quit_menu.is_mouse_over_item(self.quit_menu.items[0], pygame.mouse.get_pos()):
-			self.rematch_menu.items[0].selected = False
-		elif self.rematch_menu.is_mouse_over_item(self.rematch_menu.items[0], pygame.mouse.get_pos()):
-			self.quit_menu.items[0].selected = False
+		# Draw the winning players name.
+		self.winning_player_text.draw(self.window_surface)
+
+		# Draw the winning players name.
+		self.winning_player_text.draw(self.window_surface)
 
 		# Draw the menus.
 		self.quit_menu.draw(self.window_surface)
 		self.rematch_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == None:
-			# If no next_screen is specified, we quit.
-			pygame.quit()
-			sys.exit()
-		elif self.next_screen == screens.game.Game:
+		if self.next_screen == screens.game.Game:
 			# If a rematch was selected, we reset the score and start a new instance of Game.
 			self.score[self.player_one] = 0
 			self.score[self.player_two] = 0

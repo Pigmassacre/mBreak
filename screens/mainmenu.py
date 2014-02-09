@@ -12,6 +12,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 
 # These are the screens we can reach directly from the main menu, so we import them here.
 import screens.preparemenu as preparemenu
@@ -30,12 +31,11 @@ If either the quit button is activated or the ESCAPE key is pressed, we quit the
 
 """
 
-class MainMenu:
+class MainMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, title_logo = None):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = preparemenu.PrepareMenu
@@ -177,60 +177,40 @@ class MainMenu:
 		self.done = True
 		self.next_screen = None
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the ESCAPE key or back button on gamepad is pressed, we go back a level in the menu system.
+			if len(self.active_menu) > 1:
+				self.back(None)
+			else:
+				# If we're at the top level, we select the last item in the main menu, which should be the QUIT button.
+				for item in self.main_menu.items:
+					item.selected = False
+				self.main_menu.items[len(self.main_menu.items) - 1].selected = True
+		else:
+			# The traverse menus function wants a list of menus, so we simply give it a list of one menu!
+			traversal.traverse_menus(event, [self.active_menu[-1]])
 
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(settings.BACKGROUND_COLOR)
-			
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we go back a level in the menu system. If we're at the lowest level, we quit.
-					if len(self.active_menu) > 1:
-						self.back(None)
-					else:
-						sys.exit()
-						pygame.quit()
-				else:
-					# The traverse menus function wants a list of menus, so we simply give it a list of one menu!
-					traversal.traverse_menus(event, [self.active_menu[-1]])
-
-			# Move the logo to the desired position.
-			self.show_logo()
-
-			#  If the logo is in place, show the menu.
-			if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
-				self.show_menu()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			# Update the display, of course.
-			pygame.display.update()
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_logo(self):
+	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
 		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
+
+		#  If the logo is in place, show the menu.
+		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
+			# Updates the menu transitions, and the currently active menu.
+			self.menu_transition.update()
+			self.active_menu[-1].update()
+
+	def draw(self):
+		# Every frame begins by filling the whole screen with the background color.
+		self.window_surface.fill(settings.BACKGROUND_COLOR)
+
+		# Draw the title logo.
 		self.title_logo.draw(self.window_surface)
 
-	def show_menu(self):
-		# Updates the menu transitions, and the currently active menu.
-		self.menu_transition.update()
-		self.active_menu[-1].update()
-
-		# We draw the currently active menu to the screen.
-		self.active_menu[-1].draw(self.window_surface)
+		# If the logo is in place, draw the currently active menu to the screen.
+		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
+			self.active_menu[-1].draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == None:

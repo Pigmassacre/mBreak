@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
+import other.debug as debug
 import settings.settings as settings
 import settings.graphics as graphics
 import objects.groups as groups
@@ -43,6 +44,10 @@ class Scene:
 			# Call the draw method. Implement all drawing/blitting etc. in this method.
 			self.draw()
 
+			# Display various debug information, if debug mode is enabled.
+			if settings.DEBUG_MODE:
+				debug.Debug.display(self.window_surface, self.main_clock)
+
 			# Finally, update the display.
 			pygame.display.update()
 
@@ -50,13 +55,17 @@ class Scene:
 		self.on_exit()
 
 	def event(self, event):
+		# Handle events in this method.
 		pass
 
 	def update(self):
+		# Handle update logic in this method.
 		pass
 
 	def draw(self):
+		# Handle all drawing in this method.
 		pass
 
 	def on_exit(self):
+		# Handle what to do when the gameloop ends in this method.
 		pass

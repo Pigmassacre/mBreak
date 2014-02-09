@@ -16,6 +16,7 @@ import gui.toast as toast
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 import screens.game as game
 import screens
 
@@ -30,12 +31,11 @@ to the main menu).
 
 """
 
-class PrepareMenu:
+class PrepareMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# These are the connected and active joysticks.
 		self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
@@ -225,7 +225,7 @@ class PrepareMenu:
 		# At last, return the value of the selected item.
 		return item.value
 
-	def start(self, item):
+	def start(self, item = None):
 		if not self.player_one_color == None and not self.player_two_color == None:
 			# The game can only be started if both players have picked a color.
 			pygame.mixer.music.stop()
@@ -234,85 +234,57 @@ class PrepareMenu:
 			# If a player haven't picked his or hers color, we show a toast that informs the players of this.
 			self.not_all_colors_chosen_toast.start()
 
-	def back(self, item):
+	def back(self, item = None):
 		# Simply moves back to the main menu.
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Constrain the game to a set maximum amount of FPS, and update the delta time value.
-			self.main_clock.tick(graphics.MAX_FPS)
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we go back to the main menu.
+			self.back()
+		else:
+			traversal.traverse_menus(event, self.all_menus)
 
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(settings.BACKGROUND_COLOR)
-			
-			# We then check for any events.
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we go back to the main menu.
-					self.next_screen = screens.mainmenu.MainMenu
-					self.done = True
-				else:
-					traversal.traverse_menus(event, self.all_menus)
-
-			# We update and draw the menus.
-			self.show_menu()
-
-			# We also try to show any toast(s).
-			self.show_toasts()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			# We have to update the display if we want anything we just did to actually display.
-			pygame.display.update()
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_menu(self):
+	def update(self):
 		# Handle all transitions.
 		self.transitions.update()
 
-		# Update and show all menus and items.
+		# Update all menus and items.
 		self.number_of_rounds_menu.update()
-		self.number_of_rounds_menu.draw(self.window_surface)
-
-		self.number_of_rounds_text.draw(self.window_surface)
-
 		self.color_menu_one.update()
-		self.color_menu_one.draw(self.window_surface)
-
-		self.player_one_text.draw(self.window_surface)
-
 		self.color_menu_two.update()
-		self.color_menu_two.draw(self.window_surface)
-
-		self.player_two_text.draw(self.window_surface)
-		
 		self.back_menu.update()
 		self.start_menu.update()
 
+		# Update the toast.
+		self.not_all_colors_chosen_toast.update()
+
+	def draw(self):
+		# Every frame begins by filling the whole screen with the background color.
+		self.window_surface.fill(settings.BACKGROUND_COLOR)
+
+		# Draw the number of rounds menu.
+		self.number_of_rounds_menu.draw(self.window_surface)
+		self.number_of_rounds_text.draw(self.window_surface)
+		
+		# Draw the color menu for player one.
+		self.color_menu_one.draw(self.window_surface)
+		self.player_one_text.draw(self.window_surface)
+
+		# Draw the color menu for player two.
+		self.color_menu_two.draw(self.window_surface)
+		self.player_two_text.draw(self.window_surface)
+
+		# Draw the back and start menus.
 		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)
 
-	def show_toasts(self):
-		# Updates and tries to draw the toast, if it should be drawn.
-		self.not_all_colors_chosen_toast.update_and_draw(self.window_surface)
+		# Draw the toast.
+		self.not_all_colors_chosen_toast.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == None:
-			# If next_screen haven't been set, we just quit.
-			pygame.quit()
-			sys.exit()
-		elif self.next_screen == game.Game:
+		if self.next_screen == game.Game:
 			# If we're going to start the game, we first create both players.
 			joystick_count = pygame.joystick.get_count()
 			if joystick_count == 0:

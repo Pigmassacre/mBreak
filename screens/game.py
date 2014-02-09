@@ -120,22 +120,19 @@ class Game(scene.Scene):
 		self.powerup_second_speed_spawn_chance = 0.05
 
 		# Create the score texts. These are only displayed when the amount of rounds is greater than 0.
-		item_side_padding = textitem.TextItem.font_size
-
-		# This is to more correctly align the two textitems so they are all equally far away from their respective sides.
-		# Magic value, I know, but without this the textitems look misaligned.
-		left_side_extra_padding = 3 * settings.GAME_SCALE
-
+		item_side_padding = 25 * settings.GAME_SCALE
+		font_dead_space = 1.5 * settings.GAME_SCALE
+		
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
 		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_one_score_text.x = item_side_padding + left_side_extra_padding
+		self.player_one_score_text.x = item_side_padding - (self.player_one_score_text.get_width() / 2.0) + font_dead_space
 		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
-
+		
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
 		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - self.player_two_score_text.get_width()
+		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - (self.player_two_score_text.get_width() / 2.0) + font_dead_space
 		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
-
+		
 		# We setup and play music.
 		self.setup_music()
 
@@ -274,13 +271,8 @@ class Game(scene.Scene):
 		if self.countdown_screen.done:
 			# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
 			for player in groups.Groups.player_group:
-				if player.unleash_energy_pressed:
-					player.unleash_energy_pressed = False
-				else:
-					if (event.type == KEYDOWN and event.key == player.key_unleash_energy) or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
-						player.unleash_energy_pressed = True
-					if event.type == KEYUP and event.key == player.key_unleash_energy or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
-						player.unleash_energy_pressed = False
+				if (event.type == KEYDOWN and event.key == player.key_unleash_energy) or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
+					player.unleash_energy()
 			if settings.DEBUG_MODE:
 				if event.type == KEYDOWN and event.key == K_n:
 					debug.create_ball_left(self.player_one)
@@ -428,13 +420,9 @@ class Game(scene.Scene):
 		self.game_background.draw(self.window_surface)
 
 		# Draw the scores if we're playing more than one round.
-		if self.number_of_rounds > 1:
+		if self.number_of_rounds > 1 and not self.done:
 			self.player_one_score_text.draw(self.window_surface)
 			self.player_two_score_text.draw(self.window_surface)
-
-		if settings.DEBUG_MODE:
-			# Display various debug information.
-			debug.Debug.display(self.window_surface, self.main_clock)
 
 		# Finally, draw the countdown screen. It doesn't draw itself if it is finished, so.
 		self.countdown_screen.draw(self.window_surface)
@@ -442,6 +430,9 @@ class Game(scene.Scene):
 	def on_exit(self):
 		# Restore the time scale.
 		self.main_clock.time_scale = self.main_clock.default_time_scale
+
+		# Show the mouse again.
+		pygame.mouse.set_visible(True)
 
 		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
 		self.player_one.empty_groups()

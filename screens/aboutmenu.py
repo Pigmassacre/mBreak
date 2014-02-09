@@ -13,6 +13,7 @@ import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
+import screens.scene as scene
 import screens
 
 """
@@ -36,12 +37,11 @@ will have its gameloop() method restarted when this screen ends.
 
 """
 
-class AboutMenu:
+class AboutMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, menu_screen_instance = None):
-		# Store the game variables.
-		self.window_surface = window_surface
-		self.main_clock = main_clock
+		# Call the superconstructor.
+		scene.Scene.__init__(self, window_surface, main_clock)
 
 		# If we've gotten a menu instance to return to, then save that.
 		self.menu_screen_instance = menu_screen_instance
@@ -165,48 +165,25 @@ class AboutMenu:
 			pygame.mixer.music.load(settings.TITLE_MUSIC)
 			pygame.mixer.music.play(-1)
 
-	def back(self, item):
+	def back(self, item = None):
 		# Simply moves back to the main menu.
 		self.next_screen = screens.mainmenu.MainMenu
 		self.done = True
 
-	def gameloop(self):
-		self.done = False
-		while not self.done:
-			# Every frame begins by filling the whole screen with the background color.
-			self.window_surface.fill(settings.BACKGROUND_COLOR)
-			
-			# We then check for any events.
-			for event in pygame.event.get():
-				if event.type == QUIT:
-					# If the window is closed, the game is shut down.
-					sys.exit()
-					pygame.quit()
-				elif (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button == 0):
-					# If the escape key is pressed, we go back to the main menu.
-					self.back(None)
-				else:
-					traversal.traverse_menus(event, [self.back_menu])
+	def event(self, event):
+		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
+			# If the escape key is pressed, we go back to the main menu.
+			self.back()
+		else:
+			traversal.traverse_menus(event, [self.back_menu])
 
-			# We update and draw the menus.
-			self.show_menu()
-
-			if settings.DEBUG_MODE:
-				# Display various debug information.
-				debug.Debug.display(self.window_surface, self.main_clock)
-
-			# We have to update the display if we want anything we just did to actually display.
-			pygame.display.update()
-			
-			# Finally, we constrain the game to a set maximum amount of FPS.
-			self.main_clock.tick(graphics.MAX_FPS)
-
-		# The gameloop is over, so we either start the next screen or quit the game.
-		self.on_exit()
-
-	def show_menu(self):
+	def update(self):		
 		# Handle all transitions.
 		self.transitions.update()
+
+	def draw(self):
+		# Every frame begins by filling the whole screen with the background color.
+		self.window_surface.fill(settings.BACKGROUND_COLOR)
 
 		# Blit the two images to the window_surface, in the bottom left and bottom right of the screen.
 		self.window_surface.blit(self.image_left, (self.made_by_author.x - self.image_left.get_width() - self.made_by_author.get_height(), self.made_by_author.y - (self.image_left.get_height() / 2)))

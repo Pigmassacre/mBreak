@@ -13,6 +13,9 @@ Save on the other hand, will take the current values of the variables and try to
 
 """
 
+# Simply the version of the game. Doesn't affect anything, really.
+GAME_VERSION = "v0.9"
+
 # Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
 # I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
 # whatever you want, of course.
@@ -56,6 +59,12 @@ PLAYER_TWO_KEY_UP = pygame.locals.K_UP
 PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 PLAYER_TWO_KEY_UNLEASH_ENERGY = pygame.locals.K_RSHIFT
 PLAYER_TWO_JOY_UNLEASH_ENERGY = 2
+
+# Non-player-specific joypad button settings.
+JOY_BUTTON_BACK = [0]
+JOY_BUTTON_ACCEPT = [2]
+JOY_BUTTON_START = [9]
+JOY_BUTTON_SKIP = [2, 9]
 
 # Enables various debug information.
 DEBUG_MODE = True
