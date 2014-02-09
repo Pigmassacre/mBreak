@@ -105,4 +105,4 @@ class ChoiceItem():
 			surface.fill(self.selected_border_color, self.selected_rect)
 
 		# Draw the font surface in the middle of this item.
-		surface.blit(self.font_surface, ((self.rect.x + (self.rect.width - self.font_surface.get_width()) / 2), self.rect.y + (self.rect.height - self.font_surface.get_height()) / 2))
+		surface.blit(self.font_surface, ((self.rect.x + (self.rect.width - self.font_surface.get_width()) / 2) + 0.5 * settings.GAME_SCALE, self.rect.y + (self.rect.height - self.font_surface.get_height()) / 2))

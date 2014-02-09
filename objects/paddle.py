@@ -217,7 +217,7 @@ class Paddle(pygame.sprite.Sprite):
 
 	def update(self,  main_clock):
 		# Very simple AI.
-		if self.owner.ai:
+		if self.owner.ai_difficulty > 0:
 			self.key_up_pressed = False
 			self.key_down_pressed = False
 

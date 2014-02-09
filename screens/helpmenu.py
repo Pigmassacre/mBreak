@@ -90,17 +90,6 @@ class HelpMenu(scene.Scene):
 		for file in os.listdir("res/helpdata"):
 			if file.endswith(".json"):
 				self.setup_info(os.path.join(root, file))
-				"""
-		first_item = self.setup_info("res/helpdata/help.json")
-		self.setup_info("res/helpdata/ball.json")
-		self.setup_info("res/helpdata/block.json")
-		self.setup_info("res/helpdata/fire.json")
-		self.setup_info("res/helpdata/frost.json")
-		self.setup_info("res/helpdata/doublespeed.json")
-		self.setup_info("res/helpdata/multiball.json")
-		self.setup_info("res/helpdata/rocket.json")
-		self.setup_info("res/helpdata/enlarger.json")
-		self.setup_info("res/helpdata/reducer.json")"""
 
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 

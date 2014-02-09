@@ -44,9 +44,14 @@ class PrepareMenu(scene.Scene):
 		self.next_screen = game.Game
 		self.player_one_color = None
 		self.player_two_color = None
+		self.player_one_ai = None
+		self.player_two_ai = None
 
 		# Configure the GUI.
 		distance_from_screen_edge = 9 * settings.GAME_SCALE
+
+		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
+		self.all_menus = []
 
 		# We create a gridmenu that allows the player to select the number of rounds they want to play.
 		self.number_of_rounds_menu = gridmenu.GridMenu(5)
@@ -54,9 +59,6 @@ class PrepareMenu(scene.Scene):
 		# We set the default number of rounds to 1.
 		temp_item = choiceitem.ChoiceItem(1)
 		self.rounds(temp_item)
-
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
 
 		# Add that item, and the other items to the menu.
 		self.number_of_rounds_menu.add(temp_item, self.rounds)
@@ -83,6 +85,11 @@ class PrepareMenu(scene.Scene):
 		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
 		self.player_one_text.x = self.color_menu_one.x + ((self.color_menu_one.get_width() - self.player_one_text.get_width()) / 2)
 		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
+
+		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
+		self.ai_menu_one.x = self.color_menu_one.x
+		self.ai_menu_one.y = self.color_menu_one.y + self.color_menu_one.get_height() + 4 * settings.GAME_SCALE
+		self.all_menus.append(self.ai_menu_one)
 		
 		# The color menu for player two.
 		self.color_menu_two = self.setup_color_menu(self.color_two)
@@ -94,6 +101,11 @@ class PrepareMenu(scene.Scene):
 		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
 		self.player_two_text.x = self.color_menu_two.x + ((self.color_menu_two.get_width() - self.player_two_text.get_width()) / 2)
 		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
+
+		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
+		self.ai_menu_two.x = self.color_menu_two.x
+		self.ai_menu_two.y = self.color_menu_two.y + self.color_menu_two.get_height() + 4 * settings.GAME_SCALE
+		self.all_menus.append(self.ai_menu_two)
 
 		# The back button, displayed in the bottom-left corner of the screen.
 		back_button = textitem.TextItem("Back")
@@ -117,7 +129,7 @@ class PrepareMenu(scene.Scene):
 			a_menu.register_other_menus(self.all_menus)
 
 		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
-		self.not_all_colors_chosen_toast = toast.Toast("Both players need to pick a color", 1700, self.main_clock)
+		self.not_all_colors_chosen_toast = toast.Toast("Pick colors and AI difficulty", 1700, self.main_clock)
 		self.not_all_colors_chosen_toast.x = (settings.SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
 		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
@@ -126,8 +138,10 @@ class PrepareMenu(scene.Scene):
 		self.transitions.setup_transition(self.number_of_rounds_menu, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
 		self.transitions.setup_transition(self.color_menu_one, True, False, False, True)
+		self.transitions.setup_transition(self.ai_menu_one, True, False, False, True)
 		self.transitions.setup_single_item_transition(self.player_one_text, True, False, True, False)
 		self.transitions.setup_transition(self.color_menu_two, False, True, False, True)
+		self.transitions.setup_transition(self.ai_menu_two, True, False, False, True)
 		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
 		self.transitions.setup_transition(self.back_menu, True, False, False, True)
 		self.transitions.setup_transition(self.start_menu, False, True, False, True)
@@ -201,11 +215,27 @@ class PrepareMenu(scene.Scene):
 			# If the item is unavailible, we return the color of the chosen item instead.
 			return chosen_item.color
 
+	def setup_ai_menu(self, function):
+		ai_menu = gridmenu.GridMenu()
+		self.setup_ai_items(ai_menu, function)
+		return ai_menu
+
+	def setup_ai_items(self, grid_menu, function):
+		grid_menu.add(choiceitem.ChoiceItem(0), function)
+		grid_menu.add(choiceitem.ChoiceItem(1), function)
+		grid_menu.add(choiceitem.ChoiceItem(2), function)
+
+	def ai_one(self, item):
+		self.player_one_ai = self.choose_item_from_menu(item, self.ai_menu_one)
+
+	def ai_two(self, item):
+		self.player_two_ai = self.choose_item_from_menu(item, self.ai_menu_two)
+
 	def rounds(self, item):
 		# Set the number of rounds to the value of the selected item.
-		self.number_of_rounds = self.choose_number_of_rounds(item, self.number_of_rounds_menu)
+		self.number_of_rounds = self.choose_item_from_menu(item, self.number_of_rounds_menu)
 
-	def choose_number_of_rounds(self, item, grid_menu):
+	def choose_item_from_menu(self, item, grid_menu):
 		# Figure out what item is the chosen item.
 		chosen_item = None
 		for menu_item in grid_menu.items:
@@ -226,7 +256,12 @@ class PrepareMenu(scene.Scene):
 		return item.value
 
 	def start(self, item = None):
-		if not self.player_one_color == None and not self.player_two_color == None:
+		if not self.player_one_color is None and not self.player_two_color is None:
+			if self.player_one_ai is None:
+				self.player_one_ai = 0
+			if self.player_two_ai is None:
+				self.player_two_ai = 0
+
 			# The game can only be started if both players have picked a color.
 			pygame.mixer.music.stop()
 			self.done = True
@@ -254,6 +289,8 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_menu.update()
 		self.color_menu_one.update()
 		self.color_menu_two.update()
+		self.ai_menu_one.update()
+		self.ai_menu_two.update()
 		self.back_menu.update()
 		self.start_menu.update()
 
@@ -268,13 +305,15 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_menu.draw(self.window_surface)
 		self.number_of_rounds_text.draw(self.window_surface)
 		
-		# Draw the color menu for player one.
+		# Draw the menus for player one.
 		self.color_menu_one.draw(self.window_surface)
 		self.player_one_text.draw(self.window_surface)
+		self.ai_menu_one.draw(self.window_surface)
 
-		# Draw the color menu for player two.
+		# Draw the menus for player two.
 		self.color_menu_two.draw(self.window_surface)
 		self.player_two_text.draw(self.window_surface)
+		self.ai_menu_two.draw(self.window_surface)
 
 		# Draw the back and start menus.
 		self.back_menu.draw(self.window_surface)
@@ -318,8 +357,8 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_ONE_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_ONE_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_ONE_JOY_UNLEASH_ENERGY
-		
-		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, False, 1)
+		print(str(self.player_one_ai))
+		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_one_ai)
 		return player_one
 
 	def create_player_two(self, color, **kwargs):
@@ -332,6 +371,6 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_TWO_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_TWO_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_TWO_JOY_UNLEASH_ENERGY
-
-		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, True, 1)
+		print(str(self.player_two_ai))
+		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_two_ai)
 		return player_two
