@@ -28,6 +28,8 @@ class Menu:
 		# This is the amount of items the menu will display in a row before generating a new column.
 		self.max_number_of_rows = 3
 
+		#self.current_row_size = 0
+
 		# Setup a dictionary that contains the functions that each item will call when activated.
 		self.functions = {}
 

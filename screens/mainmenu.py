@@ -110,6 +110,10 @@ class MainMenu(scene.Scene):
 		particles_button.setup_is_on_off("Particles Off", graphics.PARTICLES)
 		self.graphics_menu.add(particles_button, self.particles)
 
+		flashes_button = textitem.TextItem("Flashes On")
+		flashes_button.setup_is_on_off("Flashes Off", graphics.FLASHES)
+		self.graphics_menu.add(flashes_button, self.flashes)
+
 		traces_button = textitem.TextItem("Traces On")
 		traces_button.setup_is_on_off("Traces Off", graphics.TRACES)
 		self.graphics_menu.add(traces_button, self.traces)
@@ -119,7 +123,7 @@ class MainMenu(scene.Scene):
 		self.graphics_menu.add(traces_button, self.background)
 		
 		# We store the graphics offset so we can offset the logo by this later.
-		self.graphics_menu_offset = (shadows_button.get_height() * 2)
+		self.graphics_menu_offset = (shadows_button.get_height() * 3)
 		self.graphics_menu.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
 
 		# We add a back button to the menu.
@@ -131,6 +135,9 @@ class MainMenu(scene.Scene):
 
 	def particles(self, item):
 		graphics.PARTICLES = item.toggle_on_off()
+
+	def flashes(self, item):
+		graphics.FLASHES = item.toggle_on_off()
 
 	def traces(self, item):
 		graphics.TRACES = item.toggle_on_off()

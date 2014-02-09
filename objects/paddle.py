@@ -239,7 +239,7 @@ class Paddle(pygame.sprite.Sprite):
 				unleash_chance = 0
 
 			if random.random() <= unleash_chance:
-				self.owner.unleash_energy_pressed = True
+				self.owner.unleash_energy()
 
 			# Reset the targeting variables.
 			self.focused_ball = None

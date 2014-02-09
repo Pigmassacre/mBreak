@@ -14,6 +14,7 @@ Save on the other hand, will take the current values of the variables and try to
 
 SHADOWS = True
 PARTICLES = True
+FLASHES = True
 TRACES = True
 BACKGROUND = True
 FULLSCREEN = False
@@ -23,6 +24,7 @@ def load():
 	# Tries to load the graphics options from settings.txt.
 	global SHADOWS
 	global PARTICLES
+	global FLASHES
 	global TRACES
 	global BACKGROUND
 	global FULLSCREEN
@@ -39,6 +41,8 @@ def load():
 				SHADOWS = bool(int(line.strip("shadows").strip()))
 			elif "particles" in line:
 				PARTICLES = bool(int(line.strip("particles").strip()))
+			elif "flashes" in line:
+				FLASHES = bool(int(line.strip("flashes").strip()))
 			elif "traces" in line:
 				TRACES = bool(int(line.strip("traces").strip()))
 			elif "background" in line:
@@ -69,6 +73,8 @@ def save():
 				temp_file.write(line.replace(line.strip("shadows").strip(), str(int(SHADOWS))))
 			elif "particles" in line:
 				temp_file.write(line.replace(line.strip("particles").strip(), str(int(PARTICLES))))
+			elif "flashes" in line:
+				temp_file.write(line.replace(line.strip("flashes").strip(), str(int(FLASHES))))
 			elif "traces" in line:
 				temp_file.write(line.replace(line.strip("traces").strip(), str(int(TRACES))))
 			elif "background" in line:

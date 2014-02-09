@@ -100,6 +100,7 @@ def load():
 		file.write("# GRAPHICS\n")
 		file.write("shadows 	1\n")
 		file.write("particles 	1\n")
+		file.write("flashes 	1\n")
 		file.write("traces 		1\n")
 		file.write("background 	1\n")
 		file.write("resolution	855x480")
@@ -118,11 +119,14 @@ def load():
 				PLAYER_TWO_NAME = line.strip("p2name").strip()
 			elif "resolution" in line:
 				resolution = line.strip("resolution").strip().split("x")
-				SCREEN_WIDTH = int(resolution[0])
-				SCREEN_HEIGHT = int(resolution[1])
+				set_resolution(int(resolution[0]), int(resolution[1]))
 	finally:
 		file.close()
-			
+
+def set_resolution(width, height):
+	SCREEN_WIDTH = width
+	SCREEN_HEIGHT = height
+
 	# Now, set values that depend on values loaded here.
 	LEVEL_X = (SCREEN_WIDTH - LEVEL_WIDTH) / 2 
 	LEVEL_Y = (SCREEN_HEIGHT - LEVEL_HEIGHT) / 2

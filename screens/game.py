@@ -407,9 +407,10 @@ class Game(scene.Scene):
 				effect.draw(self.window_surface)
 
 		# Draw the flash effects.
-		for effect in groups.Groups.effect_group:
-			if effect.__class__ == flash.Flash:
-				effect.draw(self.window_surface)
+		if graphics.FLASHES:
+			for effect in groups.Groups.effect_group:
+				if effect.__class__ == flash.Flash:
+					effect.draw(self.window_surface)
 
 		# Draw the particles.
 		if graphics.PARTICLES:
