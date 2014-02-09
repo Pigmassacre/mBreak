@@ -85,9 +85,6 @@ class Paddle(pygame.sprite.Sprite):
 		# The velocity at which the Paddle will be moved when it is updated.
 		self.velocity_y = 0
 
-		# This value can be "spent" to create powerup effects. The higher the charge value, the more / more powerful effects will be created.
-		self.charge = 0
-
 		# These values affect the velocity of the paddle.
 		self.acceleration = Paddle.acceleration
 		self.retardation = Paddle.retardation
@@ -102,7 +99,6 @@ class Paddle(pygame.sprite.Sprite):
 		# Store the whether or not keys are held down for this paddle.
 		self.key_up_pressed = False
 		self.key_down_pressed = False
-		self.key_unleash_charge_pressed = False
 
 		# AI variables.
 		self.focused_ball = None
@@ -180,7 +176,15 @@ class Paddle(pygame.sprite.Sprite):
 	def add_size(self, added_width, added_height):
 		self.set_size(self.actual_width + added_width, self.actual_height + added_height)
 
-	def on_hit(self, other_object):
+	def on_hit(self, entity):
+		# If hit by an enemy ball, we increase our owners energy.
+		if entity.owner != self.owner:
+			print(str(self.owner.energy))
+			if self.owner.energy + self.owner.energy_increase_on_hit < self.owner.max_energy:
+				self.owner.energy += self.owner.energy_increase_on_hit
+			else:
+				self.owner.energy = self.owner.max_energy
+
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
 
@@ -221,6 +225,21 @@ class Paddle(pygame.sprite.Sprite):
 				paddle_side_left = True
 			else:
 				paddle_side_left = False
+
+			# Decide whether or not to unleash our energy.
+			if self.owner.energy >= 80:
+				unleash_chance = 0.8
+			elif self.owner.energy >= 60:
+				unleash_chance = 0.1
+			elif self.owner.energy >= 40:
+				unleash_chance = 0.04
+			elif self.owner.energy >= 20:
+				unleash_chance = 0.02
+			else:
+				unleash_chance = 0
+
+			if random.random() <= unleash_chance:
+				self.owner.unleash_energy_pressed = True
 
 			# Reset the targeting variables.
 			self.focused_ball = None
@@ -264,7 +283,10 @@ class Paddle(pygame.sprite.Sprite):
 				self.key_up_pressed = (self.owner.joystick.get_axis(1) <= -0.25) or (self.owner.joystick.get_hat(0)[1] == -1)
 				self.key_down_pressed = (self.owner.joystick.get_axis(1) >= 0.25) or (self.owner.joystick.get_hat(0)[1] == 1)
 			
-			if not self.key_up_pressed and not self.key_down_pressed:
+				if not self.key_up_pressed and not self.key_down_pressed:
+					self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
+					self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
+			else:
 				self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
 				self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
 

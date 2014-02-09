@@ -33,10 +33,6 @@ class Rocket(powerup.Powerup):
 	particle_spawn_rate = 100
 	particle_spawn_amount = 3
 
-	# Missile spawn values.
-	missile_speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
-	missile_acceleration = 0.025 * settings.GAME_FPS * settings.GAME_SCALE
-
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
@@ -65,4 +61,4 @@ class Rocket(powerup.Powerup):
 				block_list = player.block_group.sprites()
 
 		# Create a missile that homes in on a random block in the block list.
-		the_missile = missile.Missile(entity.x, entity.y, random.uniform(0, math.pi), Rocket.missile_speed, Rocket.missile_acceleration, entity.owner, random.choice(block_list))
+		missile.Missile(entity.x, entity.y, random.uniform(0, 2*math.pi), entity.owner, random.choice(block_list))

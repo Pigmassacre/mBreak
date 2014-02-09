@@ -274,15 +274,17 @@ class Game(scene.Scene):
 		if self.countdown_screen.done:
 			# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
 			for player in groups.Groups.player_group:
-				for paddle in player.paddle_group:
-					if event.type == KEYDOWN and event.key == player.key_unleash_charge:
-						paddle.key_unleash_charge_pressed = True
-					if event.type == KEYUP and event.key == player.key_unleash_charge:
-						paddle.key_unleash_charge_pressed = False
+				if player.unleash_energy_pressed:
+					player.unleash_energy_pressed = False
+				else:
+					if (event.type == KEYDOWN and event.key == player.key_unleash_energy) or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
+						player.unleash_energy_pressed = True
+					if event.type == KEYUP and event.key == player.key_unleash_energy or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
+						player.unleash_energy_pressed = False
 			if settings.DEBUG_MODE:
-				if event.type == KEYDOWN and event.key == K_l:
+				if event.type == KEYDOWN and event.key == K_n:
 					debug.create_ball_left(self.player_one)
-				elif event.type == KEYDOWN and event.key == K_r:
+				elif event.type == KEYDOWN and event.key == K_m:
 					debug.create_ball_right(self.player_two)
 				elif event.type == KEYDOWN and event.key == K_p:
 					debug.create_powerup()
@@ -405,7 +407,7 @@ class Game(scene.Scene):
 				projectile.x > settings.LEVEL_MAX_X or 
 				projectile.y + projectile.height < settings.LEVEL_Y or 
 				projectile.y > settings.LEVEL_MAX_Y):
-				self.window_surface.blit(projectile.image, (projectile.rect.x - camera.CAMERA.x, projectile.rect.y - camera.CAMERA.y))
+				projectile.draw(self.window_surface) #self.window_surface.blit(projectile.image, )
 
 		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:

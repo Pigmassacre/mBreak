@@ -2,9 +2,12 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import random
+import math
 import objects.groups as groups
 import objects.ball as ball
 import objects.powerups.powerup as powerup
+import objects.missile as missile
 import settings.settings as settings
 
 """
@@ -20,7 +23,7 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
-	def __init__(self, x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, gamepad_id, color, ai = False, ai_difficulty = 1):
+	def __init__(self, x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, gamepad_id, color, ai = False, ai_difficulty = 1):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -34,8 +37,17 @@ class Player(pygame.sprite.Sprite):
 		# These are the keys that any paddles connected to this player will respond to.
 		self.key_up = key_up
 		self.key_down = key_down
-		self.key_unleash_charge = key_unleash_charge
-		self.joy_unleash_charge = joy_unleash_charge
+		self.key_unleash_energy = key_unleash_energy
+		self.joy_unleash_energy = joy_unleash_energy
+		self.unleash_energy_pressed = False
+
+		# This value can be "spent" to create powerup effects. The higher the energy value, the more / more powerful effects will be created.
+		self.energy = 0
+		self.max_energy = 100
+		self.energy_increase_on_hit = 10
+		self.missiles_to_spawn = 0
+		self.missile_spawn_time = 200
+		self.time_passed = 0
 
 		# Store the number of the gamepad that controls this player.
 		self.gamepad_id = gamepad_id
@@ -113,7 +125,40 @@ class Player(pygame.sprite.Sprite):
 		# Change the last_powerup_group_size to match the current size of the group.
 		self.last_powerup_group_size = len(self.powerup_group)
 
+	def spawn_missile(self):
+		# Create a list of available blocks to target.
+		block_list = []
+		for player in groups.Groups.player_group:
+			if player != self:
+				block_list = player.block_group.sprites()
+
+		for paddle in self.paddle_group:
+			# Create a missile that homes in on a random block in the block list.
+			the_missile = missile.Missile(paddle.x + (paddle.width / 2) - (missile.Missile.width / 2), paddle.y + (paddle.height / 2) - (missile.Missile.height / 2), random.uniform(0, 2*math.pi), self, random.choice(block_list))
+			the_missile.acceleration *= random.uniform(1.5, 3)
+
 	def update(self, main_clock):
+		# We check if the unleash energy button has been pressed. If it has, we determine what effect to unleash!
+		if self.unleash_energy_pressed:
+			if self.energy >= 20:
+				# Set how many missiles to spawn.
+				self.missiles_to_spawn += self.energy / 20
+
+				self.spawn_missile()
+				self.missiles_to_spawn -= 1
+
+				# Reduce our energy to 0.
+				self.energy = 0
+
+		# Check if we're to spawn a missile.
+		if self.missiles_to_spawn > 0:
+			self.time_passed += main_clock.get_time()
+			if self.time_passed >= self.missile_spawn_time:
+				self.spawn_missile()
+
+				self.missiles_to_spawn -= 1
+				self.time_passed = 0
+
 		# We check if any object has been removed from the powerup group.
 		if len(self.powerup_group) < self.last_powerup_group_size:
 			# We use this to position the powerups.

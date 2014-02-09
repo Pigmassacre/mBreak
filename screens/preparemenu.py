@@ -344,10 +344,10 @@ class PrepareMenu:
 		name = settings.PLAYER_ONE_NAME
 		key_up = settings.PLAYER_ONE_KEY_UP
 		key_down = settings.PLAYER_ONE_KEY_DOWN
-		key_unleash_charge = settings.PLAYER_ONE_KEY_UNLEASH_CHARGE
-		joy_unleash_charge = settings.PLAYER_ONE_JOY_UNLEASH_CHARGE
+		key_unleash_energy = settings.PLAYER_ONE_KEY_UNLEASH_ENERGY
+		joy_unleash_energy = settings.PLAYER_ONE_JOY_UNLEASH_ENERGY
 		
-		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, kwargs.get("gamepad_id", None), color, False, 1)
+		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, False, 1)
 		return player_one
 
 	def create_player_two(self, color, **kwargs):
@@ -358,8 +358,8 @@ class PrepareMenu:
 		name = settings.PLAYER_TWO_NAME
 		key_up = settings.PLAYER_TWO_KEY_UP
 		key_down = settings.PLAYER_TWO_KEY_DOWN
-		key_unleash_charge = settings.PLAYER_TWO_KEY_UNLEASH_CHARGE
-		joy_unleash_charge = settings.PLAYER_TWO_JOY_UNLEASH_CHARGE
+		key_unleash_energy = settings.PLAYER_TWO_KEY_UNLEASH_ENERGY
+		joy_unleash_energy = settings.PLAYER_TWO_JOY_UNLEASH_ENERGY
 
-		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_charge, joy_unleash_charge, kwargs.get("gamepad_id", None), color, True, 1)
+		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, True, 1)
 		return player_two

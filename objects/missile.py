@@ -44,6 +44,10 @@ class Missile(pygame.sprite.Sprite):
 	particle_width = height / 6
 	particle_height = height / 6
 
+
+	speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
+	acceleration = 0.025 * settings.GAME_FPS * settings.GAME_SCALE
+
 	# These particles are spawned when the missile hits its target.
 	hit_particle_min_amount = 12
 	hit_particle_max_amount = 18
@@ -61,7 +65,7 @@ class Missile(pygame.sprite.Sprite):
 	# Scale image to settings.GAME_SCALE.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, x, y, angle, speed, acceleration, owner, target):
+	def __init__(self, x, y, angle, owner, target):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -76,10 +80,13 @@ class Missile(pygame.sprite.Sprite):
 		self.angle = angle
 
 		# We store the given speed of the Missile.
-		self.speed = speed
+		self.speed = Missile.speed
 
 		# Store the given acceleration.
-		self.acceleration = acceleration
+		self.acceleration = Missile.acceleration
+
+		# If this is set to anything higher than 0, this missile will not "fire" until this reaches 0.
+		self.delay = 0
 
 		# Store the owner.
 		self.owner = owner
@@ -242,3 +249,6 @@ class Missile(pygame.sprite.Sprite):
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)
+
+	def draw(self, surface):
+		surface.blit(self.image, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y))
