@@ -1,4 +1,6 @@
 {
+	"image": "res/ball/ball.png",
+	"color": [255, 0, 0],
 	"title": "Ball",
 	"body": "Balls are you weapons and your enemy. You protect your own blocks from balls, and try to make balls hit your opponents blocks."
 }

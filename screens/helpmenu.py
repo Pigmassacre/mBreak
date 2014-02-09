@@ -63,7 +63,6 @@ class HelpMenu(scene.Scene):
 		self.next_screen = screens.mainmenu.MainMenu
 
 		# This is a dictionary that contains information linked to certain imageitems.
-		self.info_about = {}
 		self.info = {}
 
 		# This is a dictionary that maps transitions methods to all all items.
@@ -77,71 +76,25 @@ class HelpMenu(scene.Scene):
 		self.font_size = 6 * settings.GAME_SCALE
 		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
 
-		"""self.setup_start_info()
-		self.setup_ball_info()
-		self.setup_block_info()
-		self.setup_paddle_info()
-		self.setup_fire_info()
-		self.setup_frost_info()
-		self.setup_doublespeed_info()
-		self.setup_multiball_info()
-		self.setup_electricity_info()"""
-
 		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
 		self.all_menus = []
 
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
-		self.help_menu = gridmenu.GridMenu(9)
+		self.help_menu = gridmenu.GridMenu(10)
 		self.help_menu.y = 9 * settings.GAME_SCALE
 		self.all_menus.append(self.help_menu)
 
 		# We setup and add all the necessary items to the help_menu.
-		first_item = imageitem.ImageItem("res/help/questionmark.png")
-		self.help_menu.add(first_item, self.view_info)
-		self.info[first_item] = self.setup_info("screens/helpdata/help.json")
-
-		temp_item = imageitem.ImageItem("res/ball/ball.png")
-		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0)) # We color this item, since otherwise it would be just gray.
-		self.help_menu.add(temp_item, self.view_info)
-		self.info[temp_item] = self.setup_info("screens/helpdata/ball.json")
-
-		"""
-		temp_item = imageitem.ImageItem("res/block/block.png")
-		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0)) # Same here.
-		self.info_about[temp_item] = self.show_block_info
-		self.transition_method[temp_item] = self.setup_block_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/paddle/paddle.png")
-		useful.colorize_image(temp_item.image, pygame.Color(255, 0, 0))	# And here.
-		self.info_about[temp_item] = self.show_paddle_info
-		self.transition_method[temp_item] = self.setup_paddle_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/powerup/fire.png")
-		self.info_about[temp_item] = self.show_fire_info
-		self.transition_method[temp_item] = self.setup_fire_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/powerup/frost.png")
-		self.info_about[temp_item] = self.show_frost_info
-		self.transition_method[temp_item] = self.setup_frost_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/powerup/doublespeed.png")
-		self.info_about[temp_item] = self.show_doublespeed_info
-		self.transition_method[temp_item] = self.setup_doublespeed_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/powerup/multiball.png")
-		self.info_about[temp_item] = self.show_multiball_info
-		self.transition_method[temp_item] = self.setup_multiball_info_transitions
-		self.help_menu.add(temp_item, self.view_info)
-
-		temp_item = imageitem.ImageItem("res/powerup/electricity.png")
-		self.info_about[temp_item] = self.show_electricity_info
-		self.transition_method[temp_item] = self.setup_electricity_info_transitions
-		self.help_menu.add(temp_item, self.view_info)"""
+		first_item = self.setup_info("res/helpdata/help.json")
+		self.setup_info("res/helpdata/ball.json")
+		self.setup_info("res/helpdata/block.json")
+		self.setup_info("res/helpdata/fire.json")
+		self.setup_info("res/helpdata/frost.json")
+		self.setup_info("res/helpdata/doublespeed.json")
+		self.setup_info("res/helpdata/multiball.json")
+		self.setup_info("res/helpdata/rocket.json")
+		self.setup_info("res/helpdata/enlarger.json")
+		self.setup_info("res/helpdata/reducer.json")
 
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 
@@ -216,16 +169,43 @@ class HelpMenu(scene.Scene):
 		try:
 			parsed_json = json.load(json_file)
 		except IOError:
-			print("IOError when reading .json file.")		
+			print("IOError when reading JSON file.")		
 		finally:
 			json_file.close()
 
+		# We try to parse the image tag in the JSON file. If it isn't found, an error is raised.
+		if "image" in parsed_json:
+			try:
+				image_item = imageitem.ImageItem(parsed_json["image"])
+			except:
+				raise ValueError("The image path could not be read.")
+		else:
+			raise SyntaxError("Image key not found in JSON file.")
+
+		# We try to parse the color tag in the JSON file. If it isn't found, we simply ignore it.
+		if "color" in parsed_json:
+			try:
+				color_list = parsed_json["color"]
+			except:
+				raise ValueError("The color value could not be read.")
+
+			try:
+				useful.colorize_image(image_item.image, pygame.Color(color_list[0], color_list[1], color_list[2]))
+			except:
+				raise ValueError("The given color values cannot be applied: [{0}, {1}, {2}]".format(color_list[0], color_list[1], color_list[2]))
+
+		# We add the image item to the help_menu here, so that the text can be be positioned properly.
+		self.help_menu.add(image_item, self.view_info)
+
+		# We try to parse the title tag in the JSON file. If it isn't found, an error is raised.
 		if "title" in parsed_json:
 			info_text = textitem.TextItem(parsed_json["title"], pygame.Color(255, 255, 255), 255, self.font_size)
 			info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
 			info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
 			info_texts.append(info_text)
 			previous_info_text = info_text
+		else:
+			raise SyntaxError("Title key not found in JSON file.")
 
 		if "body" in parsed_json:
 			body = parsed_json["body"]
@@ -236,7 +216,6 @@ class HelpMenu(scene.Scene):
 			wrapped_body = useful.wrap_multi_line(body, pygame.font.Font(textitem.TextItem.font_path, self.font_size), self.max_width_of_text_line)
 
 			for line in wrapped_body:
-
 				if odd:
 					color = pygame.Color(255, 255, 255)
 				else:
@@ -251,369 +230,27 @@ class HelpMenu(scene.Scene):
 				else:
 					info_text.x = self.distance_from_screen_edge
 					info_text.y = previous_info_text.y + info_text.get_height()
-
+				
 				info_texts.append(info_text)
 				previous_info_text = info_text
 
-				odd = not odd
+				if line != "":
+					odd = not odd
+		else:
+			raise SyntaxError("Body tag not found in JSON file.")
 
-		return info_texts
+		self.info[image_item] = info_texts
+		
+		return image_item
 
 	def setup_info_transitions(self, info_texts):
 		for item in info_texts:
 			self.transitions.setup_single_item_transition(item, True, True, False, False)
 
 	def show_info(self, info_texts, surface):
-		for info_text in info_texts:
-			info_text.draw(surface)
-	"""
-	def setup_block_info(self):
-		self.block_info_texts = []
-
-		self.block_info_title_text = textitem.TextItem("Block", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.block_info_title_text.x = (settings.SCREEN_WIDTH - self.block_info_title_text.get_width()) / 2
-		self.block_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.block_info_title_text.get_height()
-		self.block_info_texts.append(self.block_info_title_text)
-
-		self.block_info_text_1 = textitem.TextItem("Blocks come in different strengths", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.block_info_text_1.x = self.distance_from_screen_edge
-		self.block_info_text_1.y = self.block_info_title_text.y + (2 * self.block_info_text_1.get_height())
-		self.block_info_texts.append(self.block_info_text_1)
-
-		self.block_info_text_2 = textitem.TextItem("There are three types of blocks", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.block_info_text_2.x = self.distance_from_screen_edge
-		self.block_info_text_2.y = self.block_info_text_1.y + self.block_info_text_2.get_height()
-		self.block_info_texts.append(self.block_info_text_2)
-
-		self.block_info_text_3_image = imageitem.ImageItem("res/block/block_weak.png", pygame.Color(255, 255, 255))
-		useful.colorize_image(self.block_info_text_3_image.image, pygame.Color(255, 0, 0))
-		self.block_info_text_3_image.x = self.distance_from_screen_edge
-		self.block_info_text_3_image.y = self.block_info_text_2.y + (2 * self.block_info_text_2.get_height())
-		self.block_info_texts.append(self.block_info_text_3_image)
-
-		self.block_info_text_3 = textitem.TextItem("Weak blocks have " + str(weakblock.WeakBlock.health) + " health", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.block_info_text_3.x = self.block_info_text_3_image.x + self.block_info_text_3_image.get_width() + self.distance_from_screen_edge
-		self.block_info_text_3.y = self.block_info_text_3_image.y + ((self.block_info_text_3_image.get_height() - self.block_info_text_3.get_height()) / 2)
-		self.block_info_texts.append(self.block_info_text_3)
-
-		self.block_info_text_4_image = imageitem.ImageItem("res/block/block.png", pygame.Color(255, 255, 255))
-		useful.colorize_image(self.block_info_text_4_image.image, pygame.Color(255, 0, 0))
-		self.block_info_text_4_image.x = self.distance_from_screen_edge
-		self.block_info_text_4_image.y = self.block_info_text_3.y + (2 * self.block_info_text_2.get_height())
-		self.block_info_texts.append(self.block_info_text_4_image)
-
-		self.block_info_text_4 = textitem.TextItem("Normal blocks have " + str(normalblock.NormalBlock.health) + " health", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.block_info_text_4.x = self.block_info_text_4_image.x + self.block_info_text_4_image.get_width() + self.distance_from_screen_edge
-		self.block_info_text_4.y = self.block_info_text_4_image.y + ((self.block_info_text_4_image.get_height() - self.block_info_text_4.get_height()) / 2)
-		self.block_info_texts.append(self.block_info_text_4)
-
-		self.block_info_text_5_image = imageitem.ImageItem("res/block/block_strong.png", pygame.Color(255, 255, 255))
-		useful.colorize_image(self.block_info_text_5_image.image, pygame.Color(255, 0, 0))
-		self.block_info_text_5_image.x = self.distance_from_screen_edge
-		self.block_info_text_5_image.y = self.block_info_text_4.y + (2 * self.block_info_text_2.get_height())
-		self.block_info_texts.append(self.block_info_text_5_image)
-
-		self.block_info_text_5 = textitem.TextItem("Strong blocks have " + str(strongblock.StrongBlock.health) + " health", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.block_info_text_5.x = self.block_info_text_5_image.x + self.block_info_text_5_image.get_width() + self.distance_from_screen_edge
-		self.block_info_text_5.y = self.block_info_text_5_image.y + ((self.block_info_text_5_image.get_height() - self.block_info_text_5.get_height()) / 2)
-		self.block_info_texts.append(self.block_info_text_5)
-
-		self.block_info_text_6 = textitem.TextItem("When blocks reach 0 health they break", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.block_info_text_6.x = self.distance_from_screen_edge
-		self.block_info_text_6.y = self.block_info_text_5_image.y + self.block_info_text_5_image.get_height() + self.block_info_text_6.get_height()
-		self.block_info_texts.append(self.block_info_text_6)
-
-	def setup_block_info_transitions(self):
-		self.transitions.setup_single_item_transition(self.block_info_title_text, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_1, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_2, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_3_image, True, False, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_3, False, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_4_image, True, False, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_4, False, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_5_image, True, False, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_5, False, True, False, False)
-		self.transitions.setup_single_item_transition(self.block_info_text_6, False, True, False, False)
-
-	def show_block_info(self, surface):
-		for info_text in self.block_info_texts:
-			info_text.draw(surface)
-
-	def setup_paddle_info(self):
-		self.paddle_info_texts = []
-
-		self.paddle_info_title_text = textitem.TextItem("Paddle", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_title_text.x = (settings.SCREEN_WIDTH - self.paddle_info_title_text.get_width()) / 2
-		self.paddle_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.paddle_info_title_text.get_height()
-		self.paddle_info_texts.append(self.paddle_info_title_text)
-
-		self.paddle_info_text_1 = textitem.TextItem("Both players have one paddle each", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_1.x = self.distance_from_screen_edge
-		self.paddle_info_text_1.y = self.paddle_info_title_text.y + (2 * self.paddle_info_text_1.get_height())
-		self.paddle_info_texts.append(self.paddle_info_text_1)
-
-		self.paddle_info_text_2 = textitem.TextItem("Steer your paddle to protect your blocks", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_text_2.x = self.distance_from_screen_edge
-		self.paddle_info_text_2.y = self.paddle_info_text_1.y + self.paddle_info_text_2.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_2)
-
-		self.paddle_info_text_3 = textitem.TextItem(settings.PLAYER_ONE_NAME + " moves up and down with the", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_3.x = self.distance_from_screen_edge
-		self.paddle_info_text_3.y = self.paddle_info_text_2.y + (2 * self.paddle_info_text_3.get_height())
-		self.paddle_info_texts.append(self.paddle_info_text_3)
-
-		self.paddle_info_text_4 = textitem.TextItem("W and S keys by default", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_text_4.x = self.distance_from_screen_edge
-		self.paddle_info_text_4.y = self.paddle_info_text_3.y + self.paddle_info_text_4.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_4)
-
-		self.paddle_info_text_5 = textitem.TextItem(settings.PLAYER_TWO_NAME + " moves up and down with the", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_5.x = self.distance_from_screen_edge
-		self.paddle_info_text_5.y = self.paddle_info_text_4.y + (2 * self.paddle_info_text_5.get_height())
-		self.paddle_info_texts.append(self.paddle_info_text_5)
-
-		self.paddle_info_text_6 = textitem.TextItem("UP and DOWN keys by default", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_text_6.x = self.distance_from_screen_edge
-		self.paddle_info_text_6.y = self.paddle_info_text_5.y + self.paddle_info_text_6.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_6)
-
-		self.paddle_info_text_7 = textitem.TextItem("If your paddle is moving while it collides with a", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_7.x = self.distance_from_screen_edge
-		self.paddle_info_text_7.y = self.paddle_info_text_6.y + (2 * self.paddle_info_text_7.get_height())
-		self.paddle_info_texts.append(self.paddle_info_text_7)
-
-		self.paddle_info_text_8 = textitem.TextItem("ball it will cause that ball to change its angle", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_text_8.x = self.distance_from_screen_edge
-		self.paddle_info_text_8.y = self.paddle_info_text_7.y + self.paddle_info_text_8.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_8)
-
-		self.paddle_info_text_9 = textitem.TextItem("depending on the direction your paddle moved in", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_9.x = self.distance_from_screen_edge
-		self.paddle_info_text_9.y = self.paddle_info_text_8.y + self.paddle_info_text_9.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_9)
-
-		self.paddle_info_text_10 = textitem.TextItem("relative to the angle of that ball", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.paddle_info_text_10.x = self.distance_from_screen_edge
-		self.paddle_info_text_10.y = self.paddle_info_text_9.y + self.paddle_info_text_10.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_10)
-
-		self.paddle_info_text_11 = textitem.TextItem("This is called spinning the ball", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.paddle_info_text_11.x = self.distance_from_screen_edge
-		self.paddle_info_text_11.y = self.paddle_info_text_10.y + self.paddle_info_text_11.get_height()
-		self.paddle_info_texts.append(self.paddle_info_text_11)
-
-	def setup_paddle_info_transitions(self):
-		for item in self.paddle_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-
-	def show_paddle_info(self, surface):
-		for info_text in self.paddle_info_texts:
-			info_text.draw(surface)
-
-	def setup_fire_info(self):
-		self.fire_info_texts = []
-
-		self.fire_info_title_text = textitem.TextItem("Fire", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.fire_info_title_text.x = (settings.SCREEN_WIDTH - self.fire_info_title_text.get_width()) / 2
-		self.fire_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.fire_info_title_text.get_height()
-		self.fire_info_texts.append(self.fire_info_title_text)
-
-		self.fire_info_text_1 = textitem.TextItem("This powerup will make your balls burn", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.fire_info_text_1.x = self.distance_from_screen_edge
-		self.fire_info_text_1.y = self.fire_info_title_text.y + (2 * self.fire_info_text_1.get_height())
-		self.fire_info_texts.append(self.fire_info_text_1)
-
-		self.fire_info_text_2 = textitem.TextItem("for " + str(burning.Burning.duration / 1000) + " seconds", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.fire_info_text_2.x = self.distance_from_screen_edge
-		self.fire_info_text_2.y = self.fire_info_text_1.y + self.fire_info_text_2.get_height()
-		self.fire_info_texts.append(self.fire_info_text_2)
-
-		self.fire_info_text_3 = textitem.TextItem("Any blocks hit by burning balls will also burn", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.fire_info_text_3.x = self.distance_from_screen_edge
-		self.fire_info_text_3.y = self.fire_info_text_2.y + (2 * self.fire_info_text_3.get_height())
-		self.fire_info_texts.append(self.fire_info_text_3)
-
-		self.fire_info_text_4 = textitem.TextItem("taking " + str(int(burning.Burning.damage_per_second)) + " damage per second", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.fire_info_text_4.x = self.distance_from_screen_edge
-		self.fire_info_text_4.y = self.fire_info_text_3.y + self.fire_info_text_4.get_height()
-		self.fire_info_texts.append(self.fire_info_text_4)
-
-		self.fire_info_text_5 = textitem.TextItem("Your balls will not burn your own blocks", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.fire_info_text_5.x = self.distance_from_screen_edge
-		self.fire_info_text_5.y = self.fire_info_text_4.y + (2 * self.fire_info_text_5.get_height())
-		self.fire_info_texts.append(self.fire_info_text_5)
-
-		self.fire_info_text_6 = textitem.TextItem("This effect stacks additively on blocks", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.fire_info_text_6.x = self.distance_from_screen_edge
-		self.fire_info_text_6.y = self.fire_info_text_5.y + (2 * self.fire_info_text_6.get_height())
-		self.fire_info_texts.append(self.fire_info_text_6)
-
-	def setup_fire_info_transitions(self):
-		for item in self.fire_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-
-	def show_fire_info(self, surface):
-		for info_text in self.fire_info_texts:
-			info_text.draw(surface)
-
-	def setup_frost_info(self):
-		self.frost_info_texts = []
-
-		self.frost_info_title_text = textitem.TextItem("Frost", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.frost_info_title_text.x = (settings.SCREEN_WIDTH - self.frost_info_title_text.get_width()) / 2
-		self.frost_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.frost_info_title_text.get_height()
-		self.frost_info_texts.append(self.frost_info_title_text)
-
-		self.frost_info_text_1 = textitem.TextItem("This powerup will make your balls ice cold", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.frost_info_text_1.x = self.distance_from_screen_edge
-		self.frost_info_text_1.y = self.frost_info_title_text.y + (2 * self.frost_info_text_1.get_height())
-		self.frost_info_texts.append(self.frost_info_text_1)
-
-		self.frost_info_text_2 = textitem.TextItem("for " + str(freezing.Freezing.duration / 1000) + " seconds", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.frost_info_text_2.x = self.distance_from_screen_edge
-		self.frost_info_text_2.y = self.frost_info_text_1.y + self.frost_info_text_2.get_height()
-		self.frost_info_texts.append(self.frost_info_text_2)
-
-		self.frost_info_text_3 = textitem.TextItem("Your opponents paddle will frozen by your balls", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.frost_info_text_3.x = self.distance_from_screen_edge
-		self.frost_info_text_3.y = self.frost_info_text_2.y + (2 * self.frost_info_text_3.get_height())
-		self.frost_info_texts.append(self.frost_info_text_3)
-
-		self.frost_info_text_4 = textitem.TextItem("and will move at reduced speed while frozen", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.frost_info_text_4.x = self.distance_from_screen_edge
-		self.frost_info_text_4.y = self.frost_info_text_3.y + self.frost_info_text_4.get_height()
-		self.frost_info_texts.append(self.frost_info_text_4)
-
-		self.frost_info_text_5 = textitem.TextItem("Your own paddle will not be frozen by your balls", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.frost_info_text_5.x = self.distance_from_screen_edge
-		self.frost_info_text_5.y = self.frost_info_text_4.y + (2 * self.frost_info_text_5.get_height())
-		self.frost_info_texts.append(self.frost_info_text_5)
-
-		self.frost_info_text_6 = textitem.TextItem("This effect stacks additively on blocks", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.frost_info_text_6.x = self.distance_from_screen_edge
-		self.frost_info_text_6.y = self.frost_info_text_5.y + (2 * self.frost_info_text_6.get_height())
-		self.frost_info_texts.append(self.frost_info_text_6)
-
-	def setup_frost_info_transitions(self):
-		for item in self.frost_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-
-	def show_frost_info(self, surface):
-		for info_text in self.frost_info_texts:
-			info_text.draw(surface)
-
-	def setup_doublespeed_info(self):
-		self.doublespeed_info_texts = []
-
-		self.doublespeed_info_title_text = textitem.TextItem("Doublespeed", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.doublespeed_info_title_text.x = (settings.SCREEN_WIDTH - self.doublespeed_info_title_text.get_width()) / 2
-		self.doublespeed_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.doublespeed_info_title_text.get_height()
-		self.doublespeed_info_texts.append(self.doublespeed_info_title_text)
-
-		self.doublespeed_info_text_1 = textitem.TextItem("This powerup makes your balls move at double", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.doublespeed_info_text_1.x = self.distance_from_screen_edge
-		self.doublespeed_info_text_1.y = self.doublespeed_info_title_text.y + (2 * self.doublespeed_info_text_1.get_height())
-		self.doublespeed_info_texts.append(self.doublespeed_info_text_1)
-
-		self.doublespeed_info_text_2 = textitem.TextItem("their original speed", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.doublespeed_info_text_2.x = self.distance_from_screen_edge
-		self.doublespeed_info_text_2.y = self.doublespeed_info_text_1.y + self.doublespeed_info_text_2.get_height()
-		self.doublespeed_info_texts.append(self.doublespeed_info_text_2)
-
-		self.doublespeed_info_text_3 = textitem.TextItem("This effect lasts for " + str(freezing.Freezing.duration / 1000) + " seconds", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.doublespeed_info_text_3.x = self.distance_from_screen_edge
-		self.doublespeed_info_text_3.y = self.doublespeed_info_text_2.y + (2 * self.doublespeed_info_text_3.get_height())
-		self.doublespeed_info_texts.append(self.doublespeed_info_text_3)
-
-		self.doublespeed_info_text_4 = textitem.TextItem("Multiple instances of speed will stack additively", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.doublespeed_info_text_4.x = self.distance_from_screen_edge
-		self.doublespeed_info_text_4.y = self.doublespeed_info_text_3.y + (2 * self.doublespeed_info_text_4.get_height())
-		self.doublespeed_info_texts.append(self.doublespeed_info_text_4)
-
-	def setup_doublespeed_info_transitions(self):
-		for item in self.doublespeed_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-		
-	def show_doublespeed_info(self, surface):
-		for info_text in self.doublespeed_info_texts:
-			info_text.draw(surface)
-
-	def setup_multiball_info(self):
-		self.multiball_info_texts = []
-
-		self.multiball_info_title_text = textitem.TextItem("Multiball", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.multiball_info_title_text.x = (settings.SCREEN_WIDTH - self.multiball_info_title_text.get_width()) / 2
-		self.multiball_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.multiball_info_title_text.get_height()
-		self.multiball_info_texts.append(self.multiball_info_title_text)
-
-		self.multiball_info_text_1 = textitem.TextItem("This powerup gives you an extra ball that lasts", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.multiball_info_text_1.x = self.distance_from_screen_edge
-		self.multiball_info_text_1.y = self.multiball_info_title_text.y + (2 * self.multiball_info_text_1.get_height())
-		self.multiball_info_texts.append(self.multiball_info_text_1)
-
-		self.multiball_info_text_2 = textitem.TextItem("for " + str(multiball.Multiball.duration / 1000) + " seconds", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.multiball_info_text_2.x = self.distance_from_screen_edge
-		self.multiball_info_text_2.y = self.multiball_info_text_1.y + self.multiball_info_text_2.get_height()
-		self.multiball_info_texts.append(self.multiball_info_text_2)
-
-		self.multiball_info_text_3 = textitem.TextItem("These balls work the same as regular balls", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.multiball_info_text_3.x = self.distance_from_screen_edge
-		self.multiball_info_text_3.y = self.multiball_info_text_2.y + (2 * self.multiball_info_text_3.get_height())
-		self.multiball_info_texts.append(self.multiball_info_text_3)
-
-		self.multiball_info_text_4 = textitem.TextItem("but look slightly different", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.multiball_info_text_4.x = self.distance_from_screen_edge
-		self.multiball_info_text_4.y = self.multiball_info_text_3.y + self.multiball_info_text_4.get_height()
-		self.multiball_info_texts.append(self.multiball_info_text_4)
-
-	def setup_multiball_info_transitions(self):
-		for item in self.multiball_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-		
-	def show_multiball_info(self, surface):
-		for info_text in self.multiball_info_texts:
-			info_text.draw(surface)
-
-	def setup_electricity_info(self):
-		self.electricity_info_texts = []
-
-		self.electricity_info_title_text = textitem.TextItem("Electricity", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.electricity_info_title_text.x = (settings.SCREEN_WIDTH - self.electricity_info_title_text.get_width()) / 2
-		self.electricity_info_title_text.y = self.help_menu.y + + self.help_menu.get_height() + self.electricity_info_title_text.get_height()
-		self.electricity_info_texts.append(self.electricity_info_title_text)
-
-		self.electricity_info_text_1 = textitem.TextItem("This powerup makes the ball that touches it", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.electricity_info_text_1.x = self.distance_from_screen_edge
-		self.electricity_info_text_1.y = self.electricity_info_title_text.y + (2 * self.electricity_info_text_1.get_height())
-		self.electricity_info_texts.append(self.electricity_info_text_1)
-
-		self.electricity_info_text_2 = textitem.TextItem("electrified for " + str(charged.Charged.duration / 1000) + " seconds", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.electricity_info_text_2.x = self.distance_from_screen_edge
-		self.electricity_info_text_2.y = self.electricity_info_text_1.y + self.electricity_info_text_2.get_height()
-		self.electricity_info_texts.append(self.electricity_info_text_2)
-
-		self.electricity_info_text_3 = textitem.TextItem("When an electrified ball hits an enemy block", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.electricity_info_text_3.x = self.distance_from_screen_edge
-		self.electricity_info_text_3.y = self.electricity_info_text_2.y + (2 * self.electricity_info_text_3.get_height())
-		self.electricity_info_texts.append(self.electricity_info_text_3)
-
-		self.electricity_info_text_4 = textitem.TextItem("that block and blocks around it take damage", pygame.Color(255, 255, 255), 255, self.font_size)
-		self.electricity_info_text_4.x = self.distance_from_screen_edge
-		self.electricity_info_text_4.y = self.electricity_info_text_3.y + self.electricity_info_text_4.get_height()
-		self.electricity_info_texts.append(self.electricity_info_text_4)
-
-		self.electricity_info_text_5 = textitem.TextItem("After that the electricity effect disappears", pygame.Color(150, 150, 150), 255, self.font_size)
-		self.electricity_info_text_5.x = self.distance_from_screen_edge
-		self.electricity_info_text_5.y = self.electricity_info_text_4.y + self.electricity_info_text_5.get_height()
-		self.electricity_info_texts.append(self.electricity_info_text_5)
-
-	def setup_electricity_info_transitions(self):
-		for item in self.electricity_info_texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-		
-	def show_electricity_info(self, surface):
-		for info_text in self.electricity_info_texts:
-			info_text.draw(surface)"""
+		if not info_texts is None:
+			for info_text in info_texts:
+				info_text.draw(surface)
 
 	def back(self, item = None):
 		# Simply moves back to the main menu.
