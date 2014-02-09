@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import os
 import json
 from pygame.locals import *
 import other.debug as debug
@@ -80,11 +81,16 @@ class HelpMenu(scene.Scene):
 		self.all_menus = []
 
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
-		self.help_menu = gridmenu.GridMenu(10)
+		self.help_menu = gridmenu.GridMenu(13)
 		self.help_menu.y = 9 * settings.GAME_SCALE
 		self.all_menus.append(self.help_menu)
 
 		# We setup and add all the necessary items to the help_menu.
+		root = "res/helpdata"
+		for file in os.listdir("res/helpdata"):
+			if file.endswith(".json"):
+				self.setup_info(os.path.join(root, file))
+				"""
 		first_item = self.setup_info("res/helpdata/help.json")
 		self.setup_info("res/helpdata/ball.json")
 		self.setup_info("res/helpdata/block.json")
@@ -94,7 +100,7 @@ class HelpMenu(scene.Scene):
 		self.setup_info("res/helpdata/multiball.json")
 		self.setup_info("res/helpdata/rocket.json")
 		self.setup_info("res/helpdata/enlarger.json")
-		self.setup_info("res/helpdata/reducer.json")
+		self.setup_info("res/helpdata/reducer.json")"""
 
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 
@@ -118,7 +124,8 @@ class HelpMenu(scene.Scene):
 		self.transitions.setup_transition(self.back_menu, True, True, False, False)
 
 		# Set the first item as the active information.
-		self.view_info(first_item)
+		if len(self.help_menu.items) > 0:
+			self.view_info(self.help_menu.items[0])
 
 		# We setup and play music.
 		self.setup_music()

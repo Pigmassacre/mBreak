@@ -38,7 +38,7 @@ class TextItem:
 	# This is the rate at which the textitem will blink if blink() is called once per frame.
 	blink_rate = 750
 
-	def __init__(self, text_value, font_color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
+	def __init__(self, string, font_color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y
@@ -55,7 +55,7 @@ class TextItem:
 		self.font_path = TextItem.font_path
 
 		# Set the given values.
-		self.text_value = text_value
+		self.string = string
 		self.font_color = font_color
 		self.alpha_value = alpha_value
 		self.size = size
@@ -76,41 +76,41 @@ class TextItem:
 
 	def setup_surfaces(self):
 		# Render the font surface.
-		self.surface = self.font.render(self.text_value, False, self.font_color)
+		self.surface = self.font.render(self.string, False, self.font_color)
 		self.surface.set_alpha(self.alpha_value)
 
 		# Render the selected font surface.
-		self.selected_surface = self.font.render(self.text_value, False, self.selected_font_color)
+		self.selected_surface = self.font.render(self.string, False, self.selected_font_color)
 		self.selected_surface.set_alpha(self.alpha_value)
 
 		# Create the surface used for drawing the shadow.
-		self.shadow_surface = self.font.render(self.text_value, False, self.shadow_color)
+		self.shadow_surface = self.font.render(self.string, False, self.shadow_color)
 		self.shadow_surface.set_alpha(self.alpha_value)
 
-	def setup_is_on_off(self, off_text_value, state):
+	def setup_is_on_off(self, off_string, state):
 		# Set the textitem to be on and off, set the on state and save the off text value.
 		self.is_on_off = True
 		self.on = state
-		self.off_text_value = off_text_value
+		self.off_string = off_string
 
 		# Render the on font surface.
-		self.on_surface = self.font.render(self.text_value, False, self.on_font_color)
+		self.on_surface = self.font.render(self.string, False, self.on_font_color)
 		self.on_surface.set_alpha(self.alpha_value)
 
 		# Render the off font surface.
-		self.off_surface = self.font.render(self.off_text_value, False, self.off_font_color)
+		self.off_surface = self.font.render(self.off_string, False, self.off_font_color)
 		self.off_surface.set_alpha(self.alpha_value)
 
 		# Render the selected and on surface.
-		self.selected_on_surface = self.font.render(self.text_value, False, self.selected_on_font_color)
+		self.selected_on_surface = self.font.render(self.string, False, self.selected_on_font_color)
 		self.selected_on_surface.set_alpha(self.alpha_value)
 
 		# Render the selected and off surface.
-		self.selected_off_surface = self.font.render(self.off_text_value, False, self.selected_off_font_color)
+		self.selected_off_surface = self.font.render(self.off_string, False, self.selected_off_font_color)
 		self.selected_off_surface.set_alpha(self.alpha_value)
 
 		# Create the surface used for drawing the shadow.
-		self.shadow_off_surface = self.font.render(self.off_text_value, False, self.shadow_color)
+		self.shadow_off_surface = self.font.render(self.off_string, False, self.shadow_color)
 		self.shadow_off_surface.set_alpha(self.alpha_value)
 
 	def set_font(self, font_path):
@@ -125,13 +125,18 @@ class TextItem:
 			self.font = pygame.font.Font(self.font_path, font_size)
 			self.setup_surfaces()
 			if self.is_on_off:
-				self.setup_is_on_off(self.off_text_value, self.on)
+				self.setup_is_on_off(self.off_string, self.on)
+
+	def set_string(self, string):
+		if not self.string == string:
+			self.string = string
+			self.setup_surfaces()
 
 	def get_width(self):
-		return self.font.size(self.text_value)[0]
+		return self.font.size(self.string)[0]
 
 	def get_height(self):
-		return self.font.size(self.text_value)[1]
+		return self.font.size(self.string)[1]
 
 	def blink(self, time_passed):
 		# If called once per loop, switches the target surface alpha value between 255 and 0 every blink_rate.

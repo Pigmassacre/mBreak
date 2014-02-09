@@ -55,7 +55,7 @@ class Background:
 			surface.blit(self.corner_top_right, (settings.LEVEL_MAX_X - camera.CAMERA.x, settings.LEVEL_Y - camera.CAMERA.y - self.wall_horizontal.get_height()))
 			surface.blit(self.corner_top_right, (settings.LEVEL_X - camera.CAMERA.x - self.wall_vertical.get_width(), settings.LEVEL_MAX_Y - camera.CAMERA.y))
 		else:
-			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_top_rect.x - camera.CAMERA.x, self.wall_horizontal_top_rect.y - camera.CAMERA.y))
-			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_bottom_rect.x - camera.CAMERA.x, self.wall_horizontal_bottom_rect.y - camera.CAMERA.y))
-			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_left_rect.x - camera.CAMERA.x, self.wall_vertical_left_rect.y - camera.CAMERA.y))
-			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_right_rect.x - camera.CAMERA.x, self.wall_vertical_top_rect.y - camera.CAMERA.y))
+			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_top_rect.x - camera.CAMERA.x, self.wall_horizontal_top_rect.y - camera.CAMERA.y, self.wall_horizontal_top_rect.width, self.wall_horizontal_top_rect.height))
+			surface.fill(settings.BORDER_COLOR, (self.wall_horizontal_bottom_rect.x - camera.CAMERA.x, self.wall_horizontal_bottom_rect.y - camera.CAMERA.y, self.wall_horizontal_bottom_rect.width, self.wall_horizontal_bottom_rect.height))
+			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_left_rect.x - camera.CAMERA.x, self.wall_vertical_left_rect.y - camera.CAMERA.y, self.wall_vertical_left_rect.width, self.wall_vertical_left_rect.height))
+			surface.fill(settings.BORDER_COLOR, (self.wall_vertical_right_rect.x - camera.CAMERA.x, self.wall_vertical_right_rect.y - camera.CAMERA.y, self.wall_vertical_right_rect.width, self.wall_vertical_right_rect.height))

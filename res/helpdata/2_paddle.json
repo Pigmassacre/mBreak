@@ -1,5 +1,6 @@
 {
 	"image": "res/paddle/paddle.png",
+	"color": [0, 0, 255],
 	"title": "Paddle",
 	"body": "Paddles. Fucking paddles. Jeez."
 }
