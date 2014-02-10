@@ -28,7 +28,7 @@ class Stun(effect.Effect):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
-	max_speed_reduction = 100 * settings.GAME_SCALE
+	max_speed_reduction = 20 * settings.GAME_FPS * settings.GAME_SCALE
 	particle_spawn_rate = 125
 	particle_spawn_amount = 5
 
@@ -83,7 +83,7 @@ class Stun(effect.Effect):
 
 	def update(self, main_clock):
 		# We make sure that our size matches the parent.
-		if self.parent_is_paddle:
+		if self.parent.__class__ == paddle.Paddle:
 			if self.parent.rect.width != self.image.get_width() or self.parent.rect.height != self.image.get_height():
 				self.image = pygame.transform.scale(self.image, (self.parent.rect.width, self.parent.rect.height))
 				self.create_final_image()

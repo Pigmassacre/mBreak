@@ -5,6 +5,7 @@ import pygame
 import random
 import math
 import objects.camera as camera
+import objects.effects.stun as stun
 import objects.powerups.powerup as powerup
 import objects.shadow as shadow
 import objects.particle as particle
@@ -150,6 +151,22 @@ class Missile(pygame.sprite.Sprite):
 		# Tell the block that we've hit it.
 		block.on_hit(Missile.damage)
 
+		# Shake the camera slightly.
+		camera.CAMERA.shake(350, 1)
+
+		# Spawn some particles.
+		self.spawn_destroy_particles()
+
+	def on_hit_paddle(self, paddle):
+		# Destroy ourselves.
+		self.destroy()
+
+		# Apply a stun effect to the hit paddle.
+		stun.Stun(paddle, 600)
+
+		# Shake the camera slightly.
+		camera.CAMERA.shake(350, 1)
+
 		# Spawn some particles.
 		self.spawn_destroy_particles()
 
@@ -169,7 +186,11 @@ class Missile(pygame.sprite.Sprite):
 		for block in blocks_collide_list:
 			if block == self.target:
 				self.on_hit_block(block)
-				camera.CAMERA.shake(350, 1)
+
+		# Check if we have collided with any paddle.
+		paddle_collide_list = pygame.sprite.spritecollide(self, self.target.owner.paddle_group, False)
+		for paddle in paddle_collide_list:
+			self.on_hit_paddle(paddle)
 
 		# If the target is already destroyed, choose a new target.
 		if self.target.health <= 0 or self.target == None:

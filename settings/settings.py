@@ -75,12 +75,6 @@ def load():
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
-	global SCREEN_WIDTH
-	global SCREEN_HEIGHT
-	global LEVEL_X
-	global LEVEL_Y
-	global LEVEL_MAX_X
-	global LEVEL_MAX_Y
 
 	try:
 		# This will raise an OSError if the file doesn't exist.
@@ -124,6 +118,13 @@ def load():
 		file.close()
 
 def set_resolution(width, height):
+	global SCREEN_WIDTH
+	global SCREEN_HEIGHT
+	global LEVEL_X
+	global LEVEL_Y
+	global LEVEL_MAX_X
+	global LEVEL_MAX_Y
+	
 	SCREEN_WIDTH = width
 	SCREEN_HEIGHT = height
 

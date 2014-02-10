@@ -75,8 +75,9 @@ class Fire(powerup.Powerup):
 
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(Fire.particle_least_spawn_amount, Fire.particle_maximum_spawn_amount)):
+				width = random.uniform(self.rect.width / 8.0, self.rect.width / 5.0)
 				angle = random.uniform(0, 2 * math.pi)
 				speed = random.uniform(0.75 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
-				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 8, self.rect.width / 8, angle, speed, retardation, color, 5 * settings.GAME_FPS)
+				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5 * settings.GAME_FPS)
