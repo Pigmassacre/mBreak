@@ -42,9 +42,6 @@ class Missile(pygame.sprite.Sprite):
 	height = image.get_height() * settings.GAME_SCALE
 	particle_spawn_rate = 25
 	particle_spawn_amount = 5
-	particle_width = height / 6
-	particle_height = height / 6
-
 
 	speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
 	acceleration = 0.025 * settings.GAME_FPS * settings.GAME_SCALE
@@ -173,12 +170,13 @@ class Missile(pygame.sprite.Sprite):
 	def spawn_destroy_particles(self):
 		# Spawn a random amount of particles.
 		for _ in range(0, random.randrange(Missile.hit_particle_min_amount, Missile.hit_particle_max_amount)):
+			width = random.uniform(Missile.width / 4.5, Missile.width / 3.25)
 			angle = self.angle + math.pi
 			angle += random.uniform(math.pi - (math.pi / 16.0), math.pi + (math.pi / 16.0))
 			speed = random.uniform(Missile.hit_particle_min_speed, Missile.hit_particle_max_speed)
-			retardation = speed / 24.0
+			retardation = speed / 21.0
 			color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
-			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)
+			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5)
 
 	def update(self, main_clock):
 		# Check if we have collided with the target block.
@@ -265,11 +263,12 @@ class Missile(pygame.sprite.Sprite):
 
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(1, Missile.particle_spawn_amount)):
+				width = random.uniform(Missile.width / 5.0, Missile.width / 4.0)
 				angle = self.angle + random.uniform(math.pi - (math.pi / 24.0), math.pi + (math.pi / 24.0))
 				speed = random.uniform(0.65 * settings.GAME_FPS * settings.GAME_SCALE, 1.1 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
-				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Missile.particle_width, Missile.particle_height, angle, speed, retardation, color, 5)
+				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5)
 
 	def draw(self, surface):
 		surface.blit(self.image, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y))

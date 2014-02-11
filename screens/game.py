@@ -394,16 +394,13 @@ class Game(scene.Scene):
 			for paddle in groups.Groups.paddle_group:
 				paddle.debug_draw(self.window_surface)
 
+		# Draw the particles.
+		if graphics.PARTICLES:
+			for particle in groups.Groups.particle_group:
+				self.window_surface.fill(particle.color, (particle.rect.x - camera.CAMERA.x, particle.rect.y - camera.CAMERA.y, particle.rect.width, particle.rect.height))
+
 		# Draw the balls.
 		self.blit_with_camera(groups.Groups.ball_group, self.window_surface)
-
-		# Draw the projectiles.
-		for projectile in groups.Groups.projectile_group:
-			if not (projectile.x + projectile.width < settings.LEVEL_X or 
-				projectile.x > settings.LEVEL_MAX_X or 
-				projectile.y + projectile.height < settings.LEVEL_Y or 
-				projectile.y > settings.LEVEL_MAX_Y):
-				projectile.draw(self.window_surface) #self.window_surface.blit(projectile.image, )
 
 		# Draw the effects for which we don't care which order they are drawn in.
 		for effect in groups.Groups.effect_group:
@@ -416,10 +413,13 @@ class Game(scene.Scene):
 				if effect.__class__ == flash.Flash:
 					effect.draw(self.window_surface)
 
-		# Draw the particles.
-		if graphics.PARTICLES:
-			for particle in groups.Groups.particle_group:
-				self.window_surface.fill(particle.color, (particle.rect.x - camera.CAMERA.x, particle.rect.y - camera.CAMERA.y, particle.rect.width, particle.rect.height))
+		# Draw the projectiles.
+		for projectile in groups.Groups.projectile_group:
+			if not (projectile.x + projectile.width < settings.LEVEL_X or 
+				projectile.x > settings.LEVEL_MAX_X or 
+				projectile.y + projectile.height < settings.LEVEL_Y or 
+				projectile.y > settings.LEVEL_MAX_Y):
+				projectile.draw(self.window_surface) #self.window_surface.blit(projectile.image, )		
 
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface)

@@ -121,7 +121,9 @@ class Player(pygame.sprite.Sprite):
 		# This is the color of the energy level.
 		self.energy_color = copy.copy(self.color)
 		self.energy_color.a = 180
-		self.energy_lightness = self.energy_color.hsla[2]
+		self.energy_color_r = self.energy_color.r
+		self.energy_color_g = self.energy_color.g
+		self.energy_color_b = self.energy_color.b
 
 		# Create and store the paddle.
 		self.paddle_group = pygame.sprite.Group()
@@ -218,9 +220,35 @@ class Player(pygame.sprite.Sprite):
 		self.energy_rect.y = self.energy_level_surface.get_height() - self.energy_rect.height
 
 		# Update the color of the energy.
-		hsla = self.energy_color.hsla
-		hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * (10 * (self.energy / float(self.max_energy))), hsla[3])
-		self.energy_color.hsla = hsla
+		#hsla = self.energy_color.hsla
+		#hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * (10 * (self.energy / float(self.max_energy))), hsla[3])
+		#self.energy_color.hsla = hsla
+		new_r = int(self.energy_color_r + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		if new_r <= 255 and new_r >= 0:
+			self.energy_color.r = new_r
+		else:
+			if new_r < 0:
+				self.energy_color.r = 0
+			else:
+				self.energy_color.r = 255
+
+		new_g = int(self.energy_color_g + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		if new_g <= 255 and new_g >= 0:
+			self.energy_color.g = new_g
+		else:
+			if new_g < 0:
+				self.energy_color.g = 0
+			else:
+				self.energy_color.g = 255
+
+		new_b = int(self.energy_color_b + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		if new_b <= 255 and new_b >= 0:
+			self.energy_color.b = new_b
+		else:
+			if new_b < 0:
+				self.energy_color.b = 0
+			else:
+				self.energy_color.b = 255
 
 		# Check if we're to spawn a missile.
 		if self.missiles_to_spawn > 0:
