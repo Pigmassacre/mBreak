@@ -120,7 +120,7 @@ class Player(pygame.sprite.Sprite):
 
 		# This is the color of the energy level.
 		self.energy_color = copy.copy(self.color)
-		self.energy_color.a = 150
+		self.energy_color.a = 180
 		self.energy_lightness = self.energy_color.hsla[2]
 
 		# Create and store the paddle.
@@ -154,7 +154,11 @@ class Player(pygame.sprite.Sprite):
 		self.block_group.empty()
 		self.powerup_group.empty()
 		self.effect_group.empty()
-		
+
+		# Reset our energy.
+		self.energy = 0
+		print(str(self.energy_color.hsla))
+
 	def add_powerup(self, classname, effect):
 		# Determine what position to place the powerup at.
 		if self.x <= settings.SCREEN_WIDTH / 2:
@@ -215,7 +219,7 @@ class Player(pygame.sprite.Sprite):
 
 		# Update the color of the energy.
 		hsla = self.energy_color.hsla
-		hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * 10, hsla[3])
+		hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * (10 * (self.energy / float(self.max_energy))), hsla[3])
 		self.energy_color.hsla = hsla
 
 		# Check if we're to spawn a missile.
