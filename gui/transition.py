@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import random
+import math
 import gui.menu as menu
 import settings.settings as settings
 

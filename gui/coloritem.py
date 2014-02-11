@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import copy
 import objects.shadow as shadow
+import gui.item as item
 import settings.settings as settings
 
 """
@@ -16,7 +17,7 @@ any sort of color.
 
 """
 
-class ColorItem():
+class ColorItem(item.Item):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	x = 0
@@ -33,6 +34,8 @@ class ColorItem():
 	unavailable_color = pygame.Color(100, 100, 100)
 
 	def __init__(self, color):
+		item.Item.__init__(self)
+
 		# These values cause the item to be drawn differently.
 		self.selected = False
 		self.chosen = False
@@ -66,15 +69,17 @@ class ColorItem():
 		return self.rect.height
 
 	def draw(self, surface):
+		item.Item.draw(self, surface)
+
 		# Updates the positions of the rects.
 		self.rect.x = self.x
-		self.rect.y = self.y
+		self.rect.y = self.y + self.y_nudge
 		self.selected_rect.x = self.x - (ColorItem.selected_border_size / 2.0)
-		self.selected_rect.y = self.y - (ColorItem.selected_border_size / 2.0)
+		self.selected_rect.y = self.y - (ColorItem.selected_border_size / 2.0) + self.y_nudge
 		self.chosen_rect.x = self.x - (ColorItem.chosen_border_size / 2.0)
-		self.chosen_rect.y = self.y - (ColorItem.chosen_border_size / 2.0)
+		self.chosen_rect.y = self.y - (ColorItem.chosen_border_size / 2.0) + self.y_nudge
 		self.shadow_rect.x = self.x + self.shadow_offset_x
-		self.shadow_rect.y = self.y + self.shadow_offset_y
+		self.shadow_rect.y = self.y + self.shadow_offset_y + self.y_nudge
 
 		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)

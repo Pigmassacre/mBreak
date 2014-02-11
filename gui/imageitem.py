@@ -3,7 +3,9 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import copy
+import math
 import objects.shadow as shadow
+import gui.item as item
 import settings.settings as settings
 
 """
@@ -18,7 +20,7 @@ should contain. I hope that this is OK.
 
 """
 
-class ImageItem():
+class ImageItem(item.Item):
 
 	# Initialize the font module.
 	pygame.font.init()
@@ -37,6 +39,8 @@ class ImageItem():
 	chosen_border_size = 2 * settings.GAME_SCALE
 
 	def __init__(self, path, color = pygame.Color(128, 128, 128)):
+		item.Item.__init__(self)
+
 		# These values cause the item to be drawn differently.
 		self.selected = False
 		self.chosen = False
@@ -74,15 +78,17 @@ class ImageItem():
 		return self.rect.height
 
 	def draw(self, surface):
+		item.Item.draw(self, surface)
+		
 		# Update the position of all the rects.
 		self.rect.x = self.x
-		self.rect.y = self.y
+		self.rect.y = self.y + self.y_nudge
 		self.selected_rect.x = self.x - (ImageItem.selected_border_size / 2.0)
-		self.selected_rect.y = self.y - (ImageItem.selected_border_size / 2.0)
+		self.selected_rect.y = self.y - (ImageItem.selected_border_size / 2.0) + self.y_nudge
 		self.chosen_rect.x = self.x - (ImageItem.chosen_border_size / 2.0)
-		self.chosen_rect.y = self.y - (ImageItem.chosen_border_size / 2.0)
+		self.chosen_rect.y = self.y - (ImageItem.chosen_border_size / 2.0) + self.y_nudge
 		self.shadow_rect.x = self.x + self.shadow_offset_x
-		self.shadow_rect.y = self.y + self.shadow_offset_y
+		self.shadow_rect.y = self.y + self.shadow_offset_y + self.y_nudge
 
 		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)

@@ -4,6 +4,7 @@ __license__ = "All Rights Reserved"
 import pygame
 import math
 import other.useful as useful
+import gui.item as item
 import settings.settings as settings
 
 """
@@ -13,7 +14,7 @@ or simply used to display text. It has a quite a few extra surfaces and variable
 
 """
 
-class TextItem:
+class TextItem(item.Item):
 
 	# Initialize the font module.
 	pygame.font.init()
@@ -39,6 +40,8 @@ class TextItem:
 	blink_rate = 750
 
 	def __init__(self, string, font_color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
+		item.Item.__init__(self)
+
 		# Load default values.
 		self.x = TextItem.x
 		self.y = TextItem.y
@@ -144,10 +147,12 @@ class TextItem:
 		if time_passed > self.blink_rate:
 			if self.surface.get_alpha() == 255:
 				self.surface.set_alpha(0)
+				self.selected_surface.set_alpha(0)
 				self.shadow_surface.set_alpha(0)
 				return self.blink_rate / 3
 			else:
 				self.surface.set_alpha(255)
+				self.selected_surface.set_alpha(255)
 				self.shadow_surface.set_alpha(255)
 				return 0
 		else:
@@ -159,28 +164,30 @@ class TextItem:
 		return self.on
 
 	def draw(self, surface):
+		item.Item.draw(self, surface)
+
 		# First we determine what shadow to blit, and then blit that. We do this before we blit the text so the shadow is under the text.
 		if self.is_on_off:
 			if self.on:
-				surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+				surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y + self.y_nudge))
 			else:
-				surface.blit(self.shadow_off_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+				surface.blit(self.shadow_off_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y + self.y_nudge))
 		else:
-			surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y))
+			surface.blit(self.shadow_surface, (self.x + self.shadow_offset_x, self.y + self.shadow_offset_y + self.y_nudge))
 
 		# Then we determine what text surface to blit, and blit that.
 		if self.selected:
 			if self.is_on_off:
 				if self.on:
-					surface.blit(self.selected_on_surface, (self.x, self.y))
+					surface.blit(self.selected_on_surface, (self.x, self.y + self.y_nudge))
 				elif not self.on:
-					surface.blit(self.selected_off_surface, (self.x, self.y))
+					surface.blit(self.selected_off_surface, (self.x, self.y + self.y_nudge))
 			else:
-				surface.blit(self.selected_surface, (self.x, self.y))
+				surface.blit(self.selected_surface, (self.x, self.y + self.y_nudge))
 		elif self.is_on_off:
 			if self.on:
-				surface.blit(self.on_surface, (self.x, self.y))
+				surface.blit(self.on_surface, (self.x, self.y + self.y_nudge))
 			else:
-				surface.blit(self.off_surface, (self.x, self.y))
+				surface.blit(self.off_surface, (self.x, self.y + self.y_nudge))
 		else:
-			surface.blit(self.surface, (self.x, self.y))
+			surface.blit(self.surface, (self.x, self.y + self.y_nudge))
