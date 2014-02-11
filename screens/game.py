@@ -362,6 +362,10 @@ class Game(scene.Scene):
 		if graphics.BACKGROUND:
 			self.window_surface.blit(self.game_background.floor_surface, (settings.LEVEL_X - camera.CAMERA.x, settings.LEVEL_Y - camera.CAMERA.y))
 
+		# Draw the players.
+		for player in groups.Groups.player_group:
+			player.draw(self.window_surface)
+
 		# Draw the shadows.
 		if graphics.SHADOWS:
 			for shadow in groups.Groups.shadow_group:

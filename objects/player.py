@@ -4,6 +4,8 @@ __license__ = "All Rights Reserved"
 import pygame
 import random
 import math
+import copy
+import objects.camera as camera
 import objects.groups as groups
 import objects.ball as ball
 import objects.powerups.powerup as powerup
@@ -23,6 +25,27 @@ more than one.
 
 class Player(pygame.sprite.Sprite):
 
+	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
+	energy_image_top_left = pygame.image.load("res/player/energy/energy_top_left_2.png")
+	energy_image_middle_left = pygame.image.load("res/player/energy/energy_middle_4.png")
+	energy_image_middle_right = pygame.image.load("res/player/energy/energy_middle_right_4.png")
+	energy_image_bottom_left = pygame.image.load("res/player/energy/energy_bottom_left_2.png")
+
+	energy_image_top_left_width = energy_image_top_left.get_width() * settings.GAME_SCALE
+	energy_image_top_left_height = energy_image_top_left.get_height() * settings.GAME_SCALE
+	energy_image_middle_left_width = energy_image_middle_left.get_width() * settings.GAME_SCALE
+	energy_image_middle_left_height = energy_image_middle_left.get_height() * settings.GAME_SCALE
+	energy_image_middle_right_width = energy_image_middle_right.get_width() * settings.GAME_SCALE
+	energy_image_middle_right_height = energy_image_middle_right.get_height() * settings.GAME_SCALE
+	energy_image_bottom_left_width = energy_image_bottom_left.get_width() * settings.GAME_SCALE
+	energy_image_bottom_left_height = energy_image_bottom_left.get_height() * settings.GAME_SCALE
+
+	# Scale image to settings.GAME_SCALE.
+	energy_image_top_left = pygame.transform.scale(energy_image_top_left, (energy_image_top_left_width, energy_image_top_left_height))
+	energy_image_middle_left = pygame.transform.scale(energy_image_middle_left, (energy_image_middle_left_width, energy_image_middle_left_height))
+	energy_image_middle_right = pygame.transform.scale(energy_image_middle_right, (energy_image_middle_right_width, energy_image_middle_right_height))
+	energy_image_bottom_left = pygame.transform.scale(energy_image_bottom_left, (energy_image_bottom_left_width, energy_image_bottom_left_height))
+
 	def __init__(self, x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, gamepad_id, color, ai_difficulty = 1):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
@@ -33,6 +56,9 @@ class Player(pygame.sprite.Sprite):
 
 		# The name is dislayed at the end of each match/game.
 		self.name = name
+
+		# Store the selected color, used to colorize objects that belong to the player.
+		self.color = color
 
 		# These are the keys that any paddles connected to this player will respond to.
 		self.key_up = key_up
@@ -59,6 +85,44 @@ class Player(pygame.sprite.Sprite):
 		# Store the difficulty of the AI. A higher number equals a smarter/more cheaty AI. A difficulty of 0 means no AI.
 		self.ai_difficulty = ai_difficulty
 
+		# Store the energy images.
+		self.energy_image_top = Player.energy_image_top_left.copy()
+		self.energy_image_bottom = Player.energy_image_bottom_left.copy()
+		if self.x <= settings.SCREEN_WIDTH / 2:
+			self.energy_image_middle = Player.energy_image_middle_left.copy()
+
+			self.energy_top_x = settings.LEVEL_X - self.energy_image_top.get_width() - 4 * settings.GAME_SCALE
+			self.energy_middle_x = settings.LEVEL_X - self.energy_image_middle.get_width() - 4 * settings.GAME_SCALE
+			self.energy_bottom_x = settings.LEVEL_X - self.energy_image_bottom.get_width() - 4 * settings.GAME_SCALE
+
+			self.energy_level_x = self.energy_middle_x + 1 * settings.GAME_SCALE
+		else:
+			self.energy_image_top = pygame.transform.flip(self.energy_image_top, True, False)
+			self.energy_image_middle = Player.energy_image_middle_right.copy()
+			self.energy_image_bottom = pygame.transform.flip(self.energy_image_bottom, True, False)
+
+			self.energy_top_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
+			self.energy_middle_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
+			self.energy_bottom_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
+
+			self.energy_level_x = self.energy_middle_x
+		self.energy_top_y = settings.LEVEL_Y
+		self.energy_middle_y = self.energy_top_y + self.energy_image_top.get_height()
+		self.energy_bottom_y = self.energy_middle_y + self.energy_image_middle.get_height()
+
+		# This is the surface used to draw the actual energy level.
+		self.energy_level_surface = pygame.surface.Surface((self.energy_image_middle.get_width() - 1 * settings.GAME_SCALE, self.energy_image_middle.get_height()), pygame.locals.SRCALPHA)
+		self.energy_level_y = self.energy_middle_y
+
+		# This is the energy rect, this changes according to the energy level of the player.
+		energy_y = self.energy_level_surface.get_height() - (self.energy_level_surface.get_height() * (self.energy / float(self.max_energy)))
+		self.energy_rect = pygame.rect.Rect(0, energy_y, self.energy_level_surface.get_width(), self.energy_level_surface.get_height() * (self.energy / float(self.max_energy)))
+
+		# This is the color of the energy level.
+		self.energy_color = copy.copy(self.color)
+		self.energy_color.a = 150
+		self.energy_lightness = self.energy_color.hsla[2]
+
 		# Create and store the paddle.
 		self.paddle_group = pygame.sprite.Group()
 
@@ -82,9 +146,6 @@ class Player(pygame.sprite.Sprite):
 
 		# The offset between each powerup.
 		self.powerup_offset = 2 * settings.GAME_SCALE
-
-		# Store the selected color, used to colorize objects that belong to the player.
-		self.color = color
 
 	def empty_groups(self):
 		# Empty all the groups.
@@ -148,6 +209,15 @@ class Player(pygame.sprite.Sprite):
 			self.energy = 0
 
 	def update(self, main_clock):
+		# Update the energy rect.
+		self.energy_rect.height = self.energy_level_surface.get_height() * (self.energy / float(self.max_energy))
+		self.energy_rect.y = self.energy_level_surface.get_height() - self.energy_rect.height
+
+		# Update the color of the energy.
+		hsla = self.energy_color.hsla
+		hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * 10, hsla[3])
+		self.energy_color.hsla = hsla
+
 		# Check if we're to spawn a missile.
 		if self.missiles_to_spawn > 0:
 			self.time_passed += main_clock.get_time()
@@ -182,6 +252,17 @@ class Player(pygame.sprite.Sprite):
 
 			# Finally, change the last_powerup_group_size to match the current size.
 			self.last_powerup_group_size = len(self.powerup_group)		
+
+	def draw(self, surface):
+		# Draw the energy images.
+		surface.blit(self.energy_image_top, (self.energy_top_x - camera.CAMERA.x, self.energy_top_y - camera.CAMERA.y))
+		surface.blit(self.energy_image_middle, (self.energy_middle_x - camera.CAMERA.x, self.energy_middle_y - camera.CAMERA.y))
+
+		temp_energy_surface = self.energy_level_surface.copy()
+		temp_energy_surface.fill(self.energy_color, self.energy_rect)
+		surface.blit(temp_energy_surface, (self.energy_level_x - camera.CAMERA.x, self.energy_level_y - camera.CAMERA.y))
+
+		surface.blit(self.energy_image_bottom, (self.energy_bottom_x - camera.CAMERA.x, self.energy_bottom_y - camera.CAMERA.y))
 
 	def handle_events(self, event):
 		# Work on this later...

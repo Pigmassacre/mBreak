@@ -152,7 +152,7 @@ class Missile(pygame.sprite.Sprite):
 		block.on_hit(Missile.damage)
 
 		# Shake the camera slightly.
-		camera.CAMERA.shake(350, 1)
+		camera.CAMERA.shake(350, 0.66)
 
 		# Spawn some particles.
 		self.spawn_destroy_particles()
@@ -165,7 +165,7 @@ class Missile(pygame.sprite.Sprite):
 		stun.Stun(paddle, 600)
 
 		# Shake the camera slightly.
-		camera.CAMERA.shake(350, 1)
+		camera.CAMERA.shake(350, 0.33)
 
 		# Spawn some particles.
 		self.spawn_destroy_particles()
