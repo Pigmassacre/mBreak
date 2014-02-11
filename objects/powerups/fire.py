@@ -79,5 +79,9 @@ class Fire(powerup.Powerup):
 				angle = random.uniform(0, 2 * math.pi)
 				speed = random.uniform(0.75 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 24.0
-				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
+				if random.random() > 0.1:
+					color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
+				else:
+					a_color = random.randint(0, 255)
+					color = pygame.Color(a_color, a_color, a_color)
 				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5 * settings.GAME_FPS)

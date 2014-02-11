@@ -20,6 +20,7 @@ import objects.powerups.enlarger as enlarger
 import objects.powerups.reducer as reducer
 import objects.effects.speed as speed
 import objects.effects.flash as flash
+import objects.effects.explosion as explosion
 import objects.blocks.block as block
 import objects.blocks.normal as block_normal
 import objects.blocks.strong as block_strong
@@ -81,6 +82,10 @@ class Game(scene.Scene):
 		fire.convert()
 		frost.convert()
 		electricity.convert()
+		reducer.convert()
+		enlarger.convert()
+		rocket.convert()
+		explosion.convert()
 
 		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
 		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
@@ -394,11 +399,6 @@ class Game(scene.Scene):
 			for paddle in groups.Groups.paddle_group:
 				paddle.debug_draw(self.window_surface)
 
-		# Draw the particles.
-		if graphics.PARTICLES:
-			for particle in groups.Groups.particle_group:
-				self.window_surface.fill(particle.color, (particle.rect.x - camera.CAMERA.x, particle.rect.y - camera.CAMERA.y, particle.rect.width, particle.rect.height))
-
 		# Draw the balls.
 		self.blit_with_camera(groups.Groups.ball_group, self.window_surface)
 
@@ -412,6 +412,11 @@ class Game(scene.Scene):
 			for effect in groups.Groups.effect_group:
 				if effect.__class__ == flash.Flash:
 					effect.draw(self.window_surface)
+
+		# Draw the particles.
+		if graphics.PARTICLES:
+			for particle in groups.Groups.particle_group:
+				self.window_surface.fill(particle.color, (particle.rect.x - camera.CAMERA.x, particle.rect.y - camera.CAMERA.y, particle.rect.width, particle.rect.height))
 
 		# Draw the projectiles.
 		for projectile in groups.Groups.projectile_group:

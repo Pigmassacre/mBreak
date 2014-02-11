@@ -191,8 +191,8 @@ class AboutMenu(scene.Scene):
 
 		# Draw all the textitems.
 		self.pyganim_credits.draw(self.window_surface)
-		self.pyganim_credits_author.draw(self.window_surface)
 		self.pyganim_credits_source_code.draw(self.window_surface)
+		self.pyganim_credits_author.draw(self.window_surface)
 
 		self.music_credits_title.draw(self.window_surface)
 		self.music_credits_after_game.draw(self.window_surface)

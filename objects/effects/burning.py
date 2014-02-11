@@ -35,7 +35,7 @@ class Burning(effect.Effect):
 	width = image.get_width() * settings.GAME_SCALE
 	height = image.get_height() * settings.GAME_SCALE
 	damage_per_second = 2.0
-	particle_spawn_rate = 100
+	particle_spawn_rate = 75
 	particle_least_spawn_amount = 3
 	particle_maximum_spawn_amount = 5
 	duration = 10000
@@ -81,7 +81,7 @@ class Burning(effect.Effect):
 		if self.parent.owner == self.real_owner:
 			# If the parent has health, deal damage to it.
 			if hasattr(self.parent, "health"):
-				self.parent.health -= Burning.damage_per_second * main_clock.delta_time
+				self.parent.hurt(Burning.damage_per_second * main_clock.delta_time)
 
 			# If it's time, spawn particles.
 			self.particle_spawn_time += main_clock.get_time()
@@ -96,7 +96,11 @@ class Burning(effect.Effect):
 						angle = self.parent.angle + random.uniform(-math.pi / 5.0, math.pi / 5.0)
 					else:
 						angle = random.uniform(0, 2 * math.pi)
-					speed = random.uniform(0.75 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
+					speed = random.uniform(0.5 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
 					retardation = speed / 24.0
-					color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
+					if random.random() > 0.1:
+						color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
+					else:
+						a_color = random.randint(0, 255)
+						color = pygame.Color(a_color, a_color, a_color)
 					particle.Particle(self.parent.x + self.parent.rect.width / 2, self.parent.y + self.parent.rect.height / 2, width, width, angle, speed, retardation, color, 5 * settings.GAME_FPS)

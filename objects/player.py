@@ -159,7 +159,6 @@ class Player(pygame.sprite.Sprite):
 
 		# Reset our energy.
 		self.energy = 0
-		print(str(self.energy_color.hsla))
 
 	def add_powerup(self, classname, effect):
 		# Determine what position to place the powerup at.

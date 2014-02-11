@@ -6,6 +6,8 @@ import random
 import math
 import objects.camera as camera
 import objects.effects.stun as stun
+import objects.effects.explosion as explosion
+import objects.dummy as dummy
 import objects.powerups.powerup as powerup
 import objects.shadow as shadow
 import objects.particle as particle
@@ -49,8 +51,8 @@ class Missile(pygame.sprite.Sprite):
 	# These particles are spawned when the missile hits its target.
 	hit_particle_min_amount = 12
 	hit_particle_max_amount = 18
-	hit_particle_min_speed = 2 * settings.GAME_FPS * settings.GAME_SCALE
-	hit_particle_max_speed = 3 * settings.GAME_FPS * settings.GAME_SCALE
+	hit_particle_min_speed = 1 * settings.GAME_FPS * settings.GAME_SCALE
+	hit_particle_max_speed = 2.5 * settings.GAME_FPS * settings.GAME_SCALE
 
 	# The amount of damage the missile deals to a hit block.
 	damage = 20
@@ -154,6 +156,12 @@ class Missile(pygame.sprite.Sprite):
 		# Spawn some particles.
 		self.spawn_destroy_particles()
 
+		# Create a dummy and attach an explosion effect to it.
+		a_dummy = dummy.Dummy(1000, block.rect.centerx - explosion.Explosion.frame_width / 2.0,
+									block.rect.centery - explosion.Explosion.frame_height / 2.0, 
+									explosion.Explosion.frame_width, explosion.Explosion.frame_height)
+		a_dummy.effect_group.add(explosion.Explosion(a_dummy))
+
 	def on_hit_paddle(self, paddle):
 		# Destroy ourselves.
 		self.destroy()
@@ -167,13 +175,19 @@ class Missile(pygame.sprite.Sprite):
 		# Spawn some particles.
 		self.spawn_destroy_particles()
 
+		# Create a dummy and attach an explosion effect to it.
+		a_dummy = dummy.Dummy(1000, self.rect.centerx - explosion.Explosion.frame_width / 2.0,
+									self.rect.centery - explosion.Explosion.frame_height / 2.0, 
+									explosion.Explosion.frame_width, explosion.Explosion.frame_height)
+		a_dummy.effect_group.add(explosion.Explosion(a_dummy))
+
 	def spawn_destroy_particles(self):
 		# Spawn a random amount of particles.
 		for _ in range(0, random.randrange(Missile.hit_particle_min_amount, Missile.hit_particle_max_amount)):
 			width = random.uniform(Missile.width / 4.5, Missile.width / 3.25)
 			angle = self.angle + math.pi
 			angle += random.uniform(math.pi - (math.pi / 16.0), math.pi + (math.pi / 16.0))
-			speed = random.uniform(Missile.hit_particle_min_speed, Missile.hit_particle_max_speed)
+			speed = min(max(self.speed, Missile.hit_particle_min_speed), Missile.hit_particle_max_speed) * random.uniform(0.75, 1.25)
 			retardation = speed / 21.0
 			color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5)

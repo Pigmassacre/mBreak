@@ -11,6 +11,17 @@ from itertools import chain
 This module contains a few useful methods to deal with colors.
 
 """
+
+def create_frames_from_sheet(sheet, frame_width, frame_height, frame_duration = None):
+	frames = []
+	for i in range(0, sheet.get_height(), frame_height):
+		frame_surface = pygame.surface.Surface((frame_width, frame_height), SRCALPHA)
+		frame_surface.blit(sheet, (0, -i))
+		if frame_duration is None:
+			frames.append(frame_surface)
+		else:
+			frames.append((frame_surface, frame_duration))
+	return frames
  
  # Shamelessly stolen from http://www.pygame.org/wiki/TextWrapping
  # It doesn't say who the author is, so, eh, thanks to her/him for

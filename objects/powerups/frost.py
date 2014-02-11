@@ -4,6 +4,8 @@ __license__ = "All Rights Reserved"
 import pygame
 import random
 import math
+import other.useful as useful
+from libs import pyganim
 import objects.powerups.powerup as powerup
 import objects.effects.timeout as timeout
 import objects.effects.freezing as freezing
@@ -23,21 +25,29 @@ that balls owner.
 def convert():
 	# We put this here so the game-class can call this method to "preload" the image used for this powerup.
 	# I could probably put this in the constructor of the powerup, but I worry about performance so I make sure to only do it once.
-	Frost.image.convert_alpha()
+	Frost.image_sheet.convert_alpha()
+	#Frost.image_02.convert_alpha()
+	#Frost.image_03.convert_alpha()
 
 class Frost(powerup.Powerup):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/powerup/frost.png")
+	image_sheet = pygame.image.load("res/powerup/frost.png")
+	#image_02 = pygame.image.load("res/powerup/frost_02.png")
+	#image_03 = pygame.image.load("res/powerup/frost_03.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image_sheet.get_width() * settings.GAME_SCALE
+	height = image_sheet.get_height() * settings.GAME_SCALE
+	frame_width = width
+	frame_height = width
 	particle_spawn_rate = 600
 	particle_spawn_amount = 2
 
 	# Scale image to settings.GAME_SCALE.
-	image = pygame.transform.scale(image, (width, height))
+	image_sheet = pygame.transform.scale(image_sheet, (width, height))
+	#image_02 = pygame.transform.scale(image_02, (width, height))
+	#image_03 = pygame.transform.scale(image_03, (width, height))
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
@@ -47,7 +57,15 @@ class Frost(powerup.Powerup):
 		self.particle_spawn_time = 0
 
 		# Load the image file.
-		self.image = Frost.image.copy()
+		# Generate the animation frames.
+		self.frames = useful.create_frames_from_sheet(Frost.image_sheet, Frost.frame_width, Frost.frame_height)
+		#self.image_01 = Frost.image_01.copy()
+		#self.image_02 = Frost.image_02.copy()
+		#self.image_03 = Frost.image_03.copy()
+		self.image = self.frames[1]
+
+		# This affects how far the powerup must be from it's center y to change frames.
+		self.center_y_grace = 0.2 * settings.GAME_SCALE
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -69,11 +87,17 @@ class Frost(powerup.Powerup):
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
 		entity.owner.add_powerup(self.__class__, created_effect)
 
-		#self.share_effect(entity, timeout.Timeout, self.create_effect)
-
 	def update(self, main_clock):
 		# We make sure to call the supermethod.
 		powerup.Powerup.update(self, main_clock)
+
+		# Update the current image.
+		if self.y < self.center_y - self.center_y_grace:
+			self.image = self.frames[0]
+		elif self.y > self.center_y + self.center_y_grace:
+			self.image = self.frames[2]
+		else:
+			self.image = self.frames[1]
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()

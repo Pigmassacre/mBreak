@@ -70,12 +70,17 @@ class Block(pygame.sprite.Sprite):
 		# Create an effect group to handle effects on this block.
 		self.effect_group = pygame.sprite.Group()
 
-	def on_hit(self, damage):
+	def hurt(self, damage):
 		# Reduce the health.
 		self.health = self.health - damage
 
+		# Change the image to the half health image if health is under half.
 		if self.health <= self.max_health / 2:
 			self.image = self.half_health_image
+
+	def on_hit(self, damage):
+		# Damage self.
+		self.hurt(damage)
 
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Block.hit_effect_start_color), copy.copy(Block.hit_effect_final_color), Block.hit_effect_tick_amount))
