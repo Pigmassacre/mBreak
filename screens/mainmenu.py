@@ -206,7 +206,7 @@ class MainMenu(scene.Scene):
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
 			self.menu_transition.update()
-			self.active_menu[-1].update()
+			self.active_menu[-1].update(self.main_clock)
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.

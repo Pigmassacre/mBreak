@@ -294,13 +294,13 @@ class PrepareMenu(scene.Scene):
 		self.transitions.update()
 
 		# Update all menus and items.
-		self.number_of_rounds_menu.update()
-		self.color_menu_one.update()
-		self.color_menu_two.update()
-		self.ai_menu_one.update()
-		self.ai_menu_two.update()
-		self.back_menu.update()
-		self.start_menu.update()
+		self.number_of_rounds_menu.update(self.main_clock)
+		self.color_menu_one.update(self.main_clock)
+		self.color_menu_two.update(self.main_clock)
+		self.ai_menu_one.update(self.main_clock)
+		self.ai_menu_two.update(self.main_clock)
+		self.back_menu.update(self.main_clock)
+		self.start_menu.update(self.main_clock)
 
 		# Update the toast.
 		self.not_all_colors_chosen_toast.update()

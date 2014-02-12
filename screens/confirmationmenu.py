@@ -98,7 +98,7 @@ class ConfirmationMenu(scene.Scene):
 		self.transitions.update()
 
 		# Update the confirmation menu.
-		self.confirmation_menu.update()
+		self.confirmation_menu.update(self.main_clock)
 
 	def draw(self):
 		# Begin every frame by blitting the background surface.

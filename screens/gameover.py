@@ -125,8 +125,8 @@ class GameOver(scene.Scene):
 		self.transitions.update()
 
 		# Update the menus.
-		self.quit_menu.update()
-		self.rematch_menu.update()
+		self.quit_menu.update(self.main_clock)
+		self.rematch_menu.update(self.main_clock)
 		
 	def draw(self):
 		# Every frame begins by blitting the background surface.

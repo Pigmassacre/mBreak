@@ -265,10 +265,10 @@ class HelpMenu(scene.Scene):
 		self.transitions.update()
 
 		# Update the help menu.
-		self.help_menu.update()	
+		self.help_menu.update(self.main_clock)	
 
 		# Update the back meenu.
-		self.back_menu.update()	
+		self.back_menu.update(self.main_clock)	
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.

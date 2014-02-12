@@ -109,7 +109,7 @@ class Menu:
 			# We don't want to register ourself, so we filter ourself out with an anonymous function.
 			self.other_menus.extend(filter(lambda x: x != self, other_menus))
 
-	def update(self):
+	def update(self, main_clock):
 		# We store the current mouse position and the state of the mouse buttons in order to figure out if an item
 		# is selected / clicked on by the mouse.
 		mouse_pos = pygame.mouse.get_pos()
@@ -119,6 +119,9 @@ class Menu:
 		selected_items = []
 
 		for item in self.items:
+			# Call the items update method.
+			item.update(main_clock)
+		
 			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
 			if pressed_buttons[0]:
 				# If the left mouse button is clicked...

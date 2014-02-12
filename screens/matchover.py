@@ -98,12 +98,12 @@ class MatchOver(scene.Scene):
 		quit_button = textitem.TextItem("Quit")
 		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.maybe_quit)
-		self.quit_menu.items[0].selected = True
 		self.all_menus.append(self.quit_menu)
 		
 		next_match_button = textitem.TextItem("Next Round")
 		self.next_match_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
+		self.next_match_menu.items[0].selected = True
 		self.all_menus.append(self.next_match_menu)
 
 		# Register all menus with each other. This is for gui.traversals sake, so it knows that there are more than one menu to traverse upon.
@@ -127,7 +127,7 @@ class MatchOver(scene.Scene):
 		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
 		pygame.mixer.music.play(-1)
 
-	def maybe_quit(self, item = None):
+	def maybe_quit(self, item):
 		# We ask the players if they REALLY want to quit, since they're in between matches. Also, we make sure that the confirmation
 		# menu gets a clean window_surface.
 		self.window_surface.blit(self.background_surface, (0, 0))
@@ -148,7 +148,7 @@ class MatchOver(scene.Scene):
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we do the same thing as the quit button.
-			self.maybe_quit()
+			self.maybe_quit(None)
 		else:
 			# The traversal module handles key movement between menus.
 			traversal.traverse_menus(event, self.all_menus)

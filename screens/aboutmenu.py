@@ -180,6 +180,9 @@ class AboutMenu(scene.Scene):
 	def update(self):		
 		# Handle all transitions.
 		self.transitions.update()
+		
+		# Update the back menu.
+		self.back_menu.update(self.main_clock)
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
@@ -206,11 +209,10 @@ class AboutMenu(scene.Scene):
 
 		self.more_info_and_licenses.draw(self.window_surface)
 
-		# Update and draw the menus.
 		self.made_by_info.draw(self.window_surface)
 		self.made_by_author.draw(self.window_surface)
 
-		self.back_menu.update()
+		# Draw the back menu.
 		self.back_menu.draw(self.window_surface)
 
 	def on_exit(self):

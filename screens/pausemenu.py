@@ -94,7 +94,7 @@ class PauseMenu(scene.Scene):
 		self.transitions.update()
 
 		# Update the pause menu.
-		self.pause_menu.update()
+		self.pause_menu.update(self.main_clock)
 
 	def draw(self):
 		# Begin every frame by blitting the background surface.
