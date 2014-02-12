@@ -82,9 +82,9 @@ class ChoiceItem(item.Item):
 	def get_height(self):
 		return self.rect.height
 
-	def draw(self, surface):
-		item.Item.draw(self, surface)
-		
+	def update(self, main_clock):
+		item.Item.update(self, main_clock)
+
 		# Update the position of the rects.
 		self.rect.x = self.x
 		self.rect.y = self.y + self.y_nudge
@@ -95,18 +95,33 @@ class ChoiceItem(item.Item):
 		self.shadow_rect.x = self.x + self.shadow_offset_x
 		self.shadow_rect.y = self.y + self.shadow_offset_y + self.y_nudge
 
+	def draw(self, surface):
+		item.Item.draw(self, surface)
+
 		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)
 
 		# Draw the color of the item.
 		surface.fill(self.color, self.rect)
-
+		"""
 		if self.chosen:
 			# If the item is chosen, draw the chosen border.
 			surface.fill(self.chosen_border_color, self.chosen_rect)
 
 		if self.selected:
 			# If the item is selected, draw the selected border.
+			surface.fill(self.selected_border_color, self.selected_rect)"""
+
+		# If chosen, draw the chosen border around the item.
+		if self.chosen:
+			surface.fill(self.chosen_border_color, self.chosen_rect)
+
+			# If also selected, draw a smaller selected border around the item.
+			if self.selected:
+				surface.fill(self.selected_border_color, self.rect)
+
+		elif self.selected:
+			# If selected, draw the selected border around the item.
 			surface.fill(self.selected_border_color, self.selected_rect)
 
 		# Draw the font surface in the middle of this item.

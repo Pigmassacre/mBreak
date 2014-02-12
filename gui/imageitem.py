@@ -22,9 +22,6 @@ should contain. I hope that this is OK.
 
 class ImageItem(item.Item):
 
-	# Initialize the font module.
-	pygame.font.init()
-
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	x = 0
 	y = 0
@@ -80,8 +77,8 @@ class ImageItem(item.Item):
 	def get_height(self):
 		return self.rect.height
 
-	def draw(self, surface):
-		item.Item.draw(self, surface)
+	def update(self, main_clock):
+		item.Item.update(self, main_clock)
 
 		# Update the position of all the rects.
 		self.rect.x = self.x
@@ -93,6 +90,9 @@ class ImageItem(item.Item):
 		self.shadow_rect.x = self.x + self.shadow_offset_x
 		self.shadow_rect.y = self.y + self.shadow_offset_y + self.y_nudge
 
+	def draw(self, surface):
+		item.Item.draw(self, surface)
+
 		# Draw the shadow.
 		surface.fill(self.shadow_color, self.shadow_rect)
 		surface.fill(self.color, self.rect)
@@ -101,8 +101,12 @@ class ImageItem(item.Item):
 		if self.chosen:
 			surface.fill(self.chosen_border_color, self.chosen_rect)
 
-		# If selected, draw the selected border around the item.
-		if self.selected:
+			# If also selected, draw a smaller selected border around the item.
+			if self.selected:
+				surface.fill(self.selected_border_color, self.rect)
+
+		elif self.selected:
+			# If selected, draw the selected border around the item.
 			surface.fill(self.selected_border_color, self.selected_rect)
 
 		# Finally, blit the image to the given surface (on top of everything else drawn in here).

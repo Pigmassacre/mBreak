@@ -21,13 +21,31 @@ def traverse_menus(event, list_of_menus):
 
 	list_of_menus is the list which contains all the menus that we should be able to traverse through.
 	"""
-	if (event.type == KEYDOWN and event.key == K_RETURN) or (event.type == JOYBUTTONDOWN and event.button == 2):
+	
+	if (event.type == MOUSEMOTION):
+		# If the mouse has been moved, we check every item in every menu.
+		for a_menu in list_of_menus:
+			for item in a_menu.items:
+				# If the mouse is positioned over an item, unselect all items and then select that item.
+				if a_menu.is_mouse_over_item(item, event.pos):
+					for an_item in a_menu.items:
+						an_item.selected = False
+					for other_menu in a_menu.other_menus:
+						for other_item in other_menu.items:
+							other_item.selected = False
+					item.selected = True
+	elif (event.type == KEYDOWN and event.key == K_RETURN) or (event.type == JOYBUTTONDOWN and event.button == 2) or (event.type == MOUSEBUTTONDOWN and event.button == 1):
 		# If it is a list, check through all menus in the list.
 		for a_menu in list_of_menus:
 			for item in a_menu.items:
-				# And for the first selected item we find, we call the matching function.
-				if item.selected:
-					a_menu.functions[item](item)
+				if event.type == MOUSEBUTTONDOWN:
+					# If the mouse button was clicked, we check if the mouse is positioned over the item, and if the item was selected.
+					if a_menu.is_mouse_over_item(item, event.pos) and item.selected:
+						a_menu.functions[item](item)
+				else:
+					# Otherwise, if the item is selected we just call it's function.
+					if item.selected:
+						a_menu.functions[item](item)
 	elif ((event.type == KEYDOWN and event.key == K_LEFT) or (event.type == JOYHATMOTION and event.value[0] == -1) or
 		  (event.type == JOYAXISMOTION and event.axis == 0 and event.value <= -0.25)):
 		# We try to traverse the menu to the left.

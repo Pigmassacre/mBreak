@@ -42,8 +42,7 @@ class GridMenu(menu.Menu):
 		self.current_row_size = temp_size_pos[0]
 		self.current_row_position = temp_size_pos[1]
 
-		# Store the clicked outside value for this item and the function.
-		self.clicked_outside[item] = False
+		# Store the function for this item.
 		self.functions[item] = function
 
 	def populate_grid(self, item, row_size, row_position):

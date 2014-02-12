@@ -82,7 +82,7 @@ class IntroMenu(scene.Scene):
 		pygame.mixer.music.play(-1)
 
 	def event(self, event):
-		if ((event.type == KEYDOWN and event.key in [K_ESCAPE, K_RETURN]) or (event.type == MOUSEBUTTONDOWN and event.button == 0) or
+		if ((event.type == KEYDOWN and event.key in [K_ESCAPE, K_RETURN]) or (event.type == MOUSEBUTTONDOWN and event.button == 1) or
 		     (event.type == JOYBUTTONDOWN and (event.button in settings.JOY_BUTTON_SKIP))):
 			# If ENTER, left mouse button or any joystick skip button on a gamepad is pressed, proceed to the main menu.
 			self.done = True

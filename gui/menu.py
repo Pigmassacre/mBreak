@@ -28,19 +28,11 @@ class Menu:
 		# This is the amount of items the menu will display in a row before generating a new column.
 		self.max_number_of_rows = 3
 
-		#self.current_row_size = 0
-
 		# Setup a dictionary that contains the functions that each item will call when activated.
 		self.functions = {}
 
 		# We keep track of the previously selected item so we know when to play a sound effect.
 		self.previous_selected_item = None
-
-		# Store the last clicked button, so if we click a button and then hold down the mouse button it only registers as one click.
-		self.last_clicked_item = None
-
-		# We keep track of if we clicked outside a button until we release the mouse button.
-		self.clicked_outside = {}
 
 		# Store the current position in the menu.
 		self.position = 0
@@ -89,8 +81,7 @@ class Menu:
 			item.x = self.x - (item.get_width() / 2)
 			item.y = self.y
 
-		# Register the item to the clicked_outside and functions dictionaries.
-		self.clicked_outside[item] = False
+		# Register the item to the functions dictionary.
 		self.functions[item] = function
 
 	def remove(self, item):
@@ -110,10 +101,8 @@ class Menu:
 			self.other_menus.extend(filter(lambda x: x != self, other_menus))
 
 	def update(self, main_clock):
-		# We store the current mouse position and the state of the mouse buttons in order to figure out if an item
-		# is selected / clicked on by the mouse.
+		# We store the current mouse position in order to figure out if an item is selected / clicked on by the mouse.
 		mouse_pos = pygame.mouse.get_pos()
-		pressed_buttons = pygame.mouse.get_pressed()
 
 		# We use this list to figure out if no items are selected
 		selected_items = []
@@ -121,43 +110,9 @@ class Menu:
 		for item in self.items:
 			# Call the items update method.
 			item.update(main_clock)
-		
-			# We want to ignore any "clicks" that occur if we hold the mouse button down and then move the cursor on top of the item.
-			if pressed_buttons[0]:
-				# If the left mouse button is clicked...
-				if not self.clicked_outside[item]:
-					# And we haven't clicked outside this item, we set the clicked_outside value for this item
-					# to either True if the mouse is outside this item, or False otherwise.
-					self.clicked_outside[item] = not self.is_mouse_over_item(item, mouse_pos)
-			else:
-				# If the left mouse button isn't clicked, well then there surely wasn't a click outside this item, so we set the
-				# clicked outside value for this item to False.
-				self.clicked_outside[item] = False
-
-			if self.is_mouse_over_item(item, mouse_pos):
-				# If the mouse cursor is over this item...
-				for another_item in self.items:
-					# We unselect all the other items.
-					another_item.selected = False
-				# And set this item to be selected.
-				item.selected = True
-				if pressed_buttons[0] and not self.clicked_outside[item]:
-					# If the left mouse button is clicked, and we haven't clicked outside the item and then moved the mouse cursor
-					# on top of the item without letting go of the mouse button...
-					if not self.last_clicked_item == item:
-						# We call the matching function, and set this item as the last clicked item.
-						self.functions[item](item)
-						self.last_clicked_item = item
-				else:
-					# If the mouse cursor isn't over any item, we set the last clicked item to be None.
-					self.last_clicked_item = None
 
 			# If the item is selected but we still haven't played a sound effect, do so.
 			if item.selected:
-				# Unselect all other items in the other menus.
-				for other_menu in self.other_menus:
-					for an_item in other_menu.items:
-						an_item.selected = False
 				selected_items.append(item)
 				if item != self.previous_selected_item:
 					# If the item differs from the previously selected item, it must mean it's a newly selected item.
