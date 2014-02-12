@@ -319,10 +319,13 @@ class Ball(pygame.sprite.Sprite):
 	def spawn_particles(self):
 		# Spawn a slightly random amount of particles.
 		for _ in range(0, Ball.particle_spawn_amount):
+			width = random.uniform(self.rect.width / 4.0, self.rect.width / 3.0)
 			angle = self.angle + random.uniform(-0.20, 0.20)
+			max_speed = min(self.speed, self.max_speed / 2.0)
+			speed = random.uniform(max_speed - max_speed / 7.0, max_speed + max_speed / 7.0)
 			retardation = self.speed / 24.0
 			alpha_step = 5 * settings.GAME_FPS
-			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.height / 4, angle, self.speed, retardation, self.color, alpha_step)
+			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, self.color, alpha_step)
 
 	def check_collision_paddles(self):
 		# This method is used to check if we've collided with any paddles. If a collision is detected, we

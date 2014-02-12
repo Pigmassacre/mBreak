@@ -66,7 +66,7 @@ class ConfirmationMenu(scene.Scene):
 		self.confirmation_menu.items[1].selected = True
 
 		# Setup the textitem.
-		self.confirmation_text = textitem.TextItem("Are you sure", pygame.Color(255, 255, 255))
+		self.confirmation_text = textitem.TextItem("Are you sure?", pygame.Color(255, 255, 255))
 		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
 		self.confirmation_text.y = self.confirmation_menu.y - (2 * self.confirmation_text.get_height())
 

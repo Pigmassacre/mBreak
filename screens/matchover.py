@@ -76,7 +76,7 @@ class MatchOver(scene.Scene):
 
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
 		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_one_score_text.x = (settings.SCREEN_WIDTH - self.player_one_score_text.get_width()) / 4
+		self.player_one_score_text.x = (settings.SCREEN_WIDTH - self.player_one_score_text.get_width()) / 4 + 1.5 * settings.GAME_SCALE
 		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
 
 		self.player_one_text = textitem.TextItem(self.player_one.name, pygame.Color(255, 255, 255))
@@ -85,7 +85,7 @@ class MatchOver(scene.Scene):
 
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
 		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_two_score_text.x = 3 * ((settings.SCREEN_WIDTH - self.player_two_score_text.get_width()) / 4)
+		self.player_two_score_text.x = 3 * ((settings.SCREEN_WIDTH - self.player_two_score_text.get_width()) / 4) + 1.5 * settings.GAME_SCALE
 		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
 
 		self.player_two_text = textitem.TextItem(self.player_two.name, pygame.Color(255, 255, 255))
