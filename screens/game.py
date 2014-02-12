@@ -276,8 +276,7 @@ class Game(scene.Scene):
 		if self.countdown_screen.done:
 			# Handle KEYUP, KEYDOWN events (not keys held down) for player paddles.
 			for player in groups.Groups.player_group:
-				if (event.type == KEYDOWN and event.key == player.key_unleash_energy) or (event.type == JOYBUTTONDOWN and event.button == player.joy_unleash_energy):
-					player.unleash_energy()
+				player.event(event)
 			if settings.DEBUG_MODE:
 				if event.type == KEYDOWN and event.key == K_n:
 					debug.create_ball_left(self.player_one)

@@ -51,6 +51,9 @@ class ImageItem(item.Item):
 		self.width = ImageItem.width
 		self.height = ImageItem.height
 
+		# Values can be stored here, for when you want to retrieve it later (via chosing the item, for instance).
+		self.value = None
+
 		# Load the image from the path.
 		self.image = pygame.image.load(path)
 
@@ -79,7 +82,7 @@ class ImageItem(item.Item):
 
 	def draw(self, surface):
 		item.Item.draw(self, surface)
-		
+
 		# Update the position of all the rects.
 		self.rect.x = self.x
 		self.rect.y = self.y + self.y_nudge

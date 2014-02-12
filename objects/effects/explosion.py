@@ -51,6 +51,9 @@ class Explosion(effect.Effect):
 		# We make sure to call the supermethod.
 		effect.Effect.update(self, main_clock)
 
+		# Update the playback rate of the animation.
+		self.animation.rate = main_clock.time_scale
+
 		# If the animation is finished, we destroy ourselves.
 		if self.animation.isFinished():
 			self.destroy()

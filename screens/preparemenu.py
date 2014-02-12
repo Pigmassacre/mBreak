@@ -11,6 +11,7 @@ import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
+import gui.imageitem as imageitem
 import gui.transition as transition
 import gui.toast as toast
 import gui.traversal as traversal
@@ -87,8 +88,8 @@ class PrepareMenu(scene.Scene):
 		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
 
 		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
-		self.ai_menu_one.x = self.color_menu_one.x
-		self.ai_menu_one.y = self.color_menu_one.y + self.color_menu_one.get_height() + 4 * settings.GAME_SCALE
+		self.ai_menu_one.x = self.color_menu_one.x + self.color_menu_one.get_width() + self.color_menu_one.offset * 2
+		self.ai_menu_one.y = self.color_menu_one.y
 		self.all_menus.append(self.ai_menu_one)
 		
 		# The color menu for player two.
@@ -103,8 +104,8 @@ class PrepareMenu(scene.Scene):
 		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
-		self.ai_menu_two.x = self.color_menu_two.x
-		self.ai_menu_two.y = self.color_menu_two.y + self.color_menu_two.get_height() + 4 * settings.GAME_SCALE
+		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - self.color_menu_two.offset * 2
+		self.ai_menu_two.y = self.color_menu_two.y
 		self.all_menus.append(self.ai_menu_two)
 
 		# The back button, displayed in the bottom-left corner of the screen.
@@ -216,26 +217,29 @@ class PrepareMenu(scene.Scene):
 			return chosen_item.color
 
 	def setup_ai_menu(self, function):
-		ai_menu = gridmenu.GridMenu()
+		ai_menu = gridmenu.GridMenu(1)
 		self.setup_ai_items(ai_menu, function)
 		return ai_menu
 
 	def setup_ai_items(self, grid_menu, function):
-		grid_menu.add(choiceitem.ChoiceItem(0), function)
-		grid_menu.add(choiceitem.ChoiceItem(1), function)
-		grid_menu.add(choiceitem.ChoiceItem(2), function)
+		item = imageitem.ImageItem("res/ai/ai_easy.png")
+		item.value = 1
+		grid_menu.add(item, function)
+		item = imageitem.ImageItem("res/ai/ai_hard.png")
+		item.value = 2
+		grid_menu.add(item, function)
 
 	def ai_one(self, item):
-		self.player_one_ai = self.choose_item_from_menu(item, self.ai_menu_one)
+		self.player_one_ai = self.choose_item_from_menu(item, self.ai_menu_one, True)
 
 	def ai_two(self, item):
-		self.player_two_ai = self.choose_item_from_menu(item, self.ai_menu_two)
+		self.player_two_ai = self.choose_item_from_menu(item, self.ai_menu_two, True)
 
 	def rounds(self, item):
 		# Set the number of rounds to the value of the selected item.
 		self.number_of_rounds = self.choose_item_from_menu(item, self.number_of_rounds_menu)
 
-	def choose_item_from_menu(self, item, grid_menu):
+	def choose_item_from_menu(self, item, grid_menu, can_unchoose = False):
 		# Figure out what item is the chosen item.
 		chosen_item = None
 		for menu_item in grid_menu.items:
@@ -246,6 +250,10 @@ class PrepareMenu(scene.Scene):
 		if chosen_item == None:
 			# If there isn't a chosen item, set the selected item as the chosen item
 			item.chosen = True
+		elif chosen_item == item and can_unchoose:
+			# Unchose the chosen item.
+			chosen_item.chosen = False
+			return 0 # There is no value to be returned, so we simply return 0.
 		elif not chosen_item == item:
 			# If the chosen item and the selected item doesn't match, unchose the old chosen item and set the selected 
 			# item as chosen instead.

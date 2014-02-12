@@ -398,10 +398,6 @@ class Ball(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.on_hit_paddle(paddle)
 
-		# If smash stack is equal to max smash stack, stun the hit paddle.
-		#if self.smash_stack > Ball.smash_max_stack / 2:
-		#self.effect_group.add(stun.Stun(self, self.smash_stack * 50))
-		
 		# Attach a new flash effect to the ball.
 		self.effect_group.add(flash.Flash(self, copy.copy(Ball.smash_effect_start_color), copy.copy(Ball.smash_effect_final_color), Ball.smash_effect_tick_amount))
 

@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import random
 import math
 import copy
@@ -70,7 +71,7 @@ class Player(pygame.sprite.Sprite):
 		# This value can be "spent" to create powerup effects. The higher the energy value, the more / more powerful effects will be created.
 		self.energy = 0
 		self.max_energy = 100
-		self.energy_increase_on_hit = 10
+		self.energy_increase_on_hit = 2.5
 		self.missiles_to_spawn = 0
 		self.missile_spawn_time = 200
 		self.time_passed = 0
@@ -201,17 +202,22 @@ class Player(pygame.sprite.Sprite):
 			the_missile.acceleration *= random.uniform(1.5, 3)
 
 	def unleash_energy(self):
-		print(str(self.name) + "'s energy level: " + str(self.energy))
 		if self.energy >= 20:
-			print("unleash_energy")
 			# Set how many missiles to spawn.
 			self.missiles_to_spawn += self.energy / 20
 
+			# Spawn one missile right now.
 			self.spawn_missile()
 			self.missiles_to_spawn -= 1
 
 			# Reduce our energy to 0.
 			self.energy = 0
+
+	def event(self, event):
+		if self.ai_difficulty == 0:
+			if ((event.type == KEYDOWN and event.key == self.key_unleash_energy) or 
+				(event.type == JOYBUTTONDOWN and event.button == self.joy_unleash_energy)):
+				self.unleash_energy()
 
 	def update(self, main_clock):
 		# Update the energy rect.

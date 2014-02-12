@@ -166,6 +166,9 @@ class Missile(pygame.sprite.Sprite):
 		# Destroy ourselves.
 		self.destroy()
 
+		# Tell the paddle that it has been hit.
+		paddle.on_hit(self)
+
 		# Apply a stun effect to the hit paddle.
 		stun.Stun(paddle, 600)
 
