@@ -27,7 +27,12 @@ It also contains a debug class used to display the FPS counter in the top-left c
 """
 
 def event(event):
-	if event.type == KEYDOWN and event.key == K_n:
+	if event.type == MOUSEBUTTONDOWN:
+		if event.button == 1:
+			create_ball_at_pos(event.pos)
+		elif event.button == 3:
+			create_powerup_at_pos(event.pos)
+	elif event.type == KEYDOWN and event.key == K_n:
 		for player in groups.Groups.player_group:
 			if player.x < settings.SCREEN_WIDTH / 2:
 				create_ball_left(player)
@@ -43,6 +48,13 @@ def event(event):
 		for player in groups.Groups.player_group:
 			destroy_blocks_for_player(player)
 			break
+
+def create_ball_at_pos(pos):
+	return ball.Ball(pos[0], pos[1], random.uniform(0, math.pi), list(groups.Groups.player_group)[random.randint(0, len(groups.Groups.player_group) - 1)])
+
+def create_powerup_at_pos(pos):
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+	return random.choice(powerup_list)(pos[0], pos[1])
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
