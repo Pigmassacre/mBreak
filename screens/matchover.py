@@ -158,8 +158,8 @@ class MatchOver(scene.Scene):
 		self.transitions.update()
 
 		# We update the menus first, so if the confirmationmenu is shown the screen is empty of items and menus (other than the confirmation menu, ofc).
-		self.quit_menu.update()
-		self.next_match_menu.update()
+		self.quit_menu.update(self.main_clock)
+		self.next_match_menu.update(self.main_clock)
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
@@ -180,10 +180,10 @@ class MatchOver(scene.Scene):
 		self.player_two_score_text.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == screens.game.Game:
+		if self.next_screen is screens.game.Game:
 			# Next match is selected, so we start Game.
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
-		else:
+		elif self.next_screen is screens.mainmenu.MainMenu:
 			# Quit is selected, so we return to the main menu.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

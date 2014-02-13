@@ -15,6 +15,7 @@ import objects.powerups.rocket as rocket
 import objects.powerups.enlarger as enlarger
 import objects.powerups.reducer as reducer
 import objects.ball as ball
+import objects.groups as groups
 import settings.settings as settings
 
 """
@@ -24,6 +25,24 @@ This module contains a few useful methods used when debugging the game. These ar
 It also contains a debug class used to display the FPS counter in the top-left corner of the screen, when DEBUG_MODE is True.
 
 """
+
+def event(event):
+	if event.type == KEYDOWN and event.key == K_n:
+		for player in groups.Groups.player_group:
+			if player.x < settings.SCREEN_WIDTH / 2:
+				create_ball_left(player)
+	elif event.type == KEYDOWN and event.key == K_m:
+		for player in groups.Groups.player_group:
+			if player.x > settings.SCREEN_WIDTH / 2:
+				create_ball_left(player)
+	elif event.type == KEYDOWN and event.key == K_p:
+		create_powerup()
+	elif event.type == KEYDOWN and event.key == K_t:
+		change_time_scale(self.main_clock)
+	elif event.type == KEYDOWN and event.key == K_k:
+		for player in groups.Groups.player_group:
+			destroy_blocks_for_player(player)
+			break
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
@@ -44,6 +63,10 @@ def create_ball_right(player_right):
 	for paddle in player_right.paddle_group:
 		angle = random.uniform(math.pi / 2, (3 * math.pi) / 2)
 		temp_ball = ball.Ball(paddle.x - (paddle.width), paddle.y + (paddle.height / 2), angle, player_right)
+
+def destroy_blocks_for_player(player):
+	for block in player.block_group:
+		block.destroy()
 
 def update(player_left, player_right, main_clock):
 	# When hold, the space button spawns balls every frame.

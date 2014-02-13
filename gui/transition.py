@@ -45,6 +45,12 @@ class Transition:
 			if not item in self.items:
 				self.items.append(item)
 
+	def remove_all_items(self):
+		"""
+		Simply removes all the items in this Transitions object.
+		"""
+		del(self.items[:])
+
 	def setup_transition(self, menu_to_setup, left, right, up, down):
 		"""
 		Given a menu, calls add_items to populate the list of items in this Transition object and then, if the items don't already have

@@ -143,12 +143,14 @@ class GameOver(scene.Scene):
 		self.rematch_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == screens.game.Game:
+		if self.next_screen is screens.game.Game:
 			# If a rematch was selected, we reset the score and start a new instance of Game.
 			self.score[self.player_one] = 0
 			self.score[self.player_two] = 0
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
-		else:
+		elif not self.next_screen is None:
 			# If quit was selected, we empty all the groups and return to the main menu.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)
+
+		# Else, we simply let this scene end.

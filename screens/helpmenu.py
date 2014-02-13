@@ -26,9 +26,6 @@ import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
 
-# We import any needed game screens here.
-import screens
-
 """
 
 This class is the Help menu screen, accessible from the options menu in the main menu.
@@ -47,21 +44,15 @@ destroying all objects. Or something. I really don't know, but luckily getting t
 
 I don't think anyone should ever go in and out of a menu repeatedly... But if they do, well, then I don't know what to do. :(
 
-This class can take an optional "menu_screen_instance" parameter, which if filled with a menu SCREEN instance, that menu screen instance
-will have its gameloop() method restarted when this screen ends.
-
 """
 class HelpMenu(scene.Scene):
 
-	def __init__(self, window_surface, main_clock, menu_screen_instance = None):
+	def __init__(self, window_surface, main_clock):
 		# Call the superconstructor.
 		scene.Scene.__init__(self, window_surface, main_clock)
 
-		# If we've gotten a main menu instance to return to, then save that.
-		self.menu_screen_instance = menu_screen_instance
-
 		# The next screen to be started when the gameloop ends.
-		self.next_screen = screens.mainmenu.MainMenu
+		self.next_screen = None
 
 		# This is a dictionary that contains information linked to certain imageitems.
 		self.info = {}
@@ -248,15 +239,14 @@ class HelpMenu(scene.Scene):
 			for info_text in info_texts:
 				info_text.draw(surface)
 
-	def back(self, item = None):
-		# Simply moves back to the main menu.
-		self.next_screen = screens.mainmenu.MainMenu
+	def back(self, item):
+		# Simply ends this scene.
 		self.done = True
 
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
-			# If the escape key is pressed, we go back to the main menu.
-			self.back()
+			# If the escape key is pressed, we go end this scene.
+			self.back(None)
 		else:
 			traversal.traverse_menus(event, self.all_menus)
 
@@ -284,16 +274,8 @@ class HelpMenu(scene.Scene):
 		self.back_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == None:
-			# If next_screen haven't been set, we just quit.
-			pygame.quit()
-			sys.exit()
-		elif self.next_screen == screens.mainmenu.MainMenu:
-			# If we have a main menu instance still going, then start that. Otherwise just start the main menu screen as normal.
-			if self.menu_screen_instance != None:
-				self.menu_screen_instance.gameloop()
-			else:
-				self.next_screen(self.window_surface, self.main_clock, None)
-		else:
-			# For any other screen we just call it using the normal variables.
+		if not self.next_screen is None:
+			# If there is a next screen set, start that.
 			self.next_screen(self.window_surface, self.main_clock)
+		
+		# Else, we simply let this scene end.

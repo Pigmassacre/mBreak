@@ -32,22 +32,16 @@ destroying all objects. Or something. I really don't know, but luckily getting t
 
 I don't think anyone should ever go in and out of a menu repeatedly... But if they do, well, then I don't know what to do. :(
 
-This class can take an optional "menu_screen_instance" parameter, which if filled with a menu SCREEN instance, that menu screen instance
-will have its gameloop() method restarted when this screen ends.
-
 """
 
 class AboutMenu(scene.Scene):
 
-	def __init__(self, window_surface, main_clock, menu_screen_instance = None):
+	def __init__(self, window_surface, main_clock):
 		# Call the superconstructor.
 		scene.Scene.__init__(self, window_surface, main_clock)
 
-		# If we've gotten a menu instance to return to, then save that.
-		self.menu_screen_instance = menu_screen_instance
-
 		# The next screen to be started when the gameloop ends.
-		self.next_screen = screens.mainmenu.MainMenu
+		self.next_screen = None
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
@@ -61,7 +55,7 @@ class AboutMenu(scene.Scene):
 		font_size = 6 * settings.GAME_SCALE
 
 		# Create and setup all the textitems.
-		self.pyganim_credits = textitem.TextItem("Pyganim is used for animating the mBreak logo")
+		self.pyganim_credits = textitem.TextItem("Pyganim is used to help animate items in the game")
 		self.pyganim_credits.set_size(font_size)
 		self.pyganim_credits.x = (settings.SCREEN_WIDTH - self.pyganim_credits.get_width()) / 2
 		self.pyganim_credits.y = 9 * settings.GAME_SCALE
@@ -165,15 +159,14 @@ class AboutMenu(scene.Scene):
 			pygame.mixer.music.load(settings.TITLE_MUSIC)
 			pygame.mixer.music.play(-1)
 
-	def back(self, item = None):
-		# Simply moves back to the main menu.
-		self.next_screen = screens.mainmenu.MainMenu
+	def back(self, item):
+		# This simply ends this scene.
 		self.done = True
 
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
-			# If the escape key is pressed, we go back to the main menu.
-			self.back()
+			# If the escape key is pressed, we go end this scene.
+			self.back(None)
 		else:
 			traversal.traverse_menus(event, [self.back_menu])
 
@@ -216,16 +209,8 @@ class AboutMenu(scene.Scene):
 		self.back_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == None:
-			# If next_screen haven't been set, we just quit.
-			pygame.quit()
-			sys.exit()
-		elif self.next_screen == screens.mainmenu.MainMenu:
-			# If we have a main menu instance still going, then start that. Otherwise just start the main menu screen as normal.
-			if self.menu_screen_instance != None:
-				self.menu_screen_instance.gameloop()
-			else:
-				self.next_screen(self.window_surface, self.main_clock)
-		else:
-			# For any other screen we just call it using the normal variables.
+		if not self.next_screen is None:
+			# If there is a next screen set, start that.
 			self.next_screen(self.window_surface, self.main_clock)
+		
+		# Else, we simply let this scene end.

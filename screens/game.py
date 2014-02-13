@@ -278,14 +278,7 @@ class Game(scene.Scene):
 			for player in groups.Groups.player_group:
 				player.event(event)
 			if settings.DEBUG_MODE:
-				if event.type == KEYDOWN and event.key == K_n:
-					debug.create_ball_left(self.player_one)
-				elif event.type == KEYDOWN and event.key == K_m:
-					debug.create_ball_right(self.player_two)
-				elif event.type == KEYDOWN and event.key == K_p:
-					debug.create_powerup()
-				elif event.type == KEYDOWN and event.key == K_t:
-					debug.change_time_scale(self.main_clock)
+				debug.event(event)
 
 	def update(self):
 		# First, we check if any player has won.
@@ -459,18 +452,20 @@ class Game(scene.Scene):
 			# Else, continue to MatchOver screen.
 			self.next_screen = matchover.MatchOver
 
-		if self.next_screen == None:
+		if self.next_screen is None:
 			pygame.quit()
 			sys.exit()
-		elif self.next_screen == matchover.MatchOver:
+		elif self.next_screen is matchover.MatchOver:
 			# The game is over, but we're restarting Game so we empty all the groups but the groups that contain the players.
 			groups.empty_after_round()
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
-		elif self.next_screen == gameover.GameOver:
+		elif self.next_screen is gameover.GameOver:
 			# The game is over, but we're allowing for a rematch so we empty all the groups but the groups that contain the players.
 			groups.empty_after_round()
 			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
-		else:
+		elif not self.next_screen is None:
 			# The game is over so we empty all the groups.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)
+
+		# Otherwise, we simply let this scene end.

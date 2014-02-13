@@ -185,19 +185,19 @@ class PrepareMenu(scene.Scene):
 				chosen_item = menu_item
 				break
 
-		if chosen_item == None:
+		if chosen_item is None:
 			# If there is no chosen item and the item is available, set the selected item as chosen and set it's match on the secondary menu as unavailable.
 			if not item.unavailable:
 				item.chosen = True
 				secondary_menu.items[primary_menu.items.index(item)].unavailable = True
 				return item.color
-		elif chosen_item == item:
+		elif chosen_item is item:
 			# If the chosen item is the same as the selected item, set that item as not chosen and restore the availability
 			# of the matching item on the secondary menu.
-			item.chosen = False
+			chosen_item.chosen = False
 			secondary_menu.items[primary_menu.items.index(item)].unavailable = False
 			return None
-		elif not chosen_item == item:
+		elif not chosen_item is item:
 			# If the chosen item isn't the same as the selected item, check if it is available first.
 			if not item.unavailable:
 				# If the item is available, set the chosen item to not be chosen, and set the selected item to be chosen.
@@ -242,14 +242,14 @@ class PrepareMenu(scene.Scene):
 				chosen_item = menu_item
 				break
 
-		if chosen_item == None:
+		if chosen_item is None:
 			# If there isn't a chosen item, set the selected item as the chosen item
 			item.chosen = True
-		elif chosen_item == item and can_unchoose:
+		elif chosen_item is item and can_unchoose:
 			# Unchose the chosen item.
 			chosen_item.chosen = False
 			return 0 # There is no value to be returned, so we simply return 0.
-		elif not chosen_item == item:
+		elif not chosen_item is item:
 			# If the chosen item and the selected item doesn't match, unchose the old chosen item and set the selected 
 			# item as chosen instead.
 			chosen_item.chosen = False
@@ -320,7 +320,7 @@ class PrepareMenu(scene.Scene):
 		self.start_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if self.next_screen == game.Game:
+		if self.next_screen is game.Game:
 			# If we're going to start the game, we first create both players.
 			joystick_count = pygame.joystick.get_count()
 			if joystick_count == 0:
@@ -340,9 +340,11 @@ class PrepareMenu(scene.Scene):
 
 			# And finally, we start the game!
 			self.next_screen(self.window_surface, self.main_clock, player_one, player_two, self.number_of_rounds, score)
-		else:
+		elif not self.next_screen is None:
 			# For any other screen we just call it using the normal variables.
 			self.next_screen(self.window_surface, self.main_clock)
+
+		# Otherwise, we just let this scene end.
 
 	def create_player_one(self, color, **kwargs):
 		# Creates player one, and sets the position of the player to the top-left corner of the screen.

@@ -14,6 +14,7 @@ import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
 import screens.confirmationmenu as confirmationmenu
+import screens.optionsmenu as optionsmenu
 import screens
 
 """
@@ -49,8 +50,7 @@ class PauseMenu(scene.Scene):
 
 		# Setup the menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
-		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
+		self.setup_transitions()
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -59,17 +59,23 @@ class PauseMenu(scene.Scene):
 		# Creates and adds the items to the pause menu.
 		pause_menu = menu.Menu()
 		pause_menu.add(textitem.TextItem("Resume"), self.resume)
+		pause_menu.add(textitem.TextItem("Options"), self.options)
 		pause_menu.add(textitem.TextItem("Quit"), self.maybe_quit)
 		return pause_menu
 
-	def resume(self, item = None):
+	def resume(self, item):
 		# Finished the gameloop, allowing the class that started this pausemenu to resume.
 		self.done = True
 
+	def options(self, item):
+		# Setup the transitions so that if we return to the pause menu the items will transition.
+		self.setup_transitions()
+
+		optionsmenu.OptionsMenu(self.window_surface, self.main_clock)
+
 	def maybe_quit(self, item):
 		# Setup the transitions so that if we return to the pause menu the items will transition.
-		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
-		self.transitions.setup_single_item_transition(self.pause_menu.items[1], True, True, False, True)
+		self.setup_transitions
 
 		# Blit the background surface over the window surface, so that the confirmation menu display over clean background surface.
 		self.window_surface.blit(self.background_surface, (0, 0))
@@ -81,10 +87,17 @@ class PauseMenu(scene.Scene):
 		self.done = True
 		self.next_screen = screens.mainmenu.MainMenu
 
+	def setup_transitions(self):
+		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
+		for item in self.pause_menu.items[1:len(self.pause_menu.items) - 1]:
+			# For every item other than the first and last item, we set these transitions.
+			self.transitions.setup_single_item_transition(item, True, True, False, False)
+		self.transitions.setup_single_item_transition(self.pause_menu.items[-1], True, True, False, True)
+
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_START):
 			# If the escape key is pressed, we resume the game.
-			self.resume()
+			self.resume(None)
 		else:
 			# Traversal handles key movement in menus!
 			traversal.traverse_menus(event, [self.pause_menu])
@@ -104,7 +117,7 @@ class PauseMenu(scene.Scene):
 		self.pause_menu.draw(self.window_surface)
 
 	def on_exit(self):
-		if not self.next_screen == None:
+		if not self.next_screen is None:
 			# Gameloop is over, and since we're going to return to the main menu so we clear all the groups of their contents.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

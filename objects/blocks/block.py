@@ -93,11 +93,15 @@ class Block(pygame.sprite.Sprite):
 			alpha_step = 5 * settings.GAME_FPS
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
 
+	def destroy(self):
+		# Takes care of killing self and shadow.
+		self.kill()
+		self.shadow.kill()
+
 	def update(self):
 		# Kill the block if health is reduced to zero.
 		if self.health <= 0:
-			self.kill()
-			self.shadow.kill()
+			self.destroy()
 			for effect in self.effect_group:
 				effect.destroy()
 
