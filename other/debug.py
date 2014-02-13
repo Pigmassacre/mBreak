@@ -26,7 +26,7 @@ It also contains a debug class used to display the FPS counter in the top-left c
 
 """
 
-def event(event):
+def event(event, main_clock):
 	if event.type == MOUSEBUTTONDOWN:
 		if event.button == 1:
 			create_ball_at_pos(event.pos)
@@ -43,7 +43,7 @@ def event(event):
 	elif event.type == KEYDOWN and event.key == K_p:
 		create_powerup()
 	elif event.type == KEYDOWN and event.key == K_t:
-		change_time_scale(self.main_clock)
+		change_time_scale(main_clock)
 	elif event.type == KEYDOWN and event.key == K_k:
 		for player in groups.Groups.player_group:
 			destroy_blocks_for_player(player)

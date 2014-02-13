@@ -11,11 +11,11 @@ import gui.gridmenu as gridmenu
 import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
-import settings.graphics as graphics
 import screens.scene as scene
 
 # These are the screens we can reach directly from the main menu, so we import them here.
 import screens.aboutmenu as aboutmenu
+import screens.graphicsmenu as graphicsmenu
 
 """
 
@@ -46,7 +46,6 @@ class OptionsMenu(scene.Scene):
 
 		# Setup all the menu buttons.
 		self.setup_options_menu()
-		self.setup_graphics_menu()
 
 		# Set the menu to actually display.
 		self.active_menu = [self.options_menu]
@@ -66,62 +65,12 @@ class OptionsMenu(scene.Scene):
 		self.options_menu.items[0].selected = True
 
 	def graphics(self, item):
-		self.active_menu.append(self.graphics_menu)
+		graphicsmenu.GraphicsMenu(self.window_surface, self.main_clock, self.title_logo)
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
-		
-		# Move the logo so the graphics menu has enough space.
-		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4) - self.graphics_menu_offset)
 
 	def about(self, item):
 		aboutmenu.AboutMenu(self.window_surface, self.main_clock)
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
-
-	def setup_graphics_menu(self):
-		self.graphics_menu = self.setup_menu()
-
-		# Setup the buttons and make them "on/off" buttons.
-		shadows_button = textitem.TextItem("Shadows On")
-		shadows_button.setup_is_on_off("Shadows Off", graphics.SHADOWS)
-		self.graphics_menu.add(shadows_button, self.shadows)
-
-		particles_button = textitem.TextItem("Particles On")
-		particles_button.setup_is_on_off("Particles Off", graphics.PARTICLES)
-		self.graphics_menu.add(particles_button, self.particles)
-
-		flashes_button = textitem.TextItem("Flashes On")
-		flashes_button.setup_is_on_off("Flashes Off", graphics.FLASHES)
-		self.graphics_menu.add(flashes_button, self.flashes)
-
-		traces_button = textitem.TextItem("Traces On")
-		traces_button.setup_is_on_off("Traces Off", graphics.TRACES)
-		self.graphics_menu.add(traces_button, self.traces)
-		
-		traces_button = textitem.TextItem("Background On")
-		traces_button.setup_is_on_off("Background Off", graphics.BACKGROUND)
-		self.graphics_menu.add(traces_button, self.background)
-		
-		# We store the graphics offset so we can offset the logo by this later.
-		self.graphics_menu_offset = (shadows_button.get_height() * 3)
-		self.graphics_menu.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
-
-		# We add a back button to the menu.
-		self.graphics_menu.add(textitem.TextItem("Back"), self.back)
-		self.graphics_menu.items[0].selected = True
-
-	def shadows(self, item):
-		graphics.SHADOWS = item.toggle_on_off()
-
-	def particles(self, item):
-		graphics.PARTICLES = item.toggle_on_off()
-
-	def flashes(self, item):
-		graphics.FLASHES = item.toggle_on_off()
-
-	def traces(self, item):
-		graphics.TRACES = item.toggle_on_off()
-		
-	def background(self, item):
-		graphics.BACKGROUND = item.toggle_on_off()
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:

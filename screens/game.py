@@ -68,6 +68,11 @@ class Game(scene.Scene):
 		# Keep track of the number of rounds we've done so far.
 		self.number_of_rounds_done = number_of_rounds_done
 
+		# When this is true, the game will keep on running for game_over_time milliseconds.
+		self.game_over = False
+		self.game_over_time = 1000.0
+		self.game_over_time_left = self.game_over_time
+
 		# The score is kept to be sent to the gameover screen and also to be kept for "best-of" matches.
 		self.score = score
 
@@ -166,10 +171,10 @@ class Game(scene.Scene):
 		# Detect if a player has won or not.
 		if len(self.player_one.block_group) == 0:
 			self.score[self.player_two] = self.score[self.player_two] + 1
-			self.done = True
+			self.game_over = True
 		elif len(self.player_two.block_group) == 0:
 			self.score[self.player_one] = self.score[self.player_one] + 1
-			self.done = True
+			self.game_over = True
 
 	def try_to_spawn_powerups(self):
 		# If it's time, all powerup spawn chances will increase by a certain amount.
@@ -278,7 +283,7 @@ class Game(scene.Scene):
 			for player in groups.Groups.player_group:
 				player.event(event)
 			if settings.DEBUG_MODE:
-				debug.event(event)
+				debug.event(event, self.main_clock)
 
 	def update(self):
 		# First, we check if any player has won.
@@ -348,6 +353,15 @@ class Game(scene.Scene):
 
 		# At last, we update the countdown_screen.
 		self.countdown_screen.update()
+
+		# Check if the game should be over.
+		if self.game_over:
+			if self.game_over_time_left <= 0:
+				self.done = True
+			else:
+				self.game_over_time_left -= self.main_clock.get_time()
+				if self.game_over_time_left >= 0:
+					self.main_clock.time_scale = self.game_over_time_left / self.game_over_time
 
 	def blit_with_camera(self, group, surface):
 		for entity in group:
