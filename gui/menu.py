@@ -73,12 +73,12 @@ class Menu:
 			last_item = self.items[-1]
 
 			self.items.append(item)
-			item.x = self.x - (item.get_width() / 2)
-			item.y = last_item.y + (last_item.get_height() * 2)
+			item.x = self.x - (item.get_width() / 2.0)
+			item.y = last_item.y + (last_item.get_height() * 2.0)
 		else:
 			# If it is the first item in the menu, place it at the top of the menu.
 			self.items.append(item)
-			item.x = self.x - (item.get_width() / 2)
+			item.x = self.x - (item.get_width() / 2.0)
 			item.y = self.y
 
 		# Register the item to the functions dictionary.
@@ -91,8 +91,8 @@ class Menu:
 	def cleanup(self):
 		# Repositions all the items in the menu.
 		for item in self.items:
-			item.x = self.x - (item.get_width() / 2)
-			item.y = self.y + ((item.get_height() * 2) * self.items.index(item))
+			item.x = self.x - (item.get_width() / 2.0)
+			item.y = self.y + ((item.get_height() * 2.0) * self.items.index(item))
 
 	def register_other_menus(self, other_menus):
 		# Register the other menus into our own list of other menus.

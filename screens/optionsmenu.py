@@ -16,6 +16,7 @@ import screens.scene as scene
 # These are the screens we can reach directly from the main menu, so we import them here.
 import screens.aboutmenu as aboutmenu
 import screens.graphicsmenu as graphicsmenu
+import screens.soundmenu as soundmenu
 
 """
 
@@ -60,12 +61,17 @@ class OptionsMenu(scene.Scene):
 	def setup_options_menu(self):
 		self.options_menu = self.setup_menu()
 		self.options_menu.add(textitem.TextItem("Graphics"), self.graphics)
+		self.options_menu.add(textitem.TextItem("Sound"), self.sound)
 		self.options_menu.add(textitem.TextItem("About"), self.about)
 		self.options_menu.add(textitem.TextItem("Back"), self.back)
 		self.options_menu.items[0].selected = True
 
 	def graphics(self, item):
 		graphicsmenu.GraphicsMenu(self.window_surface, self.main_clock, self.title_logo)
+		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+
+	def sound(self, item):
+		soundmenu.SoundMenu(self.window_surface, self.main_clock, self.title_logo)
 		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 	def about(self, item):

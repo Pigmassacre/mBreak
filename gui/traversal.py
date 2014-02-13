@@ -99,10 +99,10 @@ def select_left_or_right(list_of_menus, left):
 	# Depending on if we're going left or right, we filter in different ways.
 	if left:
 		# If we're going left, we only want the items that have an x-value SMALLER than our selected items x-value.
-		list_of_possible = filter(lambda x: (x.x + (x.get_width() / 2)) < (selected_item.x + (selected_item.get_width() / 2)), list_of_possible)
+		list_of_possible = filter(lambda x: (x.x + (x.get_width() / 2.0)) < (selected_item.x + (selected_item.get_width() / 2.0)), list_of_possible)
 	else:
 		# If we're going right, we only want the items that have an x-value LARGER than our selected items x-value.
-		list_of_possible = filter(lambda x: (x.x + (x.get_width() / 2)) > (selected_item.x + (selected_item.get_width() / 2)), list_of_possible)
+		list_of_possible = filter(lambda x: (x.x + (x.get_width() / 2.0)) > (selected_item.x + (selected_item.get_width() / 2.0)), list_of_possible)
 
 	# Find out if there if any of the possible items are in the same menu as the selected item. If they are
 	# we only care about those items.
@@ -117,12 +117,12 @@ def select_left_or_right(list_of_menus, left):
 			least_y_difference = 999999
 			for an_item in list_of_possible:
 				# Find the least y difference.
-				this_difference = abs((an_item.y + (an_item.get_height() / 2)) - (selected_item.y + (selected_item.get_height() / 2)))
+				this_difference = abs((an_item.y + (an_item.get_height() / 2.0)) - (selected_item.y + (selected_item.get_height() / 2.0)))
 				if this_difference < least_y_difference:
 					least_y_difference = this_difference
 
 			# We want to retain the items which have a y-difference equal to the least y-difference.
-			list_of_possible = filter(lambda x: abs((x.y + (x.get_height() / 2)) - (selected_item.y + (selected_item.get_height() / 2))) == least_y_difference, list_of_possible)
+			list_of_possible = filter(lambda x: abs((x.y + (x.get_height() / 2.0)) - (selected_item.y + (selected_item.get_height() / 2.0))) == least_y_difference, list_of_possible)
 		else:
 			# If we're traveling within the same menu, we only care about those menu items and the x-positions.
 			list_of_possible = same_menu_items
@@ -175,10 +175,10 @@ def select_up_or_down(list_of_menus, up):
 	# Depending on if we're going up or down, we want to filter in different ways.
 	if up:
 		# If we're going up, we only want the items which have a y-value SMALLER than the selected item.
-		list_of_possible = filter(lambda x: (x.y + (x.get_height() / 2)) < (selected_item.y + (selected_item.get_height() / 2)), list_of_possible)
+		list_of_possible = filter(lambda x: (x.y + (x.get_height() / 2.0)) < (selected_item.y + (selected_item.get_height() / 2.0)), list_of_possible)
 	else:
 		# If we're going down, we only want the items which have a y-value LARGER than the selected item.
-		list_of_possible = filter(lambda x: (x.y + (x.get_height() / 2)) > (selected_item.y + (selected_item.get_height() / 2)), list_of_possible)
+		list_of_possible = filter(lambda x: (x.y + (x.get_height() / 2.0)) > (selected_item.y + (selected_item.get_height() / 2.0)), list_of_possible)
 
 	# Find out if there if any of the possible items are in the same menu as the selected item.
 	same_menu_items = list(list_of_possible)
@@ -192,12 +192,12 @@ def select_up_or_down(list_of_menus, up):
 			least_x_difference = 999999
 			for an_item in list_of_possible:
 				# Find the least x difference.
-				this_difference = abs((an_item.x + (an_item.get_width() / 2)) - (selected_item.x + (selected_item.get_width() / 2)))
+				this_difference = abs((an_item.x + (an_item.get_width() / 2.0)) - (selected_item.x + (selected_item.get_width() / 2.0)))
 				if this_difference < least_x_difference:
 					least_x_difference = this_difference
 
 			# We want to retain the items which have a x-difference equal to the least x-difference.
-			list_of_possible = filter(lambda x: abs((x.x + (x.get_width() / 2)) - (selected_item.x + (selected_item.get_width() / 2))) == least_x_difference, list_of_possible)
+			list_of_possible = filter(lambda x: abs((x.x + (x.get_width() / 2.0)) - (selected_item.x + (selected_item.get_width() / 2.0))) == least_x_difference, list_of_possible)
 		else:
 			# If we're traveling within the same menu, we only care about the items in that menu and the y-positions.
 			list_of_possible = same_menu_items

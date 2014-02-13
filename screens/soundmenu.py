@@ -11,16 +11,15 @@ import gui.gridmenu as gridmenu
 import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
-import settings.graphics as graphics
 import screens.scene as scene
 
 """
 
-This is the Graphics Menu of the game. Here you can set the various graphical options.
+This is the sound Menu of the game. Here you can set the various sound options.
 
 """
 
-class GraphicsMenu(scene.Scene):
+class SoundMenu(scene.Scene):
 
 	def __init__(self, window_surface, main_clock, title_logo = None):
 		# Call the superconstructor.
@@ -33,7 +32,7 @@ class GraphicsMenu(scene.Scene):
 		self.all_menus = []
 
 		# Setup all the menu buttons.
-		self.setup_graphics_menu()
+		self.setup_sound_menu()
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
@@ -46,7 +45,7 @@ class GraphicsMenu(scene.Scene):
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
-		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4) - self.graphics_menu_offset)
+		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition(self.main_clock)
 		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
@@ -56,60 +55,35 @@ class GraphicsMenu(scene.Scene):
 
 		# Setup the menu transitions.
 		self.menu_transition = transition.Transition(self.main_clock)
-		self.menu_transition.setup_transition(self.graphics_menu_left, True, False, False, False)
-		self.menu_transition.setup_transition(self.graphics_menu_right, False, True, False, False)
+		self.menu_transition.setup_transition(self.sound_menu, True, True, False, False)
 		self.menu_transition.setup_transition(self.back_menu, True, True, False, False)
 
 		# And finally, start the gameloop!
 		self.gameloop()
 
-	def setup_graphics_menu(self):
-		self.graphics_menu_left = self.setup_menu_left()
-		self.graphics_menu_right = self.setup_menu_right()
+	def setup_sound_menu(self):
+		self.sound_menu = menu.Menu(settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
 		# Setup the buttons and make them "on/off" buttons.
-		shadows_button = textitem.TextItem("Shadows On")
-		shadows_button.setup_is_on_off("Shadows Off", graphics.SHADOWS)
-		self.graphics_menu_left.add(shadows_button, self.shadows)
+		"""sound_button = textitem.TextItem("Sound Effects On")
+		sound_button.setup_is_on_off("Sound Effects Off", aaaarrgghh)
+		self.sound_menu.add(sound_button, self.sound)"""
 
-		particles_button = textitem.TextItem("Particles On")
-		particles_button.setup_is_on_off("Particles Off", graphics.PARTICLES)
-		self.graphics_menu_left.add(particles_button, self.particles)
+		music_button = textitem.TextItem("Music On")
+		music_button.setup_is_on_off("Music Off", pygame.mixer.music.get_volume() > 0.0)
+		self.sound_menu.add(music_button, self.music)
 
-		flashes_button = textitem.TextItem("Flashes On")
-		flashes_button.setup_is_on_off("Flashes Off", graphics.FLASHES)
-		self.graphics_menu_left.add(flashes_button, self.flashes)
+		self.all_menus.append(self.sound_menu)
 
-		traces_button = textitem.TextItem("Traces On")
-		traces_button.setup_is_on_off("Traces Off", graphics.TRACES)
-		self.graphics_menu_right.add(traces_button, self.traces)
-		
-		traces_button = textitem.TextItem("Background On")
-		traces_button.setup_is_on_off("Background Off", graphics.BACKGROUND)
-		self.graphics_menu_right.add(traces_button, self.background)
-		
-		# We store the graphics offset so we can offset the logo by this later.
-		self.graphics_menu_offset = (shadows_button.get_height() * 1)
-		self.graphics_menu_left.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
-		self.graphics_menu_right.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
+	def sound(self, item):
+		if item.toggle_on_off():
+			pass
 
-		self.all_menus.append(self.graphics_menu_left)
-		self.all_menus.append(self.graphics_menu_right)
-
-	def shadows(self, item):
-		graphics.SHADOWS = item.toggle_on_off()
-
-	def particles(self, item):
-		graphics.PARTICLES = item.toggle_on_off()
-
-	def flashes(self, item):
-		graphics.FLASHES = item.toggle_on_off()
-
-	def traces(self, item):
-		graphics.TRACES = item.toggle_on_off()
-		
-	def background(self, item):
-		graphics.BACKGROUND = item.toggle_on_off()
+	def music(self, item):
+		if item.toggle_on_off():
+			pygame.mixer.music.set_volume(1.0)
+		else:
+			pygame.mixer.music.set_volume(0.0)
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
@@ -123,12 +97,6 @@ class GraphicsMenu(scene.Scene):
 		else:
 			# Otherwise, we just save the given title_logo object
 			self.title_logo = title_logo
-
-	def setup_menu_left(self):
-		return menu.Menu(settings.SCREEN_WIDTH / 4, settings.SCREEN_HEIGHT / 2)
-
-	def setup_menu_right(self):
-		return menu.Menu(settings.SCREEN_WIDTH - (settings.SCREEN_WIDTH / 4), settings.SCREEN_HEIGHT / 2)
 
 	def back(self, item):
 		self.done = True

@@ -76,14 +76,6 @@ class HelpMenu(scene.Scene):
 		self.help_menu.y = 9 * settings.GAME_SCALE
 		self.all_menus.append(self.help_menu)
 
-		# We setup and add all the necessary items to the help_menu.
-		root = "res/helpdata"
-		for file in os.listdir("res/helpdata"):
-			if file.endswith(".json"):
-				self.setup_info(os.path.join(root, file))
-
-		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
-
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
 		self.back_menu = menu.Menu()
@@ -92,6 +84,14 @@ class HelpMenu(scene.Scene):
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
 		self.all_menus.append(self.back_menu)
+
+		# We setup and add all the necessary items to the help_menu.
+		root = "res/helpdata"
+		for file in os.listdir("res/helpdata"):
+			if file.endswith(".json"):
+				self.setup_info(os.path.join(root, file))
+
+		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 
 		# Register all menus with each other.
 		for a_menu in self.all_menus:
@@ -149,7 +149,7 @@ class HelpMenu(scene.Scene):
 		return self.info[item]
 
 	def setup_info(self, file_path):
-		info_texts = []
+		texts = []
 
 		# Parse the JSON file.
 		json_file = open(file_path, "r")
@@ -159,6 +159,7 @@ class HelpMenu(scene.Scene):
 			print("IOError when reading JSON file.")		
 		finally:
 			json_file.close()
+
 
 		# We try to parse the image tag in the JSON file. If it isn't found, an error is raised.
 		if "image" in parsed_json:
@@ -186,11 +187,11 @@ class HelpMenu(scene.Scene):
 
 		# We try to parse the title tag in the JSON file. If it isn't found, an error is raised.
 		if "title" in parsed_json:
-			info_text = textitem.TextItem(parsed_json["title"], pygame.Color(255, 255, 255), 255, self.font_size)
-			info_text.x = (settings.SCREEN_WIDTH - info_text.get_width()) / 2
-			info_text.y = self.help_menu.y + self.help_menu.get_height() + info_text.get_height()
-			info_texts.append(info_text)
-			previous_info_text = info_text
+			text = textitem.TextItem(parsed_json["title"], pygame.Color(255, 255, 255), 255, self.font_size)
+			text.x = (settings.SCREEN_WIDTH - text.get_width()) / 2
+			text.y = self.help_menu.y + self.help_menu.get_height() + text.get_height()
+			texts.append(text)
+			previous_text = text
 		else:
 			raise SyntaxError("Title key not found in JSON file.")
 
@@ -208,36 +209,65 @@ class HelpMenu(scene.Scene):
 				else:
 					color = pygame.Color(150, 150, 150)
 
-				info_text = textitem.TextItem(line, color, 255, self.font_size)
+				text = textitem.TextItem(line, color, 255, self.font_size)
 
 				if first_line:
-					info_text.x = self.distance_from_screen_edge
-					info_text.y = previous_info_text.y + (2 * info_text.get_height())
+					text.x = self.distance_from_screen_edge
+					text.y = previous_text.y + (2 * text.get_height())
 					first_line = False
 				else:
-					info_text.x = self.distance_from_screen_edge
-					info_text.y = previous_info_text.y + info_text.get_height()
+					text.x = self.distance_from_screen_edge
+					text.y = previous_text.y + text.get_height()
 				
-				info_texts.append(info_text)
-				previous_info_text = info_text
+				texts.append(text)
+				previous_text = text
 
 				if line != "":
 					odd = not odd
 		else:
 			raise SyntaxError("Body tag not found in JSON file.")
 
-		self.info[image_item] = info_texts
+		if "quote" in parsed_json:
+			quote = parsed_json["quote"]
+
+			odd = True
+
+			quotes = []
+
+			font = pygame.font.Font(textitem.TextItem.font_path, self.font_size)
+			wrapped_quote = useful.wrap_multi_line(quote, font, self.max_width_of_text_line)
+
+			for line in wrapped_quote:
+				if odd:
+					color = pygame.Color(200, 0, 200)
+				else:
+					color = pygame.Color(200, 50, 200)
+
+				text = textitem.TextItem(line, color, 255, self.font_size)
+				text.x = settings.SCREEN_WIDTH - text.get_width() - self.distance_from_screen_edge
+				
+				quotes.append(text)
+				texts.append(text)
+				previous_text = text
+
+				if line != "":
+					odd = not odd
+
+			for quote_line in quotes:
+				quote_line.y = (self.back_menu.y - (2 * quote_line.get_height()) - len(quotes) * quote_line.get_height()) + quotes.index(quote_line) * quote_line.get_height()
+
+		self.info[image_item] = texts
 		
 		return image_item
 
-	def setup_info_transitions(self, info_texts):
-		for item in info_texts:
+	def setup_info_transitions(self, texts):
+		for item in texts:
 			self.transitions.setup_single_item_transition(item, True, True, False, False)
 
-	def show_info(self, info_texts, surface):
-		if not info_texts is None:
-			for info_text in info_texts:
-				info_text.draw(surface)
+	def show_info(self, texts, surface):
+		if not texts is None:
+			for text in texts:
+				text.draw(surface)
 
 	def back(self, item):
 		# Simply ends this scene.

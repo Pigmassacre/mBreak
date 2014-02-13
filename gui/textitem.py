@@ -59,6 +59,7 @@ class TextItem(item.Item):
 
 		# Set the given values.
 		self.string = string
+		self.off_string = string
 		self.font_color = font_color
 		self.alpha_value = alpha_value
 		self.size = size
@@ -134,6 +135,14 @@ class TextItem(item.Item):
 		if not self.string == string:
 			self.string = string
 			self.setup_surfaces()
+
+	def set_bold(self, choice):
+		self.font.set_bold(choice)
+		self.setup_surfaces()
+
+	def set_italic(self, choice):
+		self.font.set_italic(choice)
+		self.setup_surfaces()
 
 	def get_width(self):
 		return self.font.size(self.string)[0]

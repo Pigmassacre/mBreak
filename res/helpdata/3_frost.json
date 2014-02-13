@@ -1,5 +1,6 @@
 {
-	"image": "res/powerup/frost.png",
+	"image": "res/powerup/frost_help.png",
 	"title": "Frost",
-	"body": "Don't be so frosty, Mr. Frosty."
+	"body": "When picked up, applies a frost effect to all your balls.\n\nWhen a frozen ball hits an enemy paddle, that paddle is frozen for a short while. Frozen paddles move more slowly.\n\nThis effect stacks additively, meaning that eventually a paddle can become unable to move for a short while if it has enough stacks of this effect.",
+	"quote": "\"Don't be so frosty, Mr Frosty.\""
 }

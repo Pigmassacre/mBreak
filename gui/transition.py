@@ -49,7 +49,8 @@ class Transition:
 		"""
 		Simply removes all the items in this Transitions object.
 		"""
-		del(self.items[:])
+		if len(self.items) > 0:
+			del(self.items[:])
 
 	def setup_transition(self, menu_to_setup, left, right, up, down):
 		"""

@@ -101,10 +101,14 @@ class Debug:
 	font_size = 9 * settings.GAME_SCALE
 	font = pygame.font.Font(settings.DEBUG_FONT, font_size)
 	font_color = (255, 255, 255)
+	shadow_color = pygame.Color(50, 50, 50)
+	shadow_offset_x = 0 * settings.GAME_SCALE
+	shadow_offset_y = 1 * settings.GAME_SCALE
 	x = font_size
 	y = font_size
 
 	@staticmethod
 	def display(surface, main_clock):
 		# Display the current FPS.
+		surface.blit(Debug.font.render(str(int(main_clock.get_fps())), False, Debug.shadow_color), (Debug.x + Debug.shadow_offset_x, Debug.y + Debug.shadow_offset_y))
 		surface.blit(Debug.font.render(str(int(main_clock.get_fps())), False, Debug.font_color), (Debug.x, Debug.y))
