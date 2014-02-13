@@ -59,8 +59,8 @@ class GameOver(scene.Scene):
 		item_side_padding = textitem.TextItem.font_size
 
 		# Determine if there is a clear winner, or if there is a draw.
-		if not self.winner == None:
-			winning_text = self.winner.name + " Wins"
+		if not self.winner is None:
+			winning_text = self.winner.name + " wins!"
 		else:
 			winning_text = "Draw"
 

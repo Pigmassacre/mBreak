@@ -55,6 +55,12 @@ class Toast(scene.Scene):
 
 		# Setup the menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
+		#self.transitions.speed *= 2.0
+		for message in self.message:
+			if self.message.index(message) == 0:
+				self.transitions.setup_single_item_transition(message, True, True, True, False)
+			else:
+				self.transitions.setup_single_item_transition(message, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.toast_menu.items[0], True, True, False, True)
 
 		# And finally, start the gameloop!

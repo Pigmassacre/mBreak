@@ -22,7 +22,7 @@ However, there's no harm in having multiple instances if you want to given them 
 class Transition:
 
 	# The standard speed value, used unless changed for the instance of this class.
-	speed = 840 * settings.GAME_SCALE
+	speed = 14 * settings.GAME_FPS * settings.GAME_SCALE
 
 	def __init__(self, main_clock):
 		# The speed at which each item moves.

@@ -31,7 +31,7 @@ class ColorItem(item.Item):
 	selected_border_size = 2 * settings.GAME_SCALE
 	chosen_border_color = pygame.Color(200, 200, 200)
 	chosen_border_size = 2 * settings.GAME_SCALE
-	unavailable_color = pygame.Color(100, 100, 100)
+	unavailable_color = pygame.Color(75, 75, 75)
 
 	def __init__(self, color):
 		item.Item.__init__(self)
