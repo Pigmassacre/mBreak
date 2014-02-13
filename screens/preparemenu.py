@@ -13,7 +13,7 @@ import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
 import gui.imageitem as imageitem
 import gui.transition as transition
-import gui.toast as toast
+import screens.toast as toast
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -128,11 +128,6 @@ class PrepareMenu(scene.Scene):
 		# Register all menus with each other.
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
-
-		# This toast is displayed when the start button is pressed if not all players have chosen their colors.
-		self.not_all_colors_chosen_toast = toast.Toast("Pick colors and AI difficulty", 1700, self.main_clock)
-		self.not_all_colors_chosen_toast.x = (settings.SCREEN_WIDTH - self.not_all_colors_chosen_toast.get_width()) / 2
-		self.not_all_colors_chosen_toast.y = self.color_menu_two.y + self.color_menu_two.get_height() +  self.not_all_colors_chosen_toast.get_height()
 
 		# We setup all menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
@@ -275,7 +270,7 @@ class PrepareMenu(scene.Scene):
 			self.done = True
 		else:
 			# If a player haven't picked his or hers color, we show a toast that informs the players of this.
-			self.not_all_colors_chosen_toast.start()
+			toast.Toast(self.window_surface, self.main_clock, "Both players need to pick a color before the game can begin.")
 
 	def back(self, item = None):
 		# Simply moves back to the main menu.
@@ -302,9 +297,6 @@ class PrepareMenu(scene.Scene):
 		self.back_menu.update(self.main_clock)
 		self.start_menu.update(self.main_clock)
 
-		# Update the toast.
-		self.not_all_colors_chosen_toast.update()
-
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
 		self.window_surface.fill(settings.BACKGROUND_COLOR)
@@ -326,9 +318,6 @@ class PrepareMenu(scene.Scene):
 		# Draw the back and start menus.
 		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)
-
-		# Draw the toast.
-		self.not_all_colors_chosen_toast.draw(self.window_surface)
 
 	def on_exit(self):
 		if self.next_screen == game.Game:
