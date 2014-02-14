@@ -70,12 +70,12 @@ class AboutMenu(scene.Scene):
 		self.pyganim_credits_author.x = (settings.SCREEN_WIDTH - self.pyganim_credits_author.get_width()) / 2
 		self.pyganim_credits_author.y = self.pyganim_credits_source_code.y + self.pyganim_credits_author.get_height()
 
-		self.music_credits_title = textitem.TextItem("Title screen music is sexxxy bit 3 dot xm")
+		self.music_credits_title = textitem.TextItem("Title screen music is sexxxy bit 3.xm")
 		self.music_credits_title.set_size(font_size)
 		self.music_credits_title.x = (settings.SCREEN_WIDTH - self.music_credits_title.get_width()) / 2
 		self.music_credits_title.y = self.pyganim_credits_author.y + (2 * self.music_credits_title.get_height())
 
-		self.music_credits_after_game = textitem.TextItem("Postgame music is october chip dot xm")
+		self.music_credits_after_game = textitem.TextItem("Postgame music is october chip.xm")
 		self.music_credits_after_game.set_size(font_size)
 		self.music_credits_after_game.x = (settings.SCREEN_WIDTH - self.music_credits_after_game.get_width()) / 2
 		self.music_credits_after_game.y = self.music_credits_title.y + self.music_credits_after_game.get_height()
@@ -85,7 +85,7 @@ class AboutMenu(scene.Scene):
 		self.music_credits_title_author.x = (settings.SCREEN_WIDTH - self.music_credits_title_author.get_width()) / 2
 		self.music_credits_title_author.y = self.music_credits_after_game.y + self.music_credits_title_author.get_height()
 
-		self.music_credits_game = textitem.TextItem("Game music is stardstm dot mod")
+		self.music_credits_game = textitem.TextItem("Game music is stardstm.mod")
 		self.music_credits_game.set_size(font_size)
 		self.music_credits_game.x = (settings.SCREEN_WIDTH - self.music_credits_game.get_width()) / 2
 		self.music_credits_game.y = self.music_credits_title_author.y + (2 * self.music_credits_game.get_height())

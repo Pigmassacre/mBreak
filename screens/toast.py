@@ -55,7 +55,7 @@ class Toast(scene.Scene):
 
 		# Setup the menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
-		#self.transitions.speed *= 2.0
+		self.transitions.speed *= 1.5
 		for message in self.message:
 			if self.message.index(message) == 0:
 				self.transitions.setup_single_item_transition(message, True, True, True, False)

@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import logging
 from pygame.locals import *
 import math
 import random
@@ -103,7 +104,7 @@ class Game(scene.Scene):
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 1, 2, 1)
+		self.game_level = level.Level(self.player_one, self.player_two, 0, 0, 2)
 
 		# The list of available powerups to spawn.
 		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
@@ -169,12 +170,15 @@ class Game(scene.Scene):
 
 	def check_for_winner(self):
 		# Detect if a player has won or not.
-		if len(self.player_one.block_group) == 0:
-			self.score[self.player_two] = self.score[self.player_two] + 1
-			self.game_over = True
-		elif len(self.player_two.block_group) == 0:
-			self.score[self.player_one] = self.score[self.player_one] + 1
-			self.game_over = True
+		if not self.game_over:
+			if len(self.player_one.block_group) == 0:
+				self.score[self.player_two] = self.score[self.player_two] + 1
+				self.winner = self.player_two
+				self.game_over = True
+			elif len(self.player_two.block_group) == 0:
+				self.score[self.player_one] = self.score[self.player_one] + 1
+				self.winner = self.player_one
+				self.game_over = True
 
 	def try_to_spawn_powerups(self):
 		# If it's time, all powerup spawn chances will increase by a certain amount.
@@ -298,6 +302,15 @@ class Game(scene.Scene):
 		
 		# Slows down time if a ball is close to the last remaining enemy blocks.
 		self.main_clock.time_scale = self.main_clock.default_time_scale
+
+		# Check if the game should be over.
+		if self.game_over:
+			if self.game_over_time_left <= 0:
+				self.done = True
+			else:
+				self.game_over_time_left -= self.main_clock.get_time()
+				if self.game_over_time_left >= 0:
+					self.main_clock.time_scale = self.game_over_time_left / self.game_over_time
 		
 		least_distance = 999999
 		least_distance = self.calculate_time_dilation(groups.Groups.ball_group, least_distance)
@@ -353,15 +366,6 @@ class Game(scene.Scene):
 
 		# At last, we update the countdown_screen.
 		self.countdown_screen.update()
-
-		# Check if the game should be over.
-		if self.game_over:
-			if self.game_over_time_left <= 0:
-				self.done = True
-			else:
-				self.game_over_time_left -= self.main_clock.get_time()
-				if self.game_over_time_left >= 0:
-					self.main_clock.time_scale = self.game_over_time_left / self.game_over_time
 
 	def blit_with_camera(self, group, surface):
 		for entity in group:
@@ -453,6 +457,34 @@ class Game(scene.Scene):
 		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
 		self.player_one.empty_groups()
 		self.player_two.empty_groups()
+
+		# Log AI matches.
+		if False:
+			if sum(self.score.itervalues()) > 20:
+				self.next_screen = None
+			else:
+				if sum(self.score.itervalues()) <= 5:
+					self.player_one.ai_difficulty = 1
+					self.player_two.ai_difficulty = 1
+					logging.basicConfig(filename="ai_100.log", level=logging.DEBUG)
+				elif sum(self.score.itervalues()) <= 10:
+					logging.basicConfig(filename="ai_200.log", level=logging.DEBUG)
+					self.player_one.ai_difficulty = 2
+					self.player_two.ai_difficulty = 1
+				elif sum(self.score.itervalues()) <= 15:
+					logging.basicConfig(filename="ai_300.log", level=logging.DEBUG)
+					self.player_one.ai_difficulty = 1
+					self.player_two.ai_difficulty = 2
+				elif sum(self.score.itervalues()) <= 20:
+					logging.basicConfig(filename="ai_400.log", level=logging.DEBUG)
+					self.player_one.ai_difficulty = 2
+					self.player_two.ai_difficulty = 2			
+
+				logging.info("Time (in seconds): %s", pygame.time.get_ticks() / 1000.0)
+				logging.info("%s won this round. Total score for %s: %s", self.winner.name, self.winner.name, self.score[self.winner])
+
+				groups.empty_after_round()
+				Game(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
 
 		# We decrement the number of rounds by 1 because we've just played one round.
 		self.number_of_rounds_done += 1

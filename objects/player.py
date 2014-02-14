@@ -196,10 +196,11 @@ class Player(pygame.sprite.Sprite):
 			if player != self:
 				block_list = player.block_group.sprites()
 
-		for paddle in self.paddle_group:
-			# Create a missile that homes in on a random block in the block list.
-			the_missile = missile.Missile(paddle.x + (paddle.width / 2) - (missile.Missile.width / 2), paddle.y + (paddle.height / 2) - (missile.Missile.height / 2), random.uniform(0, 2*math.pi), self, random.choice(block_list))
-			the_missile.acceleration *= random.uniform(1.5, 3)
+		if len(block_list) > 0:
+			for paddle in self.paddle_group:
+				# Create a missile that homes in on a random block in the block list.
+				the_missile = missile.Missile(paddle.x + (paddle.width / 2) - (missile.Missile.width / 2), paddle.y + (paddle.height / 2) - (missile.Missile.height / 2), random.uniform(0, 2*math.pi), self, random.choice(block_list))
+				the_missile.acceleration *= random.uniform(1.5, 3)
 
 	def unleash_energy(self):
 		if self.energy >= 20:

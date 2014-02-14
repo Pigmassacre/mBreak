@@ -194,29 +194,47 @@ class Paddle(pygame.sprite.Sprite):
 			surface.fill(color, pygame.Rect(self.focused_item.rect.x - 1 * settings.GAME_SCALE - camera.CAMERA.x, self.focused_item.y - 1 * settings.GAME_SCALE - camera.CAMERA.y, self.focused_item.width + 2 * settings.GAME_SCALE, self.focused_item.height + 2 * settings.GAME_SCALE))
 
 	def decide_which_item(self, item):
-		if self.owner.ai_difficulty >= 2:
+		if self.owner.ai_difficulty >= 3:
 			# The higher the difficulty the smarter / cheatier the AI.
-			if math.fabs(self.x - item.x) < self.min_x_distance:
-				self.min_x_distance = math.fabs(self.x - item.x)
+			if math.fabs(self.rect.x - item.x) < self.min_x_distance:
+				self.min_x_distance = math.fabs(self.rect.x - item.x)
 				self.focused_item = item
 		else:
-			# Standard difficulty, no cheat. Simply seek out the item with the least distance to
-			# the paddle, and move towards that item.
-			self.min_x_distance = math.fabs(self.x - item.x)
-			self.min_y_distance = math.fabs(self.y - item.y)
+			# If high difficulty, we're check a bit more.
+			if self.owner.ai_difficulty >= 2:
+				predicted_x = item.rect.x#item.rect.x + math.cos(item.angle) * item.speed
+				predicted_y = item.rect.y#item.rect.y + math.sin(item.angle) * item.speed
+				if item.rect.y + item.rect.height < self.rect.y:
+					# If the item is above our item, we check distance from our top.
+					self.min_x_distance = math.fabs(self.rect.x - (predicted_x + item.rect.width / 2.0))
+					self.min_y_distance = math.fabs(self.rect.y - (predicted_y + item.rect.height / 2.0))
+				elif item.rect.y > self.rect.y + self.rect.height:
+					# If the item is below our item, we check distance from our bottom.
+					self.min_x_distance = math.fabs(self.rect.x - (predicted_x + item.rect.width / 2.0))
+					self.min_y_distance = math.fabs((self.rect.y + self.rect.height) - (predicted_y + item.rect.height / 2.0))
+				else:
+					# If the item is in the middle of our paddle, we check against the middle of our paddle.
+					self.min_x_distance = math.fabs(self.rect.x - (predicted_x + item.rect.width / 2.0))
+					self.min_y_distance = math.fabs((self.rect.y + self.rect.height / 2.0) - (predicted_y + item.rect.height / 2.0))
+			else:
+				# For normal difficulty, simply check middle of item against middle of paddle.
+				self.min_x_distance = math.fabs(self.rect.x - (item.rect.x + item.rect.width / 2.0))
+				self.min_y_distance = math.fabs((self.rect.y + self.rect.height / 2.0) - (item.rect.y + item.rect.height / 2.0))
+
 			if math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2)) < self.min_distance:
 				self.min_distance = math.sqrt(math.pow(self.min_x_distance, 2) + math.pow(self.min_y_distance, 2))
 
-				# If it is one of our own items, we do not care about it as much, so increase the distance to it.
-				if hasattr(item, "owner"):
-					if item.owner == self.owner:
-						self.min_distance = self.min_distance * 2
+				if self.owner.ai_difficulty >= 2:
+					# If it is one of our own items, we do not care about it as much, so increase the distance to it.
+					if hasattr(item, "owner"):
+						if item.owner == self.owner:
+							self.min_distance = self.min_distance * 2.5
 
-				# For each speed effect on the item, we halve the distance to it (since each speed effect doubles it's speed)
-				if hasattr(item, "effect_group"):
-					for effect in item.effect_group:
-						if effect.__class__ == speed.Speed:
-							self.min_distance = self.min_distance / 2
+					# For each speed effect on the item, we halve the distance to it (since each speed effect doubles it's speed)
+					if hasattr(item, "effect_group"):
+						for effect in item.effect_group:
+							if effect.__class__ == speed.Speed:
+								self.min_distance = self.min_distance / 2.0
 
 				self.focused_item = item
 
@@ -257,12 +275,12 @@ class Paddle(pygame.sprite.Sprite):
 				if paddle_side_left:
 					# If this is the left paddle, we only care about the projectile that have an angle that points to
 					# the paddle, and projectile that are on the right side of the paddle.
-					if projectile.angle >= math.pi / 2 and projectile.angle <= 3 * math.pi / 2 and projectile.x > self.x + self.width:
+					if projectile.angle >= math.pi / 2.0 and projectile.angle <= 3 * math.pi / 2.0 and projectile.x > self.x + self.width:
 						self.decide_which_item(projectile)
 				else:
 					# If this is the right paddle, we only care about projectile to the left of this paddle (and projectile
 					# that have an angle that points to the paddle).
-					if projectile.angle <= math.pi / 2 or projectile.angle >= 3 * math.pi / 2 and projectile.x < self.x:
+					if ((projectile.angle <= math.pi / 2.0 and projectile.angle >= -math.pi / 2.0) or (projectile.angle >= 3 * math.pi / 2.0 and projectile.angle <= 2 * math.pi + math.pi / 2.0)) and projectile.x < self.x:
 						self.decide_which_item(projectile)
 
 			# Loop over every ball in the game, and figure out which ball to focus on.
@@ -270,30 +288,41 @@ class Paddle(pygame.sprite.Sprite):
 				if paddle_side_left:
 					# If this is the left paddle, we only care about the balls that have an angle that points to
 					# the paddle, and balls that are on the right side of the paddle.
-					if ball.angle >= math.pi / 2 and ball.angle <= 3 * math.pi / 2 and ball.x >= self.x + (self.width / 3):
+					if ball.angle >= math.pi / 2.0 and ball.angle <= 3 * math.pi / 2.0 and ball.x >= self.x + (self.width / 3.0):
 						self.decide_which_item(ball)
 				else:
 					# If this is the right paddle, we only care about balls to the left of this paddle (and balls
 					# that have an angle that points to the paddle).
-					if ball.angle <= math.pi / 2 or ball.angle >= 3 * math.pi / 2 and ball.x < self.x + (self.width / 3):
+					if ((ball.angle <= math.pi / 2.0 and ball.angle >= -math.pi / 2.0) or (ball.angle >= 3 * math.pi / 2.0 and ball.angle <= 2 * math.pi + math.pi / 2.0)) and ball.x < self.x + (self.width / 3.0):
 						self.decide_which_item(ball)
 					
 
 			if self.focused_item != None:
 				if self.focused_item != self.old_focused_item:
-					self.chosen_distance_from_center = random.uniform((self.y + self.height / 2) - self.y + self.focused_item.height, (self.y + self.height / 2) - (self.y + self.height) - self.focused_item.height) / 2
+					if self.owner.ai_difficulty >= 2:
+						self.chosen_distance_from_center = 0#random.uniform((self.rect.y + self.rect.height / 4.0) - self.rect.y + self.focused_item.rect.height, (self.rect.y + self.rect.height / 4.0) - (self.rect.y + self.rect.height) - self.focused_item.rect.height) / 2
+					else:
+						self.chosen_distance_from_center = random.uniform((self.rect.y + self.rect.height / 2.0) - self.rect.y + self.focused_item.rect.height, (self.rect.y + self.rect.height / 2.0) - (self.rect.y + self.rect.height) - self.focused_item.rect.height) / 2
 
-				if self.owner.ai_difficulty >= 2:
+				if self.owner.ai_difficulty >= 3:
 					# If cheaty AI, teleport to ball.
-					self.y = self.focused_item.y + (self.focused_item.height / 2) - (self.height / 2)
+					self.y = self.focused_item.rect.y + (self.focused_item.rect.height / 2.0) - (self.rect.height / 2.0)
 				else:
 					# If normal AI, move to ball.
-					if self.focused_item.y + self.chosen_distance_from_center < self.y + self.height / 2:
-						if self.focused_item.y < self.y + self.height / 3:
+					if self.owner.ai_difficulty >= 2:
+						if self.focused_item.rect.y + self.focused_item.rect.height / 2.0 < self.rect.y + self.rect.height / 4.0:
 							self.key_up_pressed = True
-					elif self.focused_item.y + self.chosen_distance_from_center > self.y + self.height / 2:
-						if self.focused_item.y > self.y + self.height - self.height / 3:
+						elif self.focused_item.rect.y + self.focused_item.rect.height / 2.0 > self.rect.y + self.rect.height - self.rect.height / 4.0:
 							self.key_down_pressed = True
+					else:
+						if random.random() > 0.25:
+							# For the easy AI, we give it a small chance of failing to move.
+							if self.focused_item.rect.y + self.focused_item.rect.height / 2.0 + self.chosen_distance_from_center < self.rect.y + self.rect.height / 2.0:
+								if self.focused_item.rect.y + self.focused_item.rect.height / 2.0 < self.rect.y + self.rect.height / 3.0:
+									self.key_up_pressed = True
+							elif self.focused_item.rect.y + self.focused_item.rect.height / 2.0 + self.chosen_distance_from_center > self.rect.y + self.rect.height / 2.0:
+								if self.focused_item.rect.y + self.focused_item.rect.height / 2.0 > self.rect.y + self.rect.height - self.rect.height / 3.0:
+									self.key_down_pressed = True
 
 			self.old_focused_item = self.focused_item
 		else:

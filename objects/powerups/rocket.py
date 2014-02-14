@@ -61,4 +61,5 @@ class Rocket(powerup.Powerup):
 				block_list = player.block_group.sprites()
 
 		# Create a missile that homes in on a random block in the block list.
-		missile.Missile(entity.x, entity.y, random.uniform(0, 2*math.pi), entity.owner, random.choice(block_list))
+		if len(block_list) > 0:
+			missile.Missile(entity.x, entity.y, random.uniform(0, 2*math.pi), entity.owner, random.choice(block_list))

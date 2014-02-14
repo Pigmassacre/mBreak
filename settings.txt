@@ -1,4 +1,4 @@
-debugmode	1
+debugmode	0
 
 # PLAYER 1 SETTINGS
 p1name		Player One

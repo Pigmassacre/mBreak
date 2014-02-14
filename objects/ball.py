@@ -412,9 +412,9 @@ class Ball(pygame.sprite.Sprite):
 
 	def hit_left_side_of_paddle(self, paddle):
 		# Calculate the new angle of the ball.
-		paddle_center = paddle.y + paddle.height / 2
-		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
-		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
+		paddle_center = paddle.y + paddle.rect.height / 2.0
+		distance_from_paddle_center = (self.y + self.height / 2.0) - paddle_center
+		max_distance = (paddle.y + paddle.rect.height + self.height) - paddle_center
 		normalized_distance = (distance_from_paddle_center / max_distance)
 		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
 		self.angle = math.pi - normalized_distance * max_angle_offset
@@ -431,9 +431,9 @@ class Ball(pygame.sprite.Sprite):
 
 	def hit_right_side_of_paddle(self, paddle):
 		# Calculate the new angle of the ball.
-		paddle_center = paddle.y + paddle.height / 2
+		paddle_center = paddle.y + paddle.rect.height / 2
 		distance_from_paddle_center = (self.y + self.height / 2) - paddle_center
-		max_distance = (paddle.y + paddle.height + self.height) - paddle_center
+		max_distance = (paddle.y + paddle.rect.height + self.height) - paddle_center
 		normalized_distance = (distance_from_paddle_center / max_distance)
 		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
 		self.angle = normalized_distance * max_angle_offset
