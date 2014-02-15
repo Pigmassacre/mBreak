@@ -118,7 +118,8 @@ class Menu:
 					# If the item differs from the previously selected item, it must mean it's a newly selected item.
 					# So, we play a sound effect and then set this item as the previously selected item, so we won't play
 					# a sound effect again unless a new item is selected.
-					Menu.sound_effect.play()
+					channel = Menu.sound_effect.play()
+					print(str(channel.get_volume()))
 					self.previous_selected_item = item
 
 		# If there is no selected item in this menu, reset the previous selected item.

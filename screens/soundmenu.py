@@ -99,9 +99,10 @@ class SoundMenu(scene.Scene):
 		self.sound_volume_menu.y = self.sound_item.y - (abs(self.sound_item.get_height() - self.sound_volume_menu.get_height()) / 2.0)
 
 		# Set the button that corresponds to the current volume level to be the chosen item.
-		channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))		
+		channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))
 		average_volume = sum(channel.get_volume() for channel in channels) / float(pygame.mixer.get_num_channels())
-		self.sound_volume_menu.items[int(average_volume * len(self.sound_volume_menu.items) + 0.5) - 1].chosen = True
+		self.sound_volume_menu.items[int((average_volume * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
+		# THIS FUCKING THING DOESNT WORK RIGHT AND FUCKING BLOWS OK
 
 		self.all_menus.append(self.music_volume_menu)
 		self.all_menus.append(self.sound_volume_menu)
@@ -118,7 +119,6 @@ class SoundMenu(scene.Scene):
 
 	def set_music_volume(self, item):
 		pygame.mixer.music.set_volume(self.choose_item_from_menu(item, self.music_volume_menu) / float(len(self.music_volume_menu.items) - 1))
-		print(str(pygame.mixer.music.get_volume()))
 
 	def set_sound_volume(self, item):
 		for channel in (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels())):
