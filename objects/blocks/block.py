@@ -107,4 +107,5 @@ class Block(pygame.sprite.Sprite):
 
 			# Play a sound effect.
 			sound = Block.sound_effect.play()
-			sound.set_volume(settings.SOUND_VOLUME)
+			if not sound is None:
+				sound.set_volume(settings.SOUND_VOLUME)

@@ -119,7 +119,8 @@ class Menu:
 					# So, we play a sound effect and then set this item as the previously selected item, so we won't play
 					# a sound effect again unless a new item is selected.
 					sound = Menu.sound_effect.play()
-					sound.set_volume(settings.SOUND_VOLUME)
+					if not sound is None:
+						sound.set_volume(settings.SOUND_VOLUME)
 					self.previous_selected_item = item
 
 		# If there is no selected item in this menu, reset the previous selected item.

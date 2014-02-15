@@ -85,7 +85,8 @@ class Freezing(effect.Effect):
 			if not self.parent.owner == hit_paddle.owner:
 				Freezing(hit_paddle, Freezing.paddle_freezing_duration)
 				sound = Freezing.sound_effect.play()
-				sound.set_volume(settings.SOUND_VOLUME)
+				if not sound is None:
+					sound.set_volume(settings.SOUND_VOLUME)
 
 	def update(self, main_clock):
 		# We make sure that our size matches the parent.

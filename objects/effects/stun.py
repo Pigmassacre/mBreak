@@ -79,7 +79,8 @@ class Stun(effect.Effect):
 		if not self.parent.owner == hit_paddle.owner:
 			Stun(hit_paddle, self.paddle_stun_duration)
 			sound = Stun.sound_effect.play()
-			sound.set_volume(settings.SOUND_VOLUME)
+			if not sound is None:
+				sound.set_volume(settings.SOUND_VOLUME)
 			self.destroy()
 
 	def update(self, main_clock):

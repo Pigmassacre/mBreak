@@ -6,6 +6,7 @@ import objects.powerups.powerup as powerup
 import objects.effects.sizechange as sizechange
 import objects.shadow as shadow
 import objects.groups as groups
+import other.useful as useful
 import settings.settings as settings
 
 """
@@ -17,16 +18,18 @@ This is the Enlarger powerup. When picked up by a ball, it applies a "sizechange
 def convert():
 	# We put this here so the game-class can call this method to "preload" the image used for this powerup.
 	# I could probably put this in the constructor of the powerup, but I worry about performance so I make sure to only do it once.
-	Enlarger.image.convert_alpha()
+	Enlarger.image_sheet.convert_alpha()
 
 class Enlarger(powerup.Powerup):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
-	image = pygame.image.load("res/powerup/enlarger.png")
+	image_sheet = pygame.image.load("res/powerup/enlarger.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image_sheet.get_width() * settings.GAME_SCALE
+	height = image_sheet.get_height() * settings.GAME_SCALE
+	frame_width = width
+	frame_height = width
 	
 	# The amount of time the effect will last.
 	duration = 7500
@@ -35,14 +38,18 @@ class Enlarger(powerup.Powerup):
 	size_change = 4 * settings.GAME_SCALE
 
 	# Scale image to settings.GAME_SCALE.
-	image = pygame.transform.scale(image, (width, height))
+	image_sheet = pygame.transform.scale(image_sheet, (width, height))
 
 	def __init__(self, x, y):
 		# We start by calling the superconstructor.
-		powerup.Powerup.__init__(self, x, y, Enlarger.width, Enlarger.height)
+		powerup.Powerup.__init__(self, x, y, Enlarger.frame_width, Enlarger.frame_height)
 
-		# Load the image file.
-		self.image = Enlarger.image.copy()
+		# Generate the animation frames.
+		self.frames = useful.create_frames_from_sheet(Enlarger.image_sheet, Enlarger.frame_width, Enlarger.frame_height)
+		self.image = self.frames[len(self.frames) / 2]
+
+		# This affects how far the powerup must be from it's center y to change frames.
+		self.center_y_grace = 0.25 * settings.GAME_SCALE
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -64,3 +71,15 @@ class Enlarger(powerup.Powerup):
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
 		entity.owner.add_powerup(self.__class__, created_effect)
+
+	def update(self, main_clock):
+		# We make sure to call the supermethod.
+		powerup.Powerup.update(self, main_clock)
+
+		# Update the current image.
+		if self.y < self.center_y - self.center_y_grace:
+			self.image = self.frames[0]
+		elif self.y > self.center_y + self.center_y_grace:
+			self.image = self.frames[-1]
+		else:
+			self.image = self.frames[int(len(self.frames) / 2)]

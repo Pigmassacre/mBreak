@@ -56,6 +56,7 @@ class Powerup(pygame.sprite.Sprite):
 		# Keep track of whether or not this powerup should bob.
 		self.bob = True
 		self.start_time = pygame.time.get_ticks()
+		self.passed_time = 0
 
 		# Store self in the main powerup_group.
 		groups.Groups.powerup_group.add(self)
@@ -67,8 +68,10 @@ class Powerup(pygame.sprite.Sprite):
 		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
 		# Play a random sound from the sound_effects list.
+		print(str(random.randrange(0, len(Powerup.sound_effects))))
 		sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
-		sound.set_volume(settings.SOUND_VOLUME)
+		if not sound is None:
+			sound.set_volume(settings.SOUND_VOLUME)
 
 	def share_effect(self, entity, timeout_class, effect_creation_function, *args):
 		created_effect = None
@@ -116,12 +119,14 @@ class Powerup(pygame.sprite.Sprite):
 		# Play a random sound from the sound_effects list.
 		if play_sound:
 			sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
-			sound.set_volume(settings.SOUND_VOLUME)
+			if not sound is None:
+				sound.set_volume(settings.SOUND_VOLUME)
 
 	def update(self, main_clock):
 		# Update the position according to the bob effect.
+		self.passed_time += main_clock.get_time()
 		if self.bob:
-			self.y = self.center_y + math.sin(self.start_time + pygame.time.get_ticks() * main_clock.time_scale * 0.0075) * Powerup.bob_factor
+			self.y = self.center_y + math.sin(self.start_time + self.passed_time * 0.0075) * Powerup.bob_factor
 
 		# Update the rects position.
 		self.rect.x = self.x
