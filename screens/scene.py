@@ -45,7 +45,7 @@ class Scene:
 			self.draw()
 
 			# Display various debug information, if debug mode is enabled.
-			if settings.DEBUG_MODE:
+			if settings.DEBUG_MODE and not self.done:
 				debug.Debug.display(self.window_surface, self.main_clock)
 
 			# Finally, update the display.

@@ -144,6 +144,10 @@ class TextItem(item.Item):
 		self.font.set_italic(choice)
 		self.setup_surfaces()
 
+	def set_color(self, color):
+		self.font_color = color
+		self.setup_surfaces()
+
 	def get_width(self):
 		return self.font.size(self.string)[0]
 

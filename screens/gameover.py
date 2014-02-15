@@ -2,6 +2,8 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import math
+import copy
 from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
@@ -58,15 +60,7 @@ class GameOver(scene.Scene):
 		# Configure the GUI.
 		item_side_padding = textitem.TextItem.font_size
 
-		# Determine if there is a clear winner, or if there is a draw.
-		if not self.winner is None:
-			winning_text = self.winner.name + " wins!"
-		else:
-			winning_text = "Draw"
-
-		self.winning_player_text = textitem.TextItem(winning_text, pygame.Color(255, 255, 255))
-		self.winning_player_text.x = (settings.SCREEN_WIDTH - self.winning_player_text.get_width()) / 2
-		self.winning_player_text.y = (settings.SCREEN_HEIGHT - self.winning_player_text.get_height()) / 2
+		self.setup_winner_text()
 
 		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
 		self.all_menus = []
@@ -88,7 +82,8 @@ class GameOver(scene.Scene):
 
 		# Setup the menu transitions.
 		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.setup_single_item_transition(self.winning_player_text, True, True, True, False)
+		for letter_item in self.winning_player_text:
+			self.transitions.setup_single_item_transition(letter_item, True, True, True, True)
 		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
 		self.transitions.setup_transition(self.rematch_menu, False, True, False, True)
 
@@ -96,6 +91,35 @@ class GameOver(scene.Scene):
 		self.setup_music()
 
 		self.gameloop()
+
+	def setup_winner_text(self):
+		# Determine if there is a clear winner, or if there is a draw.
+		if not self.winner is None:
+			winning_string = self.winner.name + " wins!"
+		else:
+			winning_string = "Draw"
+
+		self.winning_player_text = []
+		for letter in winning_string:
+			letter_item = textitem.TextItem(letter)
+			self.winning_player_text.append(letter_item)
+
+		length_of_winning_player_text = sum(letter_item.get_width() for letter_item in self.winning_player_text)
+
+		last_offset = 0
+		for letter_item in self.winning_player_text:
+			letter_item.x = ((settings.SCREEN_WIDTH - length_of_winning_player_text) / 2.0) + last_offset
+			letter_item.y = (settings.SCREEN_HEIGHT - letter_item.get_height()) / 2.0
+			last_offset += letter_item.get_width()
+
+			color = copy.copy(self.winner.color)
+			h = color.hsla[0] + ((360 / (len(self.winning_player_text) * 2)) * self.winning_player_text.index(letter_item))
+			if h > 360:
+				h %= 360
+			color.hsla = (h, color.hsla[1], color.hsla[2], color.hsla[3])
+			letter_item.set_color(color)
+
+		self.passed_time = 0
 
 	def setup_music(self):
 		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
@@ -124,6 +148,36 @@ class GameOver(scene.Scene):
 		# Update all transitions.
 		self.transitions.update()
 
+		# Update the winning player text.
+		self.passed_time += self.main_clock.get_time()
+		for letter_item in self.winning_player_text:
+			bob_height_differentiator = self.winning_player_text.index(letter_item) * 64
+
+			sin_scale = 0.0075
+
+			sin = 6 * settings.GAME_SCALE
+			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 128.0))
+			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 64.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 24.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 16.0))
+			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 8.0))
+			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 4.0))
+			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 2.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * sin_scale)
+
+			letter_item_standard_y = (settings.SCREEN_HEIGHT - letter_item.get_height()) / 2.0
+			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
+
+			h = letter_item.font_color.hsla[0]
+			old_h = h
+			h += self.main_clock.get_time() * 0.2
+			if h > 360:
+				h %= 360
+			new_color = copy.copy(letter_item.font_color)
+			new_color.hsla = (h, letter_item.font_color.hsla[1], letter_item.font_color.hsla[2], letter_item.font_color.hsla[3])
+			letter_item.set_color(new_color)
+
 		# Update the menus.
 		self.quit_menu.update(self.main_clock)
 		self.rematch_menu.update(self.main_clock)
@@ -133,10 +187,8 @@ class GameOver(scene.Scene):
 		self.window_surface.blit(self.background_surface, (0, 0))
 
 		# Draw the winning players name.
-		self.winning_player_text.draw(self.window_surface)
-
-		# Draw the winning players name.
-		self.winning_player_text.draw(self.window_surface)
+		for letter_item in self.winning_player_text:
+			letter_item.draw(self.window_surface)
 
 		# Draw the menus.
 		self.quit_menu.draw(self.window_surface)
