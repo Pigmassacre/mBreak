@@ -426,7 +426,7 @@ class Game(scene.Scene):
 		# Draw the particles.
 		if graphics.PARTICLES:
 			for particle in groups.Groups.particle_group:
-				self.window_surface.fill(particle.color, (particle.rect.x - camera.CAMERA.x, particle.rect.y - camera.CAMERA.y, particle.rect.width, particle.rect.height))
+				particle.draw(self.window_surface)
 
 		# Draw the projectiles.
 		for projectile in groups.Groups.projectile_group:

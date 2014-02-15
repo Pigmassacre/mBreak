@@ -3,11 +3,13 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 import math
+import random
 import copy
 from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
 import objects.groups as groups
+import objects.firework as firework
 import gui.textitem as textitem
 import gui.menu as menu
 import gui.transition as transition
@@ -60,6 +62,7 @@ class GameOver(scene.Scene):
 		# Configure the GUI.
 		item_side_padding = textitem.TextItem.font_size
 
+		# This sets up the winner text, coloring it and everything.
 		self.setup_winner_text()
 
 		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
@@ -86,6 +89,9 @@ class GameOver(scene.Scene):
 			self.transitions.setup_single_item_transition(letter_item, True, True, True, True)
 		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
 		self.transitions.setup_transition(self.rematch_menu, False, True, False, True)
+
+		self.firework_spawn_time = 300
+		self.time_passed = 0
 
 		# Setup and play music.
 		self.setup_music()
@@ -148,6 +154,23 @@ class GameOver(scene.Scene):
 		# Update all transitions.
 		self.transitions.update()
 
+		self.time_passed += self.main_clock.get_time()
+		if self.time_passed >= self.firework_spawn_time:
+			#for _ in range(2):
+			x = random.uniform(settings.SCREEN_WIDTH / 10.0, settings.SCREEN_WIDTH - settings.SCREEN_WIDTH / 10.0)
+			y = settings.SCREEN_HEIGHT
+			angle = 3 * math.pi / 2.0
+			duration = random.uniform(350, 600)
+			firework.Firework(x, y, angle, duration)
+			self.time_passed = 0
+
+		# Update the fireworks.
+		for projectile in groups.Groups.projectile_group:
+			projectile.update(self.main_clock)
+
+		for particle in groups.Groups.particle_group:
+			particle.update(self.main_clock)
+
 		# Update the winning player text.
 		self.passed_time += self.main_clock.get_time()
 		for letter_item in self.winning_player_text:
@@ -155,15 +178,11 @@ class GameOver(scene.Scene):
 
 			sin_scale = 0.0075
 
-			sin = 6 * settings.GAME_SCALE
-			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 128.0))
-			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 64.0))
+			sin = 4 * settings.GAME_SCALE
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 24.0))
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 16.0))
-			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 8.0))
-			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 4.0))
-			#sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 2.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 8.0))
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * sin_scale)
 
 			letter_item_standard_y = (settings.SCREEN_HEIGHT - letter_item.get_height()) / 2.0
@@ -186,6 +205,13 @@ class GameOver(scene.Scene):
 		# Every frame begins by blitting the background surface.
 		self.window_surface.blit(self.background_surface, (0, 0))
 
+		# Draw the fireworks.
+		for projectile in groups.Groups.projectile_group:
+			projectile.draw(self.window_surface)
+
+		for particle in groups.Groups.particle_group:
+			particle.draw(self.window_surface)
+
 		# Draw the winning players name.
 		for letter_item in self.winning_player_text:
 			letter_item.draw(self.window_surface)
@@ -196,6 +222,7 @@ class GameOver(scene.Scene):
 
 	def on_exit(self):
 		if self.next_screen is screens.game.Game:
+			groups.empty_after_round()
 			# If a rematch was selected, we reset the score and start a new instance of Game.
 			self.score[self.player_one] = 0
 			self.score[self.player_two] = 0

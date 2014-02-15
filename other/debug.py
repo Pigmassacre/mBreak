@@ -39,7 +39,7 @@ def event(event, main_clock):
 	elif event.type == KEYDOWN and event.key == K_m:
 		for player in groups.Groups.player_group:
 			if player.x > settings.SCREEN_WIDTH / 2:
-				create_ball_left(player)
+				create_ball_right(player)
 	elif event.type == KEYDOWN and event.key == K_p:
 		create_powerup()
 	elif event.type == KEYDOWN and event.key == K_t:
