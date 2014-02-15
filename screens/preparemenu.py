@@ -67,51 +67,59 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(5), self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(7), self.rounds)
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(9), self.rounds)
-		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2
+		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2.0
 		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
 		self.all_menus.append(self.number_of_rounds_menu)
 
 		# The text displayed over the rounds menu.
 		self.number_of_rounds_text = textitem.TextItem("Rounds", pygame.Color(255, 255, 255))
-		self.number_of_rounds_text.x = (settings.SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2
+		self.number_of_rounds_text.x = (settings.SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2.0
 		self.number_of_rounds_text.y = self.number_of_rounds_menu.y - (self.number_of_rounds_text.get_height() * 2)
 
 		# The color menu for player one.
 		self.color_menu_one = self.setup_color_menu(self.color_one)
-		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width()) / 4
-		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2
+		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
+
+		ai_menu_offset = self.color_menu_one.offset * 2
+
+		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width() - self.ai_menu_one.get_width() - ai_menu_offset) / 5.0
+		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2.0
+
+		self.ai_menu_one.x = self.color_menu_one.x + self.color_menu_one.get_width() + ai_menu_offset
+		self.ai_menu_one.y = self.color_menu_one.y
+
 		self.all_menus.append(self.color_menu_one)
+		self.all_menus.append(self.ai_menu_one)
 
 		# The text above the color menu for player one.
 		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
-		self.player_one_text.x = self.color_menu_one.x + ((self.color_menu_one.get_width() - self.player_one_text.get_width()) / 2)
+		self.player_one_text.x = self.color_menu_one.x + (((self.color_menu_one.get_width() + self.ai_menu_one.get_width() + ai_menu_offset) - self.player_one_text.get_width()) / 2.0)
 		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
-
-		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
-		self.ai_menu_one.x = self.color_menu_one.x + self.color_menu_one.get_width() + self.color_menu_one.offset * 2
-		self.ai_menu_one.y = self.color_menu_one.y
-		self.all_menus.append(self.ai_menu_one)
 		
 		# The color menu for player two.
 		self.color_menu_two = self.setup_color_menu(self.color_two)
-		self.color_menu_two.x = 3 * ((settings.SCREEN_WIDTH - self.color_menu_two.get_width()) / 4)
-		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2
+		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
+
+		ai_menu_offset = self.color_menu_two.offset * 2
+
+		self.color_menu_two.x = settings.SCREEN_WIDTH - ((settings.SCREEN_WIDTH - self.color_menu_two.get_width() - self.ai_menu_two.get_width() - ai_menu_offset) / 5.0) - self.color_menu_two.get_width()
+		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2.0
+
+		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - self.color_menu_two.offset * 2
+		self.ai_menu_two.y = self.color_menu_two.y
+
 		self.all_menus.append(self.color_menu_two)
+		self.all_menus.append(self.ai_menu_two)
 
 		# The text above the color menu for player two.
 		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
-		self.player_two_text.x = self.color_menu_two.x + ((self.color_menu_two.get_width() - self.player_two_text.get_width()) / 2)
+		self.player_two_text.x = self.ai_menu_two.x + (((self.color_menu_two.get_width() + self.ai_menu_two.get_width() + ai_menu_offset) - self.player_two_text.get_width()) / 2.0)
 		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
-
-		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
-		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - self.color_menu_two.offset * 2
-		self.ai_menu_two.y = self.color_menu_two.y
-		self.all_menus.append(self.ai_menu_two)
 
 		# The back button, displayed in the bottom-left corner of the screen.
 		back_button = textitem.TextItem("Back")
 		self.back_menu = menu.Menu()
-		self.back_menu.x = distance_from_screen_edge + (back_button.get_width() / 2)
+		self.back_menu.x = distance_from_screen_edge + (back_button.get_width() / 2.0)
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
@@ -120,7 +128,7 @@ class PrepareMenu(scene.Scene):
 		# The start button, displayed in the bottom-right corner of the screen.
 		start_button = textitem.TextItem("Start")
 		self.start_menu = menu.Menu()
-		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2)
+		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2.0)
 		self.start_menu.y = settings.SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)
 		self.all_menus.append(self.start_menu)

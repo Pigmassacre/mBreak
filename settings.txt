@@ -7,11 +7,11 @@ p1name		Player One
 p2name		Player Two
 
 # GRAPHICS
-shadows 	0
+shadows 	1
 particles 	1
 flashes		1
 traces 		1
-background 	0
+background 	1
 fullscreen 	0
 maxfps		60
 esolution 	1366x768

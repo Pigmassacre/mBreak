@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import math
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
@@ -52,40 +53,58 @@ class SoundMenu(scene.Scene):
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition(self.main_clock)
-		self.logo_transition.speed = 120 * settings.GAME_SCALE
+		self.logo_transition.speed = 2 * settings.GAME_FPS * settings.GAME_SCALE
 
 		# Setup the menu transitions.
 		self.menu_transition = transition.Transition(self.main_clock)
-		self.menu_transition.setup_transition(self.sound_menu, True, True, False, False)
-		self.menu_transition.setup_transition(self.volume_menu, True, True, False, False)
+		self.menu_transition.setup_single_item_transition(self.music_item, True, False, False, False)
+		self.menu_transition.setup_single_item_transition(self.sound_item, True, False, False, False)
+		self.menu_transition.setup_transition(self.music_volume_menu, False, True, False, False)
+		self.menu_transition.setup_transition(self.sound_volume_menu, False, True, False, False)
 		self.menu_transition.setup_transition(self.back_menu, True, True, False, False)
 
 		# And finally, start the gameloop!
 		self.gameloop()
 
 	def setup_sound_menu(self):
-		self.sound_menu = menu.Menu(settings.SCREEN_WIDTH / 4, settings.SCREEN_HEIGHT / 2)
+		self.music_item = textitem.TextItem("Music Volume:")
+		self.music_item.x = self.music_item.get_height()
+		self.music_item.y = settings.SCREEN_HEIGHT / 2.0
 
-		# Setup the buttons and make them "on/off" buttons.
-		"""sound_button = textitem.TextItem("Sound Effects On")
-		sound_button.setup_is_on_off("Sound Effects Off", aaaarrgghh)
-		self.sound_menu.add(sound_button, self.sound)"""
+		self.music_volume_menu = gridmenu.GridMenu(6)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(0), self.set_music_volume)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(1), self.set_music_volume)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(2), self.set_music_volume)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(3), self.set_music_volume)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(4), self.set_music_volume)
+		self.music_volume_menu.add(choiceitem.ChoiceItem(5), self.set_music_volume)
+		self.music_volume_menu.x = settings.SCREEN_WIDTH - self.music_volume_menu.get_width() - self.music_item.get_height()
+		self.music_volume_menu.y = self.music_item.y - (abs(self.music_item.get_height() - self.music_volume_menu.get_height()) / 2.0)
 
-		music_button = textitem.TextItem("Music On")
-		music_button.setup_is_on_off("Music Off", pygame.mixer.music.get_volume() > 0.0)
-		self.sound_menu.add(music_button, self.music)
+		# Set the button that corresponds to the current volume level to be the chosen item.
+		self.music_volume_menu.items[int((pygame.mixer.music.get_volume() * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
 
-		self.volume_menu = gridmenu.GridMenu(5)
-		self.volume_menu.add(choiceitem.ChoiceItem(1), self.set_music_volume)
-		self.volume_menu.add(choiceitem.ChoiceItem(2), self.set_music_volume)
-		self.volume_menu.add(choiceitem.ChoiceItem(3), self.set_music_volume)
-		self.volume_menu.add(choiceitem.ChoiceItem(4), self.set_music_volume)
-		self.volume_menu.add(choiceitem.ChoiceItem(5), self.set_music_volume)
-		self.volume_menu.x = self.sound_menu.x + self.sound_menu.get_width() + 4.5 * settings.GAME_SCALE#(settings.SCREEN_WIDTH - self.volume_menu.get_width()) / 2.0
-		self.volume_menu.y = self.sound_menu.y# + self.sound_menu.get_height() + 9 * settings.GAME_SCALE
+		self.sound_item = self.sound_item = textitem.TextItem("Sound Volume:")
+		self.sound_item.x = self.sound_item.get_height()
+		self.sound_item.y = self.music_item.y + self.sound_item.get_height() * 2.0
 
-		self.all_menus.append(self.sound_menu)
-		self.all_menus.append(self.volume_menu)
+		self.sound_volume_menu = gridmenu.GridMenu(6)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(0), self.set_sound_volume)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(1), self.set_sound_volume)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(2), self.set_sound_volume)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(3), self.set_sound_volume)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(4), self.set_sound_volume)
+		self.sound_volume_menu.add(choiceitem.ChoiceItem(5), self.set_sound_volume)
+		self.sound_volume_menu.x = settings.SCREEN_WIDTH - self.sound_volume_menu.get_width() - self.sound_item.get_height()
+		self.sound_volume_menu.y = self.sound_item.y - (abs(self.sound_item.get_height() - self.sound_volume_menu.get_height()) / 2.0)
+
+		# Set the button that corresponds to the current volume level to be the chosen item.
+		channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))		
+		average_volume = sum(channel.get_volume() for channel in channels) / float(pygame.mixer.get_num_channels())
+		self.sound_volume_menu.items[int(average_volume * len(self.sound_volume_menu.items) + 0.5) - 1].chosen = True
+
+		self.all_menus.append(self.music_volume_menu)
+		self.all_menus.append(self.sound_volume_menu)
 
 	def sound(self, item):
 		if item.toggle_on_off():
@@ -98,7 +117,12 @@ class SoundMenu(scene.Scene):
 			pygame.mixer.music.set_volume(0.0)
 
 	def set_music_volume(self, item):
-		pygame.mixer.music.set_volume(self.choose_item_from_menu(item, self.volume_menu) / 5.0)
+		pygame.mixer.music.set_volume(self.choose_item_from_menu(item, self.music_volume_menu) / float(len(self.music_volume_menu.items) - 1))
+		print(str(pygame.mixer.music.get_volume()))
+
+	def set_sound_volume(self, item):
+		for channel in (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels())):
+			channel.set_volume(self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1))
 
 	def choose_item_from_menu(self, item, grid_menu, can_unchoose = False):
 		# Figure out what item is the chosen item.
@@ -167,5 +191,7 @@ class SoundMenu(scene.Scene):
 
 		# If the logo is in place, draw the currently active menu to the screen.
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
+			self.music_item.draw(self.window_surface)
+			self.sound_item.draw(self.window_surface)
 			for a_menu in self.all_menus:
 				a_menu.draw(self.window_surface)
