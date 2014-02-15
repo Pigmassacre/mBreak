@@ -266,7 +266,8 @@ class Ball(pygame.sprite.Sprite):
 
 			# If we have collided with anything, play the sound effect.
 			if self.collided:
-				Ball.sound_effect.play()
+				sound = Ball.sound_effect.play()
+				sound.set_volume(settings.SOUND_VOLUME)
 
 			# Increase the amount of speed that we've handled this turn.
 			speed_handled += self.tick_speed

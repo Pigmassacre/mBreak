@@ -99,10 +99,10 @@ class SoundMenu(scene.Scene):
 		self.sound_volume_menu.y = self.sound_item.y - (abs(self.sound_item.get_height() - self.sound_volume_menu.get_height()) / 2.0)
 
 		# Set the button that corresponds to the current volume level to be the chosen item.
-		channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))
-		average_volume = sum(channel.get_volume() for channel in channels) / float(pygame.mixer.get_num_channels())
-		self.sound_volume_menu.items[int((average_volume * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
-		# THIS FUCKING THING DOESNT WORK RIGHT AND FUCKING BLOWS OK
+		#channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))
+		#average_volume = sum(channel.get_volume() for channel in channels) / float(pygame.mixer.get_num_channels())
+		#self.sound_volume_menu.items[int((average_volume * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
+		self.sound_volume_menu.items[int((settings.SOUND_VOLUME * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
 
 		self.all_menus.append(self.music_volume_menu)
 		self.all_menus.append(self.sound_volume_menu)
@@ -119,10 +119,12 @@ class SoundMenu(scene.Scene):
 
 	def set_music_volume(self, item):
 		pygame.mixer.music.set_volume(self.choose_item_from_menu(item, self.music_volume_menu) / float(len(self.music_volume_menu.items) - 1))
+		#settings.MUSIC_VOLUME 
 
 	def set_sound_volume(self, item):
-		for channel in (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels())):
-			channel.set_volume(self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1))
+		settings.SOUND_VOLUME = self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1)
+		#for channel in (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels())):
+		#	channel.set_volume(self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1))
 
 	def choose_item_from_menu(self, item, grid_menu, can_unchoose = False):
 		# Figure out what item is the chosen item.

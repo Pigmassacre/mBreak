@@ -57,7 +57,8 @@ class Burning(effect.Effect):
 		self.particle_spawn_time = 0
 
 		# Play the sound effect.
-		Burning.sound_effect.play()
+		sound = Burning.sound_effect.play()
+		sound.set_volume(settings.SOUND_VOLUME)
 
 		# If the parent is subclass of block, show an effect on top of the block.
 		if issubclass(self.parent.__class__, block.Block):

@@ -78,7 +78,8 @@ class Stun(effect.Effect):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
 		if not self.parent.owner == hit_paddle.owner:
 			Stun(hit_paddle, self.paddle_stun_duration)
-			Stun.sound_effect.play()
+			sound = Stun.sound_effect.play()
+			sound.set_volume(settings.SOUND_VOLUME)
 			self.destroy()
 
 	def update(self, main_clock):

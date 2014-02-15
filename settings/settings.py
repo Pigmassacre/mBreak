@@ -46,6 +46,9 @@ TITLE_MUSIC = "res/music/sexxxy_bit_3!!!.xm"
 GAME_MUSIC = "res/music/stardstm.mod"
 AFTER_GAME_MUSIC = "res/music/october_chip.xm"
 
+MUSIC_VOLUME = 1.0
+SOUND_VOLUME = 1.0
+
 # Player One settings.
 PLAYER_ONE_NAME = "One"
 PLAYER_ONE_KEY_UP = pygame.locals.K_w

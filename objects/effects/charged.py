@@ -51,7 +51,8 @@ class Charged(effect.Effect):
 			# If the hit block isn't one of the parents owners blocks...
 			if hit_block.owner != self.parent.owner:
 				# Play the sound effect.
-				Charged.sound_effect.play()
+				sound = Charged.sound_effect.play()
+				sound.set_volume(settings.SOUND_VOLUME)
 
 				# Shake the camera a little bit.
 				camera.CAMERA.shake(250, 0.5)

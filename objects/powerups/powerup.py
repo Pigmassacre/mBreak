@@ -67,7 +67,8 @@ class Powerup(pygame.sprite.Sprite):
 		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
 		# Play a random sound from the sound_effects list.
-		Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+		sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+		sound.set_volume(settings.SOUND_VOLUME)
 
 	def share_effect(self, entity, timeout_class, effect_creation_function, *args):
 		created_effect = None
@@ -114,7 +115,8 @@ class Powerup(pygame.sprite.Sprite):
 
 		# Play a random sound from the sound_effects list.
 		if play_sound:
-			Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+			sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+			sound.set_volume(settings.SOUND_VOLUME)
 
 	def update(self, main_clock):
 		# Update the position according to the bob effect.

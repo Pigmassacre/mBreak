@@ -141,7 +141,8 @@ class Missile(pygame.sprite.Sprite):
 			powerup.destroy(False)
 
 		# Play a random sound from the sound_effects list.
-		Missile.sound_effects[random.randrange(0, len(Missile.sound_effects))].play()
+		sound = Missile.sound_effects[random.randrange(0, len(Missile.sound_effects))].play()
+		sound.set_volume(settings.SOUND_VOLUME)
 
 	def on_hit_block(self, block):
 		# Destroy ourselves.
