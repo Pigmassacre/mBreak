@@ -30,7 +30,7 @@ class GameOver(scene.Scene):
 
 	tint_color = pygame.Color(255, 255, 255, 128)
 
-	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score):
+	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, winner):
 		# Call the superconstructor.
 		scene.Scene.__init__(self, window_surface, main_clock)
 
@@ -49,15 +49,8 @@ class GameOver(scene.Scene):
 		# Keep track of the number of rounds for rematch purposes.
 		self.number_of_rounds = number_of_rounds
 
-		# Figure out the winner from the score.
-		if self.score[self.player_one] > self.score[self.player_two]:
-			self.winner = self.player_one
-			self.loser = self.player_two
-		elif self.score[self.player_one] < self.score[self.player_two]:
-			self.winner = self.player_two
-			self.loser = self.player_one
-		else:
-			self.winner = None
+		# Store the winner
+		self.winner = winner
 
 		# Configure the GUI.
 		item_side_padding = textitem.TextItem.font_size
@@ -105,10 +98,8 @@ class GameOver(scene.Scene):
 		else:
 			winning_string = "Draw"
 
-		self.winning_player_text = []
-		for letter in winning_string:
-			letter_item = textitem.TextItem(letter)
-			self.winning_player_text.append(letter_item)
+		# Create a list of textitems for all the letters in the winning_string.
+		self.winning_player_text = textitem.generate_list_from_string(winning_string)
 
 		length_of_winning_player_text = sum(letter_item.get_width() for letter_item in self.winning_player_text)
 
@@ -129,7 +120,7 @@ class GameOver(scene.Scene):
 
 	def setup_music(self):
 		pygame.mixer.music.load(settings.AFTER_GAME_MUSIC)
-		pygame.mixer.music.play()
+		pygame.mixer.music.play(-1)
 
 	def quit(self, item):
 		# When the quit button is activated, we want to return to the main menu.
@@ -179,9 +170,7 @@ class GameOver(scene.Scene):
 			sin_scale = 0.0075
 
 			sin = 4 * settings.GAME_SCALE
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0))
+			sin *= math.pow(math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0)), 3)
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 8.0))
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * sin_scale)
 
@@ -189,7 +178,6 @@ class GameOver(scene.Scene):
 			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
 
 			h = letter_item.font_color.hsla[0]
-			old_h = h
 			h += self.main_clock.get_time() * 0.2
 			if h > 360:
 				h %= 360

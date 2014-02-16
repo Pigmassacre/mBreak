@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+from pygame.locals import *
 import math
 import copy
 import other.useful as useful
@@ -53,6 +54,9 @@ class Particle(pygame.sprite.Sprite):
 		# Setup the color values, used for drawing the particle.
 		self.color = copy.copy(color)
 
+		# Since we're using fill, we create a surface with SRCALPHA to handle alpha.
+		self.surface = pygame.Surface((self.rect.width, self.rect.height), SRCALPHA)
+
 		# Setup shadow color value, used for coloring the shadow.
 		self.shadow_color = useful.blend_colors(self.color, Particle.shadow_blend_color)
 
@@ -102,4 +106,5 @@ class Particle(pygame.sprite.Sprite):
 				self.destroy()
 
 	def draw(self, surface):
-		surface.fill(self.color, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y, self.rect.width, self.rect.height))
+		self.surface.fill(self.color)
+		return surface.blit(self.surface, (self.rect.x - camera.CAMERA.x, self.rect.y - camera.CAMERA.y))

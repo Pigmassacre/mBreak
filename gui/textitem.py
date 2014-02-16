@@ -14,6 +14,13 @@ or simply used to display text. It has a quite a few extra surfaces and variable
 
 """
 
+def generate_list_from_string(string):
+	list = []
+	for letter in string:
+		letter_item = TextItem(letter)
+		list.append(letter_item)
+	return list
+
 class TextItem(item.Item):
 
 	# Initialize the font module.

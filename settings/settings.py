@@ -44,7 +44,8 @@ BORDER_COLOR = (200, 200, 200)
 # Music settings
 TITLE_MUSIC = "res/music/sexxxy_bit_3!!!.xm"
 GAME_MUSIC = "res/music/stardstm.mod"
-AFTER_GAME_MUSIC = "res/music/october_chip.xm"
+AFTER_GAME_MUSIC = "res/music/theopeneddoors.xm"#"res/music/october_chip.xm"
+AFTER_MATCH_MUSIC = "res/music/thrownintosadness.xm"#"res/music/october_chip.xm"
 
 MUSIC_VOLUME = 1.0
 SOUND_VOLUME = 1.0

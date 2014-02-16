@@ -68,7 +68,6 @@ class Powerup(pygame.sprite.Sprite):
 		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
 		# Play a random sound from the sound_effects list.
-		print(str(random.randrange(0, len(Powerup.sound_effects))))
 		sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
 		if not sound is None:
 			sound.set_volume(settings.SOUND_VOLUME)

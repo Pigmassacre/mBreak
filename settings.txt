@@ -1,10 +1,10 @@
 debugmode	1
 
 # PLAYER 1 SETTINGS
-p1name		Player One
+p1name		AI One
 
 # PLAYER 2 SETTINGS
-p2name		Player Two
+p2name		AI Two
 
 # GRAPHICS
 shadows 	1

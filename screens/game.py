@@ -175,10 +175,12 @@ class Game(scene.Scene):
 				self.score[self.player_two] = self.score[self.player_two] + 1
 				self.winner = self.player_two
 				self.game_over = True
+				pygame.mixer.music.fadeout(int(self.game_over_time))
 			elif len(self.player_two.block_group) == 0:
 				self.score[self.player_one] = self.score[self.player_one] + 1
 				self.winner = self.player_one
 				self.game_over = True
+				pygame.mixer.music.fadeout(int(self.game_over_time))
 
 	def try_to_spawn_powerups(self):
 		# If it's time, all powerup spawn chances will increase by a certain amount.
@@ -431,10 +433,10 @@ class Game(scene.Scene):
 		# Draw the projectiles.
 		for projectile in groups.Groups.projectile_group:
 			if not (projectile.x + projectile.width < settings.LEVEL_X or 
-				projectile.x > settings.LEVEL_MAX_X or 
-				projectile.y + projectile.height < settings.LEVEL_Y or 
-				projectile.y > settings.LEVEL_MAX_Y):
-				projectile.draw(self.window_surface) #self.window_surface.blit(projectile.image, )		
+					projectile.x > settings.LEVEL_MAX_X or 
+					projectile.y + projectile.height < settings.LEVEL_Y or 
+					projectile.y > settings.LEVEL_MAX_Y):
+				projectile.draw(self.window_surface)
 
 		# Draw the background walls and overlying area.	
 		self.game_background.draw(self.window_surface)
@@ -454,37 +456,40 @@ class Game(scene.Scene):
 		# Show the mouse again.
 		pygame.mouse.set_visible(True)
 
-		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
-		self.player_one.empty_groups()
-		self.player_two.empty_groups()
-
 		# Log AI matches.
 		if False:
-			if sum(self.score.itervalues()) > 20:
+			if sum(self.score.itervalues()) > 100:
 				self.next_screen = None
 			else:
-				if sum(self.score.itervalues()) <= 5:
+				logging.basicConfig(filename="ai.log", level=logging.DEBUG)
+				if sum(self.score.itervalues()) <= 25:
 					self.player_one.ai_difficulty = 1
 					self.player_two.ai_difficulty = 1
-					logging.basicConfig(filename="ai_100.log", level=logging.DEBUG)
-				elif sum(self.score.itervalues()) <= 10:
-					logging.basicConfig(filename="ai_200.log", level=logging.DEBUG)
+				elif sum(self.score.itervalues()) <= 50:
 					self.player_one.ai_difficulty = 2
 					self.player_two.ai_difficulty = 1
-				elif sum(self.score.itervalues()) <= 15:
-					logging.basicConfig(filename="ai_300.log", level=logging.DEBUG)
+				elif sum(self.score.itervalues()) <= 75:
 					self.player_one.ai_difficulty = 1
 					self.player_two.ai_difficulty = 2
-				elif sum(self.score.itervalues()) <= 20:
-					logging.basicConfig(filename="ai_400.log", level=logging.DEBUG)
+				elif sum(self.score.itervalues()) <= 100:
 					self.player_one.ai_difficulty = 2
 					self.player_two.ai_difficulty = 2			
 
 				logging.info("Time (in seconds): %s", pygame.time.get_ticks() / 1000.0)
 				logging.info("%s won this round. Total score for %s: %s", self.winner.name, self.winner.name, self.score[self.winner])
+				if self.winner is self.player_one:
+					logging.info("Blocks left for %s: %s.", self.player_two.name, len(self.player_two.block_group))
+				else:
+					logging.info("Blocks left for %s: %s.", self.player_one.name, len(self.player_one.block_group))
 
 				groups.empty_after_round()
+				self.player_one.empty_groups()
+				self.player_two.empty_groups()
 				Game(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
+
+		# We have to make sure to empty the players own groups, because their groups are not emptied by groups.empty_after_round().
+		self.player_one.empty_groups()
+		self.player_two.empty_groups()
 
 		# We decrement the number of rounds by 1 because we've just played one round.
 		self.number_of_rounds_done += 1
@@ -492,23 +497,16 @@ class Game(scene.Scene):
 		if (self.score[self.player_one] > self.number_of_rounds / 2 or 
 			self.score[self.player_two] > self.number_of_rounds / 2 or 
 			self.number_of_rounds_done == self.number_of_rounds):
-			# If we've played the correct amount of rounds, or there's no point in continuing further, we set next screen to GameOver.
-			self.next_screen = gameover.GameOver
+			# If we've played the correct amount of rounds, or there's no point in continuing further:
+			groups.empty_after_round()
+			gameover.GameOver(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.winner)
 		else:
-			# Else, continue to MatchOver screen.
-			self.next_screen = matchover.MatchOver
+			groups.empty_after_round()
+			matchover.MatchOver(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done, self.winner)
 
 		if self.next_screen is None:
 			pygame.quit()
 			sys.exit()
-		elif self.next_screen is matchover.MatchOver:
-			# The game is over, but we're restarting Game so we empty all the groups but the groups that contain the players.
-			groups.empty_after_round()
-			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done)
-		elif self.next_screen is gameover.GameOver:
-			# The game is over, but we're allowing for a rematch so we empty all the groups but the groups that contain the players.
-			groups.empty_after_round()
-			self.next_screen(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score)
 		elif not self.next_screen is None:
 			# The game is over so we empty all the groups.
 			groups.empty_all()

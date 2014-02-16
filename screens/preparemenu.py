@@ -364,7 +364,6 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_ONE_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_ONE_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_ONE_JOY_UNLEASH_ENERGY
-		print(str(self.player_one_ai))
 		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_one_ai)
 		return player_one
 
@@ -378,6 +377,5 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_TWO_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_TWO_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_TWO_JOY_UNLEASH_ENERGY
-		print(str(self.player_two_ai))
 		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_two_ai)
 		return player_two

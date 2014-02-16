@@ -102,4 +102,4 @@ class Frost(powerup.Powerup):
 				speed = random.uniform(0.2 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 76.0
 				color = pygame.Color(random.randint(0, 50), random.randint(125, 255), random.randint(220, 255))
-				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.width / 4, angle, speed, retardation, color, 1 * settings.GAME_FPS)
+				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.width / 4, angle, speed, retardation, color, 3 * settings.GAME_FPS)

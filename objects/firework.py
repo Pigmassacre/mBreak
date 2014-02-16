@@ -73,7 +73,7 @@ class Firework(pygame.sprite.Sprite):
 			retardation = 0.1 * settings.GAME_FPS
 			color = pygame.Color(255, 0, 0)
 			color.hsla = (random.uniform(0, 360), color.hsla[1], color.hsla[2], color.hsla[3])
-			a_particle = particle.Particle(self.x + self.rect.width / 2.0, self.y + self.rect.height / 2.0, width, width, angle, speed, retardation, color, 2 * settings.GAME_FPS)
+			a_particle = particle.Particle(self.x + self.rect.width / 2.0, self.y + self.rect.height / 2.0, width, width, angle, speed, retardation, color, 5 * settings.GAME_FPS)
 			a_particle.kill_outside_level = False
 			a_particle.kill_when_speed_reaches_zero = False
 			a_particle.gravity = 0.05 * settings.GAME_SCALE
@@ -81,7 +81,7 @@ class Firework(pygame.sprite.Sprite):
 		# Play a random sound from the sound_effects list.
 		sound = Firework.sound_effects[random.randrange(0, len(Firework.sound_effects))].play()
 		if not sound is None:
-			sound.set_volume(settings.SOUND_VOLUME)
+			sound.set_volume(settings.SOUND_VOLUME / 8.0)
 
 	def update(self, main_clock):
 		self.time_passed += main_clock.get_time()
