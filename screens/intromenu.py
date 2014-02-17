@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import random
 from pygame.locals import *
 import gui.textitem as textitem
 import gui.logo as logo
@@ -77,9 +78,12 @@ class IntroMenu(scene.Scene):
 		self.version_message.y = settings.SCREEN_HEIGHT - self.version_message.get_height() - self.version_message.font_size
 
 	def setup_music(self):
-		# Loads the title screen music and plays it indefinitely.
-		pygame.mixer.music.load(settings.TITLE_MUSIC)
-		pygame.mixer.music.play(-1)
+		# Set the music list.
+		self.music_list = settings.TITLE_MUSIC
+		
+		pygame.mixer.music.set_endevent(settings.MUSIC_EVENT)
+		pygame.mixer.music.load(random.choice(self.music_list))
+		pygame.mixer.music.play()
 
 	def event(self, event):
 		if ((event.type == KEYDOWN and event.key in [K_ESCAPE, K_RETURN]) or (event.type == MOUSEBUTTONDOWN and event.button == 1) or

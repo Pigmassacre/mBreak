@@ -1,17 +1,17 @@
-debugmode	1
+debugmode	0
 
 # PLAYER 1 SETTINGS
-p1name		AI One
+p1name		Player One
 
 # PLAYER 2 SETTINGS
-p2name		AI Two
+p2name		Player Two
 
 # GRAPHICS
-shadows 	1
+shadows 	0
 particles 	1
 flashes		1
 traces 		1
-background 	1
+background 	0
 fullscreen 	0
 maxfps		60
 esolution 	1366x768

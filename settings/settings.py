@@ -42,10 +42,29 @@ BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (200, 200, 200)
 
 # Music settings
-TITLE_MUSIC = "res/music/sexxxy_bit_3!!!.xm"
-GAME_MUSIC = "res/music/stardstm.mod"
-AFTER_GAME_MUSIC = "res/music/theopeneddoors.xm"#"res/music/october_chip.xm"
-AFTER_MATCH_MUSIC = "res/music/thrownintosadness.xm"#"res/music/october_chip.xm"
+root = "res/music"
+
+TITLE_MUSIC = []
+for path in os.listdir(os.path.join(root, "title")):
+	TITLE_MUSIC.append(os.path.join(root, "title", path))
+
+ABOUT_MUSIC = []
+for path in os.listdir(os.path.join(root, "about")):
+	ABOUT_MUSIC.append(os.path.join(root, "about", path))
+
+GAME_MUSIC = []
+for path in os.listdir(os.path.join(root, "game")):
+	GAME_MUSIC.append(os.path.join(root, "game", path))
+
+AFTER_GAME_MUSIC = []
+for path in os.listdir(os.path.join(root, "postgame")):
+	AFTER_GAME_MUSIC.append(os.path.join(root, "postgame", path))
+
+AFTER_MATCH_MUSIC = []
+for path in os.listdir(os.path.join(root, "postmatch")):
+	AFTER_MATCH_MUSIC.append(os.path.join(root, "postmatch", path))
+
+MUSIC_EVENT = pygame.locals.USEREVENT
 
 MUSIC_VOLUME = 1.0
 SOUND_VOLUME = 1.0

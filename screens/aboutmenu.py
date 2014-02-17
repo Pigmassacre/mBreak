@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 import math
+import random
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
@@ -147,17 +148,8 @@ class AboutMenu(scene.Scene):
 		self.transitions.setup_single_item_transition(self.made_by_author, True, True, False, False)
 		self.transitions.setup_single_item_transition(self.made_by_info, True, True, False, False)
 
-		# We setup and play music.
-		self.setup_music()
-
 		# And finally, we start the gameloop!
 		self.gameloop()
-
-	def setup_music(self):
-		if not pygame.mixer.music.get_busy():
-			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(settings.TITLE_MUSIC)
-			pygame.mixer.music.play(-1)
 
 	def back(self, item):
 		# This simply ends this scene.

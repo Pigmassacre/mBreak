@@ -87,7 +87,7 @@ class HelpMenu(scene.Scene):
 
 		# We setup and add all the necessary items to the help_menu.
 		root = "res/helpdata"
-		for file in os.listdir("res/helpdata"):
+		for file in os.listdir(root):
 			if file.endswith(".json"):
 				self.setup_info(os.path.join(root, file))
 

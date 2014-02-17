@@ -163,10 +163,11 @@ class Game(scene.Scene):
 		self.gameloop()
 
 	def setup_music(self):
-		if not pygame.mixer.music.get_busy():
-			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(settings.GAME_MUSIC)
-			pygame.mixer.music.play(-1)
+		# Set the music list.
+		self.music_list = settings.GAME_MUSIC
+
+		pygame.mixer.music.load(random.choice(self.music_list))
+		pygame.mixer.music.play()
 
 	def check_for_winner(self):
 		# Detect if a player has won or not.

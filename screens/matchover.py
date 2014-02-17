@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 import copy
+import random
 from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
@@ -146,9 +147,11 @@ class MatchOver(scene.Scene):
 		self.transitions.setup_transition(self.next_match_menu, False, True, False, True)
 
 	def setup_music(self):
-		# Loads the after-match music and plays it, looping forever.
-		pygame.mixer.music.load(settings.AFTER_MATCH_MUSIC)
-		pygame.mixer.music.play(-1)
+		# Set the music list.
+		self.music_list = settings.AFTER_MATCH_MUSIC
+
+		pygame.mixer.music.load(random.choice(self.music_list))
+		pygame.mixer.music.play()
 
 	def maybe_quit(self, item):
 		# We ask the players if they REALLY want to quit, since they're in between matches. Also, we make sure that the confirmation

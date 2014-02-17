@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame, sys
+import random
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
@@ -98,7 +99,7 @@ class MainMenu(scene.Scene):
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():
 			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(settings.TITLE_MUSIC)
+			pygame.mixer.music.load(random.choice(settings.TITLE_MUSIC))
 			pygame.mixer.music.play(-1)
 
 	def start(self, item):

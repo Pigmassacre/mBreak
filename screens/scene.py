@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
+import random
 import other.debug as debug
 import settings.settings as settings
 import settings.graphics as graphics
@@ -22,6 +23,8 @@ class Scene:
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
+		self.music_list = []
+
 	def gameloop(self):
 		self.done = False
 		while not self.done:
@@ -34,6 +37,11 @@ class Scene:
 					# If the window is closed, the game is shut down.
 					sys.exit()
 					pygame.quit()
+				elif (event.type == settings.MUSIC_EVENT):
+					choice = random.choice(self.music_list)
+					if not choice is None:
+						pygame.mixer.music.load(choice)
+					pygame.mixer.music.play()
 
 				# Subclasses implementing this class should handle their events in self.event(event).
 				self.event(event)
