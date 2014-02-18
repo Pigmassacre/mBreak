@@ -57,6 +57,13 @@ class Missile(pygame.sprite.Sprite):
 	# The amount of damage the missile deals to a hit block.
 	damage = 20
 
+	paddle_stun_duration = 600
+
+	paddle_shake_strength = 0.33
+	paddle_shake_duration = 350
+	block_shake_strength = 0.66
+	block_shake_duration = 350
+
 	# These variables affect how the missile homes to its target.
 	angle_correction = 0.0005 * settings.GAME_FPS
 	angle_correction_rate = 0.1 * settings.GAME_FPS
@@ -70,7 +77,7 @@ class Missile(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 
 		# Create the rect used for collision detection, position etc.
-		self.rect = pygame.rect.Rect(x, y, Missile.width, Missile.height)
+		self.rect = pygame.rect.Rect(x, y, self.__class__.width, self.__class__.height)
 
 		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
 		self.x = x
@@ -80,10 +87,10 @@ class Missile(pygame.sprite.Sprite):
 		self.angle = angle
 
 		# We store the given speed of the Missile.
-		self.speed = Missile.speed
+		self.speed = self.__class__.speed
 
 		# Store the given acceleration.
-		self.acceleration = Missile.acceleration
+		self.acceleration = self.__class__.acceleration
 
 		# If this is set to anything higher than 0, this missile will not "fire" until this reaches 0.
 		self.delay = 0
@@ -98,7 +105,7 @@ class Missile(pygame.sprite.Sprite):
 		self.particle_spawn_time = 0
 
 		# Load the image file.
-		self.image = Missile.image.copy()
+		self.image = self.__class__.image.copy()
 
 		# Store the original, unrotated version of the image.
 		self.original_image = self.image.copy()
@@ -141,7 +148,7 @@ class Missile(pygame.sprite.Sprite):
 			powerup.destroy(False)
 
 		# Play a random sound from the sound_effects list.
-		sound = Missile.sound_effects[random.randrange(0, len(Missile.sound_effects))].play()
+		sound = self.__class__.sound_effects[random.randrange(0, len(self.__class__.sound_effects))].play()
 		if not sound is None:
 			sound.set_volume(settings.SOUND_VOLUME)
 
@@ -150,10 +157,10 @@ class Missile(pygame.sprite.Sprite):
 		self.destroy()
 
 		# Tell the block that we've hit it.
-		block.on_hit(Missile.damage)
+		block.on_hit(self.__class__.damage)
 
 		# Shake the camera slightly.
-		camera.CAMERA.shake(350, 0.66)
+		camera.CAMERA.shake(self.__class__.block_shake_duration, self.__class__.block_shake_strength)
 
 		# Spawn some particles.
 		self.spawn_destroy_particles()
@@ -172,10 +179,10 @@ class Missile(pygame.sprite.Sprite):
 		paddle.on_hit(self)
 
 		# Apply a stun effect to the hit paddle.
-		stun.Stun(paddle, 600)
+		stun.Stun(paddle, self.__class__.paddle_stun_duration)
 
 		# Shake the camera slightly.
-		camera.CAMERA.shake(350, 0.33)
+		camera.CAMERA.shake(self.__class__.paddle_shake_duration, self.__class__.paddle_shake_strength)
 
 		# Spawn some particles.
 		self.spawn_destroy_particles()
@@ -188,11 +195,11 @@ class Missile(pygame.sprite.Sprite):
 
 	def spawn_destroy_particles(self):
 		# Spawn a random amount of particles.
-		for _ in range(0, random.randrange(Missile.hit_particle_min_amount, Missile.hit_particle_max_amount)):
-			width = random.uniform(Missile.width / 4.5, Missile.width / 3.25)
+		for _ in range(0, random.randrange(self.__class__.hit_particle_min_amount, self.__class__.hit_particle_max_amount)):
+			width = random.uniform(self.__class__.width / 4.5, self.__class__.width / 3.25)
 			angle = self.angle + math.pi
 			angle += random.uniform(math.pi - (math.pi / 16.0), math.pi + (math.pi / 16.0))
-			speed = min(max(self.speed, Missile.hit_particle_min_speed), Missile.hit_particle_max_speed) * random.uniform(0.75, 1.25)
+			speed = min(max(self.speed, self.__class__.hit_particle_min_speed), self.__class__.hit_particle_max_speed) * random.uniform(0.75, 1.25)
 			retardation = speed / 21.0
 			color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5)
@@ -224,6 +231,11 @@ class Missile(pygame.sprite.Sprite):
 				# If the list is empty, simply destroy ourselves.
 				self.destroy()
 				self.spawn_destroy_particles()
+				# Create a dummy and attach an explosion effect to it.
+				a_dummy = dummy.Dummy(1000, self.rect.centerx - explosion.Explosion.frame_width / 2.0,
+											self.rect.centery - explosion.Explosion.frame_height / 2.0, 
+											explosion.Explosion.frame_width, explosion.Explosion.frame_height)
+				a_dummy.effect_group.add(explosion.Explosion(a_dummy))
 
 		# Keep angle between pi and -pi.
 		if self.angle > math.pi:
@@ -276,13 +288,13 @@ class Missile(pygame.sprite.Sprite):
 
 		# If it's time, spawn particles.
 		self.particle_spawn_time += main_clock.get_time()
-		if self.particle_spawn_time >= Missile.particle_spawn_rate:
+		if self.particle_spawn_time >= self.__class__.particle_spawn_rate:
 			# Reset the particle spawn time.
 			self.particle_spawn_time = 0
 
 			# Spawn a random amount of particles.
-			for _ in range(0, random.randrange(1, Missile.particle_spawn_amount)):
-				width = random.uniform(Missile.width / 5.0, Missile.width / 4.0)
+			for _ in range(0, random.randrange(1, self.__class__.particle_spawn_amount)):
+				width = random.uniform(self.__class__.width / 5.0, self.__class__.width / 4.0)
 				angle = self.angle + random.uniform(math.pi - (math.pi / 24.0), math.pi + (math.pi / 24.0))
 				speed = random.uniform(0.65 * settings.GAME_FPS * settings.GAME_SCALE, 1.1 * settings.GAME_FPS * settings.GAME_SCALE)
 				retardation = speed / 24.0

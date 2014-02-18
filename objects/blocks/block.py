@@ -87,7 +87,7 @@ class Block(pygame.sprite.Sprite):
 
 		# Spawn some particles.
 		for _ in range(0, Block.particle_spawn_amount):
-			angle = random.uniform(0, math.pi)
+			angle = random.uniform(0, 2 * math.pi)
 			speed = 5 * settings.GAME_FPS
 			retardation = 0.25 * settings.GAME_FPS
 			alpha_step = 5 * settings.GAME_FPS

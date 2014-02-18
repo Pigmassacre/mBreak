@@ -183,6 +183,11 @@ class Paddle(pygame.sprite.Sprite):
 				self.owner.energy += self.owner.energy_increase_on_hit
 			else:
 				self.owner.energy = self.owner.max_energy
+		else:
+			if self.owner.energy + self.owner.energy_increase_on_hit < self.owner.max_energy:
+				self.owner.energy += self.owner.energy_increase_on_hit / 2.0
+			else:
+				self.owner.energy = self.owner.max_energy
 
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
@@ -262,7 +267,7 @@ class Paddle(pygame.sprite.Sprite):
 				unleash_chance = 0
 
 			if random.random() <= unleash_chance:
-				self.owner.unleash_energy()
+				self.owner.attack()
 
 			# Reset the targeting variables.
 			self.focused_item = None

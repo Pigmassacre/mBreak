@@ -38,8 +38,8 @@ class Scene:
 					sys.exit()
 					pygame.quit()
 				elif (event.type == settings.MUSIC_EVENT):
-					choice = random.choice(self.music_list)
-					if not choice is None:
+					if len(self.music_list) > 0:
+						choice = random.choice(self.music_list)
 						pygame.mixer.music.load(choice)
 					pygame.mixer.music.play()
 

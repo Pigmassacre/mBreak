@@ -10,17 +10,14 @@ import objects.camera as camera
 import objects.groups as groups
 import objects.ball as ball
 import objects.powerups.powerup as powerup
-import objects.missile as missile
+import objects.attacks.missilestorm as missilestorm
+import objects.attacks.laser as laser
 import settings.settings as settings
 
 """
 
 This is the player class. mBreak is currently designed with two players in mind, but it wouldn't take too much work
  to allow more players than that (not sure about how fun that would be though.. :P).
-
-Each player handles updating their own paddles, by sending the key_up and key_down variables to the update method of
-each of the paddle that the player owns. Currently both players only have one paddle, but it's trivial to add
-more than one.
 
 """
 
@@ -72,9 +69,9 @@ class Player(pygame.sprite.Sprite):
 		self.energy = 0
 		self.max_energy = 100
 		self.energy_increase_on_hit = 2.5
-		self.missiles_to_spawn = 0
-		self.missile_spawn_time = 200
-		self.time_passed = 0
+		
+		#self.energy_attack = missilestorm.MissileStorm(self)
+		self.energy_attack = laser.Laser(self)
 
 		# Store the number of the gamepad that controls this player.
 		self.gamepad_id = gamepad_id
@@ -160,6 +157,7 @@ class Player(pygame.sprite.Sprite):
 
 		# Reset our energy.
 		self.energy = 0
+		self.energy_attack.reset()
 
 	def add_powerup(self, classname, effect):
 		# Determine what position to place the powerup at.
@@ -189,36 +187,14 @@ class Player(pygame.sprite.Sprite):
 		# Change the last_powerup_group_size to match the current size of the group.
 		self.last_powerup_group_size = len(self.powerup_group)
 
-	def spawn_missile(self):
-		# Create a list of available blocks to target.
-		block_list = []
-		for player in groups.Groups.player_group:
-			if player != self:
-				block_list = player.block_group.sprites()
-
-		if len(block_list) > 0:
-			for paddle in self.paddle_group:
-				# Create a missile that homes in on a random block in the block list.
-				the_missile = missile.Missile(paddle.x + (paddle.width / 2) - (missile.Missile.width / 2), paddle.y + (paddle.height / 2) - (missile.Missile.height / 2), random.uniform(0, 2*math.pi), self, random.choice(block_list))
-				the_missile.acceleration *= random.uniform(1.5, 3)
-
-	def unleash_energy(self):
-		if self.energy >= 20:
-			# Set how many missiles to spawn.
-			self.missiles_to_spawn += self.energy / 20
-
-			# Spawn one missile right now.
-			self.spawn_missile()
-			self.missiles_to_spawn -= 1
-
-			# Reduce our energy to 0.
-			self.energy = 0
+	def attack(self):
+		self.energy_attack.attack()
 
 	def event(self, event):
 		if self.ai_difficulty == 0:
 			if ((event.type == KEYDOWN and event.key == self.key_unleash_energy) or 
 				(event.type == JOYBUTTONDOWN and event.button == self.joy_unleash_energy)):
-				self.unleash_energy()
+					self.attack()
 
 	def update(self, main_clock):
 		# Update the energy rect.
@@ -226,9 +202,6 @@ class Player(pygame.sprite.Sprite):
 		self.energy_rect.y = self.energy_level_surface.get_height() - self.energy_rect.height
 
 		# Update the color of the energy.
-		#hsla = self.energy_color.hsla
-		#hsla = (hsla[0], hsla[1], self.energy_lightness + math.sin(pygame.time.get_ticks() * 0.005) * (10 * (self.energy / float(self.max_energy))), hsla[3])
-		#self.energy_color.hsla = hsla
 		new_r = int(self.energy_color_r + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
 		if new_r <= 255 and new_r >= 0:
 			self.energy_color.r = new_r
@@ -256,14 +229,8 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.energy_color.b = 255
 
-		# Check if we're to spawn a missile.
-		if self.missiles_to_spawn > 0:
-			self.time_passed += main_clock.get_time()
-			if self.time_passed >= self.missile_spawn_time:
-				self.spawn_missile()
-
-				self.missiles_to_spawn -= 1
-				self.time_passed = 0
+		# Update our attack.
+		self.energy_attack.update(main_clock)
 
 		# We check if any object has been removed from the powerup group.
 		if len(self.powerup_group) < self.last_powerup_group_size:
