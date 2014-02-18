@@ -37,9 +37,9 @@ class Laserbeam(pygame.sprite.Sprite):
 				for paddle in player.paddle_group:
 					self.attack_paddle = paddle
 
-		width = self.__class__.width
+		width = settings.LEVEL_WIDTH
 		height = self.__class__.height
-		self.rect = pygame.Rect(0, 0, self.width, self.height)					
+		self.rect = pygame.Rect(settings.LEVEL_X, settings.LEVEL_Y, width, height)					
 		self.figure_out_rect_size()
 
 		# Create the image attribute that is drawn over the parent surface.
@@ -60,30 +60,42 @@ class Laserbeam(pygame.sprite.Sprite):
 			self.rect.y = self.attack_paddle.rect.y + ((self.attack_paddle.rect.height - self.rect.height) / 2.0)
 
 			# Check collision against blocks.
-			least_x = settings.LEVEL_MAX_X
+			least_x = self.rect.x + self.rect.width
 			for block in groups.Groups.block_group:
 				if block.owner != self.owner:
 					if self.rect.colliderect(block.rect):
 						if block.rect.x < least_x:
 							least_x = block.rect.x
-							print("set least x to " + str(least_x))
+
+			for paddle in groups.Groups.paddle_group:
+				if paddle.owner != self.owner:
+					if self.rect.colliderect(paddle.rect):
+						if paddle.rect.x < least_x:
+							least_x = paddle.rect.x
 
 			self.rect.width = least_x - self.rect.x
+			if self.rect.x + self.rect.width > settings.LEVEL_MAX_X:
+				self.rect.width = settings.LEVEL_MAX_X - self.rect.x
 		else:
-			self.rect.x = self.attack_paddle.rect.x - self.rect.width
+			self.rect.x = settings.LEVEL_X
 			self.rect.y = self.attack_paddle.rect.y + ((self.attack_paddle.rect.height - self.rect.height) / 2.0)
 
 			# Check collision against blocks.
-			max_x = settings.LEVEL_X
+			max_x = self.rect.x
 			for block in groups.Groups.block_group:
 				if block.owner != self.owner:
 					if self.rect.colliderect(block.rect):
 						if block.rect.x + block.rect.width > max_x:
 							max_x = block.rect.x + block.rect.width
-							print("set max x to " + str(max_x))
 
-			self.rect.width = self.rect.x - max_x
-		print("width is now " + str(self.rect.width))
+			for paddle in groups.Groups.paddle_group:
+				if paddle.owner != self.owner:
+					if self.rect.colliderect(paddle.rect):
+						if paddle.rect.x + paddle.rect.width > max_x:
+							max_x = paddle.rect.x + paddle.rect.width
+
+			self.rect.width = self.attack_paddle.x - max_x
+			self.rect.x = max_x
 
 	def create_final_image(self):
 		self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
@@ -98,13 +110,18 @@ class Laserbeam(pygame.sprite.Sprite):
 		old_width = self.rect.width
 
 		self.rect.width += 1 * settings.GAME_SCALE
+		if self.attack_paddle.x > settings.SCREEN_WIDTH / 2.0:
+			self.rect.x -= 1 * settings.GAME_SCALE
 
 		for block in groups.Groups.block_group:
 			if block.owner != self.owner:
 				if self.rect.colliderect(block.rect):
-					block.on_hit(20 * main_clock.delta_time)
+					block.on_hit(60 * main_clock.delta_time)
 
 		self.rect.width -= 1 * settings.GAME_SCALE
+		if self.attack_paddle.x > settings.SCREEN_WIDTH / 2.0:
+			self.rect.x += 1 * settings.GAME_SCALE
+		self.rect.width = settings.LEVEL_WIDTH
 
 		self.figure_out_rect_size()
 
