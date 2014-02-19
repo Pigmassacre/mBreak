@@ -32,42 +32,37 @@ class TextItem(item.Item):
 	font = pygame.font.Font(font_path, font_size)
 	
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	x = 0
-	y = 0
-	shadow_offset_x = 0 * settings.GAME_SCALE
-	shadow_offset_y = 1 * settings.GAME_SCALE
-	shadow_color = pygame.Color(50, 50, 50)
-	selected_color = pygame.Color(255, 255, 255)
 	on_color = pygame.Color(0, 90, 0)
-	selected_on_color = pygame.Color(0, 255, 0)
 	off_color = pygame.Color(90, 0, 0)
+	selected_on_color = pygame.Color(0, 255, 0)
 	selected_off_color = pygame.Color(255, 0, 0)
 
 	# This is the rate at which the textitem will blink if blink() is called once per frame.
 	blink_rate = 750
 
-	def __init__(self, string, font_color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
-		item.Item.__init__(self)
+	def __init__(self, string, color = pygame.Color(128, 128, 128), alpha_value = 255, size = None):
+		super(TextItem, self).__init__(color)
 
 		# Load default values.
-		self.x = TextItem.x
-		self.y = TextItem.y
 		self.selected_font_color = TextItem.selected_color
-		self.selected = False
 		self.on_font_color = TextItem.on_color
 		self.off_font_color = TextItem.off_color
 		self.selected_on_font_color = TextItem.selected_on_color
 		self.selected_off_font_color = TextItem.selected_off_color
 		self.is_on_off = False
 		self.on = False
-		self.blink_rate = TextItem.blink_rate
 		self.font_size = TextItem.font_size
 		self.font_path = TextItem.font_path
+
+		# If blink is set to true, this item will "blink" (show/hide itself) at the set blink_rate.
+		self.blink = False
+		self.blink_rate = TextItem.blink_rate
+		self.time_passed = 0
 
 		# Set the given values.
 		self.string = string
 		self.off_string = string
-		self.font_color = font_color
+		self.font_color = color
 		self.alpha_value = alpha_value
 		self.size = size
 
@@ -77,11 +72,6 @@ class TextItem(item.Item):
 			self.font = pygame.font.Font(self.font_path, self.size)
 		else:
 			self.font = TextItem.font
-
-		# Setup the shadow.
-		self.shadow_color = TextItem.shadow_color
-		self.shadow_offset_x = TextItem.shadow_offset_x
-		self.shadow_offset_y = TextItem.shadow_offset_y
 
 		self.setup_surfaces()
 
@@ -161,31 +151,27 @@ class TextItem(item.Item):
 	def get_height(self):
 		return self.font.size(self.string)[1]
 
-	def blink(self, time_passed):
-		# If called once per loop, switches the target surface alpha value between 255 and 0 every blink_rate.
-		# The surface spends 2/3s of the time with alpha value 0 as with 255.
-		if time_passed > self.blink_rate:
-			if self.surface.get_alpha() == 255:
-				self.surface.set_alpha(0)
-				self.selected_surface.set_alpha(0)
-				self.shadow_surface.set_alpha(0)
-				return self.blink_rate / 3
-			else:
-				self.surface.set_alpha(255)
-				self.selected_surface.set_alpha(255)
-				self.shadow_surface.set_alpha(255)
-				return 0
-		else:
-			# We return the time_passed so that the callers time_passed value can be updated.
-			return time_passed
+	def update(self, main_clock):
+		super(TextItem, self).update(main_clock)
+
+		if self.blink:
+			if self.time_passed > self.blink_rate:
+				if self.surface.get_alpha() == 255:
+					self.surface.set_alpha(0)
+					self.selected_surface.set_alpha(0)
+					self.shadow_surface.set_alpha(0)
+					return self.blink_rate / 3
+				else:
+					self.surface.set_alpha(255)
+					self.selected_surface.set_alpha(255)
+					self.shadow_surface.set_alpha(255)
+					return 0
 
 	def toggle_on_off(self):
 		self.on = not self.on
 		return self.on
 
 	def draw(self, surface):
-		item.Item.draw(self, surface)
-
 		# First we determine what shadow to blit, and then blit that. We do this before we blit the text so the shadow is under the text.
 		if self.is_on_off:
 			if self.on:

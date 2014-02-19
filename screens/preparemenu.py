@@ -8,7 +8,7 @@ import objects.powerups.powerup as powerup
 import gui.textitem as textitem
 import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
-import gui.coloritem as coloritem
+import gui.item as item
 import gui.choiceitem as choiceitem
 import gui.imageitem as imageitem
 import screens.toast as toast
@@ -153,12 +153,12 @@ class PrepareMenu(scene.Scene):
 
 	def setup_color_items(self, grid_menu, function):
 		# Adds all standard color items to the given grid_menu.
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 0, 255)), function)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 0, 255)), function)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 0, 255, 255)), function)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 255, 0, 255)), function)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(255, 0, 255, 255)), function)
-		grid_menu.add(coloritem.ColorItem(pygame.Color(0, 255, 255, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(255, 0, 0, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(0, 255, 0, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(0, 0, 255, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(255, 255, 0, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(255, 0, 255, 255)), function)
+		grid_menu.add(item.Item(pygame.Color(0, 255, 255, 255)), function)
 
 	def color_one(self, item):
 		# Figures out what color to set player one's color to.
@@ -177,26 +177,26 @@ class PrepareMenu(scene.Scene):
 				break
 
 		if chosen_item is None:
-			# If there is no chosen item and the item is available, set the selected item as chosen and set it's match on the secondary menu as unavailable.
-			if not item.unavailable:
+			# If there is no chosen item and the item is available, set the selected item as chosen and set it's match on the secondary menu as disabled.
+			if not item.disabled:
 				item.chosen = True
-				secondary_menu.items[primary_menu.items.index(item)].unavailable = True
+				secondary_menu.items[primary_menu.items.index(item)].disabled = True
 				return item.color
 		elif chosen_item is item:
 			# If the chosen item is the same as the selected item, set that item as not chosen and restore the availability
 			# of the matching item on the secondary menu.
 			chosen_item.chosen = False
-			secondary_menu.items[primary_menu.items.index(item)].unavailable = False
+			secondary_menu.items[primary_menu.items.index(item)].disabled = False
 			return None
 		elif not chosen_item is item:
 			# If the chosen item isn't the same as the selected item, check if it is available first.
-			if not item.unavailable:
+			if not item.disabled:
 				# If the item is available, set the chosen item to not be chosen, and set the selected item to be chosen.
 				# Also fix the availability, ofcourse.
 				chosen_item.chosen = False
-				secondary_menu.items[primary_menu.items.index(chosen_item)].unavailable = False
+				secondary_menu.items[primary_menu.items.index(chosen_item)].disabled = False
 				item.chosen = True
-				secondary_menu.items[primary_menu.items.index(item)].unavailable = True
+				secondary_menu.items[primary_menu.items.index(item)].disabled = True
 				# We also return the color of the newly chosen item.
 				return item.color
 			# If the item is unavailible, we return the color of the chosen item instead.

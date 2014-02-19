@@ -2,7 +2,6 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
-import random
 from pygame.locals import *
 import gui.textitem as textitem
 import gui.logo as logo
@@ -40,9 +39,6 @@ class IntroMenu(scene.Scene):
 
 		# Setup and play music.
 		self.setup_music()
-			
-		# Keeps track of how much time has passed.
-		self.time_passed = 0
 
 		# Start the gameloop, as usual!
 		self.gameloop()
@@ -88,10 +84,8 @@ class IntroMenu(scene.Scene):
 			self.done = True
 
 	def update(self):
-		# Calls the blink method of the title_message object, which will hide the title_message at regular intervals, essentially
-		# making it "blink".
-		self.time_passed += self.main_clock.get_time()
-		self.time_passed = self.title_message.blink(self.time_passed)
+		# Since we've set the title message to blink, we have to update it so it does so.
+		self.title_message.update(self.main_clock)
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
@@ -103,6 +97,7 @@ class IntroMenu(scene.Scene):
 		# We draw the title message.
 		self.title_message.draw(self.window_surface)
 
+		# Aaand we draw the version message.
 		self.version_message.draw(self.window_surface)
 
 	def on_exit(self):
