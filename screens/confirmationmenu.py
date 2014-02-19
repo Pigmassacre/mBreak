@@ -1,12 +1,11 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
 import gui.listmenu as listmenu
-import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
@@ -65,6 +64,7 @@ class ConfirmationMenu(scene.Scene):
 
 		# Set the default action to be to refuse.
 		self.confirmation_menu.items[1].selected = True
+		self.menu_list.append(self.confirmation_menu)
 
 		self.confirmation_text.y = (settings.SCREEN_HEIGHT - ((2 * self.confirmation_text.get_height()) + self.confirmation_menu.get_height())) / 2.0
 		self.confirmation_menu.y = self.confirmation_text.y + (2 * self.confirmation_text.get_height())
@@ -89,8 +89,6 @@ class ConfirmationMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we call refuse.
 			self.refuse(None)
-		else:
-			traversal.traverse_menus(event, [self.confirmation_menu])
 
 	def update(self):
 		# Handle all transition.

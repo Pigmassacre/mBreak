@@ -28,9 +28,6 @@ class SoundMenu(scene.Scene):
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = None
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		# Setup all the menu buttons.
 		self.setup_sound_menu()
 
@@ -41,11 +38,11 @@ class SoundMenu(scene.Scene):
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
-		self.all_menus.append(self.back_menu)
+		self.menu_list.append(self.back_menu)
 
 		# Register all menus with each other.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
@@ -98,8 +95,8 @@ class SoundMenu(scene.Scene):
 		# Set the button that corresponds to the current volume level to be the chosen item.
 		self.sound_volume_menu.items[int((settings.SOUND_VOLUME * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
 
-		self.all_menus.append(self.music_volume_menu)
-		self.all_menus.append(self.sound_volume_menu)
+		self.menu_list.append(self.music_volume_menu)
+		self.menu_list.append(self.sound_volume_menu)
 
 	def sound(self, item):
 		if item.toggle_on_off():
@@ -161,8 +158,6 @@ class SoundMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the ESCAPE key or back button on gamepad is pressed, we go back a level in the menu system.
 			self.back(None)
-		else:
-			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
@@ -172,7 +167,7 @@ class SoundMenu(scene.Scene):
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
 			self.transition.update(self.main_clock)
-			for a_menu in self.all_menus:
+			for a_menu in self.menu_list:
 				a_menu.update(self.main_clock)
 
 	def draw(self):
@@ -186,5 +181,5 @@ class SoundMenu(scene.Scene):
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			self.music_item.draw(self.window_surface)
 			self.sound_item.draw(self.window_surface)
-			for a_menu in self.all_menus:
+			for a_menu in self.menu_list:
 				a_menu.draw(self.window_surface)

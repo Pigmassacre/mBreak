@@ -1,13 +1,11 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 from pygame.locals import *
-import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
 import gui.listmenu as listmenu
-import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
@@ -58,8 +56,8 @@ class PauseMenu(scene.Scene):
 		self.pause_menu.x = settings.SCREEN_WIDTH / 2
 		self.pause_menu.y = (settings.SCREEN_HEIGHT - self.pause_menu.get_height()) / 2.0
 		self.pause_menu.cleanup()
-
 		self.pause_menu.items[0].selected = True
+		self.menu_list.append(self.pause_menu)
 
 	def resume(self, item):
 		# Finished the gameloop, allowing the class that started this pausemenu to resume.
@@ -96,9 +94,6 @@ class PauseMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_START):
 			# If the escape key is pressed, we resume the game.
 			self.resume(None)
-		else:
-			# Traversal handles key movement in menus!
-			traversal.traverse_menus(event, [self.pause_menu])
 
 	def update(self):
 		# Update the transition.

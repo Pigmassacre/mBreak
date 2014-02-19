@@ -21,6 +21,10 @@ def traverse_menus(event, list_of_menus):
 
 	list_of_menus is the list which contains all the menus that we should be able to traverse through.
 	"""
+
+	# If the given list if empty, we do nothing.
+	if len(list_of_menus) == 0:
+		return
 	
 	if (event.type == MOUSEMOTION):
 		# If the mouse has been moved, we check every item in every menu.

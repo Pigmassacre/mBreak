@@ -9,7 +9,6 @@ import other.useful as useful
 import objects.groups as groups
 import gui.textitem as textitem
 import gui.listmenu as listmenu
-import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
@@ -113,23 +112,20 @@ class MatchOver(scene.Scene):
 		self.player_two_text.y = self.player_two_score_text.y - (2 * self.player_two_text.get_height())
 		self.player_two_text.set_color(self.player_two.color)
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		quit_button = textitem.TextItem("Quit")
 		self.quit_menu = listmenu.ListMenu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.maybe_quit)
-		self.all_menus.append(self.quit_menu)
+		self.menu_list.append(self.quit_menu)
 		
 		next_match_button = textitem.TextItem("Next Round")
 		self.next_match_menu = listmenu.ListMenu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
 		self.next_match_menu.items[0].selected = True
-		self.all_menus.append(self.next_match_menu)
+		self.menu_list.append(self.next_match_menu)
 
 		# Register all menus with each other. This is for gui.traversals sake, so it knows that there are more than one menu to traverse upon.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 	def setup_transition(self):
 		# Sets up the different transition of all the items.
@@ -170,9 +166,6 @@ class MatchOver(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we do the same thing as the quit button.
 			self.maybe_quit(None)
-		else:
-			# The traversal module handles key movement between menus.
-			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
 		# Handle the transition and blit all items.

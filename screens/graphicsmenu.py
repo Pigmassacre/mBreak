@@ -1,14 +1,13 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 from pygame.locals import *
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.transition as transition
-import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
@@ -28,9 +27,6 @@ class GraphicsMenu(scene.Scene):
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = None
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		# Setup all the menu buttons.
 		self.setup_graphics_menu()
 
@@ -41,7 +37,7 @@ class GraphicsMenu(scene.Scene):
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
-		self.all_menus.append(self.back_menu)
+		self.menu_list.append(self.back_menu)
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
@@ -50,8 +46,8 @@ class GraphicsMenu(scene.Scene):
 		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 		# Register all menus with each other.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 		# Setup the menu transitions.
 		self.transition.setup_transition(self.graphics_menu_left, True, False, False, False)
@@ -91,8 +87,8 @@ class GraphicsMenu(scene.Scene):
 		self.graphics_menu_left.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
 		self.graphics_menu_right.y = (settings.SCREEN_HEIGHT / 2) - self.graphics_menu_offset
 
-		self.all_menus.append(self.graphics_menu_left)
-		self.all_menus.append(self.graphics_menu_right)
+		self.menu_list.append(self.graphics_menu_left)
+		self.menu_list.append(self.graphics_menu_right)
 
 	def shadows(self, item):
 		graphics.SHADOWS = item.toggle_on_off()
@@ -135,8 +131,6 @@ class GraphicsMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the ESCAPE key or back button on gamepad is pressed, we go back a level in the menu system.
 			self.back(None)
-		else:
-			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
@@ -146,7 +140,7 @@ class GraphicsMenu(scene.Scene):
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
 			self.transition.update(self.main_clock)
-			for a_menu in self.all_menus:
+			for a_menu in self.menu_list:
 				a_menu.update(self.main_clock)
 
 	def draw(self):
@@ -158,5 +152,5 @@ class GraphicsMenu(scene.Scene):
 
 		# If the logo is in place, draw the currently active menu to the screen.
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
-			for a_menu in self.all_menus:
+			for a_menu in self.menu_list:
 				a_menu.draw(self.window_surface)

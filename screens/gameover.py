@@ -11,7 +11,6 @@ import objects.groups as groups
 import objects.firework as firework
 import gui.textitem as textitem
 import gui.listmenu as listmenu
-import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 import screens.scene as scene
@@ -56,23 +55,20 @@ class GameOver(scene.Scene):
 		# This sets up the winner text, coloring it and everything.
 		self.setup_winner_text()
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		quit_button = textitem.TextItem("Quit")
 		self.quit_menu = listmenu.ListMenu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.quit)
 		self.quit_menu.items[0].selected = True
-		self.all_menus.append(self.quit_menu)
+		self.menu_list.append(self.quit_menu)
 		
 		rematch_button = textitem.TextItem("Rematch")
 		self.rematch_menu = listmenu.ListMenu(settings.SCREEN_WIDTH - item_side_padding - (rematch_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - rematch_button.get_height())
 		self.rematch_menu.add(rematch_button, self.rematch)
-		self.all_menus.append(self.rematch_menu)
+		self.menu_list.append(self.rematch_menu)
 
 		# Register all menus with each other.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 		# Setup the menu transition.
 		for letter_item in self.winning_player_text:
@@ -136,9 +132,7 @@ class GameOver(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we go back to the main menu.
 			self.quit(None)
-		else:
-			traversal.traverse_menus(event, self.all_menus)
-
+			
 	def update(self):
 		# Update all transition.
 		self.transition.update(self.main_clock)

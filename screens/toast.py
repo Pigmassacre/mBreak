@@ -6,7 +6,6 @@ from pygame.locals import *
 import other.useful as useful
 import gui.textitem as textitem
 import gui.listmenu as listmenu
-import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
 import screens
@@ -68,6 +67,7 @@ class Toast(scene.Scene):
 		self.toast_menu.y = self.message[len(self.message) - 1].y + self.message[0].get_height() + self.toast_menu.get_height()
 		self.toast_menu.cleanup()
 		self.toast_menu.items[0].selected = True
+		self.menu_list.append(self.toast_menu)
 
 	def resume(self, item):
 		# Finished the gameloop, allowing the class that started this toastmenu to resume.
@@ -77,9 +77,6 @@ class Toast(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_START):
 			# If the escape key is pressed, we resume the game.
 			self.resume(None)
-		else:
-			# Traversal handles key movement in menus!
-			traversal.traverse_menus(event, [self.toast_menu])
 
 	def update(self):
 		# Update the transition.

@@ -51,6 +51,7 @@ class AboutMenu(scene.Scene):
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
+		self.menu_list.append(self.back_menu)
 
 		# We choose a smaller font size here for all the credits.
 		font_size = 6 * settings.GAME_SCALE
@@ -158,8 +159,6 @@ class AboutMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we go end this scene.
 			self.back(None)
-		else:
-			traversal.traverse_menus(event, [self.back_menu])
 
 	def update(self):		
 		# Handle all transition.

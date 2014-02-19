@@ -6,6 +6,7 @@ from pygame.locals import *
 import random
 import other.debug as debug
 import gui.transition as transition
+import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
 import objects.groups as groups
@@ -27,6 +28,9 @@ class Scene:
 		# We use one single transition object to handle all transitions. If we want, we can ofcourse add more transition objects
 		# to subclasses of this class, but hey.
 		self.transition = transition.Transition()
+
+		# We also store a list of all menus, for use with the traversal code.
+		self.menu_list = []
 
 		# We use this list of music to randomly choose what track to play. It's empty here, but subclasses can add to it.
 		self.music_list = []
@@ -57,6 +61,9 @@ class Scene:
 
 				# Subclasses implementing this class should handle their events in self.event(event).
 				self.event(event)
+
+				# We try to traverse the menus, if there is any.
+				traversal.traverse_menus(event, self.menu_list)
 
 			# Call the update method. Implement the handling of all game logic in this method.
 			self.update()

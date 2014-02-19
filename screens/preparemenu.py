@@ -12,7 +12,6 @@ import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
 import gui.imageitem as imageitem
 import screens.toast as toast
-import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
 import screens.game as game
@@ -48,9 +47,6 @@ class PrepareMenu(scene.Scene):
 		# Configure the GUI.
 		distance_from_screen_edge = 9 * settings.GAME_SCALE
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		# We create a gridmenu that allows the player to select the number of rounds they want to play.
 		self.number_of_rounds_menu = gridmenu.GridMenu(5)
 
@@ -66,7 +62,7 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_menu.add(choiceitem.ChoiceItem(9), self.rounds)
 		self.number_of_rounds_menu.x = (settings.SCREEN_WIDTH - self.number_of_rounds_menu.get_width()) / 2.0
 		self.number_of_rounds_menu.y = distance_from_screen_edge * 3
-		self.all_menus.append(self.number_of_rounds_menu)
+		self.menu_list.append(self.number_of_rounds_menu)
 
 		# The text displayed over the rounds menu.
 		self.number_of_rounds_text = textitem.TextItem("Rounds", pygame.Color(255, 255, 255))
@@ -85,8 +81,8 @@ class PrepareMenu(scene.Scene):
 		self.ai_menu_one.x = self.color_menu_one.x + self.color_menu_one.get_width() + ai_menu_offset
 		self.ai_menu_one.y = self.color_menu_one.y
 
-		self.all_menus.append(self.color_menu_one)
-		self.all_menus.append(self.ai_menu_one)
+		self.menu_list.append(self.color_menu_one)
+		self.menu_list.append(self.ai_menu_one)
 
 		# The text above the color menu for player one.
 		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
@@ -105,8 +101,8 @@ class PrepareMenu(scene.Scene):
 		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - self.color_menu_two.offset * 2
 		self.ai_menu_two.y = self.color_menu_two.y
 
-		self.all_menus.append(self.color_menu_two)
-		self.all_menus.append(self.ai_menu_two)
+		self.menu_list.append(self.color_menu_two)
+		self.menu_list.append(self.ai_menu_two)
 
 		# The text above the color menu for player two.
 		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
@@ -120,7 +116,7 @@ class PrepareMenu(scene.Scene):
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
-		self.all_menus.append(self.back_menu)
+		self.menu_list.append(self.back_menu)
 		
 		# The start button, displayed in the bottom-right corner of the screen.
 		start_button = textitem.TextItem("Start")
@@ -128,11 +124,11 @@ class PrepareMenu(scene.Scene):
 		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2.0)
 		self.start_menu.y = settings.SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)
-		self.all_menus.append(self.start_menu)
+		self.menu_list.append(self.start_menu)
 
 		# Register all menus with each other.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 		# We setup all menu transition.
 		self.transition.setup_transition(self.number_of_rounds_menu, True, True, False, False)
@@ -276,8 +272,6 @@ class PrepareMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we go back to the main menu.
 			self.back()
-		else:
-			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
 		# Handle all transition.

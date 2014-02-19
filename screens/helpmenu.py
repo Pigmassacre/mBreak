@@ -10,7 +10,6 @@ import gui.textitem as textitem
 import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
-import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
 
@@ -56,13 +55,10 @@ class HelpMenu(scene.Scene):
 		self.font_size = 6 * settings.GAME_SCALE
 		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
 
-		# A list of all menus, so we can easily register all menus to all menus (so they know to unselect items in other menus and stuff like that).
-		self.all_menus = []
-
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
 		self.help_menu = gridmenu.GridMenu(13)
 		self.help_menu.y = 9 * settings.GAME_SCALE
-		self.all_menus.append(self.help_menu)
+		self.menu_list.append(self.help_menu)
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
@@ -71,7 +67,7 @@ class HelpMenu(scene.Scene):
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
 		self.back_menu.items[0].selected = True
-		self.all_menus.append(self.back_menu)
+		self.menu_list.append(self.back_menu)
 
 		# We setup and add all the necessary items to the help_menu.
 		root = "res/helpdata"
@@ -82,8 +78,8 @@ class HelpMenu(scene.Scene):
 		self.help_menu.x = (settings.SCREEN_WIDTH - self.help_menu.get_width()) / 2
 
 		# Register all menus with each other.
-		for a_menu in self.all_menus:
-			a_menu.register_other_menus(self.all_menus)
+		for a_menu in self.menu_list:
+			a_menu.register_other_menus(self.menu_list)
 
 		# We setup all menu transition.
 		self.transition.speed = 20 * settings.GAME_FPS * settings.GAME_SCALE
@@ -253,10 +249,8 @@ class HelpMenu(scene.Scene):
 
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
-			# If the escape key is pressed, we go end this scene.
+			# If the escape key is pressed, we end this scene.
 			self.back(None)
-		else:
-			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
 		# Handle all transition.
