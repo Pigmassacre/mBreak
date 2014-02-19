@@ -12,7 +12,7 @@ clicked the corresponding function is called.
 
 """
 
-class Menu:
+class Menu(object):
 
 	# Initialize the mixer (so we can load a sound) and load the sound effect.
 	pygame.mixer.init(44100, -16, 2, 2048)
@@ -24,9 +24,6 @@ class Menu:
 
 		# We use this list to make sure that only one menu ever has a selected item.
 		self.other_menus = []
-
-		# This is the amount of items the menu will display in a row before generating a new column.
-		self.max_number_of_rows = 3
 
 		# Setup a dictionary that contains the functions that each item will call when activated.
 		self.functions = {}
@@ -66,23 +63,16 @@ class Menu:
 		return max_y - min_y
 
 	def add(self, item, function):
-		# Given an item and a function, this adds that item to this menu and registers a function to our
-		# function dictionary with that item as the key.
-		if len(self.items) > 0:
-			# If the added item is anything but the first item, place it below the last item in the menu.
-			last_item = self.items[-1]
+		# Add the item to our list of items.
+		self.items.append(item)
 
-			self.items.append(item)
-			item.x = self.x - (item.get_width() / 2.0)
-			item.y = last_item.y + (last_item.get_height() * 2.0)
-		else:
-			# If it is the first item in the menu, place it at the top of the menu.
-			self.items.append(item)
-			item.x = self.x - (item.get_width() / 2.0)
-			item.y = self.y
-
-		# Register the item to the functions dictionary.
+		# Register the item with the given function to the functions dictionary.
 		self.functions[item] = function
+
+		self.position_item(item)
+
+	def position_item(self, item):
+		pass
 
 	def remove(self, item):
 		# Remves the given item from the menu.
@@ -91,8 +81,7 @@ class Menu:
 	def cleanup(self):
 		# Repositions all the items in the menu.
 		for item in self.items:
-			item.x = self.x - (item.get_width() / 2.0)
-			item.y = self.y + ((item.get_height() * 2.0) * self.items.index(item))
+			self.position_item(item)
 
 	def register_other_menus(self, other_menus):
 		# Register the other menus into our own list of other menus.
@@ -100,10 +89,13 @@ class Menu:
 			# We don't want to register ourself, so we filter ourself out with an anonymous function.
 			self.other_menus.extend(filter(lambda x: x != self, other_menus))
 
-	def update(self, main_clock):
-		# We store the current mouse position in order to figure out if an item is selected / clicked on by the mouse.
-		mouse_pos = pygame.mouse.get_pos()
+	def is_mouse_over_item(self, item, mouse_pos):
+		# Returns True if the given mouse_pos is inside the given item.
+		x = mouse_pos[0]
+		y = mouse_pos[1]
+		return x >= item.x and x <= item.x + item.get_width() and y >= item.y and y <= item.y + item.get_height()
 
+	def update(self, main_clock):
 		# We use this list to figure out if no items are selected
 		selected_items = []
 
@@ -126,12 +118,6 @@ class Menu:
 		# If there is no selected item in this menu, reset the previous selected item.
 		if len(selected_items) == 0:
 			self.previous_selected_item = None
-
-	def is_mouse_over_item(self, item, mouse_pos):
-		# Returns True if the given mouse_pos is inside the given item.
-		x = mouse_pos[0]
-		y = mouse_pos[1]
-		return x >= item.x and x <= item.x + item.get_width() and y >= item.y and y <= item.y + item.get_height()
 
 	def draw(self, surface):
 		# Simply draws all the items of this menu to the given surface.

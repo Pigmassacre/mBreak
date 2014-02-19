@@ -64,11 +64,11 @@ def wrap_multi_line(text, font, maxwidth):
     lines = chain(*(wrapline(line, font, maxwidth) for line in text.splitlines()))
     return list(lines)
 
-def tint_surface(surface):
+def tint_surface(surface, alpha_value = 200):
 	"""
 	Given a surface, returns the same surface tinted a bit darker.
 	"""
-	tint_color = pygame.Color(0, 0, 0, 200)
+	tint_color = pygame.Color(0, 0, 0, alpha_value)
 	tint_surface = pygame.Surface((surface.get_width(), surface.get_height()), SRCALPHA)
 	tint_surface.fill(tint_color)
 	surface.blit(tint_surface, (0, 0))

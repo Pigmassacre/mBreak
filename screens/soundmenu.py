@@ -1,14 +1,12 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
-import math
+import pygame
 from pygame.locals import *
-import other.debug as debug
 import gui.textitem as textitem
 import gui.choiceitem as choiceitem
 import gui.logo as logo
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.transition as transition
 import gui.gridmenu as gridmenu
 import gui.traversal as traversal
@@ -38,7 +36,7 @@ class SoundMenu(scene.Scene):
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu()
+		self.back_menu = listmenu.ListMenu()
 		self.back_menu.x = settings.SCREEN_WIDTH / 2
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)

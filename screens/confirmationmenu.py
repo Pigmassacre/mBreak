@@ -5,7 +5,7 @@ import pygame, sys
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -53,21 +53,22 @@ class ConfirmationMenu(scene.Scene):
 		self.gameloop()
 
 	def setup_menu(self):
+		# Setup the textitem.
+		self.confirmation_text = textitem.TextItem("Are you sure?", pygame.Color(255, 255, 255))
+		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
+
 		# Setup the menu.
-		self.confirmation_menu = menu.Menu()
+		self.confirmation_menu = listmenu.ListMenu()
 		self.confirmation_menu.add(textitem.TextItem("Yes"), self.accept)
 		self.confirmation_menu.add(textitem.TextItem("No"), self.refuse)
 		self.confirmation_menu.x = settings.SCREEN_WIDTH / 2
-		self.confirmation_menu.y = (settings.SCREEN_HEIGHT - self.confirmation_menu.get_height()) / 2
-		self.confirmation_menu.cleanup()
 
 		# Set the default action to be to refuse.
 		self.confirmation_menu.items[1].selected = True
 
-		# Setup the textitem.
-		self.confirmation_text = textitem.TextItem("Are you sure?", pygame.Color(255, 255, 255))
-		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
-		self.confirmation_text.y = self.confirmation_menu.y - (2 * self.confirmation_text.get_height())
+		self.confirmation_text.y = (settings.SCREEN_HEIGHT - ((2 * self.confirmation_text.get_height()) + self.confirmation_menu.get_height())) / 2.0
+		self.confirmation_menu.y = self.confirmation_text.y + (2 * self.confirmation_text.get_height())
+		self.confirmation_menu.cleanup()
 
 	def setup_transition(self):
 		self.transition.setup_single_item_transition(self.confirmation_text, True, True, True, False)

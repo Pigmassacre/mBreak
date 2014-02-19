@@ -1,13 +1,12 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 import random
 from pygame.locals import *
 import gui.textitem as textitem
 import gui.logo as logo
 import settings.settings as settings
-import settings.graphics as graphics
 import screens.scene as scene
 
 # From the intromenu the only screen we can go to is the mainmenu, so we import it here.

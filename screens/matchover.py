@@ -1,16 +1,14 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 import copy
 import random
 from pygame.locals import *
-import other.debug as debug
 import other.useful as useful
 import objects.groups as groups
 import gui.textitem as textitem
-import gui.menu as menu
-#import gui.transition as transition
+import gui.listmenu as listmenu
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -119,12 +117,12 @@ class MatchOver(scene.Scene):
 		self.all_menus = []
 
 		quit_button = textitem.TextItem("Quit")
-		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
+		self.quit_menu = listmenu.ListMenu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.maybe_quit)
 		self.all_menus.append(self.quit_menu)
 		
 		next_match_button = textitem.TextItem("Next Round")
-		self.next_match_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
+		self.next_match_menu = listmenu.ListMenu(settings.SCREEN_WIDTH - item_side_padding - (next_match_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - next_match_button.get_height())
 		self.next_match_menu.add(next_match_button, self.next_match)
 		self.next_match_menu.items[0].selected = True
 		self.all_menus.append(self.next_match_menu)

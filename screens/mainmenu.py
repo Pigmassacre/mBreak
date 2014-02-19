@@ -7,7 +7,7 @@ from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
 import gui.logo as logo
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.transition as transition
 import gui.traversal as traversal
@@ -63,7 +63,7 @@ class MainMenu(scene.Scene):
 		self.gameloop()
 
 	def setup_main_menu(self):
-		self.main_menu = self.setup_menu()
+		self.main_menu = listmenu.ListMenu(settings.SCREEN_WIDTH / 2.0, settings.SCREEN_HEIGHT / 2.0)
 		self.main_menu.add(textitem.TextItem("Start"), self.start)
 		self.main_menu.add(textitem.TextItem("Options"), self.options)
 		self.main_menu.add(textitem.TextItem("Help"), self.help)
@@ -90,10 +90,6 @@ class MainMenu(scene.Scene):
 		else:
 			# Otherwise, we just save the given title_logo object
 			self.title_logo = title_logo
-	
-	def setup_menu(self):
-		# Returns a menu that is positioned in the center of the screen.
-		return menu.Menu(settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
 	def setup_music(self):
 		if not pygame.mixer.music.get_busy():

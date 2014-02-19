@@ -24,8 +24,11 @@ class Scene:
 		self.window_surface = window_surface
 		self.main_clock = main_clock
 
+		# We use one single transition object to handle all transitions. If we want, we can ofcourse add more transition objects
+		# to subclasses of this class, but hey.
 		self.transition = transition.Transition()
 
+		# We use this list of music to randomly choose what track to play. It's empty here, but subclasses can add to it.
 		self.music_list = []
 
 	def gameloop(self):

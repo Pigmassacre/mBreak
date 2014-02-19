@@ -18,9 +18,9 @@ class GridMenu(menu.Menu):
 
 	offset = 2 * settings.GAME_SCALE
 
-	def __init__(self, max_number_of_columns = 3, x = 0, y = 0, position = 0):
+	def __init__(self, max_number_of_columns = 3):
 		# We call the superconstructor, ofcourse.
-		menu.Menu.__init__(self, x, y, position)
+		super(GridMenu, self).__init__()
 
 		# This is the max number of items that are displayed next to each other before a new row is added.
 		self.max_number_of_columns = max_number_of_columns
@@ -32,18 +32,13 @@ class GridMenu(menu.Menu):
 		self.current_row_size = 0
 		self.current_row_position = self.y
 
-	def add(self, item, function):
-		# This works almost exactly like the Menu function, but it positions the added items in a grid-like fashion. 
-		self.items.append(item)
+	def position_item(self, item):
 		self.current_row_size += 1
 
 		# Populate the grid with the item, and store the new current row size and current row position.
-		temp_size_pos = self.populate_grid(item, self.current_row_size, self.current_row_position)
-		self.current_row_size = temp_size_pos[0]
-		self.current_row_position = temp_size_pos[1]
-
-		# Store the function for this item.
-		self.functions[item] = function
+		size_and_position = self.populate_grid(item, self.current_row_size, self.current_row_position)
+		self.current_row_size = size_and_position[0]
+		self.current_row_position = size_and_position[1]
 
 	def populate_grid(self, item, row_size, row_position):
 		# Populates the grid according to the max_number_of_columns.
@@ -63,15 +58,11 @@ class GridMenu(menu.Menu):
 
 		# We return the changed row_size and row_position.
 		return (row_size, row_position)
-
+		
 	def cleanup(self):
-		# Repositions all the items in the gridmenu.
-		temp_row_size = 0
-		temp_row_position = self.y
+		# The superclass takes care of repositioning all items, we just set a few default values.
+		self.current_row_size = 0
+		self.current_row_position = self.y
 
-		for item in self.items:
-			temp_row_size += 1
-			temp_size_pos = self.populate_grid(item, temp_row_size, temp_row_position)
-			temp_row_size = temp_size_pos[0]
-			temp_row_position = temp_size_pos[1]
+		super(GridMenu, self).cleanup()
 				

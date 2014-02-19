@@ -1,11 +1,11 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 from pygame.locals import *
 import other.useful as useful
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
@@ -23,7 +23,7 @@ class Toast(scene.Scene):
 
 		# Tint the window surface and set it as the background surface.
 		self.background_surface = self.window_surface.copy()
-		useful.tint_surface(self.background_surface)
+		useful.tint_surface(self.background_surface, 225)
 
 		distance_from_screen_edge = 6 * settings.GAME_SCALE
 		max_width_of_text_line = (settings.SCREEN_WIDTH - (distance_from_screen_edge * 2))
@@ -46,11 +46,7 @@ class Toast(scene.Scene):
 			message.y = (settings.SCREEN_HEIGHT - len(self.message) * message.get_height()) / 2.0 + self.message.index(message) * message.get_height()
 
 		# Create, store and position the toast menu.
-		self.toast_menu = self.setup_toast_menu()
-		self.toast_menu.x = settings.SCREEN_WIDTH / 2
-		self.toast_menu.y = self.message[len(self.message) - 1].y + self.message[0].get_height() + self.toast_menu.get_height()
-		self.toast_menu.cleanup()
-		self.toast_menu.items[0].selected = True
+		self.setup_toast_menu()
 
 		# Setup the menu transition.
 		self.transition.speed *= 1.5
@@ -66,9 +62,12 @@ class Toast(scene.Scene):
 
 	def setup_toast_menu(self):
 		# Creates and adds the items to the toast menu.
-		toast_menu = menu.Menu()
-		toast_menu.add(textitem.TextItem("Ok"), self.resume)
-		return toast_menu
+		self.toast_menu = listmenu.ListMenu()
+		self.toast_menu.add(textitem.TextItem("Ok"), self.resume)
+		self.toast_menu.x = settings.SCREEN_WIDTH / 2
+		self.toast_menu.y = self.message[len(self.message) - 1].y + self.message[0].get_height() + self.toast_menu.get_height()
+		self.toast_menu.cleanup()
+		self.toast_menu.items[0].selected = True
 
 	def resume(self, item):
 		# Finished the gameloop, allowing the class that started this toastmenu to resume.

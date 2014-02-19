@@ -7,7 +7,7 @@ import random
 from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
 #import gui.transition as transition
@@ -46,7 +46,7 @@ class AboutMenu(scene.Scene):
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu()
+		self.back_menu = listmenu.ListMenu()
 		self.back_menu.x = settings.SCREEN_WIDTH / 2
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)

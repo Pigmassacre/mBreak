@@ -6,7 +6,7 @@ from pygame.locals import *
 import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
@@ -41,11 +41,7 @@ class PauseMenu(scene.Scene):
 		self.next_screen = None
 
 		# Create, store and position the pause menu.
-		self.pause_menu = self.setup_pause_menu()
-		self.pause_menu.x = settings.SCREEN_WIDTH / 2
-		self.pause_menu.y = (settings.SCREEN_HEIGHT - self.pause_menu.get_height()) / 2
-		self.pause_menu.cleanup()
-		self.pause_menu.items[0].selected = True
+		self.setup_pause_menu()
 
 		# Setup the menu transition.
 		self.setup_transition()
@@ -55,11 +51,15 @@ class PauseMenu(scene.Scene):
 
 	def setup_pause_menu(self):
 		# Creates and adds the items to the pause menu.
-		pause_menu = menu.Menu()
-		pause_menu.add(textitem.TextItem("Resume"), self.resume)
-		pause_menu.add(textitem.TextItem("Options"), self.options)
-		pause_menu.add(textitem.TextItem("Quit"), self.maybe_quit)
-		return pause_menu
+		self.pause_menu = listmenu.ListMenu()
+		self.pause_menu.add(textitem.TextItem("Resume"), self.resume)
+		self.pause_menu.add(textitem.TextItem("Options"), self.options)
+		self.pause_menu.add(textitem.TextItem("Quit"), self.maybe_quit)
+		self.pause_menu.x = settings.SCREEN_WIDTH / 2
+		self.pause_menu.y = (settings.SCREEN_HEIGHT - self.pause_menu.get_height()) / 2.0
+		self.pause_menu.cleanup()
+
+		self.pause_menu.items[0].selected = True
 
 	def resume(self, item):
 		# Finished the gameloop, allowing the class that started this pausemenu to resume.

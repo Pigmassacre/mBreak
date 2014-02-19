@@ -1,18 +1,16 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 import math
 import random
 import copy
 from pygame.locals import *
-import other.debug as debug
 import other.useful as useful
 import objects.groups as groups
 import objects.firework as firework
 import gui.textitem as textitem
-import gui.menu as menu
-#import gui.transition as transition
+import gui.listmenu as listmenu
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -62,13 +60,13 @@ class GameOver(scene.Scene):
 		self.all_menus = []
 
 		quit_button = textitem.TextItem("Quit")
-		self.quit_menu = menu.Menu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
+		self.quit_menu = listmenu.ListMenu(item_side_padding + (quit_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - quit_button.get_height())
 		self.quit_menu.add(quit_button, self.quit)
 		self.quit_menu.items[0].selected = True
 		self.all_menus.append(self.quit_menu)
 		
 		rematch_button = textitem.TextItem("Rematch")
-		self.rematch_menu = menu.Menu(settings.SCREEN_WIDTH - item_side_padding - (rematch_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - rematch_button.get_height())
+		self.rematch_menu = listmenu.ListMenu(settings.SCREEN_WIDTH - item_side_padding - (rematch_button.get_width() / 2), settings.SCREEN_HEIGHT - item_side_padding - rematch_button.get_height())
 		self.rematch_menu.add(rematch_button, self.rematch)
 		self.all_menus.append(self.rematch_menu)
 

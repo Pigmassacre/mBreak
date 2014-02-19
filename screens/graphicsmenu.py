@@ -3,10 +3,9 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-import other.debug as debug
 import gui.textitem as textitem
 import gui.logo as logo
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.transition as transition
 import gui.traversal as traversal
@@ -37,7 +36,7 @@ class GraphicsMenu(scene.Scene):
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu()
+		self.back_menu = listmenu.ListMenu()
 		self.back_menu.x = settings.SCREEN_WIDTH / 2
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
@@ -124,10 +123,10 @@ class GraphicsMenu(scene.Scene):
 			self.title_logo = title_logo
 
 	def setup_menu_left(self):
-		return menu.Menu(settings.SCREEN_WIDTH / 4, settings.SCREEN_HEIGHT / 2)
+		return listmenu.ListMenu(settings.SCREEN_WIDTH / 4, settings.SCREEN_HEIGHT / 2)
 
 	def setup_menu_right(self):
-		return menu.Menu(settings.SCREEN_WIDTH - (settings.SCREEN_WIDTH / 4), settings.SCREEN_HEIGHT / 2)
+		return listmenu.ListMenu(settings.SCREEN_WIDTH - (settings.SCREEN_WIDTH / 4), settings.SCREEN_HEIGHT / 2)
 
 	def back(self, item):
 		self.done = True

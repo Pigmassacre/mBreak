@@ -1,7 +1,7 @@
 __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
-import pygame, sys
+import pygame
 import logging
 from pygame.locals import *
 import math
@@ -265,15 +265,15 @@ class Game(scene.Scene):
 		for entity in group:
 			for player in groups.Groups.player_group:
 				if entity.owner != player:
-					if len(player.block_group) <= 2:
+					if len(player.block_group) <= 1:
 						for block in player.block_group:
 							distance = math.sqrt(math.pow(math.fabs((entity.x + entity.width / 2) - (block.x + block.width / 2)), 2) + math.pow(math.fabs((entity.y + entity.height / 2) - (block.y + block.height / 2)), 2))
 							if distance < least_distance:
 								least_distance = distance
 								if least_distance < 25 * settings.GAME_SCALE:
 									self.main_clock.time_scale = math.pow(least_distance / (25 * settings.GAME_SCALE), 5)
-									if self.main_clock.time_scale < 0.04:
-										self.main_clock.time_scale = 0.04
+									if self.main_clock.time_scale < 0.1:
+										self.main_clock.time_scale = 0.1
 	
 		return least_distance								
 
@@ -505,10 +505,7 @@ class Game(scene.Scene):
 			groups.empty_after_round()
 			matchover.MatchOver(self.window_surface, self.main_clock, self.player_one, self.player_two, self.number_of_rounds, self.score, self.number_of_rounds_done, self.winner)
 
-		if self.next_screen is None:
-			pygame.quit()
-			sys.exit()
-		elif not self.next_screen is None:
+		if not self.next_screen is None:
 			# The game is over so we empty all the groups.
 			groups.empty_all()
 			self.next_screen(self.window_surface, self.main_clock)

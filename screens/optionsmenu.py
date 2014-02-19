@@ -3,11 +3,9 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-import other.debug as debug
 import gui.textitem as textitem
 import gui.logo as logo
-import gui.menu as menu
-import gui.gridmenu as gridmenu
+import gui.listmenu as listmenu
 import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
@@ -92,7 +90,7 @@ class OptionsMenu(scene.Scene):
 	
 	def setup_menu(self):
 		# Returns a menu that is positioned in the center of the screen.
-		return menu.Menu(settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
+		return listmenu.ListMenu(settings.SCREEN_WIDTH / 2, settings.SCREEN_HEIGHT / 2)
 
 	def back(self, item):
 		if len(self.active_menu) > 1:

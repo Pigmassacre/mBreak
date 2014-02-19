@@ -3,11 +3,10 @@ __license__ = "All Rights Reserved"
 
 import pygame, sys
 from pygame.locals import *
-import other.debug as debug
 import objects.player as player
 import objects.powerups.powerup as powerup
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
@@ -15,7 +14,6 @@ import gui.imageitem as imageitem
 import screens.toast as toast
 import gui.traversal as traversal
 import settings.settings as settings
-import settings.graphics as graphics
 import screens.scene as scene
 import screens.game as game
 import screens
@@ -117,7 +115,7 @@ class PrepareMenu(scene.Scene):
 
 		# The back button, displayed in the bottom-left corner of the screen.
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu()
+		self.back_menu = listmenu.ListMenu()
 		self.back_menu.x = distance_from_screen_edge + (back_button.get_width() / 2.0)
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)
@@ -126,7 +124,7 @@ class PrepareMenu(scene.Scene):
 		
 		# The start button, displayed in the bottom-right corner of the screen.
 		start_button = textitem.TextItem("Start")
-		self.start_menu = menu.Menu()
+		self.start_menu = listmenu.ListMenu()
 		self.start_menu.x = settings.SCREEN_WIDTH - distance_from_screen_edge - (start_button.get_width() / 2.0)
 		self.start_menu.y = settings.SCREEN_HEIGHT - (2 * start_button.get_height())
 		self.start_menu.add(start_button, self.start)

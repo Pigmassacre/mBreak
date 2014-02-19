@@ -5,24 +5,13 @@ import pygame, sys
 import os
 import json
 from pygame.locals import *
-import other.debug as debug
 import other.useful as useful
-import objects.player as player
-import objects.powerups.powerup as powerup
-import objects.powerups.multiball as multiball
-import objects.effects.burning as burning
-import objects.effects.freezing as freezing
-import objects.effects.charged as charged
-import objects.blocks.weak as weakblock
-import objects.blocks.normal as normalblock
-import objects.blocks.strong as strongblock
 import gui.textitem as textitem
-import gui.menu as menu
+import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
 import gui.traversal as traversal
 import settings.settings as settings
-import settings.graphics as graphics
 import screens.scene as scene
 
 """
@@ -77,7 +66,7 @@ class HelpMenu(scene.Scene):
 
 		# The back button, displayed in the middle-bottom of the screen.
 		back_button = textitem.TextItem("Back")
-		self.back_menu = menu.Menu()
+		self.back_menu = listmenu.ListMenu()
 		self.back_menu.x = settings.SCREEN_WIDTH / 2
 		self.back_menu.y = settings.SCREEN_HEIGHT - (2 * back_button.get_height())
 		self.back_menu.add(back_button, self.back)

@@ -56,10 +56,10 @@ class Transition:
 		outside the screen, either to the left or right of the screen, or above / below.
 		"""
 		choices = self.setup_choices(left, right, up, down)
-
+		
 		# Adds all the items to the list of items (if they already are in the list, they are not added).
 		self.add_items(menu_to_setup)
-
+		
 		# We call cleanup to make sure that all the items in the menu is in the right position.
 		menu_to_setup.cleanup()
 
@@ -86,13 +86,13 @@ class Transition:
 		the one after that to the left and so forth.
 		"""
 		choices = self.setup_choices(left, right, up, down)
-
+		
 		# Adds all the items to the list of items (if they already are in the list, they are not added).
 		self.add_items(menu_to_setup)
 
 		# We call cleanup to make sure that all the items in the menu is in the right position.
 		menu_to_setup.cleanup()
-
+		
 		# Picks a random position out of the list of available positions, and alternates between assigning that position or the
 		# opposite of that position to each item.
 		odd = random.choice([True, False])
