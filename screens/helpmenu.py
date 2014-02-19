@@ -94,17 +94,8 @@ class HelpMenu(scene.Scene):
 		if len(self.help_menu.items) > 0:
 			self.view_info(self.help_menu.items[0])
 
-		# We setup and play music.
-		self.setup_music()
-
 		# And finally, we start the gameloop!
 		self.gameloop()
-
-	def setup_music(self):
-		if not pygame.mixer.music.get_busy():
-			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(settings.TITLE_MUSIC)
-			pygame.mixer.music.play(-1)
 
 	def view_info(self, item):
 		# Unless the chosen info is the same as the currently active info, set the active info to the one chosen by the user.

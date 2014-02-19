@@ -118,9 +118,7 @@ class GameOver(scene.Scene):
 	def setup_music(self):
 		# Set the music list.
 		self.music_list = settings.AFTER_GAME_MUSIC
-
-		pygame.mixer.music.load(random.choice(self.music_list))
-		pygame.mixer.music.play()
+		self.play_music()
 
 	def quit(self, item):
 		# When the quit button is activated, we want to return to the main menu.

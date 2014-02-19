@@ -165,9 +165,7 @@ class Game(scene.Scene):
 	def setup_music(self):
 		# Set the music list.
 		self.music_list = settings.GAME_MUSIC
-
-		pygame.mixer.music.load(random.choice(self.music_list))
-		pygame.mixer.music.play()
+		self.play_music()
 
 	def check_for_winner(self):
 		# Detect if a player has won or not.

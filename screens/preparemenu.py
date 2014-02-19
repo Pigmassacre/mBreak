@@ -146,17 +146,8 @@ class PrepareMenu(scene.Scene):
 		self.transition.setup_transition(self.back_menu, True, False, False, True)
 		self.transition.setup_transition(self.start_menu, False, True, False, True)
 
-		# We setup and play music.
-		self.setup_music()
-
 		# And finally, we start the gameloop!
 		self.gameloop()
-
-	def setup_music(self):
-		if not pygame.mixer.music.get_busy():
-			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(settings.TITLE_MUSIC)
-			pygame.mixer.music.play()
 
 	def setup_color_menu(self, function):
 		# Creates a gridmenu and adds all standard color items to that menu.

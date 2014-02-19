@@ -146,9 +146,7 @@ class MatchOver(scene.Scene):
 	def setup_music(self):
 		# Set the music list.
 		self.music_list = settings.AFTER_MATCH_MUSIC
-
-		pygame.mixer.music.load(random.choice(self.music_list))
-		pygame.mixer.music.play()
+		self.play_music()
 
 	def maybe_quit(self, item):
 		# We ask the players if they REALLY want to quit, since they're in between matches. Also, we make sure that the confirmation

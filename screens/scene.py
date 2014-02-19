@@ -31,6 +31,15 @@ class Scene:
 		# We use this list of music to randomly choose what track to play. It's empty here, but subclasses can add to it.
 		self.music_list = []
 
+		# We also set pygame to send an event every time a song ends, so that scenes can know and then restart the music.
+		pygame.mixer.music.set_endevent(settings.MUSIC_EVENT)
+
+	def play_music(self):
+		if len(self.music_list) > 0:
+			choice = random.choice(self.music_list)
+			pygame.mixer.music.load(choice)
+		pygame.mixer.music.play()
+
 	def gameloop(self):
 		self.done = False
 		while not self.done:
@@ -44,10 +53,7 @@ class Scene:
 					sys.exit()
 					pygame.quit()
 				elif (event.type == settings.MUSIC_EVENT):
-					if len(self.music_list) > 0:
-						choice = random.choice(self.music_list)
-						pygame.mixer.music.load(choice)
-					pygame.mixer.music.play()
+					self.play_music()
 
 				# Subclasses implementing this class should handle their events in self.event(event).
 				self.event(event)

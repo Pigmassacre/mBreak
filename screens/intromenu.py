@@ -79,10 +79,7 @@ class IntroMenu(scene.Scene):
 	def setup_music(self):
 		# Set the music list.
 		self.music_list = settings.TITLE_MUSIC
-		
-		pygame.mixer.music.set_endevent(settings.MUSIC_EVENT)
-		pygame.mixer.music.load(random.choice(self.music_list))
-		pygame.mixer.music.play()
+		self.play_music()
 
 	def event(self, event):
 		if ((event.type == KEYDOWN and event.key in [K_ESCAPE, K_RETURN]) or (event.type == MOUSEBUTTONDOWN and event.button == 1) or

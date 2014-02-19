@@ -4,11 +4,9 @@ __license__ = "All Rights Reserved"
 import pygame, sys
 import random
 from pygame.locals import *
-import other.debug as debug
 import gui.textitem as textitem
 import gui.logo as logo
 import gui.listmenu as listmenu
-import gui.gridmenu as gridmenu
 import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
@@ -43,9 +41,6 @@ class MainMenu(scene.Scene):
 
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
-		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
-		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 		# Setup all the menu buttons.
 		self.setup_main_menu()
@@ -90,12 +85,16 @@ class MainMenu(scene.Scene):
 		else:
 			# Otherwise, we just save the given title_logo object
 			self.title_logo = title_logo
+		
+		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
+		self.logo_transition = transition.Transition()
+		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 	def setup_music(self):
+		self.music_list = settings.TITLE_MUSIC
 		if not pygame.mixer.music.get_busy():
 			# We only care about loading and playing the music if it isn't already playing.
-			pygame.mixer.music.load(random.choice(settings.TITLE_MUSIC))
-			pygame.mixer.music.play(-1)
+			self.play_music()
 
 	def start(self, item):
 		self.done = True
