@@ -141,7 +141,7 @@ class GameOver(scene.Scene):
 			x = random.uniform(settings.SCREEN_WIDTH / 10.0, settings.SCREEN_WIDTH - settings.SCREEN_WIDTH / 10.0)
 			y = settings.SCREEN_HEIGHT
 			angle = 3 * math.pi / 2.0
-			duration = random.uniform(350, 600)
+			duration = random.uniform((settings.SCREEN_HEIGHT / 4.0) * firework.Firework.speed / 4.0, (settings.SCREEN_HEIGHT - (settings.SCREEN_HEIGHT / 2.0)) * firework.Firework.speed / 4.0)
 			firework.Firework(x, y, angle, duration)
 			self.time_passed = 0
 
@@ -157,15 +157,27 @@ class GameOver(scene.Scene):
 		for letter_item in self.winning_player_text:
 			bob_height_differentiator = self.winning_player_text.index(letter_item) * 64
 
-			sin_scale = 0.0075
+			scale = 0.0075
 
 			sin = 4 * settings.GAME_SCALE
-			sin *= math.pow(math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 32.0)), 3)
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * (sin_scale / 8.0))
-			sin *= math.sin((self.passed_time + bob_height_differentiator) * sin_scale)
+			sin *= math.pow(math.sin((self.passed_time + bob_height_differentiator) * (scale / 32.0)), 3)
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * (scale / 8.0))
+			sin *= math.sin((self.passed_time + bob_height_differentiator) * scale)
 
 			letter_item_standard_y = (settings.SCREEN_HEIGHT - letter_item.get_height()) / 2.0
 			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
+			"""
+			cos = 4 * settings.GAME_SCALE
+			cos *= math.pow(math.cos((self.passed_time + bob_height_differentiator) * (scale / 32.0)), 3)
+			cos *= math.cos((self.passed_time + bob_height_differentiator) * (scale / 8.0))
+			cos *= math.cos((self.passed_time + bob_height_differentiator) * scale)
+
+			length_of_winning_player_text = sum(letter_item.get_width() for letter_item in self.winning_player_text)
+			offset = 0
+			for x in range(0, self.winning_player_text.index(letter_item)):
+				offset += self.winning_player_text[x].get_width()
+			letter_item_standard_x = ((settings.SCREEN_WIDTH - length_of_winning_player_text) / 2.0) + offset
+			letter_item.x = letter_item_standard_x + cos * 2.0 * settings.GAME_SCALE"""
 
 			h = letter_item.font_color.hsla[0]
 			h += self.main_clock.get_time() * 0.2			
