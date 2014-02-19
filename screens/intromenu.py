@@ -69,8 +69,7 @@ class IntroMenu(scene.Scene):
 
 			a = letter_item.alpha_value
 			a = ((255 / (len(self.title_message) * 2)) * self.title_message.index(letter_item))
-			if a > 255:
-				a %= 255
+			a %= 255
 			letter_item.alpha_value = a
 
 		self.time_passed = 0
@@ -111,8 +110,7 @@ class IntroMenu(scene.Scene):
 
 			a = letter_item.alpha_value
 			a = ((math.sin((pygame.time.get_ticks() + (self.title_message.index(letter_item) * 64)) * 0.0025) + 1.0) / 2.0) * 255
-			if a > 255:
-				a %= 255
+			a %= 255
 			letter_item.alpha_value = a
 			letter_item.setup_surfaces()
 

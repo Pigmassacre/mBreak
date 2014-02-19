@@ -1,6 +1,6 @@
 {
 	"image": "res/powerup/fire.png",
 	"title": "Fire",
-	"body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis et enim lectus. Nam ante massa, adipiscing a molestie sit amet, malesuada a tortor. Vivamus faucibus enim nec erat tincidunt semper. Nullam elit tortor, laoreet ut laoreet nec, lobortis euismod libero. Aliquam ac lectus sed metus tristique placerat mollis quis purus.",
+	"body": "When picked up, this powerup makes all your balls burn for a short while. Any burning balls will spread their burn effect to enemy blocks that they hit. Burning blocks will take damage for as long as they burn. Burning balls simply look cool!\n\nThis powerup stacks additively, and affects all your balls.",
 	"quote": "\"HOLY FUCK IT FUCKING BURNS!\""
 }

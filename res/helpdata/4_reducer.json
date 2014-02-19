@@ -1,5 +1,6 @@
 {
 	"image": "res/powerup/reducer.png",
 	"title": "Reducer",
-	"body": "Look at how small you are! UGUUUUUUUUUUU!"
+	"body": "Picking up this powerup will probably act as a detriment to you, since it reduces the vertical size of your paddle.\n\nThis powerup stacks additively, however your paddle may not go below a certain size, so don't worry too much!",
+	"quote": "\"Look at how small you are!\nUGUUUUUUUUUUU!\""
 }

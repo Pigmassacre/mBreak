@@ -1,5 +1,6 @@
 {
 	"image": "res/powerup/rocket.png",
 	"title": "Rocket",
-	"body": "You think you're so tough, with your fucking rockets. Well guess what? You fucking are.\n\nYou're the toughest motherfucker alive."
+	"body": "When you pick this powerup up, a missile will spawn for you and home in on a block that belongs to your opponent. When the missile hits that block, the missile will explode and deal damage to the block. Explosive!\n\nYou can protect yourself against enemy missiles with your paddle.",
+	"quote": "\"You think you're so tough, with your fucking rockets. Well guess what? You fucking are. You're the toughest motherfucker alive.\""
 }

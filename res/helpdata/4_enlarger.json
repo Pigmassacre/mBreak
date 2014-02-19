@@ -1,5 +1,6 @@
 {
 	"image": "res/powerup/enlarger.png",
 	"title": "Enlarger",
-	"body": "My... You've grown..."
+	"body": "This powerup increases the vertical size of your paddle. This means it'll be easier for you to protect against balls and projectiles!\n\nThis powerup stacks additively, however a paddle may no go above a certain size.",
+	"quote": "\"Oh my... You've grown...\""
 }

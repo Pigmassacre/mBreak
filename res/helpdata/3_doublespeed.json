@@ -1,6 +1,6 @@
 {
 	"image": "res/powerup/doublespeed.png",
 	"title": "Speed Up",
-	"body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis et enim lectus. Nam ante massa, adipiscing a molestie sit amet, malesuada a tortor. Vivamus faucibus enim nec erat tincidunt semper. Nullam elit tortor, laoreet ut laoreet nec, lobortis euismod libero. Aliquam ac lectus sed metus tristique placerat mollis quis purus.",
-	"quote": "\"Jesus FUCK you're fast! You're like the Road Runner, only not such a douchebag.\""
+	"body": "When picked up, this powerup makes all your balls travel at twice their normal speed for a short while.\n\nThis effect stacks additively, meaning meaning that a ball with 2x this effect travels 3 times as fast, and 4 times as fast with 3x this effect and so forth.",
+	"quote": "\"Hey, where'd it go?\""
 }

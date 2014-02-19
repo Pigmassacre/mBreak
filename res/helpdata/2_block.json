@@ -2,5 +2,6 @@
 	"image": "res/block/block.png",
 	"color": [255, 0, 255],
 	"title": "Block",
-	"body": "Blocks make you happy. They care for you. They are your lifeblood. Please do not lose your blocks. Please?"
+	"body": "These are what you're supposed to destroy and defend. You defend your own blocks against your enemy, and try to destroy the blocks of your enemy.\n\nThe player that destroy their opponents blocks first, wins!\n\nIt's really quite simple!",
+	"quote": "\"Square blocks? No thanks!\""
 }

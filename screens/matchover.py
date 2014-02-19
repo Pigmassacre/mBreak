@@ -77,9 +77,8 @@ class MatchOver(scene.Scene):
 			last_offset += letter_item.get_width()
 
 			color = copy.copy(self.winner.color)
-			h = color.hsla[0] + ((360 / (len(self.rounds_left_text) * 2)) * self.rounds_left_text.index(letter_item))
-			if h > 360:
-				h %= 360
+			h = color.hsla[0] + ((360 / (len(self.rounds_left_text) * 2)) * self.rounds_left_text.index(letter_item))			
+			h %= 360
 			color.hsla = (h, color.hsla[1], color.hsla[2], color.hsla[3])
 			letter_item.set_color(color)
 
@@ -176,9 +175,8 @@ class MatchOver(scene.Scene):
 		# Update the winning player text.
 		for letter_item in self.rounds_left_text:
 			h = letter_item.font_color.hsla[0]
-			h += self.main_clock.get_time() * 0.2
-			if h > 360:
-				h %= 360
+			h += self.main_clock.get_time() * 0.2			
+			h %= 360
 			new_color = copy.copy(letter_item.font_color)
 			new_color.hsla = (h, letter_item.font_color.hsla[1], letter_item.font_color.hsla[2], letter_item.font_color.hsla[3])
 			letter_item.set_color(new_color)

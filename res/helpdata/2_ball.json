@@ -2,5 +2,6 @@
 	"image": "res/ball/ball.png",
 	"color": [255, 0, 0],
 	"title": "Ball",
-	"body": "Balls are you weapons and your enemy. You protect your own blocks from balls, and try to make balls hit your opponents blocks."
+	"body": "Balls are you weapons and your enemy. You protect your own blocks from balls, and at the same time you try to make balls hit your opponents blocks.\n\nBalls can pick up powerups that randomly spawn in the level, adding additional effects that change up the gameplay.",
+	"quote": "\"Hehe, balls.\""
 }

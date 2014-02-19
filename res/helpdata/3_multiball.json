@@ -1,5 +1,6 @@
 {
 	"image": "res/powerup/multiball.png",
 	"title": "Multiball",
-	"body": "How the fucking FUCK did get all these balls. Look at you, you can't fucking hold all these fucking balls! Jeeesus..."
+	"body": "When picked up, this powerup gives you an extra ball for a short while. This ball is temporary, meaning it will go away after a short while.\n\nYou can tell multiballs apart from normal balls, since multiballs have a darker center.\n\nThere's no limit to how many extra balls you can have.",
+	"quote": "\"I can't hold all these balls!\""
 }

@@ -1,5 +1,6 @@
 {
 	"image": "res/help/questionmark.png",
-	"title": "Starting the Game",
-	"body": "mBreak is a fun game for everyone - even your pets! Yes, goldfish, dogs, cats, sharks - every single soul on the planet will enjoy this wonderful game! It has paddles, and balls! Yes, fucking BALLS! HOLY SHIT!\n\nThese balls can even catch fire. FUCKING FIRE, AAAHHH, IT BURNS SO MY SKIN! MY PRECIOUS, PEARLY WHITE, GLORIOUS SKIN!"
+	"title": "What's this?",
+	"body": "Welcome to mBreak! This is fast, frenetic action-game, which you can play either by yourself against an AI, or against a friend in a local splitscreen VS mode.\n\nThis game is sort of a cross between Arkanoid/Breakout and Pong, providing the block destroying action of the former and the versus action of the latter.",
+	"quote": "\"Fun for the whole family!\""
 }

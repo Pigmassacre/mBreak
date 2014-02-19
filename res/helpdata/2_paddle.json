@@ -2,5 +2,6 @@
 	"image": "res/paddle/paddle.png",
 	"color": [0, 0, 255],
 	"title": "Paddle",
-	"body": "Paddles. Fucking paddles. Jeez."
+	"body": "This is what you control in the game. Your goal is to protect your blocks, and you do it by moving your paddle up and down to protect agaisnt incoming dangers, like balls or missiles.\n\nYou can control the return angle of balls that hit your paddle. The return angle depends on where the paddle was hit, with a hit straight in the center of the paddle returning the ball straight forward.",
+	"quote": "\"Futuristic tennis-racket!\""
 }
