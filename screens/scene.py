@@ -5,6 +5,7 @@ import pygame, sys
 from pygame.locals import *
 import random
 import other.debug as debug
+import gui.transition as transition
 import settings.settings as settings
 import settings.graphics as graphics
 import objects.groups as groups
@@ -22,6 +23,8 @@ class Scene:
 		# Store the game variables.
 		self.window_surface = window_surface
 		self.main_clock = main_clock
+
+		self.transition = transition.Transition()
 
 		self.music_list = []
 

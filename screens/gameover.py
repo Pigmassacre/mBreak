@@ -12,7 +12,7 @@ import objects.groups as groups
 import objects.firework as firework
 import gui.textitem as textitem
 import gui.menu as menu
-import gui.transition as transition
+#import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -76,12 +76,11 @@ class GameOver(scene.Scene):
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
-		# Setup the menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
+		# Setup the menu transition.
 		for letter_item in self.winning_player_text:
-			self.transitions.setup_single_item_transition(letter_item, True, True, True, True)
-		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
-		self.transitions.setup_transition(self.rematch_menu, False, True, False, True)
+			self.transition.setup_single_item_transition(letter_item, True, True, True, True)
+		self.transition.setup_transition(self.quit_menu, True, False, False, True)
+		self.transition.setup_transition(self.rematch_menu, False, True, False, True)
 
 		self.firework_spawn_time = 300
 		self.time_passed = 0
@@ -145,8 +144,8 @@ class GameOver(scene.Scene):
 			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
-		# Update all transitions.
-		self.transitions.update()
+		# Update all transition.
+		self.transition.update(self.main_clock)
 
 		self.time_passed += self.main_clock.get_time()
 		if self.time_passed >= self.firework_spawn_time:

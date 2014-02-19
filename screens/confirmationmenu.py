@@ -6,7 +6,6 @@ from pygame.locals import *
 import other.debug as debug
 import gui.textitem as textitem
 import gui.menu as menu
-import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -48,8 +47,8 @@ class ConfirmationMenu(scene.Scene):
 		# Configure the GUI.
 		self.setup_menu()
 
-		# Setup the menu transitions.
-		self.setup_transitions()
+		# Setup the menu transition.
+		self.setup_transition()
 
 		self.gameloop()
 
@@ -70,11 +69,10 @@ class ConfirmationMenu(scene.Scene):
 		self.confirmation_text.x = (settings.SCREEN_WIDTH - self.confirmation_text.get_width()) / 2
 		self.confirmation_text.y = self.confirmation_menu.y - (2 * self.confirmation_text.get_height())
 
-	def setup_transitions(self):
-		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.setup_single_item_transition(self.confirmation_text, True, True, True, False)
-		self.transitions.setup_single_item_transition(self.confirmation_menu.items[0], True, True, False, False)
-		self.transitions.setup_single_item_transition(self.confirmation_menu.items[1], True, True, False, True)
+	def setup_transition(self):
+		self.transition.setup_single_item_transition(self.confirmation_text, True, True, True, False)
+		self.transition.setup_single_item_transition(self.confirmation_menu.items[0], True, True, False, False)
+		self.transition.setup_single_item_transition(self.confirmation_menu.items[1], True, True, False, True)
 
 	def accept(self, item):
 		# Ends the gameloop and sets accepted to True.
@@ -94,8 +92,8 @@ class ConfirmationMenu(scene.Scene):
 			traversal.traverse_menus(event, [self.confirmation_menu])
 
 	def update(self):
-		# Handle all transitions.
-		self.transitions.update()
+		# Handle all transition.
+		self.transition.update(self.main_clock)
 
 		# Update the confirmation menu.
 		self.confirmation_menu.update(self.main_clock)

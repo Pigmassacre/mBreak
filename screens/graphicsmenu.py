@@ -47,7 +47,7 @@ class GraphicsMenu(scene.Scene):
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4) - self.graphics_menu_offset)
-		self.logo_transition = transition.Transition(self.main_clock)
+		self.logo_transition = transition.Transition()
 		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 		# Register all menus with each other.
@@ -55,10 +55,9 @@ class GraphicsMenu(scene.Scene):
 			a_menu.register_other_menus(self.all_menus)
 
 		# Setup the menu transitions.
-		self.menu_transition = transition.Transition(self.main_clock)
-		self.menu_transition.setup_transition(self.graphics_menu_left, True, False, False, False)
-		self.menu_transition.setup_transition(self.graphics_menu_right, False, True, False, False)
-		self.menu_transition.setup_transition(self.back_menu, True, True, False, False)
+		self.transition.setup_transition(self.graphics_menu_left, True, False, False, False)
+		self.transition.setup_transition(self.graphics_menu_right, False, True, False, False)
+		self.transition.setup_transition(self.back_menu, True, True, False, False)
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -142,12 +141,12 @@ class GraphicsMenu(scene.Scene):
 
 	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
-		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
+		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position, self.main_clock)
 
 		#  If the logo is in place, show the menu.
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
-			self.menu_transition.update()
+			self.transition.update(self.main_clock)
 			for a_menu in self.all_menus:
 				a_menu.update(self.main_clock)
 

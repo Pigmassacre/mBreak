@@ -10,7 +10,7 @@ import gui.textitem as textitem
 import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
-import gui.transition as transition
+#import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -130,23 +130,22 @@ class AboutMenu(scene.Scene):
 		self.image_right = pygame.image.load("res/splash/splash_bloody_right.png")
 		self.image_right = pygame.transform.scale(self.image_right, (self.image_right.get_width() * self.images_current_scale, self.image_right.get_height() * self.images_current_scale))
 
-		# We setup all menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.speed = 1200 * settings.GAME_SCALE
-		self.transitions.setup_transition(self.back_menu, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.pyganim_credits, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.pyganim_credits_source_code, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.pyganim_credits_author, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.music_credits_title, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.music_credits_after_game, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.music_credits_title_author, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.music_credits_game, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.music_credits_game_author, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.sound_effect_credits, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.sound_effect_credits_author, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.more_info_and_licenses, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.made_by_author, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.made_by_info, True, True, False, False)
+		# We setup all menu transition.
+		self.transition.speed = 1200 * settings.GAME_SCALE
+		self.transition.setup_transition(self.back_menu, True, True, False, False)
+		self.transition.setup_single_item_transition(self.pyganim_credits, True, True, False, False)
+		self.transition.setup_single_item_transition(self.pyganim_credits_source_code, True, True, False, False)
+		self.transition.setup_single_item_transition(self.pyganim_credits_author, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_credits_title, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_credits_after_game, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_credits_title_author, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_credits_game, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_credits_game_author, True, True, False, False)
+		self.transition.setup_single_item_transition(self.sound_effect_credits, True, True, False, False)
+		self.transition.setup_single_item_transition(self.sound_effect_credits_author, True, True, False, False)
+		self.transition.setup_single_item_transition(self.more_info_and_licenses, True, True, False, False)
+		self.transition.setup_single_item_transition(self.made_by_author, True, True, False, False)
+		self.transition.setup_single_item_transition(self.made_by_info, True, True, False, False)
 
 		# And finally, we start the gameloop!
 		self.gameloop()
@@ -163,8 +162,8 @@ class AboutMenu(scene.Scene):
 			traversal.traverse_menus(event, [self.back_menu])
 
 	def update(self):		
-		# Handle all transitions.
-		self.transitions.update()
+		# Handle all transition.
+		self.transition.update(self.main_clock)
 		
 		# Update the back menu.
 		self.back_menu.update(self.main_clock)

@@ -7,7 +7,6 @@ import other.debug as debug
 import other.useful as useful
 import gui.textitem as textitem
 import gui.menu as menu
-import gui.transition as transition
 import gui.traversal as traversal
 import objects.groups as groups
 import settings.settings as settings
@@ -48,9 +47,8 @@ class PauseMenu(scene.Scene):
 		self.pause_menu.cleanup()
 		self.pause_menu.items[0].selected = True
 
-		# Setup the menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
-		self.setup_transitions()
+		# Setup the menu transition.
+		self.setup_transition()
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -68,14 +66,14 @@ class PauseMenu(scene.Scene):
 		self.done = True
 
 	def options(self, item):
-		# Setup the transitions so that if we return to the pause menu the items will transition.
-		self.setup_transitions()
+		# Setup the transition so that if we return to the pause menu the items will transition.
+		self.setup_transition()
 
 		optionsmenu.OptionsMenu(self.window_surface, self.main_clock)
 
 	def maybe_quit(self, item):
-		# Setup the transitions so that if we return to the pause menu the items will transition.
-		self.setup_transitions
+		# Setup the transition so that if we return to the pause menu the items will transition.
+		self.setup_transition()
 
 		# Blit the background surface over the window surface, so that the confirmation menu display over clean background surface.
 		self.window_surface.blit(self.background_surface, (0, 0))
@@ -87,12 +85,12 @@ class PauseMenu(scene.Scene):
 		self.done = True
 		self.next_screen = screens.mainmenu.MainMenu
 
-	def setup_transitions(self):
-		self.transitions.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
+	def setup_transition(self):
+		self.transition.setup_single_item_transition(self.pause_menu.items[0], True, True, True, False)
 		for item in self.pause_menu.items[1:len(self.pause_menu.items) - 1]:
-			# For every item other than the first and last item, we set these transitions.
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.pause_menu.items[-1], True, True, False, True)
+			# For every item other than the first and last item, we set these transition.
+			self.transition.setup_single_item_transition(item, True, True, False, False)
+		self.transition.setup_single_item_transition(self.pause_menu.items[-1], True, True, False, True)
 
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_START):
@@ -103,8 +101,8 @@ class PauseMenu(scene.Scene):
 			traversal.traverse_menus(event, [self.pause_menu])
 
 	def update(self):
-		# Update the transitions.
-		self.transitions.update()
+		# Update the transition.
+		self.transition.update(self.main_clock)
 
 		# Update the pause menu.
 		self.pause_menu.update(self.main_clock)

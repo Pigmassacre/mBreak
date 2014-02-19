@@ -20,7 +20,6 @@ import gui.textitem as textitem
 import gui.menu as menu
 import gui.gridmenu as gridmenu
 import gui.imageitem as imageitem
-import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -57,7 +56,7 @@ class HelpMenu(scene.Scene):
 		# This is a dictionary that contains information linked to certain imageitems.
 		self.info = {}
 
-		# This is a dictionary that maps transitions methods to all all items.
+		# This is a dictionary that maps transition methods to all all items.
 		self.transition_method = {}
 
 		# This contains the currently active function that displays the currently active information.
@@ -97,11 +96,10 @@ class HelpMenu(scene.Scene):
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
-		# We setup all menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.speed = 20 * settings.GAME_FPS * settings.GAME_SCALE
-		self.transitions.setup_transition(self.help_menu, True, True, True, False)
-		self.transitions.setup_transition(self.back_menu, True, True, False, False)
+		# We setup all menu transition.
+		self.transition.speed = 20 * settings.GAME_FPS * settings.GAME_SCALE
+		self.transition.setup_transition(self.help_menu, True, True, True, False)
+		self.transition.setup_transition(self.back_menu, True, True, False, False)
 
 		# Set the first item as the active information.
 		if len(self.help_menu.items) > 0:
@@ -125,8 +123,8 @@ class HelpMenu(scene.Scene):
 		if self.active_info != new_active_info:
 			self.active_info = new_active_info
 
-			# Setup the transitions for that info.
-			self.setup_info_transitions(self.active_info)
+			# Setup the transition for that info.
+			self.setup_info_transition(self.active_info)
 
 	def choose_active_info(self, item, grid_menu):
 		# Figure out what item is the chosen item.
@@ -260,9 +258,9 @@ class HelpMenu(scene.Scene):
 		
 		return image_item
 
-	def setup_info_transitions(self, texts):
+	def setup_info_transition(self, texts):
 		for item in texts:
-			self.transitions.setup_single_item_transition(item, True, True, False, False)
+			self.transition.setup_single_item_transition(item, True, True, False, False)
 
 	def show_info(self, texts, surface):
 		if not texts is None:
@@ -281,8 +279,8 @@ class HelpMenu(scene.Scene):
 			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
-		# Handle all transitions.
-		self.transitions.update()
+		# Handle all transition.
+		self.transition.update(self.main_clock)
 
 		# Update the help menu.
 		self.help_menu.update(self.main_clock)	

@@ -9,8 +9,8 @@ import gui.textitem as textitem
 import gui.choiceitem as choiceitem
 import gui.logo as logo
 import gui.menu as menu
-import gui.gridmenu as gridmenu
 import gui.transition as transition
+import gui.gridmenu as gridmenu
 import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
@@ -52,16 +52,15 @@ class SoundMenu(scene.Scene):
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
-		self.logo_transition = transition.Transition(self.main_clock)
+		self.logo_transition = transition.Transition()
 		self.logo_transition.speed = 2 * settings.GAME_FPS * settings.GAME_SCALE
 
 		# Setup the menu transitions.
-		self.menu_transition = transition.Transition(self.main_clock)
-		self.menu_transition.setup_single_item_transition(self.music_item, True, False, False, False)
-		self.menu_transition.setup_single_item_transition(self.sound_item, True, False, False, False)
-		self.menu_transition.setup_transition(self.music_volume_menu, False, True, False, False)
-		self.menu_transition.setup_transition(self.sound_volume_menu, False, True, False, False)
-		self.menu_transition.setup_transition(self.back_menu, True, True, False, False)
+		self.transition.setup_single_item_transition(self.music_item, True, False, False, False)
+		self.transition.setup_single_item_transition(self.sound_item, True, False, False, False)
+		self.transition.setup_transition(self.music_volume_menu, False, True, False, False)
+		self.transition.setup_transition(self.sound_volume_menu, False, True, False, False)
+		self.transition.setup_transition(self.back_menu, True, True, False, False)
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -99,9 +98,6 @@ class SoundMenu(scene.Scene):
 		self.sound_volume_menu.y = self.sound_item.y - (abs(self.sound_item.get_height() - self.sound_volume_menu.get_height()) / 2.0)
 
 		# Set the button that corresponds to the current volume level to be the chosen item.
-		#channels = (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels()))
-		#average_volume = sum(channel.get_volume() for channel in channels) / float(pygame.mixer.get_num_channels())
-		#self.sound_volume_menu.items[int((average_volume * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
 		self.sound_volume_menu.items[int((settings.SOUND_VOLUME * (len(self.music_volume_menu.items) - 1)) + 0.5)].chosen = True
 
 		self.all_menus.append(self.music_volume_menu)
@@ -119,12 +115,9 @@ class SoundMenu(scene.Scene):
 
 	def set_music_volume(self, item):
 		pygame.mixer.music.set_volume(self.choose_item_from_menu(item, self.music_volume_menu) / float(len(self.music_volume_menu.items) - 1))
-		#settings.MUSIC_VOLUME 
 
 	def set_sound_volume(self, item):
 		settings.SOUND_VOLUME = self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1)
-		#for channel in (pygame.mixer.Channel(i) for i in range(pygame.mixer.get_num_channels())):
-		#	channel.set_volume(self.choose_item_from_menu(item, self.sound_volume_menu) / float(len(self.sound_volume_menu.items) - 1))
 
 	def choose_item_from_menu(self, item, grid_menu, can_unchoose = False):
 		# Figure out what item is the chosen item.
@@ -175,12 +168,12 @@ class SoundMenu(scene.Scene):
 
 	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
-		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
+		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position, self.main_clock)
 
 		#  If the logo is in place, show the menu.
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
-			self.menu_transition.update()
+			self.transition.update(self.main_clock)
 			for a_menu in self.all_menus:
 				a_menu.update(self.main_clock)
 

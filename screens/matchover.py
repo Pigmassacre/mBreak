@@ -10,7 +10,7 @@ import other.useful as useful
 import objects.groups as groups
 import gui.textitem as textitem
 import gui.menu as menu
-import gui.transition as transition
+#import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import settings.graphics as graphics
@@ -55,8 +55,8 @@ class MatchOver(scene.Scene):
 		# Configure the GUI.
 		self.setup_menus()
 
-		# Setup the menu transitions.
-		self.setup_transitions()
+		# Setup the menu transition.
+		self.setup_transition()
 
 		# Setup and play music.
 		self.setup_music()
@@ -133,18 +133,17 @@ class MatchOver(scene.Scene):
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
-	def setup_transitions(self):
-		# Sets up the different transitions of all the items.
-		self.transitions = transition.Transition(self.main_clock)
+	def setup_transition(self):
+		# Sets up the different transition of all the items.
 		for item in self.rounds_left_text:
-			self.transitions.setup_single_item_transition(item, True, True, True, False)
-		self.transitions.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
-		self.transitions.setup_single_item_transition(self.player_one_score_text, True, False, False, False)
-		self.transitions.setup_single_item_transition(self.player_one_text, True, False, True, False)
-		self.transitions.setup_single_item_transition(self.player_two_score_text, False, True, False, False)
-		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
-		self.transitions.setup_transition(self.quit_menu, True, False, False, True)
-		self.transitions.setup_transition(self.next_match_menu, False, True, False, True)
+			self.transition.setup_single_item_transition(item, True, True, True, False)
+		self.transition.setup_single_item_transition(self.rounds_left_number_text, True, True, False, True)
+		self.transition.setup_single_item_transition(self.player_one_score_text, True, False, False, False)
+		self.transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
+		self.transition.setup_single_item_transition(self.player_two_score_text, False, True, False, False)
+		self.transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
+		self.transition.setup_transition(self.quit_menu, True, False, False, True)
+		self.transition.setup_transition(self.next_match_menu, False, True, False, True)
 
 	def setup_music(self):
 		# Set the music list.
@@ -180,8 +179,8 @@ class MatchOver(scene.Scene):
 			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
-		# Handle the transitions and blit all items.
-		self.transitions.update()
+		# Handle the transition and blit all items.
+		self.transition.update(self. main_clock)
 
 		self.passed_time += self.main_clock.get_time()
 

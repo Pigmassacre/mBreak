@@ -24,7 +24,7 @@ class Transition:
 	# The standard speed value, used unless changed for the instance of this class.
 	speed = 14 * settings.GAME_FPS * settings.GAME_SCALE
 
-	def __init__(self, main_clock):
+	def __init__(self):
 		# The speed at which each item moves.
 		self.speed = Transition.speed
 
@@ -33,9 +33,6 @@ class Transition:
 
 		# This is used to store all the start positions of each item.
 		self.start_positions = {}
-
-		# Store the clock to be used when calculating movement.
-		self.main_clock = main_clock
 
 	def add_items(self, menu_to_add):
 		"""
@@ -161,37 +158,37 @@ class Transition:
 			choices.append("down")
 		return choices
 
-	def update(self):
+	def update(self, main_clock):
 		"""
 		In order for the actual transition to take place, call this method every frame. It takes care of moving
 		each item closer (and eventually to) their start positions.
 		"""
 		for item in self.items:
-			self.move_item_to_position(item, self.start_positions[item])
+			self.move_item_to_position(item, self.start_positions[item], main_clock)
 
-	def move_item_to_position(self, item, position):
+	def move_item_to_position(self, item, position, main_clock):
 		"""
 		This does the actual moving of each item in the list of items. Moves each item with the speed variable,
 		which can be changed at any time the user wants.
 		"""
 		if position[0] < item.x:
-			if (item.x - self.speed * self.main_clock.delta_time) < position[0]:
+			if (item.x - self.speed * main_clock.delta_time) < position[0]:
 				item.x = position[0]
 			else:
-				item.x -= self.speed * self.main_clock.delta_time
+				item.x -= self.speed * main_clock.delta_time
 		elif position[0] > item.x:
-			if (item.x + self.speed * self.main_clock.delta_time) > position[0]:
+			if (item.x + self.speed * main_clock.delta_time) > position[0]:
 				item.x = position[0]
 			else:
-				item.x += self.speed * self.main_clock.delta_time
+				item.x += self.speed * main_clock.delta_time
 
 		if position[1] < item.y:
-			if (item.y - self.speed * self.main_clock.delta_time) < position[1]:
+			if (item.y - self.speed * main_clock.delta_time) < position[1]:
 				item.y = position[1]
 			else:
-				item.y -= self.speed * self.main_clock.delta_time
+				item.y -= self.speed * main_clock.delta_time
 		elif position[1] > item.y:
-			if (item.y + self.speed * self.main_clock.delta_time) > position[1]:
+			if (item.y + self.speed * main_clock.delta_time) > position[1]:
 				item.y = position[1]
 			else:
-				item.y += self.speed * self.main_clock.delta_time
+				item.y += self.speed * main_clock.delta_time

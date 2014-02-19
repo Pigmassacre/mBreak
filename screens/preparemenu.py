@@ -12,7 +12,6 @@ import gui.gridmenu as gridmenu
 import gui.coloritem as coloritem
 import gui.choiceitem as choiceitem
 import gui.imageitem as imageitem
-import gui.transition as transition
 import screens.toast as toast
 import gui.traversal as traversal
 import settings.settings as settings
@@ -137,18 +136,17 @@ class PrepareMenu(scene.Scene):
 		for a_menu in self.all_menus:
 			a_menu.register_other_menus(self.all_menus)
 
-		# We setup all menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.setup_transition(self.number_of_rounds_menu, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
-		self.transitions.setup_transition(self.color_menu_one, True, False, False, True)
-		self.transitions.setup_transition(self.ai_menu_one, True, False, False, True)
-		self.transitions.setup_single_item_transition(self.player_one_text, True, False, True, False)
-		self.transitions.setup_transition(self.color_menu_two, False, True, False, True)
-		self.transitions.setup_transition(self.ai_menu_two, True, False, False, True)
-		self.transitions.setup_single_item_transition(self.player_two_text, False, True, True, False)
-		self.transitions.setup_transition(self.back_menu, True, False, False, True)
-		self.transitions.setup_transition(self.start_menu, False, True, False, True)
+		# We setup all menu transition.
+		self.transition.setup_transition(self.number_of_rounds_menu, True, True, False, False)
+		self.transition.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
+		self.transition.setup_transition(self.color_menu_one, True, False, False, True)
+		self.transition.setup_transition(self.ai_menu_one, True, False, False, True)
+		self.transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
+		self.transition.setup_transition(self.color_menu_two, False, True, False, True)
+		self.transition.setup_transition(self.ai_menu_two, True, False, False, True)
+		self.transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
+		self.transition.setup_transition(self.back_menu, True, False, False, True)
+		self.transition.setup_transition(self.start_menu, False, True, False, True)
 
 		# We setup and play music.
 		self.setup_music()
@@ -293,8 +291,8 @@ class PrepareMenu(scene.Scene):
 			traversal.traverse_menus(event, self.all_menus)
 
 	def update(self):
-		# Handle all transitions.
-		self.transitions.update()
+		# Handle all transition.
+		self.transition.update(self.main_clock)
 
 		# Update all menus and items.
 		self.number_of_rounds_menu.update(self.main_clock)

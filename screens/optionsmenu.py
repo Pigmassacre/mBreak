@@ -42,7 +42,7 @@ class OptionsMenu(scene.Scene):
 		# Setup the logo and the variables needed to handle the animation of it.
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
-		self.logo_transition = transition.Transition(self.main_clock)
+		self.logo_transition = transition.Transition()
 		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 		# Setup all the menu buttons.
@@ -52,8 +52,7 @@ class OptionsMenu(scene.Scene):
 		self.active_menu = [self.options_menu]
 
 		# Setup the menu transitions.
-		self.menu_transition = transition.Transition(self.main_clock)
-		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+		self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -68,15 +67,15 @@ class OptionsMenu(scene.Scene):
 
 	def graphics(self, item):
 		graphicsmenu.GraphicsMenu(self.window_surface, self.main_clock, self.title_logo)
-		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+		self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 	def sound(self, item):
 		soundmenu.SoundMenu(self.window_surface, self.main_clock, self.title_logo)
-		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+		self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 	def about(self, item):
 		aboutmenu.AboutMenu(self.window_surface, self.main_clock)
-		self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+		self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:
@@ -98,7 +97,7 @@ class OptionsMenu(scene.Scene):
 	def back(self, item):
 		if len(self.active_menu) > 1:
 			self.active_menu.pop()
-			self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+			self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 		else:
 			self.done = True
 		
@@ -115,12 +114,12 @@ class OptionsMenu(scene.Scene):
 
 	def update(self):
 		# Makes sure that the logo always moves to the desired posisition, and stays there.
-		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position)
+		self.logo_transition.move_item_to_position(self.title_logo, self.logo_desired_position, self.main_clock)
 
 		#  If the logo is in place, show the menu.
 		if self.title_logo.x == self.logo_desired_position[0] and self.title_logo.y == self.logo_desired_position[1]:
 			# Updates the menu transitions, and the currently active menu.
-			self.menu_transition.update()
+			self.transition.update(self.main_clock)
 			self.active_menu[-1].update(self.main_clock)
 
 	def draw(self):
@@ -138,7 +137,7 @@ class OptionsMenu(scene.Scene):
 		if self.next_screen == aboutmenu.AboutMenu:
 			# We start the help screen or the about screen and send them a reference to this instance, so they can return to it later.
 			# We also setup the transitions, so when they return they transition in.
-			self.menu_transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
+			self.transition.setup_odd_even_transition(self.active_menu[-1], True, True, False, False)
 			self.next_screen(self.window_surface, self.main_clock)
 
 		# Else, we do nothing. This returns to the scene that created this scene.

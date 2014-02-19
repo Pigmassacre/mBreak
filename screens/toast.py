@@ -6,7 +6,6 @@ from pygame.locals import *
 import other.useful as useful
 import gui.textitem as textitem
 import gui.menu as menu
-import gui.transition as transition
 import gui.traversal as traversal
 import settings.settings as settings
 import screens.scene as scene
@@ -53,15 +52,14 @@ class Toast(scene.Scene):
 		self.toast_menu.cleanup()
 		self.toast_menu.items[0].selected = True
 
-		# Setup the menu transitions.
-		self.transitions = transition.Transition(self.main_clock)
-		self.transitions.speed *= 1.5
+		# Setup the menu transition.
+		self.transition.speed *= 1.5
 		for message in self.message:
 			if self.message.index(message) == 0:
-				self.transitions.setup_single_item_transition(message, True, True, True, False)
+				self.transition.setup_single_item_transition(message, True, True, True, False)
 			else:
-				self.transitions.setup_single_item_transition(message, True, True, False, False)
-		self.transitions.setup_single_item_transition(self.toast_menu.items[0], True, True, False, True)
+				self.transition.setup_single_item_transition(message, True, True, False, False)
+		self.transition.setup_single_item_transition(self.toast_menu.items[0], True, True, False, True)
 
 		# And finally, start the gameloop!
 		self.gameloop()
@@ -85,8 +83,8 @@ class Toast(scene.Scene):
 			traversal.traverse_menus(event, [self.toast_menu])
 
 	def update(self):
-		# Update the transitions.
-		self.transitions.update()
+		# Update the transition.
+		self.transition.update(self.main_clock)
 
 		# Update the toast menu.
 		self.toast_menu.update(self.main_clock)
