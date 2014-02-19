@@ -164,7 +164,7 @@ class Game(scene.Scene):
 
 	def setup_music(self):
 		# Set the music list.
-		self.music_list = settings.GAME_MUSIC
+		self.__class__.music_list = settings.GAME_MUSIC
 		self.play_music()
 
 	def check_for_winner(self):

@@ -57,7 +57,7 @@ class TextItem(item.Item):
 		# If blink is set to true, this item will "blink" (show/hide itself) at the set blink_rate.
 		self.blink = False
 		self.blink_rate = TextItem.blink_rate
-		self.time_passed = 0
+		self.blink_time_passed = 0
 
 		# Set the given values.
 		self.string = string
@@ -155,17 +155,18 @@ class TextItem(item.Item):
 		super(TextItem, self).update(main_clock)
 
 		if self.blink:
-			if self.time_passed > self.blink_rate:
+			self.blink_time_passed += main_clock.get_time()
+			if self.blink_time_passed > self.blink_rate:
 				if self.surface.get_alpha() == 255:
 					self.surface.set_alpha(0)
 					self.selected_surface.set_alpha(0)
 					self.shadow_surface.set_alpha(0)
-					return self.blink_rate / 3
+					self.blink_time_passed = self.blink_rate / 3
 				else:
 					self.surface.set_alpha(255)
 					self.selected_surface.set_alpha(255)
 					self.shadow_surface.set_alpha(255)
-					return 0
+					self.blink_time_passed = 0
 
 	def toggle_on_off(self):
 		self.on = not self.on

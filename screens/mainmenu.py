@@ -88,7 +88,7 @@ class MainMenu(scene.Scene):
 		self.logo_transition.speed = 120 * settings.GAME_SCALE
 
 	def setup_music(self):
-		self.music_list = settings.TITLE_MUSIC
+		self.__class__.music_list = settings.TITLE_MUSIC
 		if not pygame.mixer.music.get_busy():
 			# We only care about loading and playing the music if it isn't already playing.
 			self.play_music()

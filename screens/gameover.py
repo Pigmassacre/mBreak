@@ -113,7 +113,7 @@ class GameOver(scene.Scene):
 
 	def setup_music(self):
 		# Set the music list.
-		self.music_list = settings.AFTER_GAME_MUSIC
+		self.__class__.music_list = settings.AFTER_GAME_MUSIC
 		self.play_music()
 
 	def quit(self, item):
@@ -139,7 +139,6 @@ class GameOver(scene.Scene):
 
 		self.time_passed += self.main_clock.get_time()
 		if self.time_passed >= self.firework_spawn_time:
-			#for _ in range(2):
 			x = random.uniform(settings.SCREEN_WIDTH / 10.0, settings.SCREEN_WIDTH - settings.SCREEN_WIDTH / 10.0)
 			y = settings.SCREEN_HEIGHT
 			angle = 3 * math.pi / 2.0

@@ -141,7 +141,7 @@ class MatchOver(scene.Scene):
 
 	def setup_music(self):
 		# Set the music list.
-		self.music_list = settings.AFTER_MATCH_MUSIC
+		self.__class__.music_list = settings.AFTER_MATCH_MUSIC
 		self.play_music()
 
 	def maybe_quit(self, item):

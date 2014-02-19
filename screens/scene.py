@@ -20,6 +20,9 @@ This is the base class of all screens / scenes in the game. It's very simple, it
 
 class Scene:
 
+	# We use this list of music to randomly choose what track to play. It's empty here, but subclasses can add to it.
+	music_list = []
+
 	def __init__(self, window_surface, main_clock):
 		# Store the game variables.
 		self.window_surface = window_surface
@@ -30,17 +33,14 @@ class Scene:
 		self.transition = transition.Transition()
 
 		# We also store a list of all menus, for use with the traversal code.
-		self.menu_list = []
-
-		# We use this list of music to randomly choose what track to play. It's empty here, but subclasses can add to it.
-		self.music_list = []
+		self.menu_list = []	
 
 		# We also set pygame to send an event every time a song ends, so that scenes can know and then restart the music.
 		pygame.mixer.music.set_endevent(settings.MUSIC_EVENT)
 
 	def play_music(self):
-		if len(self.music_list) > 0:
-			choice = random.choice(self.music_list)
+		if len(self.__class__.music_list) > 0:
+			choice = random.choice(self.__class__.music_list)
 			pygame.mixer.music.load(choice)
 		pygame.mixer.music.play()
 

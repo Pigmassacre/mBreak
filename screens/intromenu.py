@@ -2,6 +2,7 @@ __author__ = "Olof Karlsson"
 __license__ = "All Rights Reserved"
 
 import pygame
+import math
 from pygame.locals import *
 import gui.textitem as textitem
 import gui.logo as logo
@@ -55,13 +56,24 @@ class IntroMenu(scene.Scene):
 		self.title_logo.play()
 
 	def setup_title_message(self):
-		text = "Press ENTER to start"
-		font_color = (255, 255, 255)
-		alpha_value = 255
+		self.title_message = textitem.generate_list_from_string("Press ENTER to start")
 
-		self.title_message = textitem.TextItem(text, font_color, alpha_value)
-		self.title_message.x = (settings.SCREEN_WIDTH - self.title_message.get_width()) / 2
-		self.title_message.y = self.title_logo.y + self.title_logo.get_height() + self.title_message.get_height()
+		length_of_title_message = sum(letter_item.get_width() for letter_item in self.title_message)
+
+		last_offset = 0
+		for letter_item in self.title_message:
+			letter_item.set_color((255, 255, 255))
+			letter_item.x = ((settings.SCREEN_WIDTH - length_of_title_message) / 2.0) + last_offset
+			letter_item.y = self.title_logo.y + self.title_logo.get_height() + letter_item.get_height()
+			last_offset += letter_item.get_width()
+
+			a = letter_item.alpha_value
+			a = ((255 / (len(self.title_message) * 2)) * self.title_message.index(letter_item))
+			if a > 255:
+				a %= 255
+			letter_item.alpha_value = a
+
+		self.time_passed = 0
 
 	def setup_version_message(self):
 		text = settings.GAME_VERSION
@@ -73,8 +85,7 @@ class IntroMenu(scene.Scene):
 		self.version_message.y = settings.SCREEN_HEIGHT - self.version_message.get_height() - self.version_message.font_size
 
 	def setup_music(self):
-		# Set the music list.
-		self.music_list = settings.TITLE_MUSIC
+		self.__class__.music_list = settings.TITLE_MUSIC
 		self.play_music()
 
 	def event(self, event):
@@ -84,8 +95,30 @@ class IntroMenu(scene.Scene):
 			self.done = True
 
 	def update(self):
+		self.time_passed += self.main_clock.get_time()
+		for letter_item in self.title_message:
+			bob_height_differentiator = self.title_message.index(letter_item) * 64
+
+			sin_scale = 0.0075
+
+			sin = 0.5 * settings.GAME_SCALE
+			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 16.0))
+			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 8.0))
+			sin *= math.sin((self.time_passed + bob_height_differentiator) * sin_scale)
+
+			letter_item_standard_y = self.title_logo.y + self.title_logo.get_height() + letter_item.get_height()
+			letter_item.y = letter_item_standard_y + -math.fabs(sin) * 2.0 * settings.GAME_SCALE
+
+			a = letter_item.alpha_value
+			a = ((math.sin((pygame.time.get_ticks() + (self.title_message.index(letter_item) * 64)) * 0.0025) + 1.0) / 2.0) * 255
+			if a > 255:
+				a %= 255
+			letter_item.alpha_value = a
+			letter_item.setup_surfaces()
+
 		# Since we've set the title message to blink, we have to update it so it does so.
-		self.title_message.update(self.main_clock)
+		for letter_item in self.title_message:
+			letter_item.update(self.main_clock)
 
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
@@ -95,7 +128,8 @@ class IntroMenu(scene.Scene):
 		self.title_logo.draw(self.window_surface)
 
 		# We draw the title message.
-		self.title_message.draw(self.window_surface)
+		for letter_item in self.title_message:
+			letter_item.draw(self.window_surface)
 
 		# Aaand we draw the version message.
 		self.version_message.draw(self.window_surface)
