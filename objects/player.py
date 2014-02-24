@@ -70,8 +70,8 @@ class Player(pygame.sprite.Sprite):
 		self.max_energy = 100
 		self.energy_increase_on_hit = 2.5
 		
-		#self.energy_attack = missilestorm.MissileStorm(self)
-		self.energy_attack = laser.Laser(self)
+		self.energy_attack = missilestorm.MissileStorm(self)
+		#self.energy_attack = laser.Laser(self)
 
 		# Store the number of the gamepad that controls this player.
 		self.gamepad_id = gamepad_id

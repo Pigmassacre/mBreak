@@ -66,11 +66,9 @@ class IntroMenu(scene.Scene):
 			letter_item.x = ((settings.SCREEN_WIDTH - length_of_title_message) / 2.0) + last_offset
 			letter_item.y = self.title_logo.y + self.title_logo.get_height() + letter_item.get_height()
 			last_offset += letter_item.get_width()
-
-			a = letter_item.alpha_value
-			a = ((255 / (len(self.title_message) * 2)) * self.title_message.index(letter_item))
-			a %= 255
-			letter_item.alpha_value = a
+			
+			if self.title_message.index(letter_item) in range(6, 11):
+				letter_item.blink = True
 
 		self.time_passed = 0
 
@@ -100,26 +98,15 @@ class IntroMenu(scene.Scene):
 
 			sin_scale = 0.0075
 
-			sin = 0.5 * settings.GAME_SCALE
+			sin = 0.3 * settings.GAME_SCALE
 			sin *= math.tan((self.time_passed + bob_height_differentiator) * (sin_scale / 4.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 16.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 8.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * sin_scale)
 
 			letter_item_standard_y = self.title_logo.y + self.title_logo.get_height() + letter_item.get_height()
-			letter_item.y = letter_item_standard_y + -math.fabs(sin) * 2.0 * settings.GAME_SCALE
-
-			a = letter_item.alpha_value
-			a = ((math.sin((pygame.time.get_ticks() + (self.title_message.index(letter_item) * 16)) * 0.005) + 1.0) / 2.0) * 1024
-			a %= 1024
-			if a > 255:
-				a = 255
-				
-			letter_item.alpha_value = a
-			letter_item.setup_surfaces()
-
-		# Since we've set the title message to blink, we have to update it so it does so.
-		for letter_item in self.title_message:
+			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
+			
 			letter_item.update(self.main_clock)
 
 	def draw(self):

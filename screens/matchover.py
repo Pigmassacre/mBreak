@@ -177,8 +177,8 @@ class MatchOver(scene.Scene):
 			h = letter_item.font_color.hsla[0]
 			h += self.main_clock.get_time() * 0.2			
 			h %= 360
-			new_color = copy.copy(letter_item.font_color)
-			new_color.hsla = (h, letter_item.font_color.hsla[1], letter_item.font_color.hsla[2], letter_item.font_color.hsla[3])
+			new_color = letter_item.font_color
+			new_color.hsla = (h, new_color.hsla[1], new_color.hsla[2], new_color.hsla[3])
 			letter_item.set_color(new_color)
 
 		# We update the menus first, so if the confirmationmenu is shown the screen is empty of items and menus (other than the confirmation menu, ofc).

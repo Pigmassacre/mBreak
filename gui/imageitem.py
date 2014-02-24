@@ -28,9 +28,6 @@ class ImageItem(item.Item):
 
 		# Scale image to settings.GAME_SCALE.
 		self.image = pygame.transform.scale(self.image, (self.image.get_width() * settings.GAME_SCALE, self.image.get_height() * settings.GAME_SCALE))
-		
-		# Setup the color values.
-		self.color = copy.copy(color)
 
 	def draw(self, surface):
 		super(ImageItem, self).draw(surface)
