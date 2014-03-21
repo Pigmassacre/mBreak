@@ -95,7 +95,7 @@ class Game(scene.Scene):
 
 		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
 		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
-		self.game_background = background.Background("planks")
+		self.game_background = background.Background("ruins")
 
 		# Store player one.
 		self.player_one = player_one

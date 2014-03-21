@@ -54,7 +54,7 @@ class Ball(pygame.sprite.Sprite):
 	speed_step = 0.75 * settings.GAME_FPS * settings.GAME_SCALE
 	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
 	least_allowed_vertical_angle = 0.32 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
-	trace_spawn_rate = 32
+	trace_spawn_rate = 0.53 * settings.GAME_FPS
 	particle_spawn_amount = 3
 
 	# Damage stuff.
@@ -206,9 +206,9 @@ class Ball(pygame.sprite.Sprite):
 			# Constrain angle to 0 < angle < 2pi. Even though angles over 2pi or under 0 work fine when translating the angles to x and y positions, 
 			# such angles mess with our ability to calculate other stuff. So we just make sure that the angle is between 0 and 2pi.
 			if self.angle > (2 * math.pi):
-				self.angle = self.angle - (2 * math.pi)
+				self.angle -= (2 * math.pi)
 			elif self.angle < 0:
-				self.angle = (2 * math.pi) + self.angle
+				self.angle += (2 * math.pi)
 
 			# We make sure that speed isn't over max_speed.
 			if self.speed > self.max_speed:
@@ -421,10 +421,6 @@ class Ball(pygame.sprite.Sprite):
 		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
 		self.angle = math.pi - normalized_distance * max_angle_offset
 
-		# Reverse angle.
-		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
-			self.angle = math.pi - self.angle
-
 		# Place ball to the left of the paddle.
 		self.place_left_of(paddle)
 
@@ -439,10 +435,6 @@ class Ball(pygame.sprite.Sprite):
 		normalized_distance = (distance_from_paddle_center / max_distance)
 		max_angle_offset = (math.pi / 2 - Ball.least_allowed_vertical_angle)
 		self.angle = normalized_distance * max_angle_offset
-
-		# Reverse angle.
-		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
-			self.angle = math.pi - self.angle
 
 		# Place ball to the right of the paddle.
 		self.place_right_of(paddle)

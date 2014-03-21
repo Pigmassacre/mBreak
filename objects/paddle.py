@@ -152,7 +152,7 @@ class Paddle(pygame.sprite.Sprite):
 			self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
 		else:
 			# Create the image attribute that is drawn to the surface.
-			self.image = pygame.Surface((self.rect.width, self.rect.height))
+			self.image = pygame.Surface((self.rect.width, self.rect.height), pygame.locals.SRCALPHA)
 		
 		# Blit the top part.
 		self.image.blit(Paddle.top_image, (0, 0))

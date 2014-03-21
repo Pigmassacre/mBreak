@@ -14,3 +14,4 @@ class ListMenu(menu.Menu):
 	def position_item(self, item):
 		item.x = self.x - (item.get_width() / 2.0)
 		item.y = self.y + ((item.get_height() * 2.0) * self.items.index(item))
+		print(str(item.get_height()))
