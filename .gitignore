@@ -1,6 +1,5 @@
 # Ignore some folders
 libs/
-res/music/
 
 # Ignore compiled python files.
 *.pyc
