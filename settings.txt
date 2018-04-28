@@ -11,7 +11,7 @@ shadows 	1
 particles 	1
 flashes		1
 traces 		1
-background 	1
-fullscreen 	0
+background 	0
+fullscreen 	1
 maxfps		60
 esolution 	1366x768

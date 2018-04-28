@@ -332,16 +332,16 @@ class Paddle(pygame.sprite.Sprite):
 			self.old_focused_item = self.focused_item
 		else:
 			# If no AI, we just check for key presses.
-			if not self.owner.gamepad_id is None:
-				self.key_up_pressed = (self.owner.joystick.get_axis(1) <= -0.25) or (self.owner.joystick.get_hat(0)[1] == -1)
-				self.key_down_pressed = (self.owner.joystick.get_axis(1) >= 0.25) or (self.owner.joystick.get_hat(0)[1] == 1)
+			#if not self.owner.gamepad_id is None:
+				#self.key_up_pressed = (self.owner.joystick.get_axis(1) <= -0.25) or (self.owner.joystick.get_hat(0)[1] == -1)
+				#self.key_down_pressed = (self.owner.joystick.get_axis(1) >= 0.25) or (self.owner.joystick.get_hat(0)[1] == 1)
 			
-				if not self.key_up_pressed and not self.key_down_pressed:
-					self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
-					self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
-			else:
-				self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
-				self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
+				#if not self.key_up_pressed and not self.key_down_pressed:
+				#	self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
+				#	self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
+			#else:
+			self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
+			self.key_down_pressed = pygame.key.get_pressed()[self.owner.key_down]
 
 		# Check for key_up or key_down events. If key_up is pressed, the paddle will move up and vice versa for key_down.
 		# However, we only move the paddle if max_speed is above zero, since if it is zero the paddle cannot move anyway.
