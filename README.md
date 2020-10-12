@@ -30,6 +30,12 @@ These are:
 
 So download all of these, and place them under the res/music/ folder (if the folder doesn't exist, create it :P).
 
+## Improvements
+
+Investigate how to package the game. Ideally the user should be able to download a version of the game from Github.
+* https://pyoxidizer.readthedocs.io/en/stable/
+* http://nuitka.net/pages/overview.html
+
 ## Legal stuff
 
 Both songs made by Drozerix are released under a [Public Domain](http://creativecommons.org/licenses/publicdomain/) license.<br/>
