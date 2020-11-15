@@ -232,7 +232,7 @@ class Game(scene.Scene):
 						return powerup_to_spawn(x, y)
 					else:
 						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't doublespeed and then break the loop.
-						powerup_to_spawn = random.choice(filter(lambda x: x != doublespeed.DoubleSpeed, self.powerup_list))
+						powerup_to_spawn = random.choice([x for x in self.powerup_list if x != doublespeed.DoubleSpeed])
 						break
 		
 		# If we got this far, we just spawn that powerup.

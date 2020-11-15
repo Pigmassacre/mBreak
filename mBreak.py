@@ -34,15 +34,15 @@ def main():
 
 	# Display modes, these are by standard double buffering (for performance reasons) and hardware acceleration (works if fullscreen is enabled).
 	if graphics.FULLSCREEN:
-		display_modes = DOUBLEBUF | HWSURFACE | FULLSCREEN
+		display_modes = DOUBLEBUF | HWSURFACE | FULLSCREEN | SCALED
 	else:
-		display_modes = DOUBLEBUF | HWSURFACE
+		display_modes = DOUBLEBUF | HWSURFACE | SCALED
 
 	# Setup the window surface to be used.
 	window_surface = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), display_modes)
 
 	# Initialize the camera.
-	camera.create_camera(0, 0, settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
+	camera.create_camera(0, 0, settings.LEVEL_WIDTH, settings.LEVEL_HEIGHT)
 
 	# Initialize the joystick module.
 	pygame.joystick.init()

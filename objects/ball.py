@@ -561,7 +561,7 @@ class Ball(pygame.sprite.Sprite):
 		# If we've only hit one block, we don't need to check so much. Just check which side we've collided with and act accordingly.
 		if len(block_information) == 1:
 			# Check what side we've hit that block and act accordingly.
-			for block, side in block_information.iteritems():
+			for block, side in iter(block_information.items()):
 				if side == "top":
 					self.hit_top_side_of_block(block)
 				elif side == "left":
@@ -575,7 +575,7 @@ class Ball(pygame.sprite.Sprite):
 			# Setup a few help lists to more easily determine how to act.
 			block_list = []
 			side_list = []
-			for block, side in block_information.iteritems():
+			for block, side in iter(block_information.items()):
 				block_list.append(block)
 				side_list.append(side)
 
@@ -599,7 +599,7 @@ class Ball(pygame.sprite.Sprite):
 					self.hit_block(block_list[1])
 			# Are the two blocks hit diagonal of each other?
 			else:
-				for block, side in block_information.iteritems():
+				for block, side in iter(block_information.items()):
 					if side == "top":
 						self.hit_top_side_of_block(block)
 					elif side == "left":
@@ -613,7 +613,7 @@ class Ball(pygame.sprite.Sprite):
 			# Setup a few help lists to more easily determine how to act.
 			block_list = []
 			side_list = []
-			for block, side in block_information.iteritems():
+			for block, side in iter(block_information.items()):
 				block_list.append(block)
 				side_list.append(side)
 
@@ -629,7 +629,7 @@ class Ball(pygame.sprite.Sprite):
 		elif len(block_information) > 3:
 			least_x_distance = 999999
 			least_y_distance = 999999
-			for block, side in block_information.iteritems():
+			for block, side in iter(block_information.items()):
 				if abs(block.x - self.x) < least_x_distance:
 					least_x_distance = block.x - self.x
 

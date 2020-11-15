@@ -81,5 +81,5 @@ class Electricity(powerup.Powerup):
 				retardation = speed / 46.0
 				random_value = random.randint(225, 255)
 				color = pygame.Color(random_value, random_value, random.randint(0, 100))
-				random_size = random.randint(self.rect.width / 8, self.rect.width / 6)
+				random_size = random.randint(self.rect.width // 8, self.rect.width // 6)
 				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, random_size, random_size, angle, speed, retardation, color, 20 * settings.GAME_FPS)

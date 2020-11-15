@@ -46,7 +46,7 @@ class Enlarger(powerup.Powerup):
 
 		# Generate the animation frames.
 		self.frames = useful.create_frames_from_sheet(Enlarger.image_sheet, Enlarger.frame_width, Enlarger.frame_height)
-		self.image = self.frames[len(self.frames) / 2]
+		self.image = self.frames[len(self.frames) // 2]
 
 		# This affects how far the powerup must be from it's center y to change frames.
 		self.center_y_grace = 0.25 * settings.GAME_SCALE
