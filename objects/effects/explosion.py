@@ -39,7 +39,7 @@ class Explosion(effect.Effect):
 		effect.Effect.__init__(self, parent, duration)
 
 		# Generate the animation frames.
-		frames = useful.create_frames_from_sheet(Explosion.image_sheet, Explosion.frame_width, Explosion.frame_height, 0.06)
+		frames = useful.create_frames_from_sheet(Explosion.image_sheet, Explosion.frame_width, Explosion.frame_height, 60)
 
 		# Create the pyganim object.
 		self.animation = pyganim.PygAnimation(frames, False)

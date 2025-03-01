@@ -5,7 +5,7 @@ import pygame
 import random
 import math
 import objects.powerups.powerup as powerup
-import objects.effects.timeout as timeout
+import objects.effects.gravitationalpull as gravitationalpull
 import objects.shadow as shadow
 import objects.groups as groups
 import settings.settings as settings
@@ -35,9 +35,6 @@ class Gravity(powerup.Powerup):
 	# The amount of time the effect will last.
 	duration = 8000
 
-	# The gravity direction change (in radians)
-	gravity_angle = math.pi / 4  # 45 degrees
-
 	# Scale image if needed
 	image = pygame.transform.scale(image, (width, height))
 
@@ -50,6 +47,9 @@ class Gravity(powerup.Powerup):
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
+
+	def create_effect(self, entity):
+		return gravitationalpull.GravitationalPull(entity)
 
 	def hit(self, entity):
 		# Call the supermethod, it takes care of killing the powerup and printing debug message(s).
@@ -64,31 +64,9 @@ class Gravity(powerup.Powerup):
 
 		# Apply gravity effect to all of the opponent's balls
 		for ball_entity in opponent.ball_group:
-			# Apply gravity effect to the ball
-			ball_entity.gravity_direction = random.uniform(0, 2 * math.pi)  # Random direction
-			ball_entity.gravity_strength = 0.05  # Small gravity effect
-
-			# Create a timeout effect which is added to the ball to reset gravity
-			timeout_effect = GravityEffect(ball_entity, Gravity.duration)
+			# Create a gravitational pull effect for the ball
+			effect = self.create_effect(ball_entity)
+			effect.real_owner = entity.owner
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		entity.owner.add_powerup(Gravity, timeout_effect)
-
-# Custom effect class for the gravity powerup
-class GravityEffect(timeout.Timeout):
-	
-	def __init__(self, entity, duration):
-		# Call the superconstructor
-		timeout.Timeout.__init__(self, entity, duration)
-		
-		# Store the original gravity values
-		self.original_gravity_direction = getattr(entity, 'gravity_direction', 0)
-		self.original_gravity_strength = getattr(entity, 'gravity_strength', 0)
-		
-	def on_remove(self):
-		# Reset gravity values when the effect expires
-		self.entity.gravity_direction = self.original_gravity_direction
-		self.entity.gravity_strength = self.original_gravity_strength
-		
-		# Call the supermethod
-		timeout.Timeout.on_remove(self) 
+		entity.owner.add_powerup(Gravity, effect) 
