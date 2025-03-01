@@ -56,21 +56,9 @@ class Gravity(powerup.Powerup):
 		powerup.Powerup.hit(self, entity)
 		self.shadow.kill()
 
-		# Find the opponent
-		for player in groups.Groups.player_group:
-			if player != entity.owner:
-				opponent = player
-				break
-
-		# Initialize effect variable
-		effect = None
-
-		# Apply gravity effect to all of the opponent's balls
-		for ball_entity in opponent.ball_group:
-			# Create a gravitational pull effect for the ball
-			effect = self.create_effect(ball_entity)
-			effect.real_owner = entity.owner
+		# Apply gravity effect to the ball that hit the powerup
+		effect = self.create_effect(entity)
+		effect.real_owner = entity.owner
 
 		# Store a powerup of this type in entity owners powerup group, so we can display the powerups collected by a player.
-		if effect is not None:
-			entity.owner.add_powerup(Gravity, effect) 
+		entity.owner.add_powerup(Gravity, effect) 
