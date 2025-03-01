@@ -14,18 +14,18 @@ Each item is drawn differently depending on these states.
 
 class Item(object):
 
-	width = 16 * settings.GAME_SCALE
-	height = 16 * settings.GAME_SCALE
+	width = 16
+	height = 16
 
 	shadow_color = pygame.Color(50, 50, 50)
 	selected_color = pygame.Color(255, 255, 255)
 	chosen_color = pygame.Color(200, 200, 200)
 	disabled_color = pygame.Color(75, 75, 75, 240)
 
-	shadow_offset_x = 0 * settings.GAME_SCALE
-	shadow_offset_y = 1 * settings.GAME_SCALE
-	selected_border_size = 2 * settings.GAME_SCALE
-	chosen_border_size = 2 * settings.GAME_SCALE
+	shadow_offset_x = 0
+	shadow_offset_y = 1
+	selected_border_size = 2
+	chosen_border_size = 2
 
 	def __init__(self, color = pygame.Color(128, 128, 128)):
 		# An item has a position and size.
@@ -60,10 +60,10 @@ class Item(object):
 		# These values are used to animate the items.
 		self.x_nudge = 0
 		self.y_nudge = 0
-		self.max_x_nudge = 2 * settings.GAME_SCALE
-		self.max_y_nudge = 2 * settings.GAME_SCALE
-		self.x_nudge_retreat_speed = 0.1 * settings.GAME_FPS * settings.GAME_SCALE
-		self.y_nudge_retreat_speed = 0.1 * settings.GAME_FPS * settings.GAME_SCALE
+		self.max_x_nudge = 2
+		self.max_y_nudge = 2
+		self.x_nudge_retreat_speed = 0.1 * settings.GAME_FPS
+		self.y_nudge_retreat_speed = 0.1 * settings.GAME_FPS
 		self.time_passed = 0
 		
 	def get_width(self):

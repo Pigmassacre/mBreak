@@ -25,11 +25,11 @@ class NormalBlock(block.Block):
 	half_health_image = pygame.image.load("res/block/block.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	health = 20
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 	half_health_image = pygame.transform.scale(image, (width, height))
 

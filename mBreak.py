@@ -34,9 +34,9 @@ def main():
 
 	# Display modes, these are by standard double buffering (for performance reasons) and hardware acceleration (works if fullscreen is enabled).
 	if graphics.FULLSCREEN:
-		display_modes = DOUBLEBUF | HWSURFACE | FULLSCREEN | SCALED
+		display_modes = DOUBLEBUF | FULLSCREEN | SCALED
 	else:
-		display_modes = DOUBLEBUF | HWSURFACE | SCALED
+		display_modes = DOUBLEBUF | SCALED
 
 	# Setup the window surface to be used.
 	window_surface = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), display_modes)

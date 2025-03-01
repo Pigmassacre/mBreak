@@ -29,8 +29,8 @@ class Splash(scene.Scene):
 
 	# These are the values that affect the movement of the splash images.
 	splash_time = 1750
-	top_half_speed = 600 * settings.GAME_SCALE
-	bottom_half_speed = -600 * settings.GAME_SCALE
+	top_half_speed = 600
+	bottom_half_speed = -600
 
 	# We use this instead of the standard background color (even if they happen to be the same) since we always want the background to
 	# be black here.

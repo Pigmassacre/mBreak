@@ -40,19 +40,19 @@ class Missile(pygame.sprite.Sprite):
 	image = pygame.image.load("res/powerup/missile.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	particle_spawn_rate = 25
 	particle_spawn_amount = 5
 
-	speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
-	acceleration = 0.025 * settings.GAME_FPS * settings.GAME_SCALE
+	speed = 0.05 * settings.GAME_FPS
+	acceleration = 0.025 * settings.GAME_FPS
 
 	# These particles are spawned when the missile hits its target.
 	hit_particle_min_amount = 12
 	hit_particle_max_amount = 18
-	hit_particle_min_speed = 1 * settings.GAME_FPS * settings.GAME_SCALE
-	hit_particle_max_speed = 2.5 * settings.GAME_FPS * settings.GAME_SCALE
+	hit_particle_min_speed = 1 * settings.GAME_FPS
+	hit_particle_max_speed = 2.5 * settings.GAME_FPS
 
 	# The amount of damage the missile deals to a hit block.
 	damage = 20
@@ -67,9 +67,9 @@ class Missile(pygame.sprite.Sprite):
 	# These variables affect how the missile homes to its target.
 	angle_correction = 0.0005 * settings.GAME_FPS
 	angle_correction_rate = 0.1 * settings.GAME_FPS
-	max_speed = 3 * settings.GAME_FPS * settings.GAME_SCALE
+	max_speed = 3 * settings.GAME_FPS
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y, angle, owner, target):
@@ -296,7 +296,7 @@ class Missile(pygame.sprite.Sprite):
 			for _ in range(0, random.randrange(1, self.__class__.particle_spawn_amount)):
 				width = random.uniform(self.__class__.width / 5.0, self.__class__.width / 4.0)
 				angle = self.angle + random.uniform(math.pi - (math.pi / 24.0), math.pi + (math.pi / 24.0))
-				speed = random.uniform(0.65 * settings.GAME_FPS * settings.GAME_SCALE, 1.1 * settings.GAME_FPS * settings.GAME_SCALE)
+				speed = random.uniform(0.65 * settings.GAME_FPS, 1.1 * settings.GAME_FPS)
 				retardation = speed / 24.0
 				color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)
 				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, width, width, angle, speed, retardation, color, 5)

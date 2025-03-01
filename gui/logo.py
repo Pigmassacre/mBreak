@@ -22,28 +22,33 @@ class Logo:
 	x = 0
 	y = 0
 
-	# Creates a pyganim object from the logo images. 
-	logo = pyganim.PygAnimation([("res/logo/mBreakTitle_01.png", 1.55),
-								("res/logo/mBreakTitle_02.png", 0.075),
-								("res/logo/mBreakTitle_03.png", 0.075),
-								("res/logo/mBreakTitle_04.png", 0.075),
-								("res/logo/mBreakTitle_05.png", 0.075),
-								("res/logo/mBreakTitle_06.png", 0.075),
-								("res/logo/mBreakTitle_07.png", 0.075),
-								("res/logo/mBreakTitle_01.png", 1.55),
-								("res/logo/mBreakTitle_07.png", 0.075),
-								("res/logo/mBreakTitle_06.png", 0.075),
-								("res/logo/mBreakTitle_05.png", 0.075),
-								("res/logo/mBreakTitle_04.png", 0.075),
-								("res/logo/mBreakTitle_03.png", 0.075),
-								("res/logo/mBreakTitle_02.png", 0.075)])
+	# Define the animation frames once
+	animation_frames = [
+		("res/logo/mBreakTitle_01.png", 1550),
+		("res/logo/mBreakTitle_02.png", 75),
+		("res/logo/mBreakTitle_03.png", 75),
+		("res/logo/mBreakTitle_04.png", 75),
+		("res/logo/mBreakTitle_05.png", 75),
+		("res/logo/mBreakTitle_06.png", 75),
+		("res/logo/mBreakTitle_07.png", 75),
+		("res/logo/mBreakTitle_01.png", 1550),
+		("res/logo/mBreakTitle_07.png", 75),
+		("res/logo/mBreakTitle_06.png", 75),
+		("res/logo/mBreakTitle_05.png", 75),
+		("res/logo/mBreakTitle_04.png", 75),
+		("res/logo/mBreakTitle_03.png", 75),
+		("res/logo/mBreakTitle_02.png", 75)
+	]
+
+	# Creates a pyganim object from the logo images.
+	logo = pyganim.PygAnimation(animation_frames)
 
 	def __init__(self):
-		# Store a copy of the pyganim object.
-		self.logo = Logo.logo.getCopy()
+		# Create a new animation instance using the same frames
+		self.logo = pyganim.PygAnimation(Logo.animation_frames)
 
-		# Set the current scale of the object to the standard scale (also scaled by settings.GAME_SCALE).
-		self.current_scale = Logo.scale * settings.GAME_SCALE
+		# Set the current scale of the object to the standard scale
+		self.current_scale = Logo.scale
 
 		# Store the default position values.
 		self.x = Logo.x

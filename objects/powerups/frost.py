@@ -33,15 +33,15 @@ class Frost(powerup.Powerup):
 	image_sheet = pygame.image.load("res/powerup/frost.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image_sheet.get_width() * settings.GAME_SCALE
-	height = image_sheet.get_height() * settings.GAME_SCALE
+	width = image_sheet.get_width()
+	height = image_sheet.get_height()
 	frame_width = width
 	frame_height = width
 
 	particle_spawn_rate = 600
 	particle_spawn_amount = 2
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image_sheet = pygame.transform.scale(image_sheet, (width, height))
 
 	def __init__(self, x, y):
@@ -56,7 +56,7 @@ class Frost(powerup.Powerup):
 		self.image = self.frames[1]
 
 		# This affects how far the powerup must be from it's center y to change frames.
-		self.center_y_grace = 0.2 * settings.GAME_SCALE
+		self.center_y_grace = 0.2
 
 		# Create a shadow.
 		self.shadow = shadow.Shadow(self)
@@ -99,7 +99,7 @@ class Frost(powerup.Powerup):
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(0, Frost.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.2 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
+				speed = random.uniform(0.2 * settings.GAME_FPS, 0.35 * settings.GAME_FPS)
 				retardation = speed / 76.0
 				color = pygame.Color(random.randint(0, 50), random.randint(125, 255), random.randint(220, 255))
 				particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, self.rect.width / 4, self.rect.width / 4, angle, speed, retardation, color, 3 * settings.GAME_FPS)

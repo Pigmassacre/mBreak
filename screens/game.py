@@ -19,6 +19,7 @@ import objects.powerups.frost as frost
 import objects.powerups.rocket as rocket
 import objects.powerups.enlarger as enlarger
 import objects.powerups.reducer as reducer
+import objects.powerups.gravity as gravity
 import objects.effects.speed as speed
 import objects.effects.flash as flash
 import objects.effects.explosion as explosion
@@ -107,7 +108,7 @@ class Game(scene.Scene):
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
 
 		# The list of available powerups to spawn.
-		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
 
 		# The rate at which powerups will perhaps be spawned.
 		self.powerup_spawn_rate = 4000
@@ -131,16 +132,16 @@ class Game(scene.Scene):
 		self.powerup_second_speed_spawn_chance = 0.05
 
 		# Create the score texts. These are only displayed when the amount of rounds is greater than 0.
-		item_side_padding = 25 * settings.GAME_SCALE
-		font_dead_space = 1.5 * settings.GAME_SCALE
+		item_side_padding = 25
+		font_dead_space = 1.5
 		
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
-		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
+		self.player_one_score_text.set_size(27)
 		self.player_one_score_text.x = item_side_padding - (self.player_one_score_text.get_width() / 2.0) + font_dead_space
 		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
 		
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
-		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
+		self.player_two_score_text.set_size(27)
 		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - (self.player_two_score_text.get_width() / 2.0) + font_dead_space
 		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
 		
@@ -268,8 +269,8 @@ class Game(scene.Scene):
 							distance = math.sqrt(math.pow(math.fabs((entity.x + entity.width / 2) - (block.x + block.width / 2)), 2) + math.pow(math.fabs((entity.y + entity.height / 2) - (block.y + block.height / 2)), 2))
 							if distance < least_distance:
 								least_distance = distance
-								if least_distance < 25 * settings.GAME_SCALE:
-									self.main_clock.time_scale = math.pow(least_distance / (25 * settings.GAME_SCALE), 5)
+								if least_distance < 25:
+									self.main_clock.time_scale = math.pow(least_distance / 25, 5)
 									if self.main_clock.time_scale < 0.1:
 										self.main_clock.time_scale = 0.1
 	

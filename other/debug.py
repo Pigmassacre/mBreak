@@ -14,6 +14,7 @@ import objects.powerups.electricity as electricity
 import objects.powerups.rocket as rocket
 import objects.powerups.enlarger as enlarger
 import objects.powerups.reducer as reducer
+import objects.powerups.gravity as gravity
 import objects.ball as ball
 import objects.groups as groups
 import settings.settings as settings
@@ -53,12 +54,12 @@ def create_ball_at_pos(pos):
 	return ball.Ball(pos[0], pos[1], random.uniform(0, math.pi), list(groups.Groups.player_group)[random.randint(0, len(groups.Groups.player_group) - 1)])
 
 def create_powerup_at_pos(pos):
-	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
 	return random.choice(powerup_list)(pos[0], pos[1])
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
-	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
+	powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
 	#powerup_list = [rocket.Rocket]
 	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
@@ -98,12 +99,12 @@ class Debug:
 	pygame.font.init()
 
 	# Default variables go here.
-	font_size = 9 * settings.GAME_SCALE
+	font_size = 9
 	font = pygame.font.Font(settings.DEBUG_FONT, font_size)
 	font_color = (255, 255, 255)
 	shadow_color = pygame.Color(50, 50, 50)
-	shadow_offset_x = 0 * settings.GAME_SCALE
-	shadow_offset_y = 1 * settings.GAME_SCALE
+	shadow_offset_x = 0
+	shadow_offset_y = 1
 	x = font_size
 	y = font_size
 

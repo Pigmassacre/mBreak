@@ -23,10 +23,10 @@ class Timeout(effect.Effect):
 	image = pygame.image.load("res/effect/timeout.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 
-	# Scale image to match the game scale.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, parent, duration):

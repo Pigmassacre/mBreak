@@ -27,11 +27,11 @@ class Powerup(pygame.sprite.Sprite):
 	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.ogg"))
 
 	# The standard width of all powerup image files. Each individual powerup can ofcourse be bigger/smaller, but this is the standard size.
-	width = 8 * settings.GAME_SCALE
-	height = 8 * settings.GAME_SCALE
+	width = 8
+	height = 8
 
 	# Used for how noticable the bob effect should be.
-	bob_factor = 0.5 * settings.GAME_SCALE
+	bob_factor = 0.5
 
 	# On hit effect values.
 	spawn_effect_start_color = pygame.Color(255, 255, 255, 255)

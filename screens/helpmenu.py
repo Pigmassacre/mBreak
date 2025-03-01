@@ -51,13 +51,13 @@ class HelpMenu(scene.Scene):
 		self.active_info = None
 
 		# This information is used to format the help texts.
-		self.distance_from_screen_edge = 6 * settings.GAME_SCALE
-		self.font_size = 6 * settings.GAME_SCALE
+		self.distance_from_screen_edge = 6
+		self.font_size = 6
 		self.max_width_of_text_line = (settings.SCREEN_WIDTH - (self.distance_from_screen_edge * 2))
 
 		# We create a gridmenu that allows the player to choose what item they want to read more about.
 		self.help_menu = gridmenu.GridMenu(13)
-		self.help_menu.y = 9 * settings.GAME_SCALE
+		self.help_menu.y = 9
 		self.menu_list.append(self.help_menu)
 
 		# The back button, displayed in the middle-bottom of the screen.
@@ -82,7 +82,7 @@ class HelpMenu(scene.Scene):
 			a_menu.register_other_menus(self.menu_list)
 
 		# We setup all menu transition.
-		self.transition.speed = 20 * settings.GAME_FPS * settings.GAME_SCALE
+		self.transition.speed = 20 * settings.GAME_FPS
 		self.transition.setup_transition(self.help_menu, True, True, True, False)
 		self.transition.setup_transition(self.back_menu, True, True, False, False)
 

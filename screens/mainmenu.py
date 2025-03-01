@@ -85,7 +85,7 @@ class MainMenu(scene.Scene):
 		
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 120 * settings.GAME_SCALE
+		self.logo_transition.speed = 120
 
 	def setup_music(self):
 		self.__class__.music_list = settings.TITLE_MUSIC

@@ -40,7 +40,7 @@ class OptionsMenu(scene.Scene):
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 120 * settings.GAME_SCALE
+		self.logo_transition.speed = 120
 
 		# Setup all the menu buttons.
 		self.setup_options_menu()

@@ -54,13 +54,13 @@ class AboutMenu(scene.Scene):
 		self.menu_list.append(self.back_menu)
 
 		# We choose a smaller font size here for all the credits.
-		font_size = 6 * settings.GAME_SCALE
+		font_size = 6
 
 		# Create and setup all the textitems.
 		self.pyganim_credits = textitem.TextItem("Pyganim is used to help animate items in the game")
 		self.pyganim_credits.set_size(font_size)
 		self.pyganim_credits.x = (settings.SCREEN_WIDTH - self.pyganim_credits.get_width()) / 2
-		self.pyganim_credits.y = 9 * settings.GAME_SCALE
+		self.pyganim_credits.y = 9
 
 		self.pyganim_credits_source_code = textitem.TextItem("Pyganim source code is not included in this game")
 		self.pyganim_credits_source_code.set_size(font_size)
@@ -123,7 +123,7 @@ class AboutMenu(scene.Scene):
 		self.made_by_info.y = self.made_by_author.y - self.made_by_info.get_height()
 
 		# The scale of the left and right looking pigs at the bottom of the screen.
-		self.images_current_scale = 1 * settings.GAME_SCALE
+		self.images_current_scale = 1
 
 		self.image_left = pygame.image.load("res/splash/splash_bloody_left.png")
 		self.image_left = pygame.transform.scale(self.image_left, (self.image_left.get_width() * self.images_current_scale, self.image_left.get_height() * self.images_current_scale))
@@ -132,7 +132,7 @@ class AboutMenu(scene.Scene):
 		self.image_right = pygame.transform.scale(self.image_right, (self.image_right.get_width() * self.images_current_scale, self.image_right.get_height() * self.images_current_scale))
 
 		# We setup all menu transition.
-		self.transition.speed = 1200 * settings.GAME_SCALE
+		self.transition.speed = 1200
 		self.transition.setup_transition(self.back_menu, True, True, False, False)
 		self.transition.setup_single_item_transition(self.pyganim_credits, True, True, False, False)
 		self.transition.setup_single_item_transition(self.pyganim_credits_source_code, True, True, False, False)

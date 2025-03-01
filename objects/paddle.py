@@ -34,14 +34,14 @@ class Paddle(pygame.sprite.Sprite):
 	bottom_image = pygame.image.load("res/paddle/paddle_bottom.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = middle_image.get_width() * settings.GAME_SCALE
-	height = 22 * settings.GAME_SCALE
-	acceleration = 1.0 * settings.GAME_FPS * settings.GAME_SCALE
-	retardation = 2.5 * settings.GAME_FPS * settings.GAME_SCALE
-	max_speed = 2.5 * settings.GAME_FPS * settings.GAME_SCALE
+	width = middle_image.get_width()
+	height = 22
+	acceleration = 1.0 * settings.GAME_FPS
+	retardation = 2.5 * settings.GAME_FPS
+	max_speed = 2.5 * settings.GAME_FPS
 
-	max_height = 33 * settings.GAME_SCALE
-	min_height = 11 * settings.GAME_SCALE
+	max_height = 33
+	min_height = 11
 
 	max_width = width
 	min_width = width
@@ -52,13 +52,13 @@ class Paddle(pygame.sprite.Sprite):
 	hit_effect_tick_amount = 22 * settings.GAME_FPS
 
 	# Used for hit effect on the paddle.
-	stabilize_speed = 0.1 * settings.GAME_FPS * settings.GAME_SCALE
-	max_nudge_distance = 2.5 * settings.GAME_SCALE
+	stabilize_speed = 0.1 * settings.GAME_FPS
+	max_nudge_distance = 2.5
 
-	# Scale the images to settings.GAME_SCALE.
-	top_image = pygame.transform.scale(top_image, (top_image.get_width() * settings.GAME_SCALE, top_image.get_height() * settings.GAME_SCALE))
-	middle_image = pygame.transform.scale(middle_image, (middle_image.get_width() * settings.GAME_SCALE, middle_image.get_height() * settings.GAME_SCALE))
-	bottom_image = pygame.transform.scale(bottom_image, (bottom_image.get_width() * settings.GAME_SCALE, bottom_image.get_height() * settings.GAME_SCALE))
+	# Scale the images.
+	top_image = pygame.transform.scale(top_image, (top_image.get_width(), top_image.get_height()))
+	middle_image = pygame.transform.scale(middle_image, (middle_image.get_width(), middle_image.get_height()))
+	bottom_image = pygame.transform.scale(bottom_image, (bottom_image.get_width(), bottom_image.get_height()))
 
 	def __init__(self, x, y, owner):
 		# We start by calling the superconstructor.
@@ -196,7 +196,7 @@ class Paddle(pygame.sprite.Sprite):
 		if self.focused_item != None and settings.DEBUG_MODE:
 			color = copy.copy(self.owner.color)
 			color.a = 128
-			surface.fill(color, pygame.Rect(self.focused_item.rect.x - 1 * settings.GAME_SCALE - camera.CAMERA.x, self.focused_item.y - 1 * settings.GAME_SCALE - camera.CAMERA.y, self.focused_item.width + 2 * settings.GAME_SCALE, self.focused_item.height + 2 * settings.GAME_SCALE))
+			surface.fill(color, pygame.Rect(self.focused_item.rect.x - 1 - camera.CAMERA.x, self.focused_item.y - 1 - camera.CAMERA.y, self.focused_item.width + 2, self.focused_item.height + 2))
 
 	def decide_which_item(self, item):
 		if self.owner.ai_difficulty >= 3:

@@ -19,10 +19,10 @@ class Laserbeam(pygame.sprite.Sprite):
 	image = pygame.image.load("res/attack/laser.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, owner):
@@ -109,18 +109,18 @@ class Laserbeam(pygame.sprite.Sprite):
 	def update(self, main_clock):
 		old_width = self.rect.width
 
-		self.rect.width += 1 * settings.GAME_SCALE
+		self.rect.width += 1
 		if self.attack_paddle.x > settings.SCREEN_WIDTH / 2.0:
-			self.rect.x -= 1 * settings.GAME_SCALE
+			self.rect.x -= 1
 
 		for block in groups.Groups.block_group:
 			if block.owner != self.owner:
 				if self.rect.colliderect(block.rect):
 					block.on_hit(60 * main_clock.delta_time)
 
-		self.rect.width -= 1 * settings.GAME_SCALE
+		self.rect.width -= 1
 		if self.attack_paddle.x > settings.SCREEN_WIDTH / 2.0:
-			self.rect.x += 1 * settings.GAME_SCALE
+			self.rect.x += 1
 		self.rect.width = settings.LEVEL_WIDTH
 
 		self.figure_out_rect_size()

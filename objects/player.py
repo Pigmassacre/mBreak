@@ -29,16 +29,16 @@ class Player(pygame.sprite.Sprite):
 	energy_image_middle_right = pygame.image.load("res/player/energy/energy_middle_right_4.png")
 	energy_image_bottom_left = pygame.image.load("res/player/energy/energy_bottom_left_2.png")
 
-	energy_image_top_left_width = energy_image_top_left.get_width() * settings.GAME_SCALE
-	energy_image_top_left_height = energy_image_top_left.get_height() * settings.GAME_SCALE
-	energy_image_middle_left_width = energy_image_middle_left.get_width() * settings.GAME_SCALE
-	energy_image_middle_left_height = energy_image_middle_left.get_height() * settings.GAME_SCALE
-	energy_image_middle_right_width = energy_image_middle_right.get_width() * settings.GAME_SCALE
-	energy_image_middle_right_height = energy_image_middle_right.get_height() * settings.GAME_SCALE
-	energy_image_bottom_left_width = energy_image_bottom_left.get_width() * settings.GAME_SCALE
-	energy_image_bottom_left_height = energy_image_bottom_left.get_height() * settings.GAME_SCALE
+	energy_image_top_left_width = energy_image_top_left.get_width()
+	energy_image_top_left_height = energy_image_top_left.get_height()
+	energy_image_middle_left_width = energy_image_middle_left.get_width()
+	energy_image_middle_left_height = energy_image_middle_left.get_height()
+	energy_image_middle_right_width = energy_image_middle_right.get_width()
+	energy_image_middle_right_height = energy_image_middle_right.get_height()
+	energy_image_bottom_left_width = energy_image_bottom_left.get_width()
+	energy_image_bottom_left_height = energy_image_bottom_left.get_height()
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	energy_image_top_left = pygame.transform.scale(energy_image_top_left, (energy_image_top_left_width, energy_image_top_left_height))
 	energy_image_middle_left = pygame.transform.scale(energy_image_middle_left, (energy_image_middle_left_width, energy_image_middle_left_height))
 	energy_image_middle_right = pygame.transform.scale(energy_image_middle_right, (energy_image_middle_right_width, energy_image_middle_right_height))
@@ -89,19 +89,19 @@ class Player(pygame.sprite.Sprite):
 		if self.x <= settings.SCREEN_WIDTH / 2:
 			self.energy_image_middle = Player.energy_image_middle_left.copy()
 
-			self.energy_top_x = settings.LEVEL_X - self.energy_image_top.get_width() - 4 * settings.GAME_SCALE
-			self.energy_middle_x = settings.LEVEL_X - self.energy_image_middle.get_width() - 4 * settings.GAME_SCALE
-			self.energy_bottom_x = settings.LEVEL_X - self.energy_image_bottom.get_width() - 4 * settings.GAME_SCALE
+			self.energy_top_x = settings.LEVEL_X - self.energy_image_top.get_width() - 4
+			self.energy_middle_x = settings.LEVEL_X - self.energy_image_middle.get_width() - 4
+			self.energy_bottom_x = settings.LEVEL_X - self.energy_image_bottom.get_width() - 4
 
-			self.energy_level_x = self.energy_middle_x + 1 * settings.GAME_SCALE
+			self.energy_level_x = self.energy_middle_x + 1
 		else:
 			self.energy_image_top = pygame.transform.flip(self.energy_image_top, True, False)
 			self.energy_image_middle = Player.energy_image_middle_right.copy()
 			self.energy_image_bottom = pygame.transform.flip(self.energy_image_bottom, True, False)
 
-			self.energy_top_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
-			self.energy_middle_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
-			self.energy_bottom_x = settings.LEVEL_MAX_X + 4 * settings.GAME_SCALE
+			self.energy_top_x = settings.LEVEL_MAX_X + 4
+			self.energy_middle_x = settings.LEVEL_MAX_X + 4
+			self.energy_bottom_x = settings.LEVEL_MAX_X + 4
 
 			self.energy_level_x = self.energy_middle_x
 		self.energy_top_y = settings.LEVEL_Y
@@ -109,7 +109,7 @@ class Player(pygame.sprite.Sprite):
 		self.energy_bottom_y = self.energy_middle_y + self.energy_image_middle.get_height()
 
 		# This is the surface used to draw the actual energy level.
-		self.energy_level_surface = pygame.surface.Surface((self.energy_image_middle.get_width() - 1 * settings.GAME_SCALE, self.energy_image_middle.get_height()), pygame.locals.SRCALPHA)
+		self.energy_level_surface = pygame.surface.Surface((self.energy_image_middle.get_width() - 1, self.energy_image_middle.get_height()), pygame.locals.SRCALPHA)
 		self.energy_level_y = self.energy_middle_y
 
 		# This is the energy rect, this changes according to the energy level of the player.
@@ -145,7 +145,7 @@ class Player(pygame.sprite.Sprite):
 		self.last_powerup_group_size = len(self.powerup_group)
 
 		# The offset between each powerup.
-		self.powerup_offset = 2 * settings.GAME_SCALE
+		self.powerup_offset = 2
 
 	def empty_groups(self):
 		# Empty all the groups.

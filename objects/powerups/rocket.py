@@ -28,12 +28,12 @@ class Rocket(powerup.Powerup):
 	image = pygame.image.load("res/powerup/rocket.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	particle_spawn_rate = 100
 	particle_spawn_amount = 3
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):

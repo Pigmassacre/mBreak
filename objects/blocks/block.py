@@ -28,10 +28,10 @@ class Block(pygame.sprite.Sprite):
 	sound_effect = pygame.mixer.Sound("res/sounds/explosion.ogg")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	particle_spawn_amount = 4
-	particle_size = 0.75 * settings.GAME_SCALE
+	particle_size = 0.75
 	half_health_blend_color = pygame.Color(128, 128, 128)
 
 	# On hit effect values.
@@ -39,7 +39,7 @@ class Block(pygame.sprite.Sprite):
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
 	hit_effect_tick_amount = 15 * settings.GAME_FPS
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 	half_health_image = pygame.transform.scale(image, (width, height))
 

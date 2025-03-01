@@ -17,26 +17,36 @@ In order to display the background images, simply call the draw method where you
 
 class Background:
 	
-	def __init__(self, folder_name):
-		# Setup the background surfaces.
-		self.floor_surface = pygame.image.load("res/background/" + folder_name + "/floor.png")
-		self.floor_surface = pygame.transform.scale(self.floor_surface, (self.floor_surface.get_width() * settings.GAME_SCALE, self.floor_surface.get_height() * settings.GAME_SCALE))
-		self.wall_vertical_left = pygame.image.load("res/background/" + folder_name + "/wall_vertical_left.png")
-		self.wall_vertical_left = pygame.transform.scale(self.wall_vertical_left, (self.wall_vertical_left.get_width() * settings.GAME_SCALE, self.wall_vertical_left.get_height() * settings.GAME_SCALE))
-		self.wall_vertical_right = pygame.image.load("res/background/" + folder_name + "/wall_vertical_right.png")
-		self.wall_vertical_right = pygame.transform.scale(self.wall_vertical_right, (self.wall_vertical_right.get_width() * settings.GAME_SCALE, self.wall_vertical_right.get_height() * settings.GAME_SCALE))
-		self.wall_horizontal_top = pygame.image.load("res/background/" + folder_name + "/wall_horizontal_top.png")
-		self.wall_horizontal_top = pygame.transform.scale(self.wall_horizontal_top, (self.wall_horizontal_top.get_width() * settings.GAME_SCALE, self.wall_horizontal_top.get_height() * settings.GAME_SCALE))
-		self.wall_horizontal_bottom = pygame.image.load("res/background/" + folder_name + "/wall_horizontal_bottom.png")
-		self.wall_horizontal_bottom = pygame.transform.scale(self.wall_horizontal_bottom, (self.wall_horizontal_bottom.get_width() * settings.GAME_SCALE, self.wall_horizontal_bottom.get_height() * settings.GAME_SCALE))
-		self.corner_top_left = pygame.image.load("res/background/" + folder_name + "/corner_top_left.png")
-		self.corner_top_left = pygame.transform.scale(self.corner_top_left, (self.corner_top_left.get_width() * settings.GAME_SCALE, self.corner_top_left.get_height() * settings.GAME_SCALE))
-		self.corner_bottom_right = pygame.image.load("res/background/" + folder_name + "/corner_bottom_right.png")
-		self.corner_bottom_right = pygame.transform.scale(self.corner_bottom_right, (self.corner_bottom_right.get_width() * settings.GAME_SCALE, self.corner_bottom_right.get_height() * settings.GAME_SCALE))
-		self.corner_top_right = pygame.image.load("res/background/" + folder_name + "/corner_top_right.png")
-		self.corner_top_right = pygame.transform.scale(self.corner_top_right, (self.corner_top_right.get_width() * settings.GAME_SCALE, self.corner_top_right.get_height() * settings.GAME_SCALE))
-		self.corner_bottom_left = pygame.image.load("res/background/" + folder_name + "/corner_bottom_left.png")
-		self.corner_bottom_left = pygame.transform.scale(self.corner_bottom_left, (self.corner_bottom_left.get_width() * settings.GAME_SCALE, self.corner_bottom_left.get_height() * settings.GAME_SCALE))
+	def __init__(self, background_type):
+		# Load the floor surface.
+		self.floor_surface = pygame.image.load("res/background/" + background_type + "/floor.png")
+		self.floor_surface = pygame.transform.scale(self.floor_surface, (self.floor_surface.get_width(), self.floor_surface.get_height()))
+
+		# Load the wall surfaces.
+		self.wall_vertical_left = pygame.image.load("res/background/" + background_type + "/wall_vertical_left.png")
+		self.wall_vertical_left = pygame.transform.scale(self.wall_vertical_left, (self.wall_vertical_left.get_width(), self.wall_vertical_left.get_height()))
+
+		self.wall_vertical_right = pygame.image.load("res/background/" + background_type + "/wall_vertical_right.png")
+		self.wall_vertical_right = pygame.transform.scale(self.wall_vertical_right, (self.wall_vertical_right.get_width(), self.wall_vertical_right.get_height()))
+
+		self.wall_horizontal_top = pygame.image.load("res/background/" + background_type + "/wall_horizontal_top.png")
+		self.wall_horizontal_top = pygame.transform.scale(self.wall_horizontal_top, (self.wall_horizontal_top.get_width(), self.wall_horizontal_top.get_height()))
+
+		self.wall_horizontal_bottom = pygame.image.load("res/background/" + background_type + "/wall_horizontal_bottom.png")
+		self.wall_horizontal_bottom = pygame.transform.scale(self.wall_horizontal_bottom, (self.wall_horizontal_bottom.get_width(), self.wall_horizontal_bottom.get_height()))
+
+		# Load the corner surfaces.
+		self.corner_top_left = pygame.image.load("res/background/" + background_type + "/corner_top_left.png")
+		self.corner_top_left = pygame.transform.scale(self.corner_top_left, (self.corner_top_left.get_width(), self.corner_top_left.get_height()))
+
+		self.corner_bottom_right = pygame.image.load("res/background/" + background_type + "/corner_bottom_right.png")
+		self.corner_bottom_right = pygame.transform.scale(self.corner_bottom_right, (self.corner_bottom_right.get_width(), self.corner_bottom_right.get_height()))
+
+		self.corner_top_right = pygame.image.load("res/background/" + background_type + "/corner_top_right.png")
+		self.corner_top_right = pygame.transform.scale(self.corner_top_right, (self.corner_top_right.get_width(), self.corner_top_right.get_height()))
+
+		self.corner_bottom_left = pygame.image.load("res/background/" + background_type + "/corner_bottom_left.png")
+		self.corner_bottom_left = pygame.transform.scale(self.corner_bottom_left, (self.corner_bottom_left.get_width(), self.corner_bottom_left.get_height()))
 
 		# Convert the surfaces, for performances sake.
 		self.floor_surface.convert()

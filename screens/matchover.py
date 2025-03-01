@@ -85,13 +85,13 @@ class MatchOver(scene.Scene):
 		self.passed_time = 0
 
 		self.rounds_left_number_text = textitem.TextItem(str(self.number_of_rounds - self.number_of_rounds_done), pygame.Color(255, 255, 255))
-		self.rounds_left_number_text.set_size(18 * settings.GAME_SCALE)
+		self.rounds_left_number_text.set_size(18)
 		self.rounds_left_number_text.x = (settings.SCREEN_WIDTH - self.rounds_left_number_text.get_width()) / 2
 		self.rounds_left_number_text.y = self.rounds_left_text[0].y + self.rounds_left_number_text.get_height()
 
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
-		self.player_one_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_one_score_text.x = (settings.SCREEN_WIDTH - self.player_one_score_text.get_width()) / 4 + 1.5 * settings.GAME_SCALE
+		self.player_one_score_text.set_size(27)
+		self.player_one_score_text.x = (settings.SCREEN_WIDTH - self.player_one_score_text.get_width()) / 4 + 1.5
 		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
 		self.player_one_score_text.set_color(self.player_one.color)
 
@@ -101,8 +101,8 @@ class MatchOver(scene.Scene):
 		self.player_one_text.set_color(self.player_one.color)
 
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
-		self.player_two_score_text.set_size(27 * settings.GAME_SCALE)
-		self.player_two_score_text.x = 3 * ((settings.SCREEN_WIDTH - self.player_two_score_text.get_width()) / 4) + 1.5 * settings.GAME_SCALE
+		self.player_two_score_text.set_size(27)
+		self.player_two_score_text.x = 3 * ((settings.SCREEN_WIDTH - self.player_two_score_text.get_width()) / 4) + 1.5
 		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
 		self.player_two_score_text.set_color(self.player_two.color)
 

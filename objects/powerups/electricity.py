@@ -29,12 +29,12 @@ class Electricity(powerup.Powerup):
 	image = pygame.image.load("res/powerup/electricity.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	particle_spawn_rate = 550
 	particle_spawn_amount = 5
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
@@ -77,7 +77,7 @@ class Electricity(powerup.Powerup):
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(2, Electricity.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.9 * settings.GAME_FPS * settings.GAME_SCALE, 1.4 * settings.GAME_FPS * settings.GAME_SCALE)
+				speed = random.uniform(0.9 * settings.GAME_FPS, 1.4 * settings.GAME_FPS)
 				retardation = speed / 46.0
 				random_value = random.randint(225, 255)
 				color = pygame.Color(random_value, random_value, random.randint(0, 100))

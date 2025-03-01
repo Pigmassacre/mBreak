@@ -16,7 +16,7 @@ Other than that, it's a subclass of menu so it works pretty much like menu.
 
 class GridMenu(menu.Menu):
 
-	offset = 2 * settings.GAME_SCALE
+	offset = 2
 
 	def __init__(self, max_number_of_columns = 3):
 		# We call the superconstructor, ofcourse.

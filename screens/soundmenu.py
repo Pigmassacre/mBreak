@@ -48,7 +48,7 @@ class SoundMenu(scene.Scene):
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4))
 		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 2 * settings.GAME_FPS * settings.GAME_SCALE
+		self.logo_transition.speed = 2 * settings.GAME_FPS
 
 		# Setup the menu transitions.
 		self.transition.setup_single_item_transition(self.music_item, True, False, False, False)

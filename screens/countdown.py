@@ -38,18 +38,18 @@ class Countdown:
 		self.countdown_ready.y = (settings.SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
 		self.countdown_ready_desired_x = (settings.SCREEN_WIDTH / 2) - self.countdown_ready.get_width()
 		self.countdown_ready_desired_y = (settings.SCREEN_HEIGHT - self.countdown_ready.get_height()) / 2
-		self.countdown_ready_speed = 780 * settings.GAME_SCALE
-		self.countdown_ready_slow_speed = 60 * settings.GAME_SCALE
+		self.countdown_ready_speed = 780
+		self.countdown_ready_slow_speed = 60
 
 		# Create, position and store the "GO" textitem.
 		self.countdown_go = textitem.TextItem("GO", (255, 255, 255))
-		self.countdown_go.set_size(18 * settings.GAME_SCALE)
+		self.countdown_go.set_size(18)
 		self.countdown_go.x = -self.countdown_go.get_width()
 		self.countdown_go.y = (settings.SCREEN_HEIGHT - self.countdown_go.get_height()) / 2
 		self.countdown_go_desired_x = (settings.SCREEN_WIDTH - self.countdown_go.get_width()) / 2
 		self.countdown_go_desired_y = (settings.SCREEN_HEIGHT / 2) - self.countdown_go.get_height()
-		self.countdown_go_speed = 780 * settings.GAME_SCALE
-		self.countdown_go_slow_speed = 78 * settings.GAME_SCALE
+		self.countdown_go_speed = 780
+		self.countdown_go_slow_speed = 78
 
 		# This is the surface that is actually drawn when the draw method is called.
 		self.active_surface = self.countdown_ready

@@ -21,8 +21,8 @@ It's trivial to add a shadow to any sprite in the game.
 class Shadow(pygame.sprite.Sprite):
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	offset_x = 1 * settings.GAME_SCALE
-	offset_y = 2 * settings.GAME_SCALE
+	offset_x = 1
+	offset_y = 2
 	linger_time = 25 * settings.GAME_FPS
 	alpha_step = 50 * settings.GAME_FPS
 

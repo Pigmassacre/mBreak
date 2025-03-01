@@ -28,13 +28,13 @@ class Firework(pygame.sprite.Sprite):
 	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion3.ogg"))
 	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion4.ogg"))
 
-	width = 2 * settings.GAME_SCALE
-	height = 2 * settings.GAME_SCALE
+	width = 2
+	height = 2
 	color = pygame.Color(255, 255, 255)
 
-	speed = 0.05 * settings.GAME_FPS * settings.GAME_SCALE
-	max_speed = 5 * settings.GAME_FPS * settings.GAME_SCALE
-	acceleration = 0.25 * settings.GAME_FPS * settings.GAME_SCALE
+	speed = 0.05 * settings.GAME_FPS
+	max_speed = 5 * settings.GAME_FPS
+	acceleration = 0.25 * settings.GAME_FPS
 
 	def __init__(self, x, y, angle, duration):
 		# We start by calling the superconstructor.
@@ -67,16 +67,16 @@ class Firework(pygame.sprite.Sprite):
 		self.kill()
 
 		for _ in range(64):
-			width = random.uniform(1 * settings.GAME_SCALE, 2.5 * settings.GAME_SCALE)
+			width = random.uniform(1, 2.5)
 			angle = random.uniform(0, 2 * math.pi)
-			speed = random.uniform(1.0 * settings.GAME_FPS * settings.GAME_SCALE, 2.25 * settings.GAME_FPS * settings.GAME_SCALE)
+			speed = random.uniform(1.0 * settings.GAME_FPS, 2.25 * settings.GAME_FPS)
 			retardation = 0.1 * settings.GAME_FPS
 			color = pygame.Color(255, 0, 0)
 			color.hsla = (random.uniform(0, 360), color.hsla[1], color.hsla[2], color.hsla[3])
 			a_particle = particle.Particle(self.x + self.rect.width / 2.0, self.y + self.rect.height / 2.0, width, width, angle, speed, retardation, color, 5 * settings.GAME_FPS)
 			a_particle.kill_outside_level = False
 			a_particle.kill_when_speed_reaches_zero = False
-			a_particle.gravity = 0.05 * settings.GAME_SCALE
+			a_particle.gravity = 0.05
 
 		# Play a random sound from the sound_effects list.
 		sound = Firework.sound_effects[random.randrange(0, len(Firework.sound_effects))].play()

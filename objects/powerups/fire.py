@@ -31,13 +31,13 @@ class Fire(powerup.Powerup):
 	image = pygame.image.load("res/powerup/fire.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
 	particle_spawn_rate = 100
 	particle_least_spawn_amount = 2
 	particle_maximum_spawn_amount = 4
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, x, y):
@@ -77,7 +77,7 @@ class Fire(powerup.Powerup):
 			for _ in range(0, random.randrange(Fire.particle_least_spawn_amount, Fire.particle_maximum_spawn_amount)):
 				width = random.uniform(self.rect.width / 8.0, self.rect.width / 5.0)
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.75 * settings.GAME_FPS * settings.GAME_SCALE, 0.9 * settings.GAME_FPS * settings.GAME_SCALE)
+				speed = random.uniform(0.75 * settings.GAME_FPS, 0.9 * settings.GAME_FPS)
 				retardation = speed / 24.0
 				if random.random() > 0.1:
 					color = pygame.Color(random.randint(200, 255), random.randint(0, 255), 0)

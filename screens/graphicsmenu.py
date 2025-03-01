@@ -43,7 +43,7 @@ class GraphicsMenu(scene.Scene):
 		self.setup_logo(title_logo)
 		self.logo_desired_position = ((settings.SCREEN_WIDTH - self.title_logo.get_width()) / 2, ((settings.SCREEN_HEIGHT - self.title_logo.get_height()) / 4) - self.graphics_menu_offset)
 		self.logo_transition = transition.Transition()
-		self.logo_transition.speed = 120 * settings.GAME_SCALE
+		self.logo_transition.speed = 120
 
 		# Register all menus with each other.
 		for a_menu in self.menu_list:

@@ -16,22 +16,17 @@ Save on the other hand, will take the current values of the variables and try to
 # Simply the version of the game. Doesn't affect anything, really.
 GAME_VERSION = "v0.9"
 
-# Game scale will scale the graphics of the game, but will keep the smoothness of the movement.
-# I recommend a value of 3. This performs well on my machine while still keeping a relatively high resolution. You can change it to
-# whatever you want, of course.
-GAME_SCALE = 1
-
 # This is the amount of ticks that the game will be designed to work with. When the game runs at any other FPS than this, delta time calculations
 # will make sure that the game still plays as if the game ran at 60 FPS.
 GAME_FPS = 60
 
 # Screen width and height is the game window width and height.
-SCREEN_WIDTH = int(285 * GAME_SCALE)
-SCREEN_HEIGHT = int(160 * GAME_SCALE)
+SCREEN_WIDTH = int(285)
+SCREEN_HEIGHT = int(160)
 
 # Level width and height is the actual level width and height. Level x and y is the position in the base area that the level is placed in.
-LEVEL_WIDTH = 176 * GAME_SCALE
-LEVEL_HEIGHT = 120 * GAME_SCALE
+LEVEL_WIDTH = 176
+LEVEL_HEIGHT = 120
 LEVEL_X = (SCREEN_WIDTH - LEVEL_WIDTH) / 2 
 LEVEL_Y = (SCREEN_HEIGHT - LEVEL_HEIGHT) / 2
 LEVEL_MAX_X = LEVEL_X + LEVEL_WIDTH

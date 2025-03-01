@@ -159,15 +159,15 @@ class GameOver(scene.Scene):
 
 			scale = 0.0075
 
-			sin = 4 * settings.GAME_SCALE
+			sin = 4
 			sin *= math.pow(math.sin((self.passed_time + bob_height_differentiator) * (scale / 32.0)), 3)
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * (scale / 8.0))
 			sin *= math.sin((self.passed_time + bob_height_differentiator) * scale)
 
 			letter_item_standard_y = (settings.SCREEN_HEIGHT - letter_item.get_height()) / 2.0
-			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
+			letter_item.y = letter_item_standard_y + sin * 2.0
 			"""
-			cos = 4 * settings.GAME_SCALE
+			cos = 4
 			cos *= math.pow(math.cos((self.passed_time + bob_height_differentiator) * (scale / 32.0)), 3)
 			cos *= math.cos((self.passed_time + bob_height_differentiator) * (scale / 8.0))
 			cos *= math.cos((self.passed_time + bob_height_differentiator) * scale)
@@ -177,7 +177,7 @@ class GameOver(scene.Scene):
 			for x in range(0, self.winning_player_text.index(letter_item)):
 				offset += self.winning_player_text[x].get_width()
 			letter_item_standard_x = ((settings.SCREEN_WIDTH - length_of_winning_player_text) / 2.0) + offset
-			letter_item.x = letter_item_standard_x + cos * 2.0 * settings.GAME_SCALE"""
+			letter_item.x = letter_item_standard_x + cos * 2.0"""
 
 			h = letter_item.font_color.hsla[0]
 			h += self.main_clock.get_time() * 0.2			

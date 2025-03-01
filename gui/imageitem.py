@@ -26,8 +26,8 @@ class ImageItem(item.Item):
 		# Load the image from the path.
 		self.image = pygame.image.load(path)
 
-		# Scale image to settings.GAME_SCALE.
-		self.image = pygame.transform.scale(self.image, (self.image.get_width() * settings.GAME_SCALE, self.image.get_height() * settings.GAME_SCALE))
+		# Scale image.
+		self.image = pygame.transform.scale(self.image, (self.image.get_width(), self.image.get_height()))
 
 	def draw(self, surface):
 		super(ImageItem, self).draw(surface)

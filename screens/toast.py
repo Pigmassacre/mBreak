@@ -24,7 +24,7 @@ class Toast(scene.Scene):
 		self.background_surface = self.window_surface.copy()
 		useful.tint_surface(self.background_surface, 225)
 
-		distance_from_screen_edge = 6 * settings.GAME_SCALE
+		distance_from_screen_edge = 6
 		max_width_of_text_line = (settings.SCREEN_WIDTH - (distance_from_screen_edge * 2))
 		wrapped_message = useful.wrap_multi_line(message, pygame.font.Font(textitem.TextItem.font_path, textitem.TextItem.font_size), max_width_of_text_line)
 

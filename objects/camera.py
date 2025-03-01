@@ -53,8 +53,8 @@ class CameraShake(pygame.sprite.Sprite):
 			
 			# Only shake GAME_FPS amount of times per second. (If time_scale slows down, we shake less often).
 			if self.time_passed > (1 / float(settings.GAME_FPS)):
-				self.x_shake_amount = random.uniform(-1, 1) * self.intensity * settings.GAME_SCALE
-				self.y_shake_amount = random.uniform(-1, 1) * self.intensity * settings.GAME_SCALE
+				self.x_shake_amount = random.uniform(-1, 1) * self.intensity
+				self.y_shake_amount = random.uniform(-1, 1) * self.intensity
 
 				# Reset time passed to 0, since we've just shook the screen.
 				self.time_passed = 0

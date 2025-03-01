@@ -24,10 +24,10 @@ class Charged(effect.Effect):
 	pygame.mixer.init(44100, -16, 2, 2048)
 	sound_effect = pygame.mixer.Sound("res/sounds/thunder.ogg")
 
-	damage_width = 16 * settings.GAME_SCALE
-	damage_height = 16 * settings.GAME_SCALE
+	damage_width = 16
+	damage_height = 16
 	damage = 5
-	max_speed_reduction = 0.41 * settings.GAME_FPS * settings.GAME_SCALE
+	max_speed_reduction = 0.41 * settings.GAME_FPS
 	particle_spawn_rate = 450
 	particle_spawn_amount = 5
 	duration = 10000
@@ -94,7 +94,7 @@ class Charged(effect.Effect):
 		# Spawns a few particles with random color, angle, speed and so on.
 		for _ in range(0, random.randrange(2, Charged.particle_spawn_amount)):
 			angle = random.uniform(0, 2 * math.pi)
-			speed = random.uniform(0.9 * settings.GAME_FPS * settings.GAME_SCALE, 1.4 * settings.GAME_FPS * settings.GAME_SCALE)
+			speed = random.uniform(0.9 * settings.GAME_FPS, 1.4 * settings.GAME_FPS)
 			retardation = speed / 46.0
 			random_value = random.randint(225, 255)
 			color = pygame.Color(random_value, random_value, random.randint(0, 100))

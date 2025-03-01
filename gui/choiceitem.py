@@ -22,7 +22,7 @@ class ChoiceItem(item.Item):
 
 	# The standard text values are stored here, such as standard font, font size and so on.
 	font_path = "fonts/ADDLG___.TTF"
-	font_size = 9 * settings.GAME_SCALE
+	font_size = 9
 	font = pygame.font.Font(font_path, font_size)
 
 	def __init__(self, value, color = pygame.Color(128, 128, 128), font_color = pygame.Color(255, 255, 255), alpha_value = 255):
@@ -45,4 +45,4 @@ class ChoiceItem(item.Item):
 		super(ChoiceItem, self).draw(surface)
 
 		# Draw the font surface in the middle of this item.
-		surface.blit(self.font_surface, ((self.rect.x + (self.rect.width - self.font_surface.get_width()) / 2) + 0.5 * settings.GAME_SCALE, self.rect.y + (self.rect.height - self.font_surface.get_height()) / 2))
+		surface.blit(self.font_surface, ((self.rect.x + (self.rect.width - self.font_surface.get_width()) / 2) + 0.5, self.rect.y + (self.rect.height - self.font_surface.get_height()) / 2))

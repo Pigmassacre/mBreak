@@ -26,13 +26,13 @@ class Stun(effect.Effect):
 	sound_effect = pygame.mixer.Sound("res/sounds/freezing.ogg")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
-	max_speed_reduction = 20 * settings.GAME_FPS * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
+	max_speed_reduction = 20 * settings.GAME_FPS
 	particle_spawn_rate = 125
 	particle_spawn_amount = 5
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, parent, paddle_stun_duration, on_kill_function = None, duration = 6000):
@@ -102,7 +102,7 @@ class Stun(effect.Effect):
 			# Spawn a random amount of particles.
 			for _ in range(0, random.randrange(2, Stun.particle_spawn_amount)):
 				angle = random.uniform(0, 2 * math.pi)
-				speed = random.uniform(0.6 * settings.GAME_FPS * settings.GAME_SCALE, 0.35 * settings.GAME_FPS * settings.GAME_SCALE)
+				speed = random.uniform(0.6 * settings.GAME_FPS, 0.35 * settings.GAME_FPS)
 				retardation = speed / 25.0
 				color_value = random.randint(100, 250)
 				color = pygame.Color(color_value, color_value, color_value)

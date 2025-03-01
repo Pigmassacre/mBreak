@@ -47,12 +47,12 @@ class Ball(pygame.sprite.Sprite):
 	sound_effect = pygame.mixer.Sound("res/sounds/ball.ogg")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image.get_width() * settings.GAME_SCALE
-	height = image.get_height() * settings.GAME_SCALE
-	speed = 1.5 * settings.GAME_FPS * settings.GAME_SCALE
-	max_speed = 5 * settings.GAME_FPS * settings.GAME_SCALE
-	speed_step = 0.75 * settings.GAME_FPS * settings.GAME_SCALE
-	paddle_nudge_distance = 1.34 * settings.GAME_SCALE
+	width = image.get_width()
+	height = image.get_height()
+	speed = 1.5 * settings.GAME_FPS
+	max_speed = 5 * settings.GAME_FPS
+	speed_step = 0.75 * settings.GAME_FPS
+	paddle_nudge_distance = 1.34
 	least_allowed_vertical_angle = 0.32 # Exists to prevent the balls from getting stuck bouncing up and down in the middle of the gamefield.
 	trace_spawn_rate = 0.53 * settings.GAME_FPS
 	particle_spawn_amount = 3
@@ -62,10 +62,10 @@ class Ball(pygame.sprite.Sprite):
 	damage_percentage_dealt_to_own_blocks = 0.25
 
 	# Smash stuff.
-	smash_speed = 0.2 * settings.GAME_FPS * settings.GAME_SCALE
+	smash_speed = 0.2 * settings.GAME_FPS
 	smash_damage_factor = 1
 	smash_max_stack = 12
-	smash_effect_size_increase = 1 * settings.GAME_SCALE
+	smash_effect_size_increase = 1
 	smash_effect_start_color = pygame.Color(255, 255, 255, 255)
 	smash_effect_final_color = pygame.Color(255, 255, 255, 0)
 	smash_effect_tick_amount = 10 * settings.GAME_FPS
@@ -142,6 +142,10 @@ class Ball(pygame.sprite.Sprite):
 		# Create an effect group to handle effects on this ball.
 		self.effect_group = pygame.sprite.Group()
 
+		# Add gravity properties (initially no gravity)
+		self.gravity_direction = 0
+		self.gravity_strength = 0
+
 	def destroy(self):
 		# This should be called when the ball is to be destroyed. It will take care of killing itself and anything affecting it completely.
 		self.kill()
@@ -171,6 +175,23 @@ class Ball(pygame.sprite.Sprite):
 				self.tick_speed = Ball.speed_step
 			else:
 				self.tick_speed = self.speed - speed_handled
+
+			# Apply gravity effect if active
+			if self.gravity_strength > 0:
+				# Calculate gravity vector components
+				gravity_x = math.cos(self.gravity_direction) * self.gravity_strength * main_clock.delta_time
+				gravity_y = math.sin(self.gravity_direction) * self.gravity_strength * main_clock.delta_time
+				
+				# Calculate new angle based on current velocity and gravity
+				velocity_x = math.cos(self.angle) * self.tick_speed
+				velocity_y = math.sin(self.angle) * self.tick_speed
+				
+				# Add gravity to velocity
+				velocity_x += gravity_x
+				velocity_y += gravity_y
+				
+				# Calculate new angle and maintain speed
+				self.angle = math.atan2(velocity_y, velocity_x)
 
 			# Check collision with paddles.
 			self.check_collision_paddles()

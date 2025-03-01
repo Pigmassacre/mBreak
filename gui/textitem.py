@@ -28,7 +28,7 @@ class TextItem(item.Item):
 
 	# The standard text values are stored here, such as standard font, font size and so on.
 	font_path = "fonts/ADDLG___.TTF"
-	font_size = 9 * settings.GAME_SCALE
+	font_size = 9
 	font = pygame.font.Font(font_path, font_size)
 	
 	# Standard values. These will be used unless any other values are specified per instance of this class.

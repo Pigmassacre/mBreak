@@ -45,7 +45,7 @@ class PrepareMenu(scene.Scene):
 		self.player_two_ai = None
 
 		# Configure the GUI.
-		distance_from_screen_edge = 9 * settings.GAME_SCALE
+		distance_from_screen_edge = 9
 
 		# We create a gridmenu that allows the player to select the number of rounds they want to play.
 		self.number_of_rounds_menu = gridmenu.GridMenu(5)

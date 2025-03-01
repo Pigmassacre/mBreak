@@ -98,14 +98,14 @@ class IntroMenu(scene.Scene):
 
 			sin_scale = 0.0075
 
-			sin = 0.3 * settings.GAME_SCALE
+			sin = 0.3
 			sin *= math.tan((self.time_passed + bob_height_differentiator) * (sin_scale / 4.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 16.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * (sin_scale / 8.0))
 			sin *= math.sin((self.time_passed + bob_height_differentiator) * sin_scale)
 
 			letter_item_standard_y = self.title_logo.y + self.title_logo.get_height() + letter_item.get_height()
-			letter_item.y = letter_item_standard_y + sin * 2.0 * settings.GAME_SCALE
+			letter_item.y = letter_item_standard_y + sin * 2.0
 			
 			letter_item.update(self.main_clock)
 

@@ -26,12 +26,12 @@ class Explosion(effect.Effect):
 	image_sheet = pygame.image.load("res/effect/explosion.png")
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
-	width = image_sheet.get_width() * (settings.GAME_SCALE + 1)
-	height = image_sheet.get_height() * (settings.GAME_SCALE + 1)
+	width = image_sheet.get_width() * 2
+	height = image_sheet.get_height() * 2
 	frame_width = width
 	frame_height = width
 
-	# Scale image to settings.GAME_SCALE.
+	# Scale image.
 	image_sheet = pygame.transform.scale(image_sheet, (width, height))
 
 	def __init__(self, parent, duration = 1000):
