@@ -1,0 +1,9 @@
+---
+description: Always use PowerShell syntax for shell commands.
+globs: 
+alwaysApply: false
+---
+
+# Always use PowerShell syntax for shell commands
+
+- Our terminal uses PowerShell. It only accepts PowerShell commands. Use the correct syntax.
