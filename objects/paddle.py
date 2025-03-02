@@ -340,8 +340,8 @@ class Paddle(pygame.sprite.Sprite):
 		confidence = max(0.1, min(1.0, confidence))
 		
 		# Return the predicted position - this is the center of the item
-		# We don't add item.rect.height/2.0 here anymore as that was causing the offset issue
-		return (self.x if paddle_side_left else self.x, predicted_y, confidence, time_to_reach)
+		# Add half the item's height to get the center of the item
+		return (self.x if paddle_side_left else self.x, predicted_y + item.rect.height / 2.0, confidence, time_to_reach)
 		
 	def adjust_distance_by_priority(self, item, distance):
 		"""
@@ -388,7 +388,8 @@ class Paddle(pygame.sprite.Sprite):
 		Determines the best strategic position when no immediate threats are present.
 		"""
 		# Default to center position - position the center of the paddle at the center of the screen
-		target_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0 - self.rect.height / 2.0
+		# FIXED: Don't subtract half the paddle height - this was causing the offset
+		target_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
 		
 		# If there are balls in play, try to position based on their general position
 		ball_count = 0
@@ -402,7 +403,8 @@ class Paddle(pygame.sprite.Sprite):
 			# Position slightly toward the average ball position
 			avg_ball_y = ball_y_sum / ball_count
 			# Position the center of the paddle at the average ball position
-			target_y = (target_y * 0.7 + (avg_ball_y - self.rect.height / 2.0) * 0.3)
+			# FIXED: Don't subtract half the paddle height - this was causing the offset
+			target_y = (target_y * 0.7 + avg_ball_y * 0.3)
 			
 		return target_y
 		
@@ -499,8 +501,9 @@ class Paddle(pygame.sprite.Sprite):
 					# Different behavior based on AI difficulty
 					if self.owner.ai_difficulty >= 3:
 						# Expert AI: Good positioning with minimal error
-						# Position the center of the paddle at the predicted position
-						self.target_y = self.predicted_y - self.rect.height / 2.0
+						# Position the paddle so its center aligns with the predicted position
+						# FIXED: Don't subtract half the paddle height - this was causing the offset
+						self.target_y = self.predicted_y
 						
 						# Add small random offset for realism, but only when changing targets
 						if self.focused_item != old_focused_item:
@@ -512,8 +515,9 @@ class Paddle(pygame.sprite.Sprite):
 					
 					elif self.owner.ai_difficulty == 2:
 						# Medium AI: Good positioning with moderate error
-						# Position the center of the paddle at the predicted position
-						self.target_y = self.predicted_y - self.rect.height / 2.0
+						# Position the paddle so its center aligns with the predicted position
+						# FIXED: Don't subtract half the paddle height - this was causing the offset
+						self.target_y = self.predicted_y
 						
 						# Add moderate random offset, but only when changing targets
 						if self.focused_item != old_focused_item:
@@ -525,8 +529,9 @@ class Paddle(pygame.sprite.Sprite):
 					
 					else:
 						# Easy AI: Basic positioning with significant error
-						# Position the center of the paddle at the predicted position
-						self.target_y = self.predicted_y - self.rect.height / 2.0
+						# Position the paddle so its center aligns with the predicted position
+						# FIXED: Don't subtract half the paddle height - this was causing the offset
+						self.target_y = self.predicted_y
 						
 						# Add large random offset, but only when changing targets
 						if self.focused_item != old_focused_item or random.random() < 0.1:
@@ -545,6 +550,7 @@ class Paddle(pygame.sprite.Sprite):
 				paddle_center_y = self.y + self.rect.height / 2.0
 				
 				# Calculate distance to target
+				# FIXED: The target_y is now the desired center position of the paddle
 				distance_to_target = self.target_y - paddle_center_y
 				
 				# Adjust buffer based on difficulty and missed balls
