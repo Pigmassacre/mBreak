@@ -452,11 +452,12 @@ class Paddle(pygame.sprite.Sprite):
 		if self.owner.ai_difficulty >= 2 and ball_count > 0:
 			aim_position = self.calculate_aim_position()
 			if aim_position is not None:
-				# For higher difficulties, prioritize aiming more
+				# For higher difficulties, prioritize aiming more but stay closer to center
 				if self.owner.ai_difficulty >= 3:
-					target_y = (target_y * 0.3 + aim_position * 0.7)
-				else:
+					# Reduce the influence of aim_position to prevent extreme positioning
 					target_y = (target_y * 0.5 + aim_position * 0.5)
+				else:
+					target_y = (target_y * 0.6 + aim_position * 0.4)
 			
 		return target_y
 		
@@ -796,12 +797,11 @@ class Paddle(pygame.sprite.Sprite):
 					if is_our_ball and ball_approaching and self.owner.ai_difficulty >= 2:
 						aim_position = self.calculate_aim_position()
 						if aim_position is not None:
-							# For higher difficulties, prioritize aiming more
+							# For higher difficulties, prioritize aiming more but stay closer to center
 							if self.owner.ai_difficulty >= 3:
-								self.target_y = aim_position  # Use the aim position directly
+								self.target_y = (self.target_y * 0.5 + aim_position * 0.5)
 							else:
-								# Medium difficulty - blend between predicted position and aim position
-								self.target_y = (self.predicted_y * 0.2 + aim_position * 0.8)
+								self.target_y = (self.target_y * 0.6 + aim_position * 0.4)
 					else:
 						# Different behavior based on AI difficulty
 						if self.owner.ai_difficulty >= 3:
@@ -849,11 +849,15 @@ class Paddle(pygame.sprite.Sprite):
 						# We have a ball that we own, try to aim it at opponent blocks
 						aim_position = self.calculate_aim_position()
 						if aim_position is not None:
-							# For expert AI, prioritize aiming more
+							# For expert AI, prioritize aiming more but stay closer to center
 							if self.owner.ai_difficulty >= 3:
-								self.target_y = (self.target_y * 0.2 + aim_position * 0.8)
+								self.target_y = (self.target_y * 0.5 + aim_position * 0.5)
 							else:
-								self.target_y = (self.target_y * 0.4 + aim_position * 0.6)
+								self.target_y = (self.target_y * 0.6 + aim_position * 0.4)
+
+					# Add a slight bias toward the center when no immediate threats
+					screen_center_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
+					self.target_y = (self.target_y * 0.8 + screen_center_y * 0.2)
 
 			# If we have a target position, move toward it
 			if self.target_y is not None:
