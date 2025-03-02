@@ -124,7 +124,7 @@ class Player(pygame.sprite.Sprite):
 		self.spent_energy = 0
 		self.spent_energy_fade = 0
 		self.spent_energy_fade_speed = 0.1
-		self.spent_energy_color = pygame.Color(255, 255, 255, 180)
+		self.spent_energy_color = pygame.Color(255, 255, 255, 255)
 		self.spent_energy_position = 0  # Store the position where energy was spent
 		self.spent_energy_delay = 0  # Time to wait before starting fade
 		self.spent_energy_delay_duration = 250  # Wait 250ms before starting fade
@@ -232,9 +232,10 @@ class Player(pygame.sprite.Sprite):
 		if self.spent_energy_fade > 0:
 			if self.spent_energy_delay < self.spent_energy_delay_duration:
 				self.spent_energy_delay += main_clock.get_time()
+				self.spent_energy_color.a = 255
 			else:
 				self.spent_energy_fade = max(0, self.spent_energy_fade - self.spent_energy_fade_speed * (main_clock.get_time() / 16.67))
-				self.spent_energy_color.a = int(180 * self.spent_energy_fade)
+				self.spent_energy_color.a = int(255 * self.spent_energy_fade)
 
 		# Update the color of the energy.
 		new_r = int(self.energy_color_r + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.visual_energy / float(self.max_energy))))
@@ -307,7 +308,7 @@ class Player(pygame.sprite.Sprite):
 		if self.spent_energy_fade > 0:
 			temp_spent_surface = self.energy_level_surface.copy()
 			spent_height = self.energy_level_surface.get_height() * (self.spent_energy / float(self.max_energy))
-			spent_y = self.energy_level_surface.get_height() * (1.0 - self.spent_energy_position / float(self.max_energy))
+			spent_y = self.energy_level_surface.get_height() * (1.0 - (self.spent_energy_position / float(self.max_energy)))
 			spent_rect = pygame.rect.Rect(0, spent_y, self.energy_level_surface.get_width(), spent_height)
 			temp_spent_surface.fill(self.spent_energy_color, spent_rect)
 			surface.blit(temp_spent_surface, (self.energy_level_x - camera.CAMERA.x, self.energy_level_y - camera.CAMERA.y))
