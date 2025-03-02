@@ -1,0 +1,10 @@
+---
+description: Always use --no-pager when calling git commands.
+globs: 
+alwaysApply: false
+---
+
+# You are not great at handling paginated output.
+
+- When running any git command, always include --no-pager as the first parameter - before the actual git command you want to perform.
+- For example: `git --no-pager diff` or `git --no-pager log` or `git --no-pager status`

@@ -39,22 +39,21 @@ class Laser(attack.Attack):
 				power_level = 1.0
 				duration = 0
 				energy_to_spend = 0
-				
 				if energy_level == 100:
 					power_level = 5.0
-					duration = 5000
+					duration = 2000
 					energy_to_spend = 100
 				elif energy_level >= 80:
 					power_level = 4.0
-					duration = 4000
+					duration = 1800
 					energy_to_spend = 80
 				elif energy_level >= 60:
 					power_level = 3.0
-					duration = 3000
+					duration = 1600
 					energy_to_spend = 60
 				elif energy_level >= 40:
 					power_level = 2.0
-					duration = 2000
+					duration = 1400
 					energy_to_spend = 40
 				elif energy_level >= 20:
 					power_level = 1.0

@@ -54,12 +54,12 @@ def create_ball_at_pos(pos):
 	return ball.Ball(pos[0], pos[1], random.uniform(0, math.pi), list(groups.Groups.player_group)[random.randint(0, len(groups.Groups.player_group) - 1)])
 
 def create_powerup_at_pos(pos):
-	powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
+	powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]#, gravity.Gravity]
 	return random.choice(powerup_list)(pos[0], pos[1])
 
 def create_powerup():
 	# The P button allows you to spawn a particle at any time you want.
-	powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
+	powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]#, gravity.Gravity]
 	#powerup_list = [rocket.Rocket]
 	x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
 	y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
