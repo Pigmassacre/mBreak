@@ -40,6 +40,10 @@ class Burning(effect.Effect):
     particle_maximum_spawn_amount = 5
     duration = 10000
     block_duration = 5000
+    spread_check_rate = 500  # Check for spread every 0.5 seconds
+    spread_range = 15  # Reduced range - blocks need to be closer to spread
+    spread_duration_factor = 0.8  # Each spread reduces duration by 20%
+    spread_chance = 0.25  # 25% chance to spread to each eligible neighbor
 
     # Scale image.
     image = pygame.transform.scale(image, (width, height))
@@ -56,6 +60,9 @@ class Burning(effect.Effect):
         # When this reaches particle_spawn_rate, a particle is spawned.
         self.particle_spawn_time = 0
 
+        # When this reaches spread_check_rate, we check for spreading
+        self.spread_check_time = 0
+
         # Play the sound effect.
         sound = Burning.sound_effect.play()
         if not sound is None:
@@ -70,11 +77,51 @@ class Burning(effect.Effect):
             self.rect.width = Burning.width
             self.rect.height = Burning.height
 
+    def find_neighboring_blocks(self):
+        """Find blocks that are close to the current burning block."""
+        if not issubclass(self.parent.__class__, block.Block):
+            return []
+        
+        neighbors = []
+        parent_center = (self.parent.rect.centerx, self.parent.rect.centery)
+        
+        # Check all blocks in the game
+        for block_sprite in groups.Groups.block_group:
+            if block_sprite != self.parent:  # Don't include self
+                block_center = (block_sprite.rect.centerx, block_sprite.rect.centery)
+                # Calculate distance between block centers
+                distance = math.sqrt(
+                    (block_center[0] - parent_center[0]) ** 2 + 
+                    (block_center[1] - parent_center[1]) ** 2
+                )
+                if distance <= Burning.spread_range:
+                    neighbors.append(block_sprite)
+        
+        return neighbors
+
+    def spread_to_neighbors(self):
+        """Attempt to spread burning effect to neighboring blocks."""   
+        if not issubclass(self.parent.__class__, block.Block):
+            return
+            
+        neighbors = self.find_neighboring_blocks()
+        for neighbor in neighbors:
+            # Only spread to blocks that aren't already burning and pass the random check
+            has_burning = any(isinstance(effect, Burning) for effect in neighbor.effect_group)
+            if not has_burning and random.random() < Burning.spread_chance:
+                # Calculate new duration based on current duration
+                new_duration = int(self.duration * Burning.spread_duration_factor)
+                if new_duration >= 1000:  # Only spread if duration would be at least 1 second
+                    Burning(neighbor, new_duration)
+
     def on_hit_block(self, hit_block):
         # Spread the effect to any hit blocks not owned by the parents owner.
         if self.parent.owner == self.real_owner:
             if not self.parent.owner == hit_block.owner:
-                Burning(hit_block, Burning.block_duration)
+                # Apply the burning effect
+                burning_effect = Burning(hit_block, Burning.block_duration)
+                # Immediately try to spread to neighbors in case the block is destroyed
+                burning_effect.spread_to_neighbors()
 
     def update(self, main_clock):
         # We make sure to call the supermethod.
@@ -84,6 +131,13 @@ class Burning(effect.Effect):
             # If the parent has health, deal damage to it.
             if hasattr(self.parent, "health"):
                 self.parent.hurt(Burning.damage_per_second * main_clock.delta_time)
+
+            # Check for spreading to neighbors
+            if issubclass(self.parent.__class__, block.Block):
+                self.spread_check_time += main_clock.get_time()
+                if self.spread_check_time >= Burning.spread_check_rate:
+                    self.spread_check_time = 0
+                    self.spread_to_neighbors()
 
             # If it's time, spawn particles.
             self.particle_spawn_time += main_clock.get_time()
