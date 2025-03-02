@@ -1,5 +1,5 @@
 ---
-description: 5cae04ded457fadca9e7ed2041b504bd52bf7937
+description: Never use git push --force unless explicitly instructed to.
 globs: 
 alwaysApply: false
 ---

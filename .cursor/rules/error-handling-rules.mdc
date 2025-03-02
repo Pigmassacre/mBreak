@@ -1,8 +1,10 @@
 ---
-description: 
+description: Do not use error handling in gameplay code.
 globs: 
 alwaysApply: false
 ---
-# No error handling in gameplay code
+# Error handling
+
+## No error handling in gameplay code
 
 Never use error-handling methods like try-catch in gameplay code. The user wants the game to crash instead, so the code can be fixed.
