@@ -38,42 +38,54 @@ class Laser(attack.Attack):
 				# Create the laserbeam with a power level based on energy
 				power_level = 1.0
 				duration = 0
+				energy_to_spend = 0
 				
 				if energy_level == 100:
 					power_level = 5.0
 					duration = 5000
+					energy_to_spend = 100
 				elif energy_level >= 80:
 					power_level = 4.0
 					duration = 4000
+					energy_to_spend = 80
 				elif energy_level >= 60:
 					power_level = 3.0
 					duration = 3000
+					energy_to_spend = 60
 				elif energy_level >= 40:
 					power_level = 2.0
 					duration = 2000
+					energy_to_spend = 40
 				elif energy_level >= 20:
 					power_level = 1.0
 					duration = 1000
+					energy_to_spend = 20
 				
 				print("creating new laserbeam with power level:", power_level)
 				self.laserbeam = laserbeam.Laserbeam(self.owner, power_level, duration)
 				
-				# Reset energy to 0 if we used at least 20
+				# Reset energy to 0
 				self.owner.energy = 0
 		else:
 			# If laserbeam already exists, we can extend its duration if we have energy
 			if self.owner.energy >= 20:
 				# Add duration based on current energy
+				energy_to_spend = 0
 				if self.owner.energy == 100:
 					self.laserbeam.duration += 2500
+					energy_to_spend = 100
 				elif self.owner.energy >= 80:
 					self.laserbeam.duration += 2000
+					energy_to_spend = 80
 				elif self.owner.energy >= 60:
 					self.laserbeam.duration += 1500
+					energy_to_spend = 60
 				elif self.owner.energy >= 40:
 					self.laserbeam.duration += 1000
+					energy_to_spend = 40
 				elif self.owner.energy >= 20:
 					self.laserbeam.duration += 500
+					energy_to_spend = 20
 					
 				self.owner.energy = 0
 				print("duration extended to " + str(self.laserbeam.duration))

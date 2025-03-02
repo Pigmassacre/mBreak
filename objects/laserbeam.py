@@ -6,6 +6,7 @@ import random
 import math
 import objects.groups as groups
 import settings.settings as settings
+import objects.camera as camera
 
 """
 
@@ -25,7 +26,7 @@ class Laserbeam(pygame.sprite.Sprite):
 	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
 
-	def __init__(self, owner, power_level=1.0):
+	def __init__(self, owner, power_level=1.0, duration=1000):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
@@ -33,8 +34,16 @@ class Laserbeam(pygame.sprite.Sprite):
 		# Store the power level which affects damage and height (clamp between 1.0 and 5.0)
 		self.power_level = max(1.0, min(5.0, power_level))
 		
+		# Animation parameters
+		self.creation_time = pygame.time.get_ticks()
+		self.total_time_alive = 0
+		self.fade_in_percentage = 0.15  # First 15% of lifetime is growing
+		self.fade_out_percentage = 0.25  # Last 25% of lifetime is fading out
+		self.current_height_multiplier = 0.0  # Start at 0 height
+		self.duration = duration  # Store the duration locally
+		
 		# Debug output
-		print(f"Creating laserbeam with power level: {self.power_level}")
+		print(f"Creating laserbeam with power level: {self.power_level}, duration: {self.duration}ms")
 
 		# Find the attack paddle
 		self.attack_paddle = None
@@ -53,8 +62,8 @@ class Laserbeam(pygame.sprite.Sprite):
 
 		# Set initial dimensions
 		width = settings.LEVEL_WIDTH
-		# Scale the height based on power level (minimum is the original height)
-		height = int(self.__class__.height * max(1.0, self.power_level))
+		# Start with a small height that will grow
+		height = int(self.__class__.height)
 		self.rect = pygame.Rect(settings.LEVEL_X, settings.LEVEL_Y, width, height)
 		
 		# Calculate the actual size and position
@@ -71,6 +80,9 @@ class Laserbeam(pygame.sprite.Sprite):
 
 		# Store the image that we use to create the final image.
 		self.laser_image = self.__class__.image.copy()
+		
+		# Store the base height (without animation)
+		self.base_height = int(self.__class__.height * max(1.0, self.power_level))
 
 		# Create the final image.
 		self.create_final_image()
@@ -78,6 +90,11 @@ class Laserbeam(pygame.sprite.Sprite):
 		# Add self to the effect group.
 		groups.Groups.effect_group.add(self)
 		print(f"Laserbeam created with dimensions: {self.rect.width}x{self.rect.height}")
+
+		# Add screen shake based on power level
+		shake_duration = int(250 * self.power_level)  # 250ms to 1250ms
+		shake_intensity = 0.5 * self.power_level  # 0.5 to 2.5
+		camera.CAMERA.shake(shake_duration, shake_intensity)
 
 	def figure_out_rect_size(self):
 		# Make sure we have a valid attack paddle
@@ -87,11 +104,14 @@ class Laserbeam(pygame.sprite.Sprite):
 		# Store the current height - we want to preserve it when adjusting width
 		current_height = self.rect.height
 		
+		# Calculate the center position of the paddle for vertical alignment
+		paddle_center_y = self.attack_paddle.rect.y + (self.attack_paddle.rect.height / 2.0)
+		
 		if self.attack_paddle.x < settings.SCREEN_WIDTH / 2.0:
 			# Left side player - beam goes right
 			self.rect.x = self.attack_paddle.rect.x + self.attack_paddle.rect.width
-			# Center the laser beam vertically based on its height
-			self.rect.y = self.attack_paddle.rect.y + ((self.attack_paddle.rect.height - current_height) / 2.0)
+			# Center the laser beam vertically based on its current animated height
+			self.rect.y = paddle_center_y - (current_height / 2.0)
 
 			# Check collision against blocks.
 			least_x = settings.LEVEL_MAX_X  # Start with maximum possible value
@@ -120,8 +140,8 @@ class Laserbeam(pygame.sprite.Sprite):
 			# Right side player - beam goes left
 			# Start with the left edge of the level
 			self.rect.x = settings.LEVEL_X
-			# Center the laser beam vertically based on its height
-			self.rect.y = self.attack_paddle.rect.y + ((self.attack_paddle.rect.height - current_height) / 2.0)
+			# Center the laser beam vertically based on its current animated height
+			self.rect.y = paddle_center_y - (current_height / 2.0)
 
 			# Check collision against blocks.
 			max_x = settings.LEVEL_X  # Start with minimum possible value
@@ -157,27 +177,61 @@ class Laserbeam(pygame.sprite.Sprite):
 		# Resize the image surface to match the current rect dimensions
 		self.image = pygame.surface.Surface((self.rect.width, self.rect.height), pygame.locals.SRCALPHA)
 		
-		# Scale the laser image to match the power level height while maintaining aspect ratio
-		scaled_laser_height = int(self.__class__.height * max(1.0, self.power_level))
+		# Use the current animated height for scaling
+		scaled_laser_height = self.rect.height
 		scaled_laser_width = self.__class__.width
 		
 		# Create a scaled copy of the original class image
-		scaled_laser = pygame.transform.scale(self.__class__.image, (scaled_laser_width, scaled_laser_height))
-		
-		# Tile the scaled laser image across the surface
-		for x in range(0, int(math.ceil(self.rect.width / float(scaled_laser_width)))):
-			y_offset = 0
-			while y_offset < self.rect.height:
-				self.image.blit(scaled_laser, (scaled_laser_width * x, y_offset))
-				y_offset += scaled_laser_height
+		if scaled_laser_height > 0:
+			scaled_laser = pygame.transform.scale(self.__class__.image, (scaled_laser_width, scaled_laser_height))
+			
+			# Tile the scaled laser image across the surface
+			for x in range(0, int(math.ceil(self.rect.width / float(scaled_laser_width)))):
+				y_offset = 0
+				while y_offset < self.rect.height:
+					self.image.blit(scaled_laser, (scaled_laser_width * x, y_offset))
+					y_offset += scaled_laser_height
 
 	def destroy(self):
 		self.kill()
 
 	def update(self, main_clock):
-		# Store the old width to check if we need to recreate the image
+		# Update total time alive
+		self.total_time_alive += main_clock.get_time()
+		
+		# Calculate the height multiplier based on animation phase
+		lifetime_ratio = self.total_time_alive / float(self.duration)
+		
+		# Fade in phase
+		if lifetime_ratio < self.fade_in_percentage:
+			# Map 0->fade_in_percentage to 0->1 using sine for smooth growth
+			phase = lifetime_ratio / self.fade_in_percentage  # 0 to 1
+			self.current_height_multiplier = math.sin(phase * math.pi / 2)  # Sine from 0 to 1
+		# Stable phase
+		elif lifetime_ratio < (1.0 - self.fade_out_percentage):
+			self.current_height_multiplier = 1.0
+		# Fade out phase
+		else:
+			# Map (1-fade_out)->1 to 1->0 using sine for smooth fade
+			phase = (lifetime_ratio - (1.0 - self.fade_out_percentage)) / self.fade_out_percentage  # 0 to 1
+			self.current_height_multiplier = math.cos(phase * math.pi / 2)  # Cosine from 1 to 0
+			
+		# If we've exceeded our duration, destroy the laserbeam
+		if self.total_time_alive >= self.duration:
+			self.destroy()
+			return
+		
+		# Calculate the animated height
+		animated_height = int(self.base_height * self.current_height_multiplier)
+		if animated_height < 1:
+			animated_height = 1  # Ensure at least 1 pixel height
+			
+		# Store the old dimensions to check if we need to recreate the image
 		old_width = self.rect.width
 		old_height = self.rect.height
+		
+		# Update the rect height with the animated height
+		self.rect.height = animated_height
 
 		# Make sure the attack paddle reference is still valid
 		if self.attack_paddle is None or not self.attack_paddle.alive():
@@ -195,12 +249,12 @@ class Laserbeam(pygame.sprite.Sprite):
 		if self.attack_paddle.x > settings.SCREEN_WIDTH / 2.0:
 			self.rect.x -= 1
 
-		# Apply damage to blocks
+		# Apply damage to blocks - scale damage by height multiplier for smooth damage ramp-up/down
 		for block in groups.Groups.block_group:
 			if block.owner != self.owner:
 				if self.rect.colliderect(block.rect):
-					# Scale damage based on power level
-					damage = 60 * main_clock.delta_time * self.power_level
+					# Scale damage based on power level and current height multiplier
+					damage = 60 * main_clock.delta_time * self.power_level * self.current_height_multiplier
 					block.on_hit(damage)
 
 		# Restore original width
@@ -213,6 +267,9 @@ class Laserbeam(pygame.sprite.Sprite):
 
 		# Recalculate the rect size based on current game state
 		self.figure_out_rect_size()
+		
+		# Restore the animated height after figure_out_rect_size (which might change it)
+		self.rect.height = animated_height
 
 		# If dimensions changed, recreate the image
 		if self.rect.width != old_width or self.rect.height != old_height:

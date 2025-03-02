@@ -70,6 +70,10 @@ class Player(pygame.sprite.Sprite):
 		self.max_energy = 100
 		self.energy_increase_on_hit = 2.5
 		
+		# Visual interpolation for energy meter
+		self.visual_energy = 0
+		self.energy_interpolation_speed = 0.2  # Controls how fast the visual energy catches up to true energy
+		
 		#self.energy_attack = missilestorm.MissileStorm(self)
 		self.energy_attack = laser.Laser(self)
 
@@ -115,6 +119,15 @@ class Player(pygame.sprite.Sprite):
 		# This is the energy rect, this changes according to the energy level of the player.
 		energy_y = self.energy_level_surface.get_height() - (self.energy_level_surface.get_height() * (self.energy / float(self.max_energy)))
 		self.energy_rect = pygame.rect.Rect(0, energy_y, self.energy_level_surface.get_width(), self.energy_level_surface.get_height() * (self.energy / float(self.max_energy)))
+
+		# This is for visualizing spent energy
+		self.spent_energy = 0
+		self.spent_energy_fade = 0
+		self.spent_energy_fade_speed = 0.1
+		self.spent_energy_color = pygame.Color(255, 255, 255, 180)
+		self.spent_energy_position = 0  # Store the position where energy was spent
+		self.spent_energy_delay = 0  # Time to wait before starting fade
+		self.spent_energy_delay_duration = 250  # Wait 250ms before starting fade
 
 		# This is the color of the energy level.
 		self.energy_color = copy.copy(self.color)
@@ -188,7 +201,17 @@ class Player(pygame.sprite.Sprite):
 		self.last_powerup_group_size = len(self.powerup_group)
 
 	def attack(self):
+		# Store current energy before attack
+		pre_attack_energy = self.energy
+		
+		# Perform the attack
 		self.energy_attack.attack()
+		
+		# Calculate and store spent energy and its position
+		self.spent_energy = pre_attack_energy - self.energy
+		self.spent_energy_position = pre_attack_energy  # Store where the energy was spent from
+		self.spent_energy_fade = 1.0
+		self.spent_energy_delay = 0  # Reset delay timer
 
 	def event(self, event):
 		if self.ai_difficulty == 0:
@@ -197,12 +220,24 @@ class Player(pygame.sprite.Sprite):
 					self.attack()
 
 	def update(self, main_clock):
-		# Update the energy rect.
-		self.energy_rect.height = self.energy_level_surface.get_height() * (self.energy / float(self.max_energy))
+		# Interpolate visual energy towards true energy
+		delta = (self.energy - self.visual_energy) * self.energy_interpolation_speed
+		self.visual_energy += delta * (main_clock.get_time() / 16.67)  # Normalize by target frame time
+		
+		# Update the energy rect using visual_energy instead of true energy
+		self.energy_rect.height = self.energy_level_surface.get_height() * (self.visual_energy / float(self.max_energy))
 		self.energy_rect.y = self.energy_level_surface.get_height() - self.energy_rect.height
 
+		# Handle spent energy delay and fade
+		if self.spent_energy_fade > 0:
+			if self.spent_energy_delay < self.spent_energy_delay_duration:
+				self.spent_energy_delay += main_clock.get_time()
+			else:
+				self.spent_energy_fade = max(0, self.spent_energy_fade - self.spent_energy_fade_speed * (main_clock.get_time() / 16.67))
+				self.spent_energy_color.a = int(180 * self.spent_energy_fade)
+
 		# Update the color of the energy.
-		new_r = int(self.energy_color_r + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		new_r = int(self.energy_color_r + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.visual_energy / float(self.max_energy))))
 		if new_r <= 255 and new_r >= 0:
 			self.energy_color.r = new_r
 		else:
@@ -211,7 +246,7 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.energy_color.r = 255
 
-		new_g = int(self.energy_color_g + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		new_g = int(self.energy_color_g + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.visual_energy / float(self.max_energy))))
 		if new_g <= 255 and new_g >= 0:
 			self.energy_color.g = new_g
 		else:
@@ -220,7 +255,7 @@ class Player(pygame.sprite.Sprite):
 			else:
 				self.energy_color.g = 255
 
-		new_b = int(self.energy_color_b + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.energy / float(self.max_energy))))
+		new_b = int(self.energy_color_b + math.sin(pygame.time.get_ticks() * 0.005) * (50 * (self.visual_energy / float(self.max_energy))))
 		if new_b <= 255 and new_b >= 0:
 			self.energy_color.b = new_b
 		else:
@@ -263,9 +298,19 @@ class Player(pygame.sprite.Sprite):
 		surface.blit(self.energy_image_top, (self.energy_top_x - camera.CAMERA.x, self.energy_top_y - camera.CAMERA.y))
 		surface.blit(self.energy_image_middle, (self.energy_middle_x - camera.CAMERA.x, self.energy_middle_y - camera.CAMERA.y))
 
+		# Draw the current energy level
 		temp_energy_surface = self.energy_level_surface.copy()
 		temp_energy_surface.fill(self.energy_color, self.energy_rect)
 		surface.blit(temp_energy_surface, (self.energy_level_x - camera.CAMERA.x, self.energy_level_y - camera.CAMERA.y))
+		
+		# Draw the spent energy visualization on top if it's visible
+		if self.spent_energy_fade > 0:
+			temp_spent_surface = self.energy_level_surface.copy()
+			spent_height = self.energy_level_surface.get_height() * (self.spent_energy / float(self.max_energy))
+			spent_y = self.energy_level_surface.get_height() * (1.0 - self.spent_energy_position / float(self.max_energy))
+			spent_rect = pygame.rect.Rect(0, spent_y, self.energy_level_surface.get_width(), spent_height)
+			temp_spent_surface.fill(self.spent_energy_color, spent_rect)
+			surface.blit(temp_spent_surface, (self.energy_level_x - camera.CAMERA.x, self.energy_level_y - camera.CAMERA.y))
 
 		surface.blit(self.energy_image_bottom, (self.energy_bottom_x - camera.CAMERA.x, self.energy_bottom_y - camera.CAMERA.y))
 
