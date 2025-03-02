@@ -371,7 +371,8 @@ class Game(scene.Scene):
 			groups.Groups.shadow_group.update(self.main_clock)
 
 		# Update the trajectories.
-		groups.Groups.trajectory_group.update(self.main_clock)
+		if graphics.TRAJECTORY:
+			groups.Groups.trajectory_group.update(self.main_clock)
 
 		# Update the camera.
 		camera.CAMERA.update(self.main_clock)
@@ -422,7 +423,8 @@ class Game(scene.Scene):
 				paddle.debug_draw(self.window_surface)
 
 		# Draw the trajectories.
-		self.blit_with_camera(groups.Groups.trajectory_group, self.window_surface)
+		if graphics.TRAJECTORY:
+			self.blit_with_camera(groups.Groups.trajectory_group, self.window_surface)
 
 		# Draw the balls.
 		self.blit_with_camera(groups.Groups.ball_group, self.window_surface)

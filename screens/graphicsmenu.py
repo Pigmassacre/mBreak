@@ -78,9 +78,13 @@ class GraphicsMenu(scene.Scene):
 		traces_button.setup_is_on_off("Traces Off", graphics.TRACES)
 		self.graphics_menu_right.add(traces_button, self.traces)
 		
-		traces_button = textitem.TextItem("Background On")
-		traces_button.setup_is_on_off("Background Off", graphics.BACKGROUND)
-		self.graphics_menu_right.add(traces_button, self.background)
+		background_button = textitem.TextItem("Background On")
+		background_button.setup_is_on_off("Background Off", graphics.BACKGROUND)
+		self.graphics_menu_right.add(background_button, self.background)
+
+		trajectory_button = textitem.TextItem("Trajectory On")
+		trajectory_button.setup_is_on_off("Trajectory Off", graphics.TRAJECTORY)
+		self.graphics_menu_right.add(trajectory_button, self.trajectory)
 		
 		# We store the graphics offset so we can offset the logo by this later.
 		self.graphics_menu_offset = (shadows_button.get_height() * 1)
@@ -104,6 +108,9 @@ class GraphicsMenu(scene.Scene):
 		
 	def background(self, item):
 		graphics.BACKGROUND = item.toggle_on_off()
+
+	def trajectory(self, item):
+		graphics.TRAJECTORY = item.toggle_on_off()
 
 	def setup_logo(self, title_logo):
 		if title_logo == None:

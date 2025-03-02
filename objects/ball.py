@@ -315,9 +315,6 @@ class Ball(pygame.sprite.Sprite):
 				trace.Trace(self)
 				self.trace_spawn_time = 0
 
-		# Update trajectory visualization
-		self.trajectory.update(main_clock)
-
 	def hit_wall(self):
 		# Spawn some particles.
 		self.spawn_particles()

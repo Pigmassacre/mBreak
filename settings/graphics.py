@@ -19,6 +19,7 @@ TRACES = True
 BACKGROUND = True
 FULLSCREEN = False
 MAX_FPS = 60
+TRAJECTORY = True
 
 def load():
 	# Tries to load the graphics options from settings.txt.
@@ -29,6 +30,7 @@ def load():
 	global BACKGROUND
 	global FULLSCREEN
 	global MAX_FPS
+	global TRAJECTORY
 
 	# We have to make sure we always call settings.load() before graphics.load(), since settings.load()
 	# takes care of creating the .txt file. mBreak.py does it in this way.
@@ -51,6 +53,8 @@ def load():
 				FULLSCREEN = bool(int(line.strip("fullscreen").strip()))
 			elif "maxfps" in line:
 				MAX_FPS = int(line.strip("maxfps").strip())
+			elif "trajectory" in line:
+				TRAJECTORY = bool(int(line.strip("trajectory").strip()))
 	finally:
 		file.close()
 			
@@ -61,6 +65,7 @@ def save():
 	global TRACES
 	global BACKGROUND
 	global FULLSCREEN
+	global TRAJECTORY
 
 	# We use a temporary file to write to, so we don't corrupt our old file if the process fails.
 	temp_file = open("settings.txt.tmp", "w")
@@ -83,6 +88,8 @@ def save():
 				temp_file.write(line.replace(line.strip("fullscreen").strip(), str(int(FULLSCREEN))))
 			elif "maxfps" in line:
 				temp_file.write(line.replace(line.strip("maxfps").strip(), str(int(MAX_FPS))))
+			elif "trajectory" in line:
+				temp_file.write(line.replace(line.strip("trajectory").strip(), str(int(TRAJECTORY))))
 			else:
 				temp_file.write(line)
 	finally:		
