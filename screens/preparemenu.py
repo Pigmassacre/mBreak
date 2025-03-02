@@ -8,6 +8,7 @@ import objects.powerups.powerup as powerup
 import gui.textitem as textitem
 import gui.listmenu as listmenu
 import gui.gridmenu as gridmenu
+import gui.colorwheelmenu as colorwheelmenu
 import gui.item as item
 import gui.choiceitem as choiceitem
 import gui.imageitem as imageitem
@@ -73,7 +74,7 @@ class PrepareMenu(scene.Scene):
 		self.color_menu_one = self.setup_color_menu(self.color_one)
 		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
 
-		ai_menu_offset = self.color_menu_one.offset * 2
+		ai_menu_offset = 20
 
 		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width() - self.ai_menu_one.get_width() - ai_menu_offset) / 5.0
 		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2.0
@@ -93,12 +94,12 @@ class PrepareMenu(scene.Scene):
 		self.color_menu_two = self.setup_color_menu(self.color_two)
 		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
 
-		ai_menu_offset = self.color_menu_two.offset * 2
+		ai_menu_offset = 20
 
 		self.color_menu_two.x = settings.SCREEN_WIDTH - ((settings.SCREEN_WIDTH - self.color_menu_two.get_width() - self.ai_menu_two.get_width() - ai_menu_offset) / 5.0) - self.color_menu_two.get_width()
 		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2.0
 
-		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - self.color_menu_two.offset * 2
+		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - ai_menu_offset
 		self.ai_menu_two.y = self.color_menu_two.y
 
 		self.menu_list.append(self.color_menu_two)
@@ -108,6 +109,19 @@ class PrepareMenu(scene.Scene):
 		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
 		self.player_two_text.x = self.ai_menu_two.x + (((self.color_menu_two.get_width() + self.ai_menu_two.get_width() + ai_menu_offset) - self.player_two_text.get_width()) / 2.0)
 		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
+		
+		# Position the color displays next to the player names
+		color_display_offset = 5
+		# Player one's color display - to the left of the name
+		self.color_menu_one.set_color_display_position(
+			self.player_one_text.x - self.color_menu_one.color_display.width - color_display_offset,
+			self.player_one_text.y + (self.player_one_text.get_height() - self.color_menu_one.color_display.height) / 2
+		)
+		# Player two's color display - to the right of the name
+		self.color_menu_two.set_color_display_position(
+			self.player_two_text.x + self.player_two_text.get_width() + color_display_offset,
+			self.player_two_text.y + (self.player_two_text.get_height() - self.color_menu_two.color_display.height) / 2
+		)
 
 		# The back button, displayed in the bottom-left corner of the screen.
 		back_button = textitem.TextItem("Back")
@@ -146,61 +160,33 @@ class PrepareMenu(scene.Scene):
 		self.gameloop()
 
 	def setup_color_menu(self, function):
-		# Creates a gridmenu and adds all standard color items to that menu.
-		color_menu = gridmenu.GridMenu()
-		self.setup_color_items(color_menu, function)
+		# Creates a color wheel menu for color selection
+		color_menu = colorwheelmenu.ColorWheelMenu(radius=30)
 		return color_menu
 
 	def setup_color_items(self, grid_menu, function):
-		# Adds all standard color items to the given grid_menu.
-		grid_menu.add(item.Item(pygame.Color(255, 0, 0, 255)), function)
-		grid_menu.add(item.Item(pygame.Color(0, 255, 0, 255)), function)
-		grid_menu.add(item.Item(pygame.Color(0, 0, 255, 255)), function)
-		grid_menu.add(item.Item(pygame.Color(255, 255, 0, 255)), function)
-		grid_menu.add(item.Item(pygame.Color(255, 0, 255, 255)), function)
-		grid_menu.add(item.Item(pygame.Color(0, 255, 255, 255)), function)
+		# This method is no longer needed with the color wheel menu
+		pass
 
 	def color_one(self, item):
-		# Figures out what color to set player one's color to.
-		self.player_one_color = self.toggle_color(item, self.color_menu_one, self.color_menu_two)
+		# Set player one's color to the selected color from the color wheel
+		self.player_one_color = self.color_menu_one.selected_color
+		# Disable the same color in player two's color wheel
+		if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
+			self.player_two_color = None
+			self.color_menu_two.clear_selection()
 
 	def color_two(self, item):
-		# Figures out what color to set player two's color to.
-		self.player_two_color = self.toggle_color(item, self.color_menu_two, self.color_menu_one)
+		# Set player two's color to the selected color from the color wheel
+		self.player_two_color = self.color_menu_two.selected_color
+		# Disable the same color in player one's color wheel
+		if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
+			self.player_one_color = None
+			self.color_menu_one.clear_selection()
 
 	def toggle_color(self, item, primary_menu, secondary_menu):
-		# Figure out what item is chosen.
-		chosen_item = None
-		for menu_item in primary_menu.items:
-			if menu_item.chosen:
-				chosen_item = menu_item
-				break
-
-		if chosen_item is None:
-			# If there is no chosen item and the item is available, set the selected item as chosen and set it's match on the secondary menu as disabled.
-			if not item.disabled:
-				item.chosen = True
-				secondary_menu.items[primary_menu.items.index(item)].disabled = True
-				return item.color
-		elif chosen_item is item:
-			# If the chosen item is the same as the selected item, set that item as not chosen and restore the availability
-			# of the matching item on the secondary menu.
-			chosen_item.chosen = False
-			secondary_menu.items[primary_menu.items.index(item)].disabled = False
-			return None
-		elif not chosen_item is item:
-			# If the chosen item isn't the same as the selected item, check if it is available first.
-			if not item.disabled:
-				# If the item is available, set the chosen item to not be chosen, and set the selected item to be chosen.
-				# Also fix the availability, ofcourse.
-				chosen_item.chosen = False
-				secondary_menu.items[primary_menu.items.index(chosen_item)].disabled = False
-				item.chosen = True
-				secondary_menu.items[primary_menu.items.index(item)].disabled = True
-				# We also return the color of the newly chosen item.
-				return item.color
-			# If the item is unavailible, we return the color of the chosen item instead.
-			return chosen_item.color
+		# This method is no longer needed with the color wheel menu
+		return primary_menu.selected_color
 
 	def setup_ai_menu(self, function):
 		ai_menu = gridmenu.GridMenu(1)
@@ -250,7 +236,10 @@ class PrepareMenu(scene.Scene):
 		return item.value
 
 	def start(self, item = None):
-		if not self.player_one_color is None and not self.player_two_color is None:
+		if self.color_menu_one.selected_color and self.color_menu_two.selected_color:
+			self.player_one_color = self.color_menu_one.selected_color
+			self.player_two_color = self.color_menu_two.selected_color
+			
 			if self.player_one_ai is None:
 				self.player_one_ai = 0
 			if self.player_two_ai is None:
@@ -272,6 +261,32 @@ class PrepareMenu(scene.Scene):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
 			# If the escape key is pressed, we go back to the main menu.
 			self.back()
+		elif event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+			# Get the mouse position
+			mouse_pos = pygame.mouse.get_pos()
+			
+			# Check if the click is on player one's color wheel
+			color = self.color_menu_one.get_color_at_position(mouse_pos)
+			if color:
+				self.color_menu_one.select_color(mouse_pos)
+				self.player_one_color = self.color_menu_one.selected_color
+				
+				# Check if both players have the same color
+				if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
+					self.player_two_color = None
+					self.color_menu_two.clear_selection()
+				return
+				
+			# Check if the click is on player two's color wheel
+			color = self.color_menu_two.get_color_at_position(mouse_pos)
+			if color:
+				self.color_menu_two.select_color(mouse_pos)
+				self.player_two_color = self.color_menu_two.selected_color
+				
+				# Check if both players have the same color
+				if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
+					self.player_one_color = None
+					self.color_menu_one.clear_selection()
 
 	def update(self):
 		# Handle all transition.
