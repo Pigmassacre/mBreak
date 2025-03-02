@@ -17,6 +17,7 @@ import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
 import objects.trajectory as trajectory
+from settings.sounds import BALL_SOUND, play_sound
 
 """
 
@@ -43,9 +44,8 @@ class Ball(pygame.sprite.Sprite):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/ball/ball.png")
 
-	# Initialize the mixer (so we can load a sound) and load the sound effect.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/ball.ogg")
+	# Initialize the sound effect.
+	sound_effect = BALL_SOUND
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width()
@@ -181,86 +181,44 @@ class Ball(pygame.sprite.Sprite):
 		# We assume we haven't collided with anything yet.
 		self.collided = False
 
+		# Store the amount of speed we've handled this turn.
 		speed_handled = 0
+
+		# While we still have speed to handle...
 		while speed_handled < self.speed:
-			# Setup the speed values to use for this iteration.
-			if self.speed - speed_handled >= Ball.speed_step:
-				self.tick_speed = Ball.speed_step
-			else:
+			# Calculate how much speed we should handle this step.
+			if speed_handled + self.tick_speed > self.speed:
+				# If adding tick_speed would put us over the total amount of speed, we just add the difference.
 				self.tick_speed = self.speed - speed_handled
-
-			# Apply gravity effect if active
-			if self.gravity_strength > 0:
-				# Calculate gravity vector components
-				gravity_x = math.cos(self.gravity_direction) * self.gravity_strength * main_clock.delta_time
-				gravity_y = math.sin(self.gravity_direction) * self.gravity_strength * main_clock.delta_time
-				
-				# Calculate new angle based on current velocity and gravity
-				velocity_x = math.cos(self.angle) * self.tick_speed
-				velocity_y = math.sin(self.angle) * self.tick_speed
-				
-				# Add gravity to velocity
-				velocity_x += gravity_x
-				velocity_y += gravity_y
-				
-				# Calculate new angle and maintain speed
-				self.angle = math.atan2(velocity_y, velocity_x)
-
-			# Check collision with paddles.
-			self.check_collision_paddles()
-					
-			# Check collision with other balls.
-			self.check_collision_balls()
-
-			# Check collision with blocks.
-			self.check_collision_blocks()
-
-			# Check collision with powerups.
-			self.check_collision_powerups()
-
-			# Here we check if the angle of the ball is in the restricted areas. We do this to make sure that the balls don't get stuck
-			# bouncing up and down in the middle of the gamefield, since that makes for a very boring game.
-			if self.angle > (math.pi / 2) - Ball.least_allowed_vertical_angle and self.angle < (math.pi / 2) + Ball.least_allowed_vertical_angle:
-				if self.angle > (math.pi / 2):
-					self.angle = (math.pi / 2) + Ball.least_allowed_vertical_angle
-				elif self.angle < (math.pi / 2):
-					self.angle = (math.pi / 2) - Ball.least_allowed_vertical_angle
-				else:
-					# If the angle is EXACTLY pi/2, we just randomly decide what angle to "nudge" the ball to.
-					self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
-			elif self.angle > ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle and self.angle < ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle:			
-				if self.angle > ((3 * math.pi) / 2):
-					self.angle = ((3 * math.pi) / 2) + Ball.least_allowed_vertical_angle
-				elif self.angle < ((3 * math.pi) / 2):
-					self.angle = ((3 * math.pi) / 2) - Ball.least_allowed_vertical_angle
-				else:
-					# If the angle is EXACTLY 3pi/2, we just randomly decide what angle to "nudge" the ball to.
-					self.angle += random.randrange(-1, 2, 2) * Ball.least_allowed_vertical_angle
-
-			# Constrain angle to 0 < angle < 2pi. Even though angles over 2pi or under 0 work fine when translating the angles to x and y positions, 
-			# such angles mess with our ability to calculate other stuff. So we just make sure that the angle is between 0 and 2pi.
-			if self.angle > (2 * math.pi):
-				self.angle -= (2 * math.pi)
-			elif self.angle < 0:
-				self.angle += (2 * math.pi)
-
-			# We make sure that speed isn't over max_speed.
-			if self.speed > self.max_speed:
-				self.speed = self.max_speed
-
+			
 			# Move the ball with speed in consideration.
 			self.x = self.x + (math.cos(self.angle) * self.tick_speed * main_clock.delta_time)
 			self.y = self.y + (math.sin(self.angle) * self.tick_speed * main_clock.delta_time)
 			self.rect.x = self.x
 			self.rect.y = self.y
 
-			# Check collision with x-edges.
+			# Check for collision with paddles.
+			self.check_collision_paddles()
+
+			# Check for collision with other balls.
+			self.check_collision_balls()
+
+			# Check for collision with blocks.
+			self.check_collision_blocks()
+
+			# Check for collision with powerups.
+			self.check_collision_powerups()
+
+			# Check if we've hit any walls.
 			if self.rect.x < settings.LEVEL_X:
 				# We hit the left wall.
 				self.hit_wall()
 
 				# Reverse angle on x-axis.
-				self.angle = math.pi - self.angle
+				if self.angle > 0:
+					self.angle = math.pi - self.angle
+				else:
+					self.angle = -math.pi - self.angle
 
 				# Constrain ball to screen size.
 				self.x = settings.LEVEL_X
@@ -270,14 +228,15 @@ class Ball(pygame.sprite.Sprite):
 				self.hit_wall()
 
 				# Reverse angle on x-axis.
-				self.angle = math.pi - self.angle
+				if self.angle > 0:
+					self.angle = math.pi - self.angle
+				else:
+					self.angle = -math.pi - self.angle
 
 				# Constrain ball to screen size.
-				self.x = settings.LEVEL_MAX_X - self.rect.width			
+				self.x = settings.LEVEL_MAX_X - self.rect.width
 				self.rect.x = self.x
-
-			# Check collision with y-edges.
-			if self.rect.y < settings.LEVEL_Y:
+			elif self.rect.y < settings.LEVEL_Y:
 				# We hit the top wall.
 				self.hit_wall()
 
@@ -300,9 +259,7 @@ class Ball(pygame.sprite.Sprite):
 
 			# If we have collided with anything, play the sound effect.
 			if self.collided:
-				sound = Ball.sound_effect.play()
-				if not sound is None:
-					sound.set_volume(settings.SOUND_VOLUME)
+				play_sound(Ball.sound_effect)
 
 			# Increase the amount of speed that we've handled this turn.
 			speed_handled += self.tick_speed

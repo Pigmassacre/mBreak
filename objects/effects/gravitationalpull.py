@@ -8,6 +8,7 @@ import objects.groups as groups
 import objects.effects.effect as effect
 import objects.particle as particle
 import settings.settings as settings
+from settings.sounds import POWERUP_SOUNDS, play_sound
 
 """
 
@@ -22,9 +23,8 @@ class GravitationalPull(effect.Effect):
     # Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
     image = pygame.image.load("res/effect/timeout.png")  # Reusing timeout image for now
 
-    # Initialize the mixer (so we can load a sound) and load the sound effect.
-    pygame.mixer.init(44100, -16, 2, 2048)
-    sound_effect = pygame.mixer.Sound("res/sounds/powerup1.ogg")  # Reusing a powerup sound for now
+    # Initialize the sound effect.
+    sound_effect = POWERUP_SOUNDS[0]  # Using first powerup sound
 
     # Standard values. These will be used unless any other values are specified per instance of this class.
     width = image.get_width()
@@ -71,9 +71,7 @@ class GravitationalPull(effect.Effect):
         self.update_gravity_direction()
         
         # Play the sound effect
-        sound = GravitationalPull.sound_effect.play()
-        if not sound is None:
-            sound.set_volume(settings.SOUND_VOLUME)
+        play_sound(GravitationalPull.sound_effect)
             
     def get_opponent_paddle(self):
         # Get the opponent's paddle based on ball ownership

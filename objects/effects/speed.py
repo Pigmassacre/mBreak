@@ -5,6 +5,7 @@ import pygame
 import objects.groups as groups
 import objects.effects.effect as effect
 import settings.settings as settings
+from settings.sounds import POWERUP_SOUNDS, play_sound
 
 """
 
@@ -32,14 +33,8 @@ class Speed(effect.Effect):
 			# Fallback for entities that don't have the method
 			parent.speed = parent.base_speed * self.speed_multiplier
 		
-		# Initialize the mixer (so we can load a sound) and load the sound effect.
-		pygame.mixer.init(44100, -16, 2, 2048)
-		self.sound_effect = pygame.mixer.Sound("res/sounds/powerup1.ogg")
-		
 		# Play the sound effect
-		sound = self.sound_effect.play()
-		if sound is not None:
-			sound.set_volume(settings.SOUND_VOLUME)
+		play_sound(POWERUP_SOUNDS[0])
 
 	def update(self, main_clock):
 		# We make sure to call the supermethod.

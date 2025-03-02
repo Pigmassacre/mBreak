@@ -10,6 +10,7 @@ import objects.effects.effect as effect
 import objects.blocks.block as block
 import objects.particle as particle
 import settings.settings as settings
+from settings.sounds import THUNDER_SOUND
 
 """
 This is the "Charged" effect. When a ball carrying this effect hits an enemy block, 
@@ -19,9 +20,8 @@ The effect is then destroyed.
 
 class Charged(effect.Effect):
 
-	# Initialize the mixer (so we can load a sound) and load the sound effect.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/thunder.ogg")
+	# Initialize the sound effect.
+	sound_effect = THUNDER_SOUND
 
 	# Chain lightning settings
 	search_radius = 40  # Larger radius to find blocks

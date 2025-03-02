@@ -10,6 +10,7 @@ import objects.groups as groups
 import objects.particle as particle
 import objects.effects.flash as flash
 import settings.settings as settings
+from settings.sounds import EXPLOSION_SOUND, play_sound
 
 """
 
@@ -23,9 +24,8 @@ class Block(pygame.sprite.Sprite):
 	image = pygame.image.load("res/block/block.png")
 	half_health_image = pygame.image.load("res/block/block.png")
 
-	# Initialize the mixer (so we can load a sound) and load the sound effect.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/explosion.ogg")
+	# Initialize the sound effect.
+	sound_effect = EXPLOSION_SOUND
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width()
@@ -150,6 +150,4 @@ class Block(pygame.sprite.Sprite):
 				effect.destroy()
 
 			# Play a sound effect.
-			sound = Block.sound_effect.play()
-			if not sound is None:
-				sound.set_volume(settings.SOUND_VOLUME)
+			play_sound(Block.sound_effect)

@@ -3,6 +3,7 @@ __license__ = "All Rights Reserved"
 
 import pygame
 import settings.settings as settings
+from settings.sounds import SELECT_SOUND
 
 """
 
@@ -12,11 +13,10 @@ clicked the corresponding function is called.
 
 """
 
-class Menu(object):
+class Menu(pygame.sprite.Sprite):
 
-	# Initialize the mixer (so we can load a sound) and load the sound effect.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/select.ogg")
+	# Initialize the sound effect.
+	sound_effect = SELECT_SOUND
 
 	def __init__(self, x = 0, y = 0, position = 0):
 		# Setup a list to contain all the menu items.

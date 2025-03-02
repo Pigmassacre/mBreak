@@ -8,6 +8,7 @@ import random
 import objects.effects.flash as flash
 import objects.groups as groups
 import settings.settings as settings
+from settings.sounds import POWERUP_SOUNDS
 
 """
 
@@ -18,13 +19,8 @@ It also handles the sound effects that are played when the powerup is destroyed 
 
 class Powerup(pygame.sprite.Sprite):
 
-	# Initialize the mixer (so we can load a sound) and load the sound effects.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effects = []
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup1.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup2.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup3.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/powerup4.ogg"))
+	# Initialize the list of sound effects.
+	sound_effects = POWERUP_SOUNDS
 
 	# The standard width of all powerup image files. Each individual powerup can ofcourse be bigger/smaller, but this is the standard size.
 	width = 8
@@ -68,7 +64,7 @@ class Powerup(pygame.sprite.Sprite):
 		self.effect_group.add(flash.Flash(self, copy.copy(Powerup.spawn_effect_start_color), copy.copy(Powerup.spawn_effect_final_color), Powerup.spawn_effect_tick_amount))
 
 		# Play a random sound from the sound_effects list.
-		sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+		sound = random.choice(Powerup.sound_effects).play()
 		if not sound is None:
 			sound.set_volume(settings.SOUND_VOLUME)
 
@@ -117,7 +113,7 @@ class Powerup(pygame.sprite.Sprite):
 
 		# Play a random sound from the sound_effects list.
 		if play_sound:
-			sound = Powerup.sound_effects[random.randrange(0, len(Powerup.sound_effects))].play()
+			sound = random.choice(Powerup.sound_effects).play()
 			if not sound is None:
 				sound.set_volume(settings.SOUND_VOLUME)
 

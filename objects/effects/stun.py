@@ -9,6 +9,7 @@ import objects.effects.effect as effect
 import objects.paddle as paddle
 import objects.particle as particle
 import settings.settings as settings
+from settings.sounds import FREEZING_SOUND, play_sound
 
 """
 
@@ -21,9 +22,8 @@ class Stun(effect.Effect):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/effect/stun.png")
 
-	# Initialize the mixer (so we can load a sound) and load the sound effect.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effect = pygame.mixer.Sound("res/sounds/freezing.ogg")
+	# Initialize the sound effect.
+	sound_effect = FREEZING_SOUND  # Reusing freezing sound
 
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width()
@@ -78,9 +78,7 @@ class Stun(effect.Effect):
 		# Spread the effect to any hit paddles not owned by the parents owner. This effect does not last as long on paddles as it does on any other object.
 		if not self.parent.owner == hit_paddle.owner:
 			Stun(hit_paddle, self.paddle_stun_duration)
-			sound = Stun.sound_effect.play()
-			if not sound is None:
-				sound.set_volume(settings.SOUND_VOLUME)
+			play_sound(Stun.sound_effect)
 			self.destroy()
 
 	def update(self, main_clock):

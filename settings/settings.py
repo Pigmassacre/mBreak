@@ -39,25 +39,49 @@ BORDER_COLOR = (200, 200, 200)
 # Music settings
 root = "res/music"
 
-TITLE_MUSIC = []
-for path in os.listdir(os.path.join(root, "title")):
-	TITLE_MUSIC.append(os.path.join(root, "title", path))
+def get_music_files(subdir):
+	try:
+		# Try to list directory contents (works in development)
+		files = os.listdir(os.path.join(root, subdir))
+		return [os.path.join(root, subdir, path) for path in files]
+	except (OSError, IOError):
+		# Fallback for compiled version - hardcoded paths
+		if subdir == "title":
+			return [
+				os.path.join(root, subdir, "sexxxy_bit_3!!!.xm"),
+				os.path.join(root, subdir, "goluigi-nonuniform.xm")
+			]
+		elif subdir == "about":
+			return [
+				os.path.join(root, subdir, "ko0x_-_foralongtime.xm"),
+				os.path.join(root, subdir, "goluigi-nonuniform.xm"),
+				os.path.join(root, subdir, "goluigi-cutie_coriolis_catastrophe.xm")
+			]
+		elif subdir == "game":
+			return [
+				os.path.join(root, subdir, "stardstm.mod"),
+				os.path.join(root, subdir, "socialmoron.xm"),
+				os.path.join(root, subdir, "divine_intervention.mod"),
+				os.path.join(root, subdir, "choke.it")
+			]
+		elif subdir == "postgame":
+			return [
+				os.path.join(root, subdir, "theopeneddoors.xm")
+			]
+		elif subdir == "postmatch":
+			return [
+				os.path.join(root, subdir, "xem_fdl.xm"),
+				os.path.join(root, subdir, "ultraviolet.it"),
+				os.path.join(root, subdir, "thrownintosadness.xm"),
+				os.path.join(root, subdir, "frigid_ridge.it")
+			]
+		return []
 
-ABOUT_MUSIC = []
-for path in os.listdir(os.path.join(root, "about")):
-	ABOUT_MUSIC.append(os.path.join(root, "about", path))
-
-GAME_MUSIC = []
-for path in os.listdir(os.path.join(root, "game")):
-	GAME_MUSIC.append(os.path.join(root, "game", path))
-
-AFTER_GAME_MUSIC = []
-for path in os.listdir(os.path.join(root, "postgame")):
-	AFTER_GAME_MUSIC.append(os.path.join(root, "postgame", path))
-
-AFTER_MATCH_MUSIC = []
-for path in os.listdir(os.path.join(root, "postmatch")):
-	AFTER_MATCH_MUSIC.append(os.path.join(root, "postmatch", path))
+TITLE_MUSIC = get_music_files("title")
+ABOUT_MUSIC = get_music_files("about")
+GAME_MUSIC = get_music_files("game")
+AFTER_GAME_MUSIC = get_music_files("postgame")
+AFTER_MATCH_MUSIC = get_music_files("postmatch")
 
 MUSIC_EVENT = pygame.locals.USEREVENT
 

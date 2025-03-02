@@ -1,5 +1,6 @@
 # Ignore some folders
 libs/
+build/
 
 # Ignore compiled python files.
 *.pyc

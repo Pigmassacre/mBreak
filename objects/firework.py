@@ -11,6 +11,7 @@ import objects.particle as particle
 import objects.ball as ball
 import objects.groups as groups
 import settings.settings as settings
+from settings.sounds import EXPLOSION_SOUNDS
 
 """
 
@@ -20,13 +21,8 @@ This is the Firework effect. When it is destroyed, it spawns particles in every 
 
 class Firework(pygame.sprite.Sprite):
 
-	# Initialize the mixer (so we can load a sound) and load the sound effects.
-	pygame.mixer.init(44100, -16, 2, 2048)
-	sound_effects = []
-	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion1.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion2.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion3.ogg"))
-	sound_effects.append(pygame.mixer.Sound("res/sounds/explosion4.ogg"))
+	# Initialize the list of sound effects.
+	sound_effects = EXPLOSION_SOUNDS
 
 	width = 2
 	height = 2
@@ -79,7 +75,7 @@ class Firework(pygame.sprite.Sprite):
 			a_particle.gravity = 0.05
 
 		# Play a random sound from the sound_effects list.
-		sound = Firework.sound_effects[random.randrange(0, len(Firework.sound_effects))].play()
+		sound = random.choice(Firework.sound_effects).play()
 		if not sound is None:
 			sound.set_volume(settings.SOUND_VOLUME / 8.0)
 

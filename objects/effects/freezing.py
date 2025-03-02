@@ -9,6 +9,7 @@ import objects.effects.effect as effect
 import objects.paddle as paddle
 import objects.particle as particle
 import settings.settings as settings
+from settings.sounds import FREEZING_SOUND
 
 """
 
@@ -22,9 +23,8 @@ class Freezing(effect.Effect):
     # Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
     image = pygame.image.load("res/effect/freezing.png")
 
-    # Initialize the mixer (so we can load a sound) and load the sound effect.
-    pygame.mixer.init(44100, -16, 2, 2048)
-    sound_effect = pygame.mixer.Sound("res/sounds/freezing.ogg")
+    # Initialize the sound effect.
+    sound_effect = FREEZING_SOUND
 
     # Standard values. These will be used unless any other values are specified per instance of this class.
     width = image.get_width()
