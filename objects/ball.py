@@ -82,18 +82,29 @@ class Ball(pygame.sprite.Sprite):
 		# We start by calling the superconstructor.
 		pygame.sprite.Sprite.__init__(self)
 
-		# Create the rect used for collision detection, position etc.
-		self.rect = pygame.rect.Rect(x, y, Ball.width, Ball.height)
+		# Store the owner.
+		self.owner = owner
 
-		# Keep track of x and y as floats, for preciseness sake (rect keeps track of x,y as ints)
+		# Store the x and y position.
 		self.x = x
 		self.y = y
 
+		# Store the angle.
+		self.angle = angle
+
+		# Store the speed.
+		self.speed = Ball.speed
+		self.base_speed = Ball.speed
+		self.tick_speed = 0
+
+		# Track consecutive paddle hits for energy growth
+		self.paddle_hit_counter = 0
+
+		# Create the rect used for collision detection, position etc.
+		self.rect = pygame.rect.Rect(x, y, Ball.width, Ball.height)
+
 		# Keep track of the balls position in the previous frame, used for collision handling.
 		self.previous = pygame.rect.Rect(self.x, self.y, Ball.width, Ball.height)
-
-		# Set the angle variable.
-		self.angle = angle
 
 		# Set maximum speed of the ball.
 		self.max_speed = Ball.max_speed
@@ -102,14 +113,8 @@ class Ball(pygame.sprite.Sprite):
 		self.speed = Ball.speed
 		self.tick_speed = self.speed
 		
-		# Store the base speed for effects to reference
-		self.base_speed = Ball.speed
-
 		# Store the current level of smash stack.
 		self.smash_stack = 0
-		
-		# Store the owner.
-		self.owner = owner
 
 		# Create one image attribute per player.
 		self.player_images = {}
@@ -426,6 +431,9 @@ class Ball(pygame.sprite.Sprite):
 		# Tell ourselves that we have been hit.
 		self.on_hit()
 
+		# Increment paddle hit counter
+		self.paddle_hit_counter += 1
+
 		# Tell the paddle that it has been hit.
 		paddle.on_hit(self)
 
@@ -694,6 +702,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Tell ourselves that we have been hit.
 		self.on_hit()
+
+		# Reset paddle hit counter since we hit a block
+		self.paddle_hit_counter = 0
 
 		# Damage is increased the higher the speed is over the standard speed.
 		damage_dealt = Ball.damage * (self.speed / Ball.speed) * Ball.smash_damage_factor

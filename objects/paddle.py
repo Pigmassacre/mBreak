@@ -190,14 +190,20 @@ class Paddle(pygame.sprite.Sprite):
 
 	def on_hit(self, entity):
 		# If hit by an enemy ball, we increase our owners energy.
+		# Energy gain grows with consecutive paddle hits if hit by a ball
+		energy_multiplier = 1.0
+		if hasattr(entity, 'paddle_hit_counter'):  # Check if entity is a ball
+			energy_multiplier = min(3.0, 1.0 + (entity.paddle_hit_counter * 0.5))  # Cap at 3x
+		energy_gain = self.owner.energy_increase_on_hit * energy_multiplier
+
 		if entity.owner != self.owner:
-			if self.owner.energy + self.owner.energy_increase_on_hit < self.owner.max_energy:
-				self.owner.energy += self.owner.energy_increase_on_hit
+			if self.owner.energy + energy_gain < self.owner.max_energy:
+				self.owner.energy += energy_gain
 			else:
 				self.owner.energy = self.owner.max_energy
 		else:
-			if self.owner.energy + self.owner.energy_increase_on_hit < self.owner.max_energy:
-				self.owner.energy += self.owner.energy_increase_on_hit / 2.0
+			if self.owner.energy + energy_gain/2.0 < self.owner.max_energy:
+				self.owner.energy += energy_gain/2.0
 			else:
 				self.owner.energy = self.owner.max_energy
 
