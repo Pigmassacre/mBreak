@@ -38,12 +38,12 @@ class Burning(effect.Effect):
     particle_spawn_rate = 75
     particle_least_spawn_amount = 3
     particle_maximum_spawn_amount = 5
-    duration = 10000
-    block_duration = 5000
-    spread_check_rate = 500  # Check for spread every 0.5 seconds
-    spread_range = 15  # Reduced range - blocks need to be closer to spread
-    spread_duration_factor = 0.8  # Each spread reduces duration by 20%
-    spread_chance = 0.1  # 25% chance to spread to each eligible neighbor
+    duration = 10000  # Duration in milliseconds for non-block entities
+    block_duration = 5000  # Duration in milliseconds for blocks
+    spread_check_rate = 500  # Check for spread every 500 milliseconds
+    spread_range = 15  # Maximum pixel distance for fire to spread between blocks
+    spread_duration_factor = 0.8  # Each spread reduces remaining duration by 20%
+    spread_chance = 0.2  # 20% chance to spread to each eligible neighboring block
 
     # Scale image.
     image = pygame.transform.scale(image, (width, height))
