@@ -111,12 +111,14 @@ class Paddle(pygame.sprite.Sprite):
 		# New AI variables for smoother movement
 		self.target_y = None
 		self.last_decision_time = 0
-		self.decision_cooldown = 0.1  # Seconds between major decision recalculations
-		self.movement_buffer = 5  # Pixels of buffer to prevent oscillation
+		self.decision_cooldown = 0.08  # Slightly faster recalculation for better accuracy
+		self.movement_buffer = 3  # Smaller buffer for more precise positioning
 		self.current_prediction = None
 		self.prediction_confidence = 0
 		self.last_direction_change = 0
-		self.direction_change_cooldown = 0.15  # Seconds between direction changes
+		self.direction_change_cooldown = 0.12  # Slightly faster direction changes
+		self.missed_balls = 0  # Track missed balls to adjust strategy
+		self.last_hit_time = 0  # Track when we last hit a ball
 
 		# Set the size of the paddle. This takes care of storing the image attribute and coloring it.
 		self.set_size(Paddle.width, Paddle.height)
@@ -201,6 +203,10 @@ class Paddle(pygame.sprite.Sprite):
 
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Paddle.hit_effect_start_color), copy.copy(Paddle.hit_effect_final_color), Paddle.hit_effect_tick_amount))
+		
+		# Record successful hit for AI learning
+		self.last_hit_time = pygame.time.get_ticks() / 1000.0
+		self.missed_balls = max(0, self.missed_balls - 1)  # Reduce missed ball count on successful hit
 
 	def debug_draw(self, surface):
 		if self.focused_item != None and settings.DEBUG_MODE:
@@ -219,7 +225,9 @@ class Paddle(pygame.sprite.Sprite):
 			
 		# Calculate distance to predicted position
 		distance_x = math.fabs(self.rect.x - predicted_x)
-		distance_y = math.fabs((self.rect.y + self.rect.height / 2.0) - predicted_y)
+		# Use the center of the paddle for distance calculation
+		paddle_center_y = self.rect.y + self.rect.height / 2.0
+		distance_y = math.fabs(paddle_center_y - predicted_y)
 		total_distance = math.sqrt(math.pow(distance_x, 2) + math.pow(distance_y, 2))
 		
 		# Adjust distance based on item properties
@@ -249,16 +257,16 @@ class Paddle(pygame.sprite.Sprite):
 			# Left paddle: item must be moving left (angle between π/2 and 3π/2)
 			if not (item.angle >= math.pi / 2.0 and item.angle <= 3 * math.pi / 2.0):
 				return None
-			# Item must be to the right of paddle
-			if item.x < self.x + self.width:
+			# Item must be to the right of paddle or very close
+			if item.x + item.rect.width < self.x:
 				return None
 		else:
 			# Right paddle: item must be moving right (angle between -π/2 and π/2 or between 3π/2 and 5π/2)
 			if not ((item.angle <= math.pi / 2.0 and item.angle >= -math.pi / 2.0) or 
 					(item.angle >= 3 * math.pi / 2.0 and item.angle <= 2 * math.pi + math.pi / 2.0)):
 				return None
-			# Item must be to the left of paddle
-			if item.x > self.x:
+			# Item must be to the left of paddle or very close
+			if item.x > self.x + self.rect.width:
 				return None
 				
 		# Calculate time to reach paddle's x position
@@ -288,26 +296,52 @@ class Paddle(pygame.sprite.Sprite):
 		bounces = 0
 		max_bounces = 5  # Limit calculation to prevent infinite loops
 		
-		while bounces < max_bounces:
-			if predicted_y < settings.LEVEL_Y:
-				# Bounce off top wall
-				overflow = settings.LEVEL_Y - predicted_y
-				predicted_y = settings.LEVEL_Y + overflow
-				bounces += 1
-			elif predicted_y + item.rect.height > settings.LEVEL_MAX_Y:
-				# Bounce off bottom wall
-				overflow = (predicted_y + item.rect.height) - settings.LEVEL_MAX_Y
-				predicted_y = settings.LEVEL_MAX_Y - item.rect.height - overflow
-				bounces += 1
-			else:
-				# No more bounces needed
+		# More accurate bounce calculation
+		remaining_time = time_to_reach
+		current_y = item.y
+		current_speed_y = speed_y
+		
+		while remaining_time > 0 and bounces < max_bounces:
+			# Calculate time to hit top or bottom wall
+			time_to_top = float('inf') if current_speed_y >= 0 else (settings.LEVEL_Y - current_y) / current_speed_y
+			time_to_bottom = float('inf') if current_speed_y <= 0 else ((settings.LEVEL_MAX_Y - item.rect.height) - current_y) / current_speed_y
+			
+			# Find the earliest collision
+			time_to_collision = min(time_to_top, time_to_bottom)
+			
+			# If no collision before reaching paddle, calculate final position
+			if time_to_collision >= remaining_time or time_to_collision <= 0:
+				current_y += current_speed_y * remaining_time
 				break
+				
+			# Move to collision point
+			current_y += current_speed_y * time_to_collision
+			remaining_time -= time_to_collision
+			
+			# Bounce (reverse y velocity)
+			current_speed_y = -current_speed_y
+			bounces += 1
+		
+		predicted_y = current_y
 		
 		# Calculate confidence in prediction based on time and bounces
 		confidence = 1.0 - (time_to_reach / 120.0) - (bounces * 0.15)
+		
+		# Increase confidence for balls that are close
+		if time_to_reach < 30:
+			confidence += 0.3
+			
+		# Increase confidence for balls that are moving directly toward paddle
+		direct_angle = math.pi if paddle_side_left else 0
+		angle_diff = min(abs(item.angle - direct_angle), abs(abs(item.angle - direct_angle) - 2 * math.pi))
+		if angle_diff < math.pi / 4:  # Within 45 degrees of direct path
+			confidence += 0.2
+		
 		confidence = max(0.1, min(1.0, confidence))
 		
-		return (self.x if paddle_side_left else self.x, predicted_y + item.rect.height / 2.0, confidence, time_to_reach)
+		# Return the predicted position - this is the center of the item
+		# We don't add item.rect.height/2.0 here anymore as that was causing the offset issue
+		return (self.x if paddle_side_left else self.x, predicted_y, confidence, time_to_reach)
 		
 	def adjust_distance_by_priority(self, item, distance):
 		"""
@@ -315,6 +349,10 @@ class Paddle(pygame.sprite.Sprite):
 		Returns the adjusted distance value.
 		"""
 		adjusted_distance = distance
+		
+		# Prioritize balls over projectiles
+		if hasattr(item, "__class__") and item.__class__.__name__ == "Ball":
+			adjusted_distance *= 0.6  # Higher priority for balls
 		
 		# Prioritize based on item type
 		if hasattr(item, "owner"):
@@ -333,8 +371,15 @@ class Paddle(pygame.sprite.Sprite):
 		# Prioritize based on distance from paddle
 		if hasattr(item, "x"):
 			x_distance = math.fabs(self.rect.x - item.x)
-			if x_distance < 200:  # Close items get higher priority
+			if x_distance < 150:  # Close items get higher priority
+				adjusted_distance *= 0.6
+			elif x_distance < 300:
 				adjusted_distance *= 0.8
+				
+		# If we've been missing balls, prioritize easier ones
+		if self.missed_balls > 2 and hasattr(item, "speed"):
+			if item.speed < 5:  # Slower balls are easier to hit
+				adjusted_distance *= 0.7
 				
 		return adjusted_distance
 		
@@ -342,7 +387,7 @@ class Paddle(pygame.sprite.Sprite):
 		"""
 		Determines the best strategic position when no immediate threats are present.
 		"""
-		# Default to center position
+		# Default to center position - position the center of the paddle at the center of the screen
 		target_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0 - self.rect.height / 2.0
 		
 		# If there are balls in play, try to position based on their general position
@@ -356,7 +401,8 @@ class Paddle(pygame.sprite.Sprite):
 		if ball_count > 0:
 			# Position slightly toward the average ball position
 			avg_ball_y = ball_y_sum / ball_count
-			target_y = target_y * 0.7 + avg_ball_y * 0.3
+			# Position the center of the paddle at the average ball position
+			target_y = (target_y * 0.7 + (avg_ball_y - self.rect.height / 2.0) * 0.3)
 			
 		return target_y
 		
@@ -417,6 +463,10 @@ class Paddle(pygame.sprite.Sprite):
 			if self.target_y is None:
 				should_recalculate = True
 				
+			# Recalculate more frequently if we've been missing balls
+			if self.missed_balls > 2:
+				should_recalculate = should_recalculate or (current_time - self.last_decision_time) >= (self.decision_cooldown * 0.5)
+				
 			# Decide whether to use energy attack (less frequently than movement decisions)
 			if should_recalculate and random.random() < 0.2:  # Only check 20% of decision times
 				if self.decide_energy_usage():
@@ -436,40 +486,55 @@ class Paddle(pygame.sprite.Sprite):
 				self.prediction_confidence = 0
 
 				# Find the most important item to focus on
-				# First check projectiles
-				for projectile in groups.Groups.projectile_group:
-					self.decide_which_item(projectile)
-						
-				# Then check balls
+				# First check balls (prioritize balls over projectiles)
 				for ball in groups.Groups.ball_group:
 					self.decide_which_item(ball)
+						
+				# Then check projectiles
+				for projectile in groups.Groups.projectile_group:
+					self.decide_which_item(projectile)
 					
 				# If we found a focused item, update target position
 				if self.focused_item is not None:
 					# Different behavior based on AI difficulty
 					if self.owner.ai_difficulty >= 3:
 						# Expert AI: Good positioning with minimal error
+						# Position the center of the paddle at the predicted position
 						self.target_y = self.predicted_y - self.rect.height / 2.0
 						
 						# Add small random offset for realism, but only when changing targets
 						if self.focused_item != old_focused_item:
-							self.target_y += random.uniform(-self.rect.height * 0.05, self.rect.height * 0.05)
+							offset_amount = self.rect.height * 0.05
+							# If we've been missing, reduce randomness
+							if self.missed_balls > 2:
+								offset_amount = self.rect.height * 0.02
+							self.target_y += random.uniform(-offset_amount, offset_amount)
 					
 					elif self.owner.ai_difficulty == 2:
 						# Medium AI: Good positioning with moderate error
+						# Position the center of the paddle at the predicted position
 						self.target_y = self.predicted_y - self.rect.height / 2.0
 						
 						# Add moderate random offset, but only when changing targets
 						if self.focused_item != old_focused_item:
-							self.target_y += random.uniform(-self.rect.height * 0.15, self.rect.height * 0.15)
+							offset_amount = self.rect.height * 0.15
+							# If we've been missing, reduce randomness
+							if self.missed_balls > 2:
+								offset_amount = self.rect.height * 0.08
+							self.target_y += random.uniform(-offset_amount, offset_amount)
 					
 					else:
 						# Easy AI: Basic positioning with significant error
+						# Position the center of the paddle at the predicted position
 						self.target_y = self.predicted_y - self.rect.height / 2.0
 						
 						# Add large random offset, but only when changing targets
 						if self.focused_item != old_focused_item or random.random() < 0.1:
-							self.target_y += random.uniform(-self.rect.height * 0.4, self.rect.height * 0.4)
+							offset_amount = self.rect.height * 0.4
+							# If we've been missing a lot, reduce randomness
+							if self.missed_balls > 3:
+								offset_amount = self.rect.height * 0.25
+							self.target_y += random.uniform(-offset_amount, offset_amount)
 				else:
 					# No immediate threats, use strategic positioning
 					self.target_y = self.strategic_positioning()
@@ -482,14 +547,26 @@ class Paddle(pygame.sprite.Sprite):
 				# Calculate distance to target
 				distance_to_target = self.target_y - paddle_center_y
 				
+				# Adjust buffer based on difficulty and missed balls
+				effective_buffer = self.movement_buffer
+				if self.owner.ai_difficulty >= 3:
+					effective_buffer = max(1, self.movement_buffer - self.missed_balls)
+				elif self.owner.ai_difficulty == 2:
+					effective_buffer = max(2, self.movement_buffer - (self.missed_balls // 2))
+				
 				# Only move if we're outside the buffer zone to prevent oscillation
-				if abs(distance_to_target) > self.movement_buffer:
+				if abs(distance_to_target) > effective_buffer:
 					# Check if we need to change direction
 					changing_direction = (distance_to_target > 0 and self.velocity_y < 0) or (distance_to_target < 0 and self.velocity_y > 0)
 					
 					# Only allow direction changes after cooldown to prevent jerky movement
 					if changing_direction:
-						if current_time - self.last_direction_change < self.direction_change_cooldown:
+						# Adjust cooldown based on missed balls - change direction faster if missing
+						effective_cooldown = self.direction_change_cooldown
+						if self.missed_balls > 2:
+							effective_cooldown *= 0.7
+							
+						if current_time - self.last_direction_change < effective_cooldown:
 							# Don't change direction yet, just slow down
 							if self.velocity_y > 0:
 								self.key_up_pressed = True
@@ -508,22 +585,34 @@ class Paddle(pygame.sprite.Sprite):
 							self.key_down_pressed = True
 						else:
 							self.key_up_pressed = True
-						
+					
 					# Adjust movement based on AI difficulty
 					if self.owner.ai_difficulty < 2:
 						# Easy AI occasionally hesitates
-						if random.random() < 0.15:
+						hesitation_chance = 0.15
+						# Reduce hesitation if missing balls
+						if self.missed_balls > 2:
+							hesitation_chance = 0.08
+						if random.random() < hesitation_chance:
 							self.key_up_pressed = False
 							self.key_down_pressed = False
 					elif self.owner.ai_difficulty == 2:
 						# Medium AI occasionally hesitates
-						if random.random() < 0.05:
+						hesitation_chance = 0.05
+						# Reduce hesitation if missing balls
+						if self.missed_balls > 2:
+							hesitation_chance = 0.02
+						if random.random() < hesitation_chance:
 							self.key_up_pressed = False
 							self.key_down_pressed = False
 				else:
 					# We're close enough to the target, stop moving
 					# This prevents oscillation around the target
 					pass
+					
+			# Check if we might have missed a ball
+			for ball in groups.Groups.ball_group:
+				self.check_if_missed_ball(ball, paddle_side_left)
 		else:
 			# If no AI, we just check for key presses.
 			self.key_up_pressed = pygame.key.get_pressed()[self.owner.key_up]
@@ -596,6 +685,25 @@ class Paddle(pygame.sprite.Sprite):
 		for effect in self.effect_group:
 			effect.rect.x = self.rect.x
 			effect.rect.y = self.rect.y
+
+	def check_if_missed_ball(self, ball, paddle_side_left):
+		"""
+		Checks if we just missed a ball and updates the missed_balls counter.
+		"""
+		# If ball just passed our paddle
+		if (paddle_side_left and ball.x < self.x and ball.rect.right > self.x - 20) or \
+		   (not paddle_side_left and ball.x > self.x + self.rect.width and ball.rect.left < self.x + self.rect.width + 20):
+			# Compare the center of the ball to the center of the paddle
+			paddle_center_y = self.y + self.rect.height / 2.0
+			ball_center_y = ball.y + ball.rect.height / 2.0
+			
+			if abs(ball_center_y - paddle_center_y) < self.rect.height * 1.5:
+				# We probably missed it
+				self.missed_balls += 1
+				# Force recalculation next frame
+				self.last_decision_time = 0
+				return True
+		return False
 
 	def unleash_charge(self):
 		pass
