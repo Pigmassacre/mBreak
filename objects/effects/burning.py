@@ -43,7 +43,7 @@ class Burning(effect.Effect):
     spread_check_rate = 500  # Check for spread every 0.5 seconds
     spread_range = 15  # Reduced range - blocks need to be closer to spread
     spread_duration_factor = 0.8  # Each spread reduces duration by 20%
-    spread_chance = 0.25  # 25% chance to spread to each eligible neighbor
+    spread_chance = 0.1  # 25% chance to spread to each eligible neighbor
 
     # Scale image.
     image = pygame.transform.scale(image, (width, height))
