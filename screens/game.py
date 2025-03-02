@@ -109,7 +109,7 @@ class Game(scene.Scene):
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
 
 		# Setup the powerup list.
-		self.powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
+		self.powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]
 
 		# The rate at which powerups will perhaps be spawned.
 		self.powerup_spawn_rate = 4000
