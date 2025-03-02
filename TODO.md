@@ -1,5 +1,5 @@
 # TODOs
 
-# Update gravity effect
+## Burning effect should spread
 
-* When the gravitational pull effect is active, instead of the current implementation it should now affect the balls gravity AWAY from the opponents paddle.
+* The burning effect that is applied to blocks should slowly spread to neighbouring blocks, copying the effect onto those blocks with a shorter duration.
