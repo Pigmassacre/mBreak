@@ -13,6 +13,7 @@ import settings.settings as settings
 
 This is the GravitationalPull effect. Balls that have this effect will have their trajectory
 affected by a gravitational pull toward the opponent's side, making their movement curve.
+The gravity direction changes randomly within a range, creating a jerky, unpredictable movement.
 
 """
 
@@ -34,6 +35,10 @@ class GravitationalPull(effect.Effect):
 
     # Gravity effect values
     gravity_strength = 200  # High value to be noticeable when multiplied by delta_time
+    
+    # Direction change values
+    direction_change_rate = 150  # How often to change direction (in milliseconds)
+    direction_variation = math.pi / 4  # Maximum variation from base direction (45 degrees)
 
     # Scale image.
     image = pygame.transform.scale(image, (width, height))
@@ -49,40 +54,58 @@ class GravitationalPull(effect.Effect):
         
         # When this reaches particle_spawn_rate, a particle is spawned.
         self.particle_spawn_time = 0
+        
+        # When this reaches direction_change_rate, the gravity direction changes.
+        self.direction_change_time = 0
+        
+        # Store the base direction based on ownership
+        if self.parent.owner == list(groups.Groups.player_group)[0]:  # If ball belongs to player_one (left side)
+            # Base direction to pull toward the right (0 radians or 0 degrees)
+            self.base_direction = 0
+        else:  # If ball belongs to player_two (right side)
+            # Base direction to pull toward the left (π radians or 180 degrees)
+            self.base_direction = math.pi
+            
+        # Set initial random direction variation
+        self.randomize_direction()
 
         # Create the image attribute that is drawn to the surface.
         self.image = GravitationalPull.image.copy()
         
         # Apply gravity effect to the ball when created
-        # This is the key change - we set the gravity properties directly on the ball
-        # when the effect is created, and the ball's update method will use these values
-        if self.parent.owner == list(groups.Groups.player_group)[0]:  # If ball belongs to player_one (left side)
-            # Set gravity to pull toward the right (0 radians or 0 degrees)
-            self.parent.gravity_direction = 0
-        else:  # If ball belongs to player_two (right side)
-            # Set gravity to pull toward the left (π radians or 180 degrees)
-            self.parent.gravity_direction = math.pi
-        
         self.parent.gravity_strength = GravitationalPull.gravity_strength
         
         # Play the sound effect
         sound = GravitationalPull.sound_effect.play()
         if not sound is None:
             sound.set_volume(settings.SOUND_VOLUME)
+            
+    def randomize_direction(self):
+        # Randomize the gravity direction within the allowed variation range
+        variation = random.uniform(-GravitationalPull.direction_variation, GravitationalPull.direction_variation)
+        self.parent.gravity_direction = self.base_direction + variation
 
     def update(self, main_clock):
         # Only apply gravity if the ball is owned by the player who picked up the powerup
         if self.parent.owner == self.real_owner:
-            # Update gravity direction based on current owner
+            # Update base direction based on current owner
             if self.parent.owner == list(groups.Groups.player_group)[0]:  # If ball belongs to player_one (left side)
-                # Set gravity to pull toward the right (0 radians or 0 degrees)
-                self.parent.gravity_direction = 0
+                # Base direction to pull toward the right (0 radians or 0 degrees)
+                self.base_direction = 0
             else:  # If ball belongs to player_two (right side)
-                # Set gravity to pull toward the left (π radians or 180 degrees)
-                self.parent.gravity_direction = math.pi
+                # Base direction to pull toward the left (π radians or 180 degrees)
+                self.base_direction = math.pi
             
             # Make sure gravity strength is set
             self.parent.gravity_strength = GravitationalPull.gravity_strength
+            
+            # Update direction change timer
+            self.direction_change_time += main_clock.get_time()
+            if self.direction_change_time >= GravitationalPull.direction_change_rate:
+                # Reset the direction change time
+                self.direction_change_time = 0
+                # Randomize the gravity direction
+                self.randomize_direction()
             
             # If it's time, spawn particles.
             self.particle_spawn_time += main_clock.get_time()
@@ -126,13 +149,15 @@ class GravitationalPull(effect.Effect):
         if paddle.owner == self.real_owner:
             # The ball is now owned by the player who picked up the powerup
             if paddle.owner == list(groups.Groups.player_group)[0]:  # If paddle belongs to player_one (left side)
-                # Set gravity to pull toward the right (0 radians or 0 degrees)
-                self.parent.gravity_direction = 0
+                # Base direction to pull toward the right (0 radians or 0 degrees)
+                self.base_direction = 0
             else:  # If paddle belongs to player_two (right side)
-                # Set gravity to pull toward the left (π radians or 180 degrees)
-                self.parent.gravity_direction = math.pi
+                # Base direction to pull toward the left (π radians or 180 degrees)
+                self.base_direction = math.pi
             
             self.parent.gravity_strength = GravitationalPull.gravity_strength
+            # Immediately randomize direction after hitting paddle
+            self.randomize_direction()
         else:
             # The ball is now owned by the opponent, turn off gravity
             self.parent.gravity_direction = 0
