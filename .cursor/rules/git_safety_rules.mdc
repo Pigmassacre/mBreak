@@ -1,0 +1,28 @@
+# Git Safety Rules
+
+## Force Push Prevention
+
+Never use `git push --force`, `git push -f`, or any other form of force pushing in Git operations unless explicitly instructed to do so by the user. Even when explicitly requested, always:
+
+1. Explain the risks of force pushing
+2. Confirm that the user understands these risks
+3. Suggest safer alternatives when appropriate
+4. Ask for explicit confirmation before proceeding
+
+## General Git Safety Guidelines
+
+1. Prioritize non-destructive Git operations
+2. Explain Git commands and their effects before executing them
+3. Suggest creating backups or branches before potentially risky operations
+4. Recommend proper merge conflict resolution rather than force pushing
+5. Advise using `git revert` instead of history rewriting when working in shared branches
+
+## Exceptions
+
+Force pushing may only be considered in the following scenarios, and only after explicit user confirmation:
+
+1. When working in a personal feature branch that no one else is using
+2. During rebasing operations on non-shared branches
+3. When fixing a very recent push of sensitive information that needs to be removed from history
+
+Even in these cases, always explain the risks and confirm before proceeding. 

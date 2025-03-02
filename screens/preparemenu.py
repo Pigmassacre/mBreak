@@ -194,11 +194,19 @@ class PrepareMenu(scene.Scene):
 		return ai_menu
 
 	def setup_ai_items(self, grid_menu, function):
+		# Easy difficulty
 		item = imageitem.ImageItem("res/ai/ai_easy.png")
 		item.value = 1
 		grid_menu.add(item, function)
-		item = imageitem.ImageItem("res/ai/ai_hard.png")
+		
+		# Medium difficulty
+		item = imageitem.ImageItem("res/ai/ai_medium.png")
 		item.value = 2
+		grid_menu.add(item, function)
+		
+		# Hard difficulty
+		item = imageitem.ImageItem("res/ai/ai_hard.png")
+		item.value = 3
 		grid_menu.add(item, function)
 
 	def ai_one(self, item):
