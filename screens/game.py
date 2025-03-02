@@ -12,7 +12,7 @@ import objects.paddle as paddle
 import objects.player as player
 import objects.powerups.powerup as powerup
 import objects.powerups.multiball as multiball
-import objects.powerups.doublespeed as doublespeed
+import objects.powerups.speedboost as speedboost
 import objects.powerups.electricity as electricity
 import objects.powerups.fire as fire
 import objects.powerups.frost as frost
@@ -85,7 +85,7 @@ class Game(scene.Scene):
 		paddle.convert()
 		ball.convert()
 		multiball.convert()
-		doublespeed.convert()
+		speedboost.convert()
 		fire.convert()
 		frost.convert()
 		electricity.convert()
@@ -93,6 +93,7 @@ class Game(scene.Scene):
 		enlarger.convert()
 		rocket.convert()
 		explosion.convert()
+		gravity.convert()
 
 		# Create and store the background. For now, we only have one background so we load that. In the future, the system supports
 		# drawing any sort of background as long as those graphics are setup in the same way as "planks" are.
@@ -107,8 +108,8 @@ class Game(scene.Scene):
 		# Create and store the level.
 		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
 
-		# The list of available powerups to spawn.
-		self.powerup_list = [multiball.Multiball, doublespeed.DoubleSpeed, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
+		# Setup the powerup list.
+		self.powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer, gravity.Gravity]
 
 		# The rate at which powerups will perhaps be spawned.
 		self.powerup_spawn_rate = 4000
@@ -128,8 +129,8 @@ class Game(scene.Scene):
 		# The chance that a THIRD powerup will spawn if a second powerup actually spawns.
 		self.powerup_third_spawn_chance = 0.175
 
-		# If there is already a doublespeed powerup on the gamefield, this is the chance that any further will spawn.
-		self.powerup_second_speed_spawn_chance = 0.05
+		# If there is already a speedboost powerup on the gamefield, this is the chance that any further will spawn.
+		self.powerup_second_speed_spawn_chance = 0.2
 
 		# Create the score texts. These are only displayed when the amount of rounds is greater than 0.
 		item_side_padding = 25
@@ -221,19 +222,19 @@ class Game(scene.Scene):
 		# Store what should spawn temporarily.
 		powerup_to_spawn = random.choice(self.powerup_list)
 
-		# If what should've spawned is doublespeed, check if we're allowed to spawn that.
-		if powerup_to_spawn == doublespeed.DoubleSpeed:
+		# If what should've spawned is speedboost, check if we're allowed to spawn that.
+		if powerup_to_spawn == speedboost.SpeedBoost:
 			# Go through all the powerups in the level and...
 			for a_powerup in groups.Groups.powerup_group:
 				# Check if there is already a speed powerup on the field.
-				if a_powerup.__class__ == doublespeed.DoubleSpeed:
+				if a_powerup.__class__ == speedboost.SpeedBoost:
 					# If there is, check if we should allow it to spawn.
 					if random.uniform(0, 1) <= self.powerup_second_speed_spawn_chance:
 						# Ok, it should spawn, so spawn it.
 						return powerup_to_spawn(x, y)
 					else:
-						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't doublespeed and then break the loop.
-						powerup_to_spawn = random.choice([x for x in self.powerup_list if x != doublespeed.DoubleSpeed])
+						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't speedboost and then break the loop.
+						powerup_to_spawn = random.choice([x for x in self.powerup_list if x != speedboost.SpeedBoost])
 						break
 		
 		# If we got this far, we just spawn that powerup.

@@ -101,6 +101,9 @@ class Ball(pygame.sprite.Sprite):
 		# Set the speed variable.
 		self.speed = Ball.speed
 		self.tick_speed = self.speed
+		
+		# Store the base speed for effects to reference
+		self.base_speed = Ball.speed
 
 		# Store the current level of smash stack.
 		self.smash_stack = 0
@@ -319,6 +322,9 @@ class Ball(pygame.sprite.Sprite):
 	def calculate_smash(self, paddle):
 		# Add smash speed to ourselves.
 		self.speed += Ball.smash_speed
+		
+		# Also update the base speed
+		self.base_speed += Ball.smash_speed
 
 		# Increase our smash stack.
 		self.smash_stack += 1
@@ -403,6 +409,9 @@ class Ball(pygame.sprite.Sprite):
 
 		# Remove smash speed.
 		self.speed = Ball.speed
+		
+		# Also reset the base speed
+		self.base_speed = Ball.speed
 
 		# Then reset our smash stack.
 		self.smash_stack = 0
@@ -747,3 +756,20 @@ class Ball(pygame.sprite.Sprite):
 		powerup_collide_list = pygame.sprite.spritecollide(self, groups.Groups.powerup_group, False)
 		for powerup in powerup_collide_list:
 			powerup.hit(self)
+
+	def update_speed_from_effects(self):
+		"""
+		Updates the ball's speed based on active speed effects.
+		This ensures that when multiple speed effects are applied or removed,
+		the ball's speed is calculated correctly.
+		"""
+		# Find all active speed effects
+		active_speed_effects = [effect for effect in self.effect_group if effect.__class__.__name__ == "Speed" and effect.parent.owner == effect.real_owner]
+		
+		if active_speed_effects:
+			# If there are active speed effects, apply the highest multiplier
+			highest_multiplier = max(effect.speed_multiplier for effect in active_speed_effects)
+			self.speed = self.base_speed * highest_multiplier
+		else:
+			# If no active speed effects, restore to base speed
+			self.speed = self.base_speed

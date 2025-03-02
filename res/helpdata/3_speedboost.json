@@ -1,0 +1,6 @@
+{
+	"image": "res/powerup/speedboost.png",
+	"title": "Speed Up",
+	"body": "When picked up, this powerup makes all your balls travel at twice their normal speed for a short while.\n\nThis effect stacks additively, meaning that a ball with 2x this effect travels 3 times as fast, and 4 times as fast with 3x this effect and so forth.",
+	"quote": "\"Hey, where'd it go?\""
+} 
