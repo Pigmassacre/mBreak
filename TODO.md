@@ -1,8 +1,8 @@
 # TODOs
 
-## Add particle effects to blocks when they die
+## Fix bug with energy spent effect
 
-* When a block is destroyed, it should spawn a small particle effect for more juicy gameplay.
+* The energy spent effect appears to occur in the reverse order, it is not visible until a 0.25 seconds have passed.
 
 ## Add particle effects to the laser
 
