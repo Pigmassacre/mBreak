@@ -20,17 +20,9 @@ class Laser(attack.Attack):
 	def __init__(self, owner):
 		# We start by calling the superconstructor.
 		super(Laser, self).__init__(owner)
-
-		self.time_passed = 0
-		self.laserbeam_duration = 0
-
 		self.laserbeam = None
 
 	def reset(self):
-		# Reset all variables to their initial state
-		self.time_passed = 0
-		self.laserbeam_duration = 0
-		
 		# Make sure to destroy any existing laserbeam
 		if self.laserbeam is not None:
 			self.laserbeam.destroy()
@@ -64,31 +56,27 @@ class Laser(attack.Attack):
 					duration = 1000
 				
 				print("creating new laserbeam with power level:", power_level)
-				self.laserbeam = laserbeam.Laserbeam(self.owner, power_level)
-				self.laserbeam_duration = duration
-				# Reset time_passed when creating a new laserbeam
-				self.time_passed = 0
+				self.laserbeam = laserbeam.Laserbeam(self.owner, power_level, duration)
 				
 				# Reset energy to 0 if we used at least 20
 				self.owner.energy = 0
-				print("duration set to " + str(self.laserbeam_duration))
 		else:
 			# If laserbeam already exists, we can extend its duration if we have energy
 			if self.owner.energy >= 20:
-				# Add a small amount of time based on current energy
+				# Add duration based on current energy
 				if self.owner.energy == 100:
-					self.laserbeam_duration += 2500
+					self.laserbeam.duration += 2500
 				elif self.owner.energy >= 80:
-					self.laserbeam_duration += 2000
+					self.laserbeam.duration += 2000
 				elif self.owner.energy >= 60:
-					self.laserbeam_duration += 1500
+					self.laserbeam.duration += 1500
 				elif self.owner.energy >= 40:
-					self.laserbeam_duration += 1000
+					self.laserbeam.duration += 1000
 				elif self.owner.energy >= 20:
-					self.laserbeam_duration += 500
+					self.laserbeam.duration += 500
 					
 				self.owner.energy = 0
-				print("duration extended to " + str(self.laserbeam_duration))
+				print("duration extended to " + str(self.laserbeam.duration))
 
 	def update(self, main_clock):
 		if self.laserbeam is not None:
@@ -96,15 +84,3 @@ class Laser(attack.Attack):
 			if not self.laserbeam.alive():
 				print("Laserbeam was destroyed externally")
 				self.laserbeam = None
-				self.time_passed = 0
-				return
-				
-			# Update the time passed
-			self.time_passed += main_clock.get_time()
-			
-			# Check if the duration has expired
-			if self.time_passed >= self.laserbeam_duration:
-				print(f"Destroying laserbeam after {self.time_passed}ms (duration: {self.laserbeam_duration}ms)")
-				self.laserbeam.destroy()
-				self.laserbeam = None
-				self.time_passed = 0
