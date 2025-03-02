@@ -435,8 +435,129 @@ class Paddle(pygame.sprite.Sprite):
 		"""
 		Determines the best strategic position when no immediate threats are present.
 		"""
-		# Default to center position - position the center of the paddle at the center of the screen
-		# FIXED: Don't subtract half the paddle height - this was causing the offset
+		# Check if we have an active laser
+		active_laser = False
+		laser_height = 0
+		laser_power = 1.0
+		for effect in groups.Groups.effect_group:
+			if effect.__class__.__name__ == "Laserbeam" and effect.owner == self.owner:
+				active_laser = True
+				laser_height = effect.rect.height
+				laser_power = effect.power_level
+				break
+				
+		if active_laser:
+			# Count enemy blocks for aggressive positioning
+			enemy_block_count = 0
+			for block in groups.Groups.block_group:
+				if block.owner != self.owner:
+					enemy_block_count += 1
+					
+			# When laser is active, try to position for maximum block coverage
+			best_position = None
+			max_blocks_hit = 0
+			best_score = float('-inf')
+			paddle_side_left = self.x < settings.SCREEN_WIDTH / 2.0
+			
+			# Try different vertical positions
+			test_positions = []
+			screen_height = settings.LEVEL_MAX_Y - settings.LEVEL_Y
+			
+			# Adjust number of test positions based on enemy block count and laser power
+			# More precise positioning when few blocks remain or laser is powerful
+			num_positions = 10
+			if enemy_block_count <= 3 or laser_power >= 4.0:
+				num_positions = 20  # More precise positioning
+			elif enemy_block_count <= 6 or laser_power >= 3.0:
+				num_positions = 15  # Moderately precise positioning
+			
+			step = screen_height / num_positions
+			
+			# Add center position first (often optimal)
+			test_positions.append(settings.LEVEL_Y + screen_height / 2.0)
+			
+			# Add other test positions
+			for i in range(1, num_positions):
+				pos = settings.LEVEL_Y + (i * step)
+				if pos not in test_positions:
+					test_positions.append(pos)
+					
+			# Test each position
+			for test_y in test_positions:
+				blocks_hit = 0
+				position_score = 0
+				weak_blocks_hit = 0
+				normal_blocks_hit = 0
+				strong_blocks_hit = 0
+				
+				for block in groups.Groups.block_group:
+					if block.owner != self.owner:
+						block_center_y = block.rect.y + block.rect.height / 2.0
+						# Check if block is in laser's vertical range
+						if abs(block_center_y - test_y) <= laser_height / 2.0:
+							# Check if block is in laser's horizontal path
+							if (paddle_side_left and block.rect.x > self.rect.x) or \
+							   (not paddle_side_left and block.rect.x < self.rect.x):
+								blocks_hit += 1
+								
+								# Score based on block type and health
+								if hasattr(block, "health"):
+									# Prioritize blocks with lower health
+									health_factor = 1.0 - (block.health / 100.0)
+									
+									# Identify block type and assign score
+									if block.__class__.__name__ == "WeakBlock":
+										weak_blocks_hit += 1
+										position_score += 3.0 * (1.0 + health_factor)
+									elif block.__class__.__name__ == "NormalBlock":
+										normal_blocks_hit += 1
+										position_score += 2.0 * (1.0 + health_factor)
+									else:  # StrongBlock
+										strong_blocks_hit += 1
+										position_score += 1.0 * (1.0 + health_factor)
+				
+				# Calculate final score for this position
+				if blocks_hit > 0:
+					# Base score from blocks hit
+					final_score = position_score
+					
+					# Bonus for hitting multiple blocks
+					if blocks_hit > 1:
+						final_score *= (1.0 + (blocks_hit / enemy_block_count))
+					
+					# Extra bonus for hitting weak blocks when few blocks remain
+					if enemy_block_count <= 3 and weak_blocks_hit > 0:
+						final_score *= 1.5
+					
+					# Bonus for powerful laser
+					final_score *= math.pow(laser_power, 1.5)
+					
+					# Small penalty for extreme positions (prefer more central positions)
+					# Reduce this penalty when few blocks remain or laser is powerful
+					position_penalty = abs(test_y - (settings.LEVEL_Y + screen_height/2.0)) / screen_height
+					if enemy_block_count <= 3 or laser_power >= 4.0:
+						position_penalty *= 0.3  # Much smaller penalty
+					elif enemy_block_count <= 6 or laser_power >= 3.0:
+						position_penalty *= 0.6  # Smaller penalty
+					final_score -= position_penalty * 10
+					
+					# Update best position if this is the highest scoring position
+					if final_score > best_score:
+						best_score = final_score
+						best_position = test_y
+						max_blocks_hit = blocks_hit
+					# If scores are very close, prefer the more central position
+					elif abs(final_score - best_score) < 0.1 and best_position is not None:
+						if abs(test_y - (settings.LEVEL_Y + screen_height/2.0)) < \
+						   abs(best_position - (settings.LEVEL_Y + screen_height/2.0)):
+							best_position = test_y
+							max_blocks_hit = blocks_hit
+					
+			if best_position is not None:
+				return best_position
+		
+		# If no laser is active or no good position found, use normal strategic positioning
+		# Default to center position
 		target_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
 		
 		# If there are balls in play, try to position based on their general position
@@ -706,9 +827,66 @@ class Paddle(pygame.sprite.Sprite):
 		if self.owner.energy < 20:
 			return False
 			
-		base_chance = self.owner.energy / 200.0  # 0.1 at 20 energy, 0.5 at full energy
+		# Count enemy blocks and blocks in potential laser path
+		enemy_block_count = 0
+		blocks_in_path = 0
+		max_blocks_in_path = 0
+		paddle_center_y = self.rect.y + self.rect.height / 2.0
+		laser_height = 40  # Approximate laser height at base power
 		
-		# Increase chance if enemy paddle is far from balls
+		# Adjust laser height based on energy level
+		if self.owner.energy >= 100:
+			laser_height = 200  # 5x power
+		elif self.owner.energy >= 80:
+			laser_height = 160  # 4x power
+		elif self.owner.energy >= 60:
+			laser_height = 120  # 3x power
+		elif self.owner.energy >= 40:
+			laser_height = 80   # 2x power
+		
+		# Check blocks in potential laser path and count total enemy blocks
+		for block in groups.Groups.block_group:
+			if block.owner != self.owner:
+				enemy_block_count += 1
+				block_center_y = block.rect.y + block.rect.height / 2.0
+				if abs(block_center_y - paddle_center_y) <= laser_height:
+					# Block is within vertical range of laser
+					if (self.x < settings.SCREEN_WIDTH / 2.0 and block.rect.x > self.rect.x) or \
+					   (self.x > settings.SCREEN_WIDTH / 2.0 and block.rect.x < self.rect.x):
+						blocks_in_path += 1
+				max_blocks_in_path += 1
+		
+		# Adjust base chance based on enemy block count
+		if enemy_block_count <= 3:
+			# Very aggressive when enemy has few blocks - use energy whenever possible
+			base_chance = self.owner.energy / 100.0  # 0.2 at 20 energy, 1.0 at full energy
+			# Even more aggressive if we can hit multiple of the remaining blocks
+			if blocks_in_path > 0 and blocks_in_path >= enemy_block_count * 0.5:
+				base_chance *= 2.0
+		elif enemy_block_count <= 6:
+			# Moderately aggressive
+			base_chance = self.owner.energy / 150.0  # 0.13 at 20 energy, 0.67 at full energy
+		else:
+			# Conservative when enemy has many blocks - gather more energy
+			base_chance = self.owner.energy / 200.0  # 0.1 at 20 energy, 0.5 at full energy
+			# Save up energy unless we can hit multiple blocks
+			if blocks_in_path <= 1:
+				base_chance *= 0.5
+		
+		# Significant boost if we can hit multiple blocks
+		if blocks_in_path > 0:
+			# Scale multiplier based on how many enemy blocks remain
+			if enemy_block_count <= 3:
+				# Very high multiplier when few blocks remain
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 3.0)
+			elif enemy_block_count <= 6:
+				# High multiplier for moderate block count
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 2.5)
+			else:
+				# Normal multiplier for many blocks
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 2.0)
+		
+		# Check if enemy paddle is vulnerable (far from balls)
 		enemy_vulnerable = False
 		for player in groups.Groups.player_group:
 			if player != self.owner:
@@ -719,7 +897,13 @@ class Paddle(pygame.sprite.Sprite):
 							break
 		
 		if enemy_vulnerable:
-			base_chance *= 2.0
+			# Scale vulnerability bonus based on remaining blocks
+			if enemy_block_count <= 3:
+				base_chance *= 2.0  # Very aggressive when few blocks remain
+			elif enemy_block_count <= 6:
+				base_chance *= 1.5  # Moderately aggressive
+			else:
+				base_chance *= 1.25  # Less aggressive when many blocks remain
 			
 		# Increase chance if we're losing
 		if hasattr(self.owner, "lives") and hasattr(self.owner, "score"):
@@ -727,11 +911,35 @@ class Paddle(pygame.sprite.Sprite):
 				if player != self.owner:
 					if (hasattr(player, "lives") and player.lives > self.owner.lives) or \
 					   (hasattr(player, "score") and player.score > self.owner.score):
-						base_chance *= 1.5
+						# Scale losing bonus based on remaining blocks
+						if enemy_block_count <= 3:
+							base_chance *= 1.5  # More aggressive when close to winning
+						else:
+							base_chance *= 1.25
 						break
 		
-		# Cap the chance at 0.8 (80%)
-		base_chance = min(base_chance, 0.8)
+		# Higher chance to use laser if we have more energy (exponential scaling)
+		# Scale energy factor based on enemy block count
+		if enemy_block_count <= 3:
+			# More aggressive energy usage when few blocks remain
+			energy_factor = math.pow(self.owner.energy / 100.0, 1.2)
+		elif enemy_block_count <= 6:
+			energy_factor = math.pow(self.owner.energy / 100.0, 1.5)
+		else:
+			# Save energy when many blocks remain
+			energy_factor = math.pow(self.owner.energy / 100.0, 1.8)
+		
+		base_chance *= (1.0 + energy_factor)
+		
+		# Adjust max chance based on enemy block count
+		if enemy_block_count <= 3:
+			max_chance = 1.0  # Allow 100% chance when few blocks remain
+		elif enemy_block_count <= 6:
+			max_chance = 0.95  # High max chance for moderate block count
+		else:
+			max_chance = 0.9   # Normal max chance when many blocks remain
+			
+		base_chance = min(base_chance, max_chance)
 		
 		return random.random() <= base_chance
 
@@ -753,6 +961,14 @@ class Paddle(pygame.sprite.Sprite):
 			# Always recalculate if we don't have a target yet
 			if self.target_y is None:
 				should_recalculate = True
+				
+			# Check if we have an active laser - recalculate more frequently to track moving blocks
+			has_active_laser = False
+			for effect in groups.Groups.effect_group:
+				if effect.__class__.__name__ == "Laserbeam" and effect.owner == self.owner:
+					has_active_laser = True
+					should_recalculate = should_recalculate or (current_time - self.last_decision_time) >= (self.decision_cooldown * 0.5)
+					break
 				
 			# Recalculate more frequently if we've been missing balls
 			if self.missed_balls > 2:
