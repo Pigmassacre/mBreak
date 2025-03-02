@@ -156,7 +156,15 @@ class Game(scene.Scene):
 		self.powerup_increase_spawn_time = 0
 
 		# We start a countdown before the game starts. When the countdown finishes, it calls start_game.
-		self.countdown_screen = countdown.Countdown(self.main_clock, self.start_game)
+		if random.choice([True, False]):
+			# Right direction with small variation
+			self.initial_angle = random.uniform(-math.pi / 24, math.pi / 24)
+			self.start_direction = True
+		else:
+			# Left direction with small variation
+			self.initial_angle = math.pi + random.uniform(-math.pi / 24, math.pi / 24)
+			self.start_direction = False
+		self.countdown_screen = countdown.Countdown(self.main_clock, self.start_game, self.initial_angle)
 
 		# We also hide the cursor.
 		pygame.mouse.set_visible(False)
@@ -241,25 +249,23 @@ class Game(scene.Scene):
 		return powerup_to_spawn(x, y)
 
 	def start_game(self):
-		# When the game starts, we randomly create a ball for either the left or the right player.
-		if random.choice([True, False]):
-			self.create_ball_left()
-		else:
+		# When the game starts, create a ball using the stored initial angle
+		if self.start_direction:
 			self.create_ball_right()
+		else:
+			self.create_ball_left()
 
 	def create_ball_left(self):
 		# Creates a ball for the left player.
 		x = settings.LEVEL_X + (settings.LEVEL_WIDTH + ball.Ball.width) / 2
 		y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT + ball.Ball.height) / 2
-		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
-		ball.Ball(x, y, random_angle, self.player_one)
+		ball.Ball(x, y, self.initial_angle, self.player_one)
 
 	def create_ball_right(self):
 		# Creates a ball for the right player.
 		x = settings.LEVEL_X + (settings.LEVEL_WIDTH + ball.Ball.width) / 2
 		y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT + ball.Ball.height) / 2
-		random_angle = random.uniform(-math.pi / 24, math.pi / 24)
-		ball.Ball(x, y, math.pi + random_angle, self.player_two)
+		ball.Ball(x, y, self.initial_angle, self.player_two)
 
 	def calculate_time_dilation(self, group, least_distance):
 		for entity in group:
@@ -364,6 +370,9 @@ class Game(scene.Scene):
 		if graphics.SHADOWS:
 			groups.Groups.shadow_group.update(self.main_clock)
 
+		# Update the trajectories.
+		groups.Groups.trajectory_group.update(self.main_clock)
+
 		# Update the camera.
 		camera.CAMERA.update(self.main_clock)
 
@@ -411,6 +420,9 @@ class Game(scene.Scene):
 		if settings.DEBUG_MODE:
 			for paddle in groups.Groups.paddle_group:
 				paddle.debug_draw(self.window_surface)
+
+		# Draw the trajectories.
+		self.blit_with_camera(groups.Groups.trajectory_group, self.window_surface)
 
 		# Draw the balls.
 		self.blit_with_camera(groups.Groups.ball_group, self.window_surface)

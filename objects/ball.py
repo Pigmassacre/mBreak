@@ -16,6 +16,7 @@ import objects.dummy as dummy
 import objects.groups as groups
 import settings.settings as settings
 import settings.graphics as graphics
+import objects.trajectory as trajectory
 
 """
 
@@ -154,12 +155,16 @@ class Ball(pygame.sprite.Sprite):
 		self.gravity_direction = 0
 		self.gravity_strength = 0
 
+		# Create a trajectory visualization
+		self.trajectory = trajectory.Trajectory(self)
+
 	def destroy(self):
 		# This should be called when the ball is to be destroyed. It will take care of killing itself and anything affecting it completely.
 		self.kill()
 		self.shadow.kill()
 		for effect in self.effect_group:
 			effect.destroy()
+		self.trajectory.destroy()
 
 	def on_hit(self):
 		# Create a new dummy and add a on hit effect to that dummy.
@@ -309,6 +314,9 @@ class Ball(pygame.sprite.Sprite):
 			if graphics.TRACES:
 				trace.Trace(self)
 				self.trace_spawn_time = 0
+
+		# Update trajectory visualization
+		self.trajectory.update(main_clock)
 
 	def hit_wall(self):
 		# Spawn some particles.
