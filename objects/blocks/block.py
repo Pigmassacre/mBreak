@@ -34,6 +34,13 @@ class Block(pygame.sprite.Sprite):
 	particle_size = 0.75
 	half_health_blend_color = pygame.Color(128, 128, 128)
 
+	# Death particle values
+	death_particle_spawn_amount = 15
+	death_particle_size = 1.2
+	death_particle_min_speed = 0.5 * settings.GAME_FPS
+	death_particle_max_speed = 0.9 * settings.GAME_FPS
+	death_particle_alpha_step = 3 * settings.GAME_FPS
+
 	# On hit effect values.
 	hit_effect_start_color = pygame.Color(255, 255, 255, 255)
 	hit_effect_final_color = pygame.Color(255, 255, 255, 0)
@@ -89,7 +96,7 @@ class Block(pygame.sprite.Sprite):
 		for _ in range(0, Block.particle_spawn_amount):
 			angle = random.uniform(0, 2 * math.pi)
 			speed = 5 * settings.GAME_FPS
-			retardation = 0.25 * settings.GAME_FPS
+			retardation = speed / 24.0  # Calculate retardation based on speed like death particles
 			alpha_step = 5 * settings.GAME_FPS
 			particle.Particle(self.x + self.rect.width / 2, self.y + self.rect.height / 2, Block.particle_size, Block.particle_size, angle, speed, retardation, self.color, alpha_step)
 
@@ -98,9 +105,46 @@ class Block(pygame.sprite.Sprite):
 		self.kill()
 		self.shadow.kill()
 
+	def spawn_death_particles(self):
+		# Spawn particles in all directions when the block is destroyed
+		for i in range(0, Block.death_particle_spawn_amount):
+			# Calculate angle to spread particles in a circle
+			angle = (i / Block.death_particle_spawn_amount) * 2 * math.pi
+			
+			# Random speed between min and max
+			speed = random.uniform(Block.death_particle_min_speed, Block.death_particle_max_speed)
+			retardation = speed / 24.0
+			
+			# Randomly choose between block color and a brighter variant
+			if random.random() > 0.3:  # 70% chance of bright particle
+				# Create a brighter version of the block's color
+				r = min(255, self.color.r + random.randint(50, 100))
+				g = min(255, self.color.g + random.randint(50, 100))
+				b = min(255, self.color.b + random.randint(50, 100))
+				particle_color = pygame.Color(r, g, b)
+			else:
+				particle_color = self.color
+			
+			# Create particle with random variations
+			width = random.uniform(Block.death_particle_size * 0.7, Block.death_particle_size * 1.3)
+			particle.Particle(
+				self.x + self.rect.width / 2, 
+				self.y + self.rect.height / 2,
+				width,  # Random size variation
+				width,
+				angle + random.uniform(-0.3, 0.3),  # More angle variation
+				speed,
+				retardation,
+				particle_color,
+				Block.death_particle_alpha_step
+			)
+
 	def update(self):
 		# Kill the block if health is reduced to zero.
 		if self.health <= 0:
+			# Spawn death particles before destroying
+			self.spawn_death_particles()
+			
 			self.destroy()
 			for effect in self.effect_group:
 				effect.destroy()
