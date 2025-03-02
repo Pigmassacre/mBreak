@@ -38,7 +38,7 @@ class SpeedBoost(powerup.Powerup):
 	duration = 7500
 	
 	# The speed multiplier to apply (1.0 = normal speed, 2.0 = double speed)
-	speed_multiplier = 2.0
+	speed_multiplier = 1.25
 
 	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
