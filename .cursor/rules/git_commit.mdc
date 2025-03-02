@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Write detailed git commit messages
+
+Always write detailed git commit messages that span multiple lines.
+Always use the correct syntax to handle multiple lines (git commit -m "Line 1" -m "Line 2" -m "Line 3").
+
+Do not attempt to make a git commit without first asking the user if they are satisfied with the implementation.
