@@ -10,9 +10,9 @@ p2name		Player Two
 shadows 	1
 particles 	1
 flashes		1
-traces 		0
+traces 		1
 background 	1
-fullscreen 	0
+fullscreen 	1
 maxfps		60
 trajectory	1
 esolution 	1366x768
