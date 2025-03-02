@@ -42,6 +42,8 @@ import screens.matchover as matchover
 import screens.countdown as countdown
 import screens.pausemenu as pausemenu
 
+import objects.effects.transition as transition
+
 """
 
 This is the screen where the actual gameplay takes place. It uses the background module to draw the background, and the
@@ -60,6 +62,9 @@ class Game(scene.Scene):
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done = 0):
 		# Call the superconstructor.
 		scene.Scene.__init__(self, window_surface, main_clock)
+
+		# Create the screen transition effect
+		self.screen_transition = transition.ScreenTransition(window_surface)
 
 		# The next screen to be started when gameloop ends.
 		self.next_screen = gameover.GameOver
@@ -376,7 +381,11 @@ class Game(scene.Scene):
 
 		# Update the camera.
 		camera.CAMERA.update(self.main_clock)
-
+		
+		# Update the screen transition first
+		if not self.screen_transition.done:
+			self.screen_transition.update(self.main_clock.get_time())
+		
 		# At last, we update the countdown_screen.
 		self.countdown_screen.update()
 
@@ -463,6 +472,10 @@ class Game(scene.Scene):
 
 		# Finally, draw the countdown screen. It doesn't draw itself if it is finished, so.
 		self.countdown_screen.draw(self.window_surface)
+
+		# Draw the screen transition effect last
+		if not self.screen_transition.done:
+			self.screen_transition.draw()
 
 	def on_exit(self):
 		# Restore the time scale.

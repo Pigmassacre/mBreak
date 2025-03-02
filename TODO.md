@@ -1,5 +1,5 @@
 # TODOs
 
-## The laser effect is too strong when fully charged
+## Dummy TODO because Cursor fails to remove the last TODO for some reason
 
-* It should not last as long.
+- Yup, AI is pretty cool though.
