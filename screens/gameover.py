@@ -141,7 +141,7 @@ class GameOver(scene.Scene):
 			x = random.uniform(settings.SCREEN_WIDTH / 10.0, settings.SCREEN_WIDTH - settings.SCREEN_WIDTH / 10.0)
 			y = settings.SCREEN_HEIGHT
 			angle = 3 * math.pi / 2.0
-			duration = random.uniform((settings.SCREEN_HEIGHT / 4.0) * firework.Firework.speed / 4.0, (settings.SCREEN_HEIGHT - (settings.SCREEN_HEIGHT / 2.0)) * firework.Firework.speed / 4.0)
+			duration = random.uniform((settings.SCREEN_HEIGHT / 4.0) * firework.Firework.speed, (settings.SCREEN_HEIGHT - (settings.SCREEN_HEIGHT / 2.0)) * firework.Firework.speed)
 			firework.Firework(x, y, angle, duration)
 			self.time_passed = 0
 
