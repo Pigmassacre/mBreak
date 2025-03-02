@@ -7,6 +7,7 @@ import math
 import objects.groups as groups
 import settings.settings as settings
 import objects.camera as camera
+import objects.particle as particle
 
 """
 
@@ -22,6 +23,16 @@ class Laserbeam(pygame.sprite.Sprite):
 	# Standard values. These will be used unless any other values are specified per instance of this class.
 	width = image.get_width()
 	height = image.get_height()
+
+	# Particle effect values
+	particle_spawn_rate = 50  # How often to spawn particles (in milliseconds)
+	particle_min_amount = 2
+	particle_max_amount = 4
+	particle_min_speed = 0.8 * settings.GAME_FPS
+	particle_max_speed = 1.5 * settings.GAME_FPS
+	particle_size_min = 1.5
+	particle_size_max = 3.0
+	particle_lifetime = 3 * settings.GAME_FPS
 
 	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
@@ -41,6 +52,9 @@ class Laserbeam(pygame.sprite.Sprite):
 		self.fade_out_percentage = 0.25  # Last 25% of lifetime is fading out
 		self.current_height_multiplier = 0.0  # Start at 0 height
 		self.duration = duration  # Store the duration locally
+		
+		# Particle spawn timing
+		self.particle_spawn_time = 0
 		
 		# Debug output
 		print(f"Creating laserbeam with power level: {self.power_level}, duration: {self.duration}ms")
@@ -256,6 +270,102 @@ class Laserbeam(pygame.sprite.Sprite):
 					# Scale damage based on power level and current height multiplier
 					damage = 60 * main_clock.delta_time * self.power_level * self.current_height_multiplier
 					block.on_hit(damage)
+
+					# Spawn impact particles at collision points
+					self.particle_spawn_time += main_clock.get_time()
+					if self.particle_spawn_time >= self.__class__.particle_spawn_rate:
+						self.particle_spawn_time = 0
+						
+						# Calculate impact point - use the edge of the laser beam
+						if self.attack_paddle.x < settings.SCREEN_WIDTH / 2.0:
+							impact_x = block.rect.left
+						else:
+							impact_x = block.rect.right
+							
+						# Calculate vertical position within intersection
+						intersection_top = max(self.rect.y, block.rect.y)
+						intersection_bottom = min(self.rect.y + self.rect.height, block.rect.y + block.rect.height)
+						impact_y = (intersection_top + intersection_bottom) / 2
+
+						# Spawn particles
+						for _ in range(random.randint(self.__class__.particle_min_amount, self.__class__.particle_max_amount)):
+							# Calculate particle angle based on laser direction
+							base_angle = math.pi if self.attack_paddle.x < settings.SCREEN_WIDTH / 2.0 else 0
+							angle = base_angle + random.uniform(-math.pi/4, math.pi/4)  # 45-degree cone
+							
+							# Random speed and size
+							speed = random.uniform(self.__class__.particle_min_speed, self.__class__.particle_max_speed)
+							size = random.uniform(self.__class__.particle_size_min, self.__class__.particle_size_max)
+							
+							# Create particle with laser-like color (bright white/blue)
+							color = pygame.Color(
+								random.randint(200, 255),  # High red for brightness
+								random.randint(200, 255),  # High green for brightness
+								255  # Full blue for laser effect
+							)
+							
+							# Create the particle
+							particle.Particle(
+								impact_x, 
+								impact_y,
+								size, 
+								size,
+								angle,
+								speed,
+								speed / 24.0,  # Retardation
+								color,
+								self.__class__.particle_lifetime
+							)
+
+		# Check for paddle hits and create particles
+		for paddle in groups.Groups.paddle_group:
+			if paddle.owner != self.owner:
+				if self.rect.colliderect(paddle.rect):
+					# Spawn impact particles at collision points
+					self.particle_spawn_time += main_clock.get_time()
+					if self.particle_spawn_time >= self.__class__.particle_spawn_rate:
+						self.particle_spawn_time = 0
+						
+						# Calculate impact point - use the edge of the laser beam
+						if self.attack_paddle.x < settings.SCREEN_WIDTH / 2.0:
+							impact_x = paddle.rect.left
+						else:
+							impact_x = paddle.rect.right
+							
+						# Calculate vertical position within intersection
+						intersection_top = max(self.rect.y, paddle.rect.y)
+						intersection_bottom = min(self.rect.y + self.rect.height, paddle.rect.y + paddle.rect.height)
+						impact_y = (intersection_top + intersection_bottom) / 2
+
+						# Spawn particles - use more particles for paddle hits
+						for _ in range(random.randint(self.__class__.particle_min_amount + 1, self.__class__.particle_max_amount + 2)):
+							# Calculate particle angle based on laser direction
+							base_angle = math.pi if self.attack_paddle.x < settings.SCREEN_WIDTH / 2.0 else 0
+							angle = base_angle + random.uniform(-math.pi/3, math.pi/3)  # 60-degree cone for more spread
+							
+							# Random speed and size - slightly faster for paddle hits
+							speed = random.uniform(self.__class__.particle_min_speed * 1.2, self.__class__.particle_max_speed * 1.2)
+							size = random.uniform(self.__class__.particle_size_min, self.__class__.particle_size_max)
+							
+							# Create particle with laser-like color (bright white/blue with more variation)
+							color = pygame.Color(
+								random.randint(180, 255),  # More variation in red
+								random.randint(180, 255),  # More variation in green
+								random.randint(230, 255)   # Slight variation in blue
+							)
+							
+							# Create the particle
+							particle.Particle(
+								impact_x, 
+								impact_y,
+								size, 
+								size,
+								angle,
+								speed,
+								speed / 28.0,  # Less retardation for paddle hits
+								color,
+								self.__class__.particle_lifetime
+							)
 
 		# Restore original width
 		self.rect.width -= 1
