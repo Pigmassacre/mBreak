@@ -1,8 +1,8 @@
 # TODOs
 
-## Add an arrow indicator to the game when its counting down
+## Improve the "GO!" countdown text
 
-* So the players know in which direction the ball will travel when the game starts.
+* Instead of it moving in from the left, it should fade in and scale up in the middle of the screen, stay there a short while then fade out quickly.
 
 ## Show ball trajectory
 
