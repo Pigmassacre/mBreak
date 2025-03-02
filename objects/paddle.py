@@ -236,6 +236,10 @@ class Paddle(pygame.sprite.Sprite):
 		# Adjust by confidence and time to reach
 		adjusted_distance = adjusted_distance / confidence
 		
+		# Give higher priority to slow balls that are close to prevent missing them
+		if hasattr(item, "speed") and item.speed < 5 and distance_x < 100:
+			adjusted_distance *= 0.3  # Much higher priority for slow, close balls
+		
 		# If this item is closer than our current focused item, focus on it
 		if adjusted_distance < self.min_distance:
 			self.min_distance = adjusted_distance
@@ -243,6 +247,28 @@ class Paddle(pygame.sprite.Sprite):
 			self.predicted_y = predicted_y
 			self.current_prediction = prediction_data
 			self.prediction_confidence = confidence
+			
+			# If this is our ball and we're a higher difficulty AI, try to aim it at opponent blocks
+			if self.owner.ai_difficulty >= 2 and hasattr(item, "owner") and item.owner == self.owner:
+				# Check if we're close enough to the ball to aim it
+				paddle_side_left = self.x < settings.SCREEN_WIDTH / 2
+				ball_x = item.x + item.rect.width / 2.0
+				
+				# Only try to aim if the ball is approaching our paddle
+				if (paddle_side_left and ball_x > self.x) or (not paddle_side_left and ball_x < self.x + self.rect.width):
+					# Calculate distance to ball
+					ball_distance = math.fabs(ball_x - (self.x + self.rect.width/2.0))
+					
+					# Only try to aim if the ball is close enough
+					if ball_distance < 150:
+						aim_position = self.calculate_aim_position()
+						if aim_position is not None:
+							# Adjust the predicted position based on aiming
+							# For expert AI, prioritize aiming more
+							if self.owner.ai_difficulty >= 3:
+								self.predicted_y = (self.predicted_y * 0.2 + aim_position * 0.8)
+							else:
+								self.predicted_y = (self.predicted_y * 0.5 + aim_position * 0.5)
 
 	def predict_trajectory(self, item):
 		"""
@@ -273,7 +299,13 @@ class Paddle(pygame.sprite.Sprite):
 		speed_x = item.speed * math.cos(item.angle)
 		
 		# If speed_x is too small, item is moving almost vertically
+		# For very slow balls, we still want to track them if they're close
 		if abs(speed_x) < 0.1:
+			# Check if the ball is very close to the paddle
+			if (paddle_side_left and item.x > self.x and item.x < self.x + 50) or \
+			   (not paddle_side_left and item.x < self.x + self.rect.width and item.x > self.x - 50):
+				# For very close balls, just use current y position
+				return (self.x if paddle_side_left else self.x, item.y + item.rect.height / 2.0, 0.9, 1)
 			return None
 			
 		# Calculate time to reach paddle
@@ -330,6 +362,10 @@ class Paddle(pygame.sprite.Sprite):
 		# Increase confidence for balls that are close
 		if time_to_reach < 30:
 			confidence += 0.3
+		
+		# Increase confidence for slow balls that are close
+		if time_to_reach < 20 and item.speed < 5:
+			confidence += 0.4
 			
 		# Increase confidence for balls that are moving directly toward paddle
 		direct_angle = math.pi if paddle_side_left else 0
@@ -352,26 +388,32 @@ class Paddle(pygame.sprite.Sprite):
 		
 		# Prioritize balls over projectiles
 		if hasattr(item, "__class__") and item.__class__.__name__ == "Ball":
-			adjusted_distance *= 0.6  # Higher priority for balls
+			adjusted_distance *= 0.5  # Even higher priority for balls (was 0.6)
 		
 		# Prioritize based on item type
 		if hasattr(item, "owner"):
 			# Prioritize enemy items over own items
 			if item.owner == self.owner:
-				adjusted_distance *= 2.0
+				adjusted_distance *= 1.5  # Less extreme priority difference (was 2.0)
 			else:
 				adjusted_distance *= 0.5
 				
 		# Prioritize based on speed
-		if hasattr(item, "effect_group"):
-			for effect in item.effect_group:
-				if effect.__class__ == speed.Speed:
-					adjusted_distance *= 0.5  # Higher priority for faster items
+		if hasattr(item, "speed"):
+			# Give higher priority to slow balls as they're easier to aim
+			if item.speed < 5:
+				adjusted_distance *= 0.6  # Higher priority for slow balls
+			elif hasattr(item, "effect_group"):
+				for effect in item.effect_group:
+					if effect.__class__ == speed.Speed:
+						adjusted_distance *= 0.5  # Higher priority for faster items
 					
 		# Prioritize based on distance from paddle
 		if hasattr(item, "x"):
 			x_distance = math.fabs(self.rect.x - item.x)
-			if x_distance < 150:  # Close items get higher priority
+			if x_distance < 100:  # Very close items get highest priority
+				adjusted_distance *= 0.4
+			elif x_distance < 200:  # Close items get higher priority
 				adjusted_distance *= 0.6
 			elif x_distance < 300:
 				adjusted_distance *= 0.8
@@ -379,7 +421,7 @@ class Paddle(pygame.sprite.Sprite):
 		# If we've been missing balls, prioritize easier ones
 		if self.missed_balls > 2 and hasattr(item, "speed"):
 			if item.speed < 5:  # Slower balls are easier to hit
-				adjusted_distance *= 0.7
+				adjusted_distance *= 0.5  # Higher priority (was 0.7)
 				
 		return adjusted_distance
 		
@@ -406,8 +448,248 @@ class Paddle(pygame.sprite.Sprite):
 			# FIXED: Don't subtract half the paddle height - this was causing the offset
 			target_y = (target_y * 0.7 + avg_ball_y * 0.3)
 			
+		# Try to aim at opponent blocks if we have a high enough AI difficulty
+		if self.owner.ai_difficulty >= 2 and ball_count > 0:
+			aim_position = self.calculate_aim_position()
+			if aim_position is not None:
+				# For higher difficulties, prioritize aiming more
+				if self.owner.ai_difficulty >= 3:
+					target_y = (target_y * 0.3 + aim_position * 0.7)
+				else:
+					target_y = (target_y * 0.5 + aim_position * 0.5)
+			
 		return target_y
 		
+	def calculate_aim_position(self):
+		"""
+		Calculates the optimal paddle position to aim at opponent blocks.
+		Returns the y-position where the paddle should be positioned to aim at blocks.
+		"""
+		# Determine if we're the left or right paddle
+		paddle_side_left = self.x < settings.SCREEN_WIDTH / 2
+		
+		# Find opponent blocks
+		opponent_blocks = []
+		for block in groups.Groups.block_group:
+			if block.owner != self.owner:
+				opponent_blocks.append(block)
+				
+		if not opponent_blocks:
+			return None
+			
+		# Find the most vulnerable blocks (prioritize weak blocks first, then normal, then strong)
+		weak_blocks = [b for b in opponent_blocks if b.__class__.__name__ == "WeakBlock"]
+		normal_blocks = [b for b in opponent_blocks if b.__class__.__name__ == "NormalBlock"]
+		strong_blocks = [b for b in opponent_blocks if b.__class__.__name__ == "StrongBlock"]
+		
+		# Prioritize blocks with lower health
+		target_blocks = []
+		if weak_blocks:
+			target_blocks = sorted(weak_blocks, key=lambda b: b.health)
+		elif normal_blocks:
+			target_blocks = sorted(normal_blocks, key=lambda b: b.health)
+		elif strong_blocks:
+			target_blocks = sorted(strong_blocks, key=lambda b: b.health)
+			
+		if not target_blocks:
+			return None
+		
+		# Find a ball that we can use to aim
+		available_balls = []
+		for ball in groups.Groups.ball_group:
+			# For left paddle, use balls owned by us
+			# For right paddle, use balls owned by opponent
+			if (paddle_side_left and ball.owner == self.owner) or (not paddle_side_left and ball.owner != self.owner):
+				available_balls.append(ball)
+				
+		if not available_balls:
+			# If no suitable ball found, aim based on block position
+			target_block = target_blocks[0]
+			return target_block.y + target_block.rect.height / 2.0
+			
+		# Try to find the best block to aim at
+		best_target = None
+		best_score = float('-inf')
+		best_paddle_position = None
+		
+		# Try each of the top 3 most vulnerable blocks (or fewer if there aren't that many)
+		for target_block in target_blocks[:min(3, len(target_blocks))]:
+			# Try to calculate trajectory to this block
+			for ball in available_balls:
+				trajectory_data = self.calculate_trajectory_to_block(ball, target_block, paddle_side_left)
+				if trajectory_data:
+					paddle_position, score = trajectory_data
+					
+					# If this is the best score so far, remember this target
+					if score > best_score:
+						best_score = score
+						best_target = target_block
+						best_paddle_position = paddle_position
+		
+		# If we found a good target, return the paddle position to aim at it
+		if best_paddle_position is not None:
+			return best_paddle_position
+			
+		# Fallback to simpler aiming logic if we couldn't calculate a good trajectory
+		target_block = target_blocks[0]  # Start with the most vulnerable block
+		
+		# Calculate the desired angle to hit the target block
+		if paddle_side_left:
+			# Left paddle aims right
+			desired_angle = 0  # Straight right
+		else:
+			# Right paddle aims left
+			desired_angle = math.pi  # Straight left
+			
+		# Calculate the normalized distance needed to achieve this angle
+		# From hit_left_side_of_paddle: self.angle = math.pi - normalized_distance * max_angle_offset
+		# From hit_right_side_of_paddle: self.angle = normalized_distance * max_angle_offset
+		max_angle_offset = (math.pi / 2 - 0.32)  # Using Ball.least_allowed_vertical_angle
+		
+		# Adjust for vertical position of the target block
+		block_center_y = target_block.y + target_block.rect.height / 2.0
+		screen_center_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
+		
+		# Calculate normalized_distance based on block position
+		# If block is above center, we want to hit lower on paddle (higher normalized_distance)
+		# If block is below center, we want to hit higher on paddle (lower normalized_distance)
+		if block_center_y < screen_center_y:
+			# Block is above center, we need to aim upward
+			normalized_distance = 0.7  # Hit lower part of paddle to aim upward
+		elif block_center_y > screen_center_y:
+			# Block is below center, we need to aim downward
+			normalized_distance = 0.3  # Hit upper part of paddle to aim downward
+		else:
+			# Block is at center, aim straight
+			normalized_distance = 0.5
+			
+		# Calculate the paddle position that would result in this normalized_distance
+		# For any available ball
+		if available_balls:
+			ball = available_balls[0]
+			ball_height = ball.rect.height
+			
+			# Calculate max_distance
+			paddle_center = self.rect.height / 2.0
+			max_distance = paddle_center + ball_height
+			
+			# Calculate where the ball should hit relative to paddle center
+			hit_position_from_center = normalized_distance * max_distance - (paddle_center / 2.0)
+			
+			# Calculate the paddle center position that would achieve this
+			ball_center_y = ball.y + ball.rect.height / 2.0
+			target_paddle_center = ball_center_y - hit_position_from_center
+			
+			# Ensure the paddle stays within the screen bounds
+			min_paddle_center = settings.LEVEL_Y + self.rect.height / 2.0
+			max_paddle_center = settings.LEVEL_MAX_Y - self.rect.height / 2.0
+			target_paddle_center = max(min_paddle_center, min(max_paddle_center, target_paddle_center))
+			
+			return target_paddle_center
+				
+		# If no suitable ball found, aim based on block position
+		return block_center_y
+		
+	def calculate_trajectory_to_block(self, ball, target_block, paddle_side_left):
+		"""
+		Calculates the trajectory needed to hit a specific block.
+		Returns (paddle_position, score) or None if no valid trajectory.
+		Score indicates how good the trajectory is (higher is better).
+		"""
+		# Calculate the target point (center of the block)
+		target_x = target_block.x + target_block.rect.width / 2.0
+		target_y = target_block.y + target_block.rect.height / 2.0
+		
+		# Calculate the angle needed to hit the target
+		ball_x = ball.x + ball.rect.width / 2.0
+		ball_y = ball.y + ball.rect.height / 2.0
+		
+		# Calculate the angle from ball to target
+		dx = target_x - ball_x
+		dy = target_y - ball_y
+		
+		# Skip if the ball is not on the correct side of the paddle
+		if paddle_side_left and ball_x < self.x:
+			return None
+		if not paddle_side_left and ball_x > self.x + self.rect.width:
+			return None
+			
+		# Calculate the desired angle
+		desired_angle = math.atan2(dy, dx)
+		if desired_angle < 0:
+			desired_angle += 2 * math.pi
+			
+		# Check if this angle is achievable with the paddle
+		max_angle_offset = (math.pi / 2 - 0.32)  # Using Ball.least_allowed_vertical_angle
+		
+		# Calculate the normalized distance needed to achieve this angle
+		if paddle_side_left:
+			# For left paddle: angle = math.pi - normalized_distance * max_angle_offset
+			# We want angle = desired_angle
+			# So: math.pi - normalized_distance * max_angle_offset = desired_angle
+			# normalized_distance = (math.pi - desired_angle) / max_angle_offset
+			normalized_distance = (math.pi - desired_angle) / max_angle_offset
+		else:
+			# For right paddle: angle = normalized_distance * max_angle_offset
+			# We want angle = desired_angle
+			# So: normalized_distance * max_angle_offset = desired_angle
+			# normalized_distance = desired_angle / max_angle_offset
+			normalized_distance = desired_angle / max_angle_offset
+			
+		# Check if the normalized distance is within valid range [0,1]
+		if normalized_distance < 0 or normalized_distance > 1:
+			# This angle is not achievable with the paddle
+			return None
+			
+		# Calculate the paddle position that would result in this normalized_distance
+		ball_height = ball.rect.height
+		
+		# Calculate max_distance
+		# This is the distance from paddle center to the top of the paddle plus ball height
+		paddle_center = self.rect.height / 2.0
+		max_distance = paddle_center + ball_height
+		
+		# Calculate where the ball should hit relative to paddle center
+		hit_position_from_center = normalized_distance * max_distance - (paddle_center / 2.0)
+		
+		# Calculate the paddle center position that would achieve this
+		ball_center_y = ball.y + ball.rect.height / 2.0
+		target_paddle_center = ball_center_y - hit_position_from_center
+		
+		# Ensure the paddle stays within the screen bounds
+		min_paddle_center = settings.LEVEL_Y + self.rect.height / 2.0
+		max_paddle_center = settings.LEVEL_MAX_Y - self.rect.height / 2.0
+		
+		# If the required position is outside the screen bounds, this trajectory is not possible
+		if target_paddle_center < min_paddle_center or target_paddle_center > max_paddle_center:
+			return None
+			
+		# Calculate a score for this trajectory
+		# Higher score for:
+		# - Lower health blocks
+		# - Blocks that are easier to hit (more central)
+		# - Trajectories that don't require extreme paddle positions
+		
+		# Base score on block health (lower health = higher score)
+		score = 100 - target_block.health
+		
+		# Bonus for weak blocks
+		if target_block.__class__.__name__ == "WeakBlock":
+			score += 50
+		elif target_block.__class__.__name__ == "NormalBlock":
+			score += 25
+			
+		# Penalty for extreme paddle positions (prefer more central positions)
+		screen_center_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
+		position_penalty = abs(target_paddle_center - screen_center_y) / (settings.LEVEL_MAX_Y - settings.LEVEL_Y)
+		score -= position_penalty * 30
+		
+		# Penalty for extreme angles (prefer more direct shots)
+		angle_penalty = abs(normalized_distance - 0.5) * 20
+		score -= angle_penalty
+		
+		return (target_paddle_center, score)
+
 	def decide_energy_usage(self):
 		"""
 		Makes intelligent decisions about when to use energy attacks.
@@ -498,52 +780,81 @@ class Paddle(pygame.sprite.Sprite):
 					
 				# If we found a focused item, update target position
 				if self.focused_item is not None:
-					# Different behavior based on AI difficulty
-					if self.owner.ai_difficulty >= 3:
-						# Expert AI: Good positioning with minimal error
-						# Position the paddle so its center aligns with the predicted position
-						# FIXED: Don't subtract half the paddle height - this was causing the offset
-						self.target_y = self.predicted_y
-						
-						# Add small random offset for realism, but only when changing targets
-						if self.focused_item != old_focused_item:
-							offset_amount = self.rect.height * 0.05
-							# If we've been missing, reduce randomness
-							if self.missed_balls > 2:
-								offset_amount = self.rect.height * 0.02
-							self.target_y += random.uniform(-offset_amount, offset_amount)
+					# Check if this is our ball and it's approaching our paddle
+					is_our_ball = hasattr(self.focused_item, "owner") and self.focused_item.owner == self.owner
+					ball_approaching = False
 					
-					elif self.owner.ai_difficulty == 2:
-						# Medium AI: Good positioning with moderate error
-						# Position the paddle so its center aligns with the predicted position
-						# FIXED: Don't subtract half the paddle height - this was causing the offset
-						self.target_y = self.predicted_y
+					if hasattr(self.focused_item, "x") and hasattr(self.focused_item, "rect"):
+						ball_x = self.focused_item.x + self.focused_item.rect.width / 2.0
+						ball_distance = math.fabs(ball_x - (self.x + self.rect.width/2.0))
 						
-						# Add moderate random offset, but only when changing targets
-						if self.focused_item != old_focused_item:
-							offset_amount = self.rect.height * 0.15
-							# If we've been missing, reduce randomness
-							if self.missed_balls > 2:
-								offset_amount = self.rect.height * 0.08
-							self.target_y += random.uniform(-offset_amount, offset_amount)
+						if (paddle_side_left and ball_x > self.x and ball_x < self.x + 200) or \
+						   (not paddle_side_left and ball_x < self.x + self.rect.width and ball_x > self.x - 200):
+							ball_approaching = True
 					
+					# If this is our ball and it's approaching, try to aim it at opponent blocks
+					if is_our_ball and ball_approaching and self.owner.ai_difficulty >= 2:
+						aim_position = self.calculate_aim_position()
+						if aim_position is not None:
+							# For higher difficulties, prioritize aiming more
+							if self.owner.ai_difficulty >= 3:
+								self.target_y = aim_position  # Use the aim position directly
+							else:
+								# Medium difficulty - blend between predicted position and aim position
+								self.target_y = (self.predicted_y * 0.2 + aim_position * 0.8)
 					else:
-						# Easy AI: Basic positioning with significant error
-						# Position the paddle so its center aligns with the predicted position
-						# FIXED: Don't subtract half the paddle height - this was causing the offset
-						self.target_y = self.predicted_y
+						# Different behavior based on AI difficulty
+						if self.owner.ai_difficulty >= 3:
+							# Expert AI: Good positioning with minimal error
+							self.target_y = self.predicted_y
+							
+							# Add small random offset for realism, but only when changing targets
+							if self.focused_item != old_focused_item:
+								offset_amount = self.rect.height * 0.05
+								# If we've been missing, reduce randomness
+								if self.missed_balls > 2:
+									offset_amount = self.rect.height * 0.02
+								self.target_y += random.uniform(-offset_amount, offset_amount)
 						
-						# Add large random offset, but only when changing targets
-						if self.focused_item != old_focused_item or random.random() < 0.1:
-							offset_amount = self.rect.height * 0.4
-							# If we've been missing a lot, reduce randomness
-							if self.missed_balls > 3:
-								offset_amount = self.rect.height * 0.25
-							self.target_y += random.uniform(-offset_amount, offset_amount)
+						elif self.owner.ai_difficulty == 2:
+							# Medium AI: Good positioning with moderate error
+							self.target_y = self.predicted_y
+							
+							# Add moderate random offset, but only when changing targets
+							if self.focused_item != old_focused_item:
+								offset_amount = self.rect.height * 0.15
+								# If we've been missing, reduce randomness
+								if self.missed_balls > 2:
+									offset_amount = self.rect.height * 0.08
+								self.target_y += random.uniform(-offset_amount, offset_amount)
+						
+						else:
+							# Easy AI: Basic positioning with significant error
+							self.target_y = self.predicted_y
+							
+							# Add large random offset, but only when changing targets
+							if self.focused_item != old_focused_item or random.random() < 0.1:
+								offset_amount = self.rect.height * 0.4
+								# If we've been missing a lot, reduce randomness
+								if self.missed_balls > 3:
+									offset_amount = self.rect.height * 0.25
+								self.target_y += random.uniform(-offset_amount, offset_amount)
 				else:
 					# No immediate threats, use strategic positioning
 					self.target_y = self.strategic_positioning()
-			
+					
+					# For higher difficulty AIs, occasionally try to aim at opponent blocks
+					# even when there's no immediate threat
+					if self.owner.ai_difficulty >= 2 and self.focused_item is not None and hasattr(self.focused_item, "owner") and self.focused_item.owner == self.owner:
+						# We have a ball that we own, try to aim it at opponent blocks
+						aim_position = self.calculate_aim_position()
+						if aim_position is not None:
+							# For expert AI, prioritize aiming more
+							if self.owner.ai_difficulty >= 3:
+								self.target_y = (self.target_y * 0.2 + aim_position * 0.8)
+							else:
+								self.target_y = (self.target_y * 0.4 + aim_position * 0.6)
+
 			# If we have a target position, move toward it
 			if self.target_y is not None:
 				# Calculate the center of the paddle
