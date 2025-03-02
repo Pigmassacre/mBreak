@@ -1,9 +1,5 @@
 # TODOs
 
-## Update energy growth
-
-* The amount of energy that is gained when a ball hits a paddle should grow every time the ball hits a paddle, resetting when it hits a block.
-
 ## Add particle effects to blocks when they die
 
 * When a block is destroyed, it should spawn a small particle effect for more juicy gameplay.
