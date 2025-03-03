@@ -555,9 +555,6 @@ class Ball(pygame.sprite.Sprite):
 				# Right side of block collided with.
 				block_information[block] = "right"
 
-		if len(block_information) > 3:
-			print("block_information len " + str(len(block_information)))
-
 		# If we've only hit one block, we don't need to check so much. Just check which side we've collided with and act accordingly.
 		if len(block_information) == 1:
 			# Check what side we've hit that block and act accordingly.

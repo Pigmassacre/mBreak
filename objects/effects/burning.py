@@ -127,7 +127,7 @@ class Burning(effect.Effect):
 
         if self.parent.owner == self.real_owner:
             # If the parent has health, deal damage to it.
-            if hasattr(self.parent, "health"):
+            if hasattr(self.parent, "health") and self.parent.health is not None:
                 self.parent.hurt(Burning.damage_per_second * main_clock.delta_time)
 
             # Check for spreading to neighbors
@@ -146,7 +146,7 @@ class Burning(effect.Effect):
                 # Spawn a random amount of particles.
                 for _ in range(0, random.randrange(Burning.particle_least_spawn_amount, Burning.particle_maximum_spawn_amount)):
                     width = random.uniform(self.parent.rect.width / 4.0, self.parent.rect.width / 2.0)
-                    if hasattr(self.parent, "angle"):
+                    if hasattr(self.parent, "angle") and self.parent.angle is not None:
                         angle = self.parent.angle + random.uniform(-math.pi / 5.0, math.pi / 5.0)
                     else:
                         angle = random.uniform(0, 2 * math.pi)

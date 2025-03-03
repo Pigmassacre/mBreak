@@ -56,9 +56,6 @@ class Laserbeam(pygame.sprite.Sprite):
 		# Particle spawn timing
 		self.particle_spawn_time = 0
 		
-		# Debug output
-		print(f"Creating laserbeam with power level: {self.power_level}, duration: {self.duration}ms")
-
 		# Find the attack paddle
 		self.attack_paddle = None
 		for player in groups.Groups.player_group:
@@ -70,7 +67,6 @@ class Laserbeam(pygame.sprite.Sprite):
 				
 		# If we couldn't find a paddle, we can't create a laserbeam
 		if self.attack_paddle is None:
-			print("Error: Could not find attack paddle for laserbeam")
 			self.kill()
 			return
 
@@ -85,7 +81,6 @@ class Laserbeam(pygame.sprite.Sprite):
 		
 		# Check if we have valid dimensions
 		if self.rect.width <= 0 or self.rect.height <= 0:
-			print("Error: Invalid laserbeam dimensions")
 			self.kill()
 			return
 
@@ -103,7 +98,6 @@ class Laserbeam(pygame.sprite.Sprite):
 
 		# Add self to the effect group.
 		groups.Groups.effect_group.add(self)
-		print(f"Laserbeam created with dimensions: {self.rect.width}x{self.rect.height}")
 
 		# Add screen shake based on power level
 		shake_duration = int(250 * self.power_level)  # 250ms to 1250ms
@@ -185,7 +179,6 @@ class Laserbeam(pygame.sprite.Sprite):
 	def create_final_image(self):
 		# Check if we have valid dimensions
 		if self.rect.width <= 0 or self.rect.height <= 0:
-			print("Error: Invalid dimensions for laserbeam image")
 			return
 			
 		# Resize the image surface to match the current rect dimensions

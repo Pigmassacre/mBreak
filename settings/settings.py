@@ -40,44 +40,8 @@ BORDER_COLOR = (200, 200, 200)
 root = "res/music"
 
 def get_music_files(subdir):
-	try:
-		# Try to list directory contents (works in development)
-		files = os.listdir(os.path.join(root, subdir))
-		for path in files:
-			print(path)
-		return [os.path.join(root, subdir, path) for path in files]
-	except (OSError, IOError):
-		# Fallback for compiled version - hardcoded paths
-		if subdir == "title":
-			return [
-				os.path.join(root, subdir, "sexxxy_bit_3!!!.xm"),
-				os.path.join(root, subdir, "goluigi-nonuniform.xm")
-			]
-		elif subdir == "about":
-			return [
-				os.path.join(root, subdir, "ko0x_-_foralongtime.xm"),
-				os.path.join(root, subdir, "goluigi-nonuniform.xm"),
-				os.path.join(root, subdir, "goluigi-cutie_coriolis_catastrophe.xm")
-			]
-		elif subdir == "game":
-			return [
-				os.path.join(root, subdir, "stardstm.mod"),
-				os.path.join(root, subdir, "socialmoron.xm"),
-				os.path.join(root, subdir, "divine_intervention.mod"),
-				os.path.join(root, subdir, "choke.it")
-			]
-		elif subdir == "postgame":
-			return [
-				os.path.join(root, subdir, "theopeneddoors.xm")
-			]
-		elif subdir == "postmatch":
-			return [
-				os.path.join(root, subdir, "xem_fdl.xm"),
-				os.path.join(root, subdir, "ultraviolet.it"),
-				os.path.join(root, subdir, "thrownintosadness.xm"),
-				os.path.join(root, subdir, "frigid_ridge.it")
-			]
-		return []
+	files = os.listdir(os.path.join(root, subdir))
+	return [os.path.join(root, subdir, path) for path in files]
 
 TITLE_MUSIC = get_music_files("title")
 ABOUT_MUSIC = get_music_files("about")
@@ -91,14 +55,14 @@ MUSIC_VOLUME = 1.0
 SOUND_VOLUME = 1.0
 
 # Player One settings.
-PLAYER_ONE_NAME = "One"
+PLAYER_ONE_NAME = "Player One"
 PLAYER_ONE_KEY_UP = pygame.locals.K_w
 PLAYER_ONE_KEY_DOWN = pygame.locals.K_s
 PLAYER_ONE_KEY_UNLEASH_ENERGY = pygame.locals.K_r
 PLAYER_ONE_JOY_UNLEASH_ENERGY = 2
 
 # Player Two settings.
-PLAYER_TWO_NAME = "Two"
+PLAYER_TWO_NAME = "Player Two"
 PLAYER_TWO_KEY_UP = pygame.locals.K_UP
 PLAYER_TWO_KEY_DOWN = pygame.locals.K_DOWN
 PLAYER_TWO_KEY_UNLEASH_ENERGY = pygame.locals.K_RSHIFT
@@ -119,6 +83,8 @@ def load():
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
+	global SOUND_VOLUME
+	global MUSIC_VOLUME
 
 	try:
 		# This will raise an OSError if the file doesn't exist.
@@ -141,7 +107,11 @@ def load():
 		file.write("flashes 	1\n")
 		file.write("traces 		1\n")
 		file.write("background 	1\n")
-		file.write("resolution	855x480")
+		file.write("resolution	855x480\n")
+		file.write("\n")
+		file.write("# AUDIO\n")
+		file.write("soundvolume	1.0\n")
+		file.write("musicvolume	1.0")
 		file.close()
 
 	# We open and read the settings file line by line.
@@ -158,6 +128,10 @@ def load():
 			elif "resolution" in line:
 				resolution = line.strip("resolution").strip().split("x")
 				set_resolution(int(resolution[0]), int(resolution[1]))
+			elif "soundvolume" in line:
+				SOUND_VOLUME = float(line.strip("soundvolume").strip())
+			elif "musicvolume" in line:
+				MUSIC_VOLUME = float(line.strip("musicvolume").strip())
 	finally:
 		file.close()
 
@@ -183,6 +157,8 @@ def save():
 	global DEBUG_MODE
 	global PLAYER_ONE_NAME
 	global PLAYER_TWO_NAME
+	global SOUND_VOLUME
+	global MUSIC_VOLUME
 
 	# We use a temporary file to write to, so we don't corrupt our old file if the process fails.
 	temp_file = open("settings.txt.tmp", "w")
@@ -197,6 +173,10 @@ def save():
 				temp_file.write(line.replace(line.strip("p1name").strip(), PLAYER_ONE_NAME))
 			elif "p2name" in line:
 				temp_file.write(line.replace(line.strip("p2name").strip(), PLAYER_TWO_NAME))
+			elif "soundvolume" in line:
+				temp_file.write(line.replace(line.strip("soundvolume").strip(), str(SOUND_VOLUME)))
+			elif "musicvolume" in line:
+				temp_file.write(line.replace(line.strip("musicvolume").strip(), str(MUSIC_VOLUME)))
 			else:
 				temp_file.write(line)
 	finally:

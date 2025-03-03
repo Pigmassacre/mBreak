@@ -159,7 +159,7 @@ class Paddle(pygame.sprite.Sprite):
 		self.x += (old_width - self.rect.width) / 2.0
 		self.y += (old_height - self.rect.height) / 2.0
 
-		if hasattr(self, 'image'):
+		if hasattr(self, 'image') and self.image is not None:
 			# Resize the current image.
 			self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
 		else:
@@ -179,7 +179,7 @@ class Paddle(pygame.sprite.Sprite):
 		useful.colorize_image(self.image, copy.copy(self.owner.color), False, False)
 
 		# If the shadow already exists, kill it first.
-		if hasattr(self, 'shadow'):
+		if hasattr(self, 'shadow') and self.shadow is not None:
 			self.shadow.kill()
 
 		# Then, create a (new) shadow.
@@ -243,7 +243,7 @@ class Paddle(pygame.sprite.Sprite):
 		adjusted_distance = adjusted_distance / confidence
 		
 		# Give higher priority to slow balls that are close to prevent missing them
-		if hasattr(item, "speed") and item.speed < 5 and distance_x < 100:
+		if hasattr(item, "speed") and item.speed is not None and item.speed < 5 and distance_x < 100:
 			adjusted_distance *= 0.3  # Much higher priority for slow, close balls
 		
 		# If this item is closer than our current focused item, focus on it
@@ -255,7 +255,7 @@ class Paddle(pygame.sprite.Sprite):
 			self.prediction_confidence = confidence
 			
 			# If this is our ball and we're a higher difficulty AI, try to aim it at opponent blocks
-			if self.owner.ai_difficulty >= 2 and hasattr(item, "owner") and item.owner == self.owner:
+			if self.owner.ai_difficulty >= 2 and hasattr(item, "owner") and item.owner is not None and item.owner == self.owner:
 				# Check if we're close enough to the ball to aim it
 				paddle_side_left = self.x < settings.SCREEN_WIDTH / 2
 				ball_x = item.x + item.rect.width / 2.0
@@ -370,7 +370,7 @@ class Paddle(pygame.sprite.Sprite):
 			confidence += 0.3
 		
 		# Increase confidence for slow balls that are close
-		if time_to_reach < 20 and item.speed < 5:
+		if time_to_reach < 20 and item.speed is not None and item.speed < 5:
 			confidence += 0.4
 			
 		# Increase confidence for balls that are moving directly toward paddle
@@ -393,11 +393,11 @@ class Paddle(pygame.sprite.Sprite):
 		adjusted_distance = distance
 		
 		# Prioritize balls over projectiles
-		if hasattr(item, "__class__") and item.__class__.__name__ == "Ball":
+		if hasattr(item, "__class__") and item.__class__ is not None and item.__class__.__name__ == "Ball":
 			adjusted_distance *= 0.5  # Even higher priority for balls (was 0.6)
 		
 		# Prioritize based on item type
-		if hasattr(item, "owner"):
+		if hasattr(item, "owner") and item.owner is not None:
 			# Prioritize enemy items over own items
 			if item.owner == self.owner:
 				adjusted_distance *= 1.5  # Less extreme priority difference (was 2.0)
@@ -405,17 +405,17 @@ class Paddle(pygame.sprite.Sprite):
 				adjusted_distance *= 0.5
 				
 		# Prioritize based on speed
-		if hasattr(item, "speed"):
+		if hasattr(item, "speed") and item.speed is not None:
 			# Give higher priority to slow balls as they're easier to aim
 			if item.speed < 5:
 				adjusted_distance *= 0.6  # Higher priority for slow balls
-			elif hasattr(item, "effect_group"):
+			elif hasattr(item, "effect_group") and item.effect_group is not None:
 				for effect in item.effect_group:
 					if effect.__class__ == speed.Speed:
 						adjusted_distance *= 0.5  # Higher priority for faster items
 					
 		# Prioritize based on distance from paddle
-		if hasattr(item, "x"):
+		if hasattr(item, "x") and item.x is not None:
 			x_distance = math.fabs(self.rect.x - item.x)
 			if x_distance < 100:  # Very close items get highest priority
 				adjusted_distance *= 0.4
@@ -425,7 +425,7 @@ class Paddle(pygame.sprite.Sprite):
 				adjusted_distance *= 0.8
 				
 		# If we've been missing balls, prioritize easier ones
-		if self.missed_balls > 2 and hasattr(item, "speed"):
+		if self.missed_balls > 2 and hasattr(item, "speed") and item.speed is not None:
 			if item.speed < 5:  # Slower balls are easier to hit
 				adjusted_distance *= 0.5  # Higher priority (was 0.7)
 				
@@ -501,7 +501,7 @@ class Paddle(pygame.sprite.Sprite):
 								blocks_hit += 1
 								
 								# Score based on block type and health
-								if hasattr(block, "health"):
+								if hasattr(block, "health") and block.health is not None:
 									# Prioritize blocks with lower health
 									health_factor = 1.0 - (block.health / 100.0)
 									
@@ -906,7 +906,7 @@ class Paddle(pygame.sprite.Sprite):
 				base_chance *= 1.25  # Less aggressive when many blocks remain
 			
 		# Increase chance if we're losing
-		if hasattr(self.owner, "lives") and hasattr(self.owner, "score"):
+		if hasattr(self.owner, "lives") and self.owner.lives is not None and hasattr(self.owner, "score") and self.owner.score is not None:
 			for player in groups.Groups.player_group:
 				if player != self.owner:
 					if (hasattr(player, "lives") and player.lives > self.owner.lives) or \
@@ -1004,10 +1004,10 @@ class Paddle(pygame.sprite.Sprite):
 				# If we found a focused item, update target position
 				if self.focused_item is not None:
 					# Check if this is our ball and it's approaching our paddle
-					is_our_ball = hasattr(self.focused_item, "owner") and self.focused_item.owner == self.owner
+					is_our_ball = hasattr(self.focused_item, "owner") and self.focused_item.owner is not None and self.focused_item.owner == self.owner
 					ball_approaching = False
 					
-					if hasattr(self.focused_item, "x") and hasattr(self.focused_item, "rect"):
+					if hasattr(self.focused_item, "x") and self.focused_item.x is not None and hasattr(self.focused_item, "rect") and self.focused_item.rect is not None:
 						ball_x = self.focused_item.x + self.focused_item.rect.width / 2.0
 						ball_distance = math.fabs(ball_x - (self.x + self.rect.width/2.0))
 						
@@ -1067,7 +1067,7 @@ class Paddle(pygame.sprite.Sprite):
 					
 					# For higher difficulty AIs, occasionally try to aim at opponent blocks
 					# even when there's no immediate threat
-					if self.owner.ai_difficulty >= 2 and self.focused_item is not None and hasattr(self.focused_item, "owner") and self.focused_item.owner == self.owner:
+					if self.owner.ai_difficulty >= 2 and self.focused_item is not None and hasattr(self.focused_item, "owner") and self.focused_item.owner is not None and self.focused_item.owner == self.owner:
 						# We have a ball that we own, try to aim it at opponent blocks
 						aim_position = self.calculate_aim_position()
 						if aim_position is not None:

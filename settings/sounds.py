@@ -1,6 +1,6 @@
 import pygame
 import os
-import settings
+import settings.settings as settings
 
 """
 Sound manager that handles loading sound effects in both development and compiled environments.
@@ -10,16 +10,7 @@ Sound manager that handles loading sound effects in both development and compile
 pygame.mixer.init(44100, -16, 2, 2048)
 
 def get_sound(path):
-    """Load a sound file with fallback for compiled version"""
-    try:
-        return pygame.mixer.Sound(path)
-    except (FileNotFoundError, IOError):
-        # In the compiled version, try without the 'res/' prefix
-        try:
-            return pygame.mixer.Sound(path.replace('res/', ''))
-        except (FileNotFoundError, IOError):
-            print(f"Warning: Could not load sound {path}")
-            return None
+    return pygame.mixer.Sound(path)
 
 def play_sound(sound):
     """Play a sound with the game's standard volume settings"""

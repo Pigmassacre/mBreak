@@ -60,7 +60,6 @@ class Laser(attack.Attack):
 					duration = 1000
 					energy_to_spend = 20
 				
-				print("creating new laserbeam with power level:", power_level)
 				self.laserbeam = laserbeam.Laserbeam(self.owner, power_level, duration)
 				
 				# Reset energy to 0
@@ -87,11 +86,9 @@ class Laser(attack.Attack):
 					energy_to_spend = 20
 					
 				self.owner.energy = 0
-				print("duration extended to " + str(self.laserbeam.duration))
 
 	def update(self, main_clock):
 		if self.laserbeam is not None:
 			# Check if the laserbeam is still alive
 			if not self.laserbeam.alive():
-				print("Laserbeam was destroyed externally")
 				self.laserbeam = None
