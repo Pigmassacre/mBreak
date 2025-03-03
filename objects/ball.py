@@ -515,145 +515,155 @@ class Ball(pygame.sprite.Sprite):
 
 	def check_collision_blocks(self):
 		# This check for collision with blocks (and handles them if they are detected).
-		# Since movement in this game is done step by step (we do not use raytracing) it's possible
-		# for balls to collided with more blocks than they actually should've collided with.
-		# This method meticulously goes through every possible combination of blocks collided with
-		# and deals with each accordingly.
 		blocks_collided_with = pygame.sprite.spritecollide(self, groups.Groups.block_group, False)
-
-		# This dictionary is used to store a side with each block we collided with. This is so we can
-		# handle each possible collision case later on.
-		block_information = {}
+		
+		if not blocks_collided_with:
+			return  # No collisions, nothing to do
+		
+		# Calculate current velocity components
+		velocity_x = math.cos(self.angle) * self.speed
+		velocity_y = math.sin(self.angle) * self.speed
+		
+		# Store original position and velocity for potential rollback
+		original_x, original_y = self.x, self.y
+		original_velocity_x, original_velocity_y = velocity_x, velocity_y
+		
+		# Determine the closest collision point and normal
+		closest_block = None
+		closest_distance = float('inf')
+		collision_normal_x, collision_normal_y = 0, 0
+		collision_side = None
+		
 		for block in blocks_collided_with:
-			# Determine what side of the block we've collided with.
-			if self.rect.bottom >= block.rect.top and self.rect.top < block.rect.top:
-				# Top side of block collided with. Compare with edges:
-				if block.rect.left - self.rect.left > block.rect.top - self.rect.top:
-					# The ball collides more with the left side than top side.
-					block_information[block] = "left"
-				elif self.rect.right - block.rect.right > block.rect.top - self.rect.top:
-					# The ball collides more with the right side than top side.
-					block_information[block] = "right"
+			# Calculate center points
+			ball_center_x = self.rect.x + self.rect.width / 2
+			ball_center_y = self.rect.y + self.rect.height / 2
+			block_center_x = block.rect.x + block.rect.width / 2
+			block_center_y = block.rect.y + block.rect.height / 2
+			
+			# Calculate vector from ball center to block center
+			delta_x = ball_center_x - block_center_x
+			delta_y = ball_center_y - block_center_y
+			
+			# Calculate distance between centers
+			distance = math.sqrt(delta_x**2 + delta_y**2)
+			
+			# Find the closest block
+			if distance < closest_distance:
+				closest_distance = distance
+				closest_block = block
+				
+				# Calculate collision normal (normalized vector from block to ball)
+				if distance > 0:  # Avoid division by zero
+					collision_normal_x = delta_x / distance
+					collision_normal_y = delta_y / distance
+				
+				# Determine which side of the block was hit
+				# Calculate the absolute projections onto each axis
+				proj_x = abs(delta_x)
+				proj_y = abs(delta_y)
+				
+				# Calculate the overlap thresholds
+				overlap_x = (self.rect.width + block.rect.width) / 2
+				overlap_y = (self.rect.height + block.rect.height) / 2
+				
+				# Determine the collision side based on the smallest overlap
+				if proj_x / overlap_x > proj_y / overlap_y:
+					# Horizontal collision (left or right)
+					collision_side = "left" if delta_x < 0 else "right"
 				else:
-					# The ball collides more with the top side than any other side.
-					block_information[block] = "top"
-			elif self.rect.top <= block.rect.bottom and self.rect.bottom > block.rect.bottom:
-				# Bottom side of block collided with.
-				if block.rect.left - self.rect.left > self.rect.bottom - block.rect.bottom:
-					# The ball collides more with the left side than top side.
-					block_information[block] = "left"
-				elif self.rect.right - block.rect.right > self.rect.bottom - block.rect.bottom:
-					# The ball collides more with the right side than top side.
-					block_information[block] = "right"
-				else:
-					# The ball collides more with the bottom side than any other side.
-					block_information[block] = "bottom"
-			elif self.rect.right >= block.rect.left and self.rect.left < block.rect.left:
-				# Left side of block collided with.
-				block_information[block] = "left"
-			elif self.rect.left <= block.rect.right and self.rect.right > block.rect.right:
-				# Right side of block collided with.
-				block_information[block] = "right"
+					# Vertical collision (top or bottom)
+					collision_side = "top" if delta_y < 0 else "bottom"
+		
+		# If we found a collision, handle it
+		if closest_block:
+			# Hit the block (apply damage, effects, etc.)
+			self.hit_block(closest_block)
+			
+			# Handle the collision based on the side
+			if collision_side == "top":
+				self.place_over(closest_block)
+				# Only reverse y velocity if moving downward
+				if velocity_y > 0:
+					velocity_y = -velocity_y
+			elif collision_side == "bottom":
+				self.place_below(closest_block)
+				# Only reverse y velocity if moving upward
+				if velocity_y < 0:
+					velocity_y = -velocity_y
+			elif collision_side == "left":
+				self.place_left_of(closest_block)
+				# Only reverse x velocity if moving rightward
+				if velocity_x > 0:
+					velocity_x = -velocity_x
+			elif collision_side == "right":
+				self.place_right_of(closest_block)
+				# Only reverse x velocity if moving leftward
+				if velocity_x < 0:
+					velocity_x = -velocity_x
+			
+			# Calculate new angle from velocity components
+			self.angle = math.atan2(velocity_y, velocity_x)
+			
+			# Add a small random variation to prevent getting stuck in patterns
+			self.angle += random.uniform(-0.05, 0.05)
+			
+			# Ensure minimum angles to prevent getting stuck
+			self.ensure_minimum_angle()
+			
+			# Handle secondary collisions
+			for block in blocks_collided_with:
+				if block != closest_block:
+					self.hit_block(block)
+		
+		# Check if we're still colliding after resolution
+		if pygame.sprite.spritecollide(self, groups.Groups.block_group, False):
+			# We're still colliding, try a more aggressive approach
+			# Move away from all blocks
+			for block in blocks_collided_with:
+				# Calculate direction away from block
+				delta_x = self.rect.centerx - block.rect.centerx
+				delta_y = self.rect.centery - block.rect.centery
+				
+				# Normalize direction
+				distance = max(0.1, math.sqrt(delta_x**2 + delta_y**2))
+				delta_x /= distance
+				delta_y /= distance
+				
+				# Move away from block
+				self.x += delta_x * 2
+				self.y += delta_y * 2
+				self.rect.x = self.x
+				self.rect.y = self.y
+			
+			# Randomize angle more aggressively
+			self.angle = random.uniform(0, 2 * math.pi)
+			self.ensure_minimum_angle()
 
-		# If we've only hit one block, we don't need to check so much. Just check which side we've collided with and act accordingly.
-		if len(block_information) == 1:
-			# Check what side we've hit that block and act accordingly.
-			for block, side in iter(block_information.items()):
-				if side == "top":
-					self.hit_top_side_of_block(block)
-				elif side == "left":
-					self.hit_left_side_of_block(block)
-				elif side == "right":
-					self.hit_right_side_of_block(block)
-				elif side == "bottom":
-					self.hit_bottom_side_of_block(block)
-		# If we've hit two blocks, we need to check what combination of sides we've hit, to determine how to act.
-		elif len(block_information) == 2:
-			# Setup a few help lists to more easily determine how to act.
-			block_list = []
-			side_list = []
-			for block, side in iter(block_information.items()):
-				block_list.append(block)
-				side_list.append(side)
-
-			# Are the two hit blocks side by side?
-			if block_list[0].y == block_list[1].y:
-				# Check if we've hit the top side of either block.
-				if "top" in side_list:
-					self.hit_top_side_of_block(block_list[0])
-					self.hit_block(block_list[1])
-				elif "bottom" in side_list:
-					self.hit_bottom_side_of_block(block_list[0])
-					self.hit_block(block_list[1])
-			# Are the two blocks hit above/below each other?
-			elif block_list[0].x == block_list[1].x:
-				# Check what side we've hit, and act accordingly.
-				if "left" in side_list:
-					self.hit_left_side_of_block(block_list[0])
-					self.hit_block(block_list[1])
-				elif "right" in side_list:
-					self.hit_right_side_of_block(block_list[0])
-					self.hit_block(block_list[1])
-			# Are the two blocks hit diagonal of each other?
+	def ensure_minimum_angle(self):
+		"""Ensures the ball's angle isn't too horizontal or vertical to prevent getting stuck."""
+		# Normalize angle to 0-2π range
+		normalized_angle = self.angle % (2 * math.pi)
+		
+		# Minimum angles (in radians)
+		min_vertical_angle = math.pi / 10  # ~18 degrees from horizontal
+		min_horizontal_angle = math.pi / 10  # ~18 degrees from vertical
+		
+		# Check if angle is too close to horizontal
+		if abs(math.sin(normalized_angle)) < math.sin(min_vertical_angle):
+			# Adjust angle to maintain direction but increase vertical component
+			if normalized_angle < math.pi:
+				self.angle = min_vertical_angle if normalized_angle < math.pi/2 else math.pi - min_vertical_angle
 			else:
-				for block, side in iter(block_information.items()):
-					if side == "top":
-						self.hit_top_side_of_block(block)
-					elif side == "left":
-						self.hit_left_side_of_block(block)
-					elif side == "right":
-						self.hit_right_side_of_block(block)
-					elif side == "bottom":
-						self.hit_bottom_side_of_block(block)
-		# If we've hit three blocks, it's a little bit more complex. We have a lot of cases to handle.
-		elif len(block_information) == 3:
-			# Setup a few help lists to more easily determine how to act.
-			block_list = []
-			side_list = []
-			for block, side in iter(block_information.items()):
-				block_list.append(block)
-				side_list.append(side)
-
-			# Here we're meticulously going through every possible combination and acting accordingly.
-			# We also damage each block separately, since we cannot be sure what block we've "really"
-			# hit until we've checked.
-			if block_list[0].y == block_list[1].y:
-				self.check_block_collisions(block_list[0], block_list[1], block_list[2], side_list[2])
-			elif block_list[1].y == block_list[2].y:
-				self.check_block_collisions(block_list[1], block_list[2], block_list[0], side_list[0])
-			elif block_list[2].y == block_list[0].y:
-				self.check_block_collisions(block_list[2], block_list[0], block_list[1], side_list[1])
-		elif len(block_information) > 3:
-			least_x_distance = 999999
-			least_y_distance = 999999
-			for block, side in iter(block_information.items()):
-				if abs(block.x - self.x) < least_x_distance:
-					least_x_distance = block.x - self.x
-
-				if abs(block.y - self.y) < least_y_distance:
-					least_y_distance = block.y - self.y
-
-			self.x += least_x_distance
-			self.y += least_y_distance
-
-	def check_block_collisions(self, block_one, block_two, block_three, block_three_side):
-		# Given a different combination of block_one, two and three (and the side of block three) this figures out
-		# what blocks we've actually hit.
-		if block_three_side == "left":
-			self.hit_left_side_of_block(block_three)
-		else:
-			self.hit_right_side_of_block(block_three)
-
-		if block_three.y > block_one.y:
-			if block_one.x > block_two.x:
-				self.hit_bottom_side_of_block(block_one)
+				self.angle = -min_vertical_angle if normalized_angle < 3*math.pi/2 else 2*math.pi - min_vertical_angle
+		
+		# Check if angle is too close to vertical
+		elif abs(math.cos(normalized_angle)) < math.cos(min_horizontal_angle):
+			# Adjust angle to maintain direction but increase horizontal component
+			if normalized_angle < math.pi/2 or normalized_angle > 3*math.pi/2:
+				self.angle = min_horizontal_angle if normalized_angle < math.pi/2 else 2*math.pi - min_horizontal_angle
 			else:
-				self.hit_bottom_side_of_block(block_two)
-		else:
-			if block_one.x > block_two.x:
-				self.hit_top_side_of_block(block_one)
-			else:
-				self.hit_top_side_of_block(block_two)
+				self.angle = math.pi - min_horizontal_angle if normalized_angle < math.pi else math.pi + min_horizontal_angle
 
 	def hit_block(self, block):
 		# We've hit a block, so we do a bunch of things. First, spawn a few particles.
@@ -689,36 +699,56 @@ class Ball(pygame.sprite.Sprite):
 		if self.angle < math.pi:
 			self.hit_block(block)
 			self.angle = -self.angle
+			# Add small random variation
+			self.angle += random.uniform(-0.05, 0.05)
 
 		# Place ball on top of the block.
 		self.place_over(block)
+		
+		# Ensure we're not stuck in a horizontal pattern
+		self.ensure_minimum_angle()
 
 	def hit_left_side_of_block(self, block):
 		# Reverse angle.
 		if self.angle < (math.pi / 2) or self.angle > ((3 * math.pi) / 2):
 			self.hit_block(block)
 			self.angle = math.pi - self.angle
+			# Add small random variation
+			self.angle += random.uniform(-0.05, 0.05)
 
 		# Place ball to the left of the block.
 		self.place_left_of(block)
+		
+		# Ensure we're not stuck in a vertical pattern
+		self.ensure_minimum_angle()
 
 	def hit_right_side_of_block(self, block):
 		# Reverse angle.
 		if self.angle > (math.pi / 2) and self.angle < ((3 * math.pi) / 2):
 			self.hit_block(block)
 			self.angle = math.pi - self.angle
+			# Add small random variation
+			self.angle += random.uniform(-0.05, 0.05)
 
 		# Place ball to the right of the block.
 		self.place_right_of(block)
+		
+		# Ensure we're not stuck in a vertical pattern
+		self.ensure_minimum_angle()
 
 	def hit_bottom_side_of_block(self, block):
 		# Reverse angle.
 		if self.angle > math.pi:
 			self.hit_block(block)
 			self.angle = -self.angle
+			# Add small random variation
+			self.angle += random.uniform(-0.05, 0.05)
 
 		# Place ball below the block.
 		self.place_below(block)
+		
+		# Ensure we're not stuck in a horizontal pattern
+		self.ensure_minimum_angle()
 
 	def check_collision_powerups(self):
 		# Here we check if we've collided with any powerups. If we have, we simply tell that powerup that we just

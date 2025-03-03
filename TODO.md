@@ -1,11 +1,5 @@
 # TODOs
 
-## Fix collision bugs
-
-- Balls sometimes get stuck in corners (block + block, block + wall).
-- This was less common with just 3 columns of blocks.
-- Maybe the ball collision system can be reworked entirely?
-
 ## Fix the fireworks effect in gameover.py
 
 - The fireworks explode way before they reach their intended position near the middle / top middle of the screen.

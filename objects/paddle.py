@@ -748,7 +748,9 @@ class Paddle(pygame.sprite.Sprite):
 			desired_angle += 2 * math.pi
 			
 		# Check if this angle is achievable with the paddle
-		max_angle_offset = (math.pi / 2 - 0.32)  # Using Ball.least_allowed_vertical_angle
+		# Use the same minimum angle as in the ball's ensure_minimum_angle method
+		min_angle = math.pi / 10  # ~18 degrees
+		max_angle_offset = (math.pi / 2 - min_angle)
 		
 		# Calculate the normalized distance needed to achieve this angle
 		if paddle_side_left:

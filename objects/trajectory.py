@@ -2,6 +2,7 @@ import pygame
 import math
 import settings.settings as settings
 import objects.groups as groups
+import random
 
 class Trajectory(pygame.sprite.Sprite):
     """
@@ -199,48 +200,101 @@ class Trajectory(pygame.sprite.Sprite):
                     points.append((next_x + self.ball.rect.width/2, next_y + self.ball.rect.height/2))
                     break
                     
-                block = blocks_hit[0]  # Handle first block hit
+                # Find the closest block (similar to our improved collision system)
+                closest_block = None
+                closest_distance = float('inf')
+                collision_side = None
                 
-                # Determine which side of the block we'll hit
-                if temp_sprite.rect.bottom >= block.rect.top and temp_sprite.rect.top < block.rect.top:
-                    # Top side collision
-                    if temp_sprite.rect.right - block.rect.left > block.rect.top - temp_sprite.rect.top:
-                        # More left side collision
-                        speed_x = -abs(speed_x)  # Bounce left
-                        next_x = block.rect.left - self.ball.rect.width
-                    elif temp_sprite.rect.left - block.rect.right > block.rect.top - temp_sprite.rect.top:
-                        # More right side collision
-                        speed_x = abs(speed_x)  # Bounce right
-                        next_x = block.rect.right
-                    else:
-                        # Top collision
-                        speed_y = -abs(speed_y)  # Bounce up
-                        next_y = block.rect.top - self.ball.rect.height
+                for block in blocks_hit:
+                    # Calculate center points
+                    ball_center_x = next_x + self.ball.rect.width / 2
+                    ball_center_y = next_y + self.ball.rect.height / 2
+                    block_center_x = block.rect.x + block.rect.width / 2
+                    block_center_y = block.rect.y + block.rect.height / 2
+                    
+                    # Calculate vector from ball center to block center
+                    delta_x = ball_center_x - block_center_x
+                    delta_y = ball_center_y - block_center_y
+                    
+                    # Calculate distance between centers
+                    distance = math.sqrt(delta_x**2 + delta_y**2)
+                    
+                    # Find the closest block
+                    if distance < closest_distance:
+                        closest_distance = distance
+                        closest_block = block
+                        
+                        # Determine which side of the block was hit
+                        # Calculate the absolute projections onto each axis
+                        proj_x = abs(delta_x)
+                        proj_y = abs(delta_y)
+                        
+                        # Calculate the overlap thresholds
+                        overlap_x = (self.ball.rect.width + block.rect.width) / 2
+                        overlap_y = (self.ball.rect.height + block.rect.height) / 2
+                        
+                        # Determine the collision side based on the smallest overlap
+                        if proj_x / overlap_x > proj_y / overlap_y:
+                            # Horizontal collision (left or right)
+                            collision_side = "left" if delta_x < 0 else "right"
+                        else:
+                            # Vertical collision (top or bottom)
+                            collision_side = "top" if delta_y < 0 else "bottom"
                 
-                elif temp_sprite.rect.top <= block.rect.bottom and temp_sprite.rect.bottom > block.rect.bottom:
-                    # Bottom side collision
-                    if temp_sprite.rect.right - block.rect.left > temp_sprite.rect.bottom - block.rect.bottom:
-                        # More left side collision
-                        speed_x = -abs(speed_x)  # Bounce left
-                        next_x = block.rect.left - self.ball.rect.width
-                    elif temp_sprite.rect.left - block.rect.right > temp_sprite.rect.bottom - block.rect.bottom:
-                        # More right side collision
-                        speed_x = abs(speed_x)  # Bounce right
-                        next_x = block.rect.right
-                    else:
-                        # Bottom collision
-                        speed_y = abs(speed_y)  # Bounce down
-                        next_y = block.rect.bottom
-                
-                elif temp_sprite.rect.right >= block.rect.left and temp_sprite.rect.left < block.rect.left:
-                    # Left side collision
-                    speed_x = -abs(speed_x)  # Bounce left
-                    next_x = block.rect.left - self.ball.rect.width
-                
-                elif temp_sprite.rect.left <= block.rect.right and temp_sprite.rect.right > block.rect.right:
-                    # Right side collision
-                    speed_x = abs(speed_x)  # Bounce right
-                    next_x = block.rect.right
+                # Handle the collision based on the side
+                if closest_block and collision_side:
+                    if collision_side == "top":
+                        # Only reverse y velocity if moving downward
+                        if speed_y > 0:
+                            speed_y = -speed_y
+                        next_y = closest_block.rect.top - self.ball.rect.height
+                    elif collision_side == "bottom":
+                        # Only reverse y velocity if moving upward
+                        if speed_y < 0:
+                            speed_y = -speed_y
+                        next_y = closest_block.rect.bottom
+                    elif collision_side == "left":
+                        # Only reverse x velocity if moving rightward
+                        if speed_x > 0:
+                            speed_x = -speed_x
+                        next_x = closest_block.rect.left - self.ball.rect.width
+                    elif collision_side == "right":
+                        # Only reverse x velocity if moving leftward
+                        if speed_x < 0:
+                            speed_x = -speed_x
+                        next_x = closest_block.rect.right
+                    
+                    # Add a small random variation to prevent predictable patterns
+                    angle = math.atan2(speed_y, speed_x)
+                    angle += random.uniform(-0.05, 0.05)
+                    
+                    # Ensure minimum angles to prevent getting stuck
+                    # Normalize angle to 0-2π range
+                    normalized_angle = angle % (2 * math.pi)
+                    
+                    # Minimum angles (in radians)
+                    min_vertical_angle = math.pi / 10  # ~18 degrees from horizontal
+                    min_horizontal_angle = math.pi / 10  # ~18 degrees from vertical
+                    
+                    # Check if angle is too close to horizontal
+                    if abs(math.sin(normalized_angle)) < math.sin(min_vertical_angle):
+                        # Adjust angle to maintain direction but increase vertical component
+                        if normalized_angle < math.pi:
+                            angle = min_vertical_angle if normalized_angle < math.pi/2 else math.pi - min_vertical_angle
+                        else:
+                            angle = -min_vertical_angle if normalized_angle < 3*math.pi/2 else 2*math.pi - min_vertical_angle
+                    
+                    # Check if angle is too close to vertical
+                    elif abs(math.cos(normalized_angle)) < math.cos(min_horizontal_angle):
+                        # Adjust angle to maintain direction but increase horizontal component
+                        if normalized_angle < math.pi/2 or normalized_angle > 3*math.pi/2:
+                            angle = min_horizontal_angle if normalized_angle < math.pi/2 else 2*math.pi - min_horizontal_angle
+                        else:
+                            angle = math.pi - min_horizontal_angle if normalized_angle < math.pi else math.pi + min_horizontal_angle
+                    
+                    # Recalculate velocities from the new angle
+                    speed_x = self.ball.speed * math.cos(angle)
+                    speed_y = self.ball.speed * math.sin(angle)
                 
                 # Add collision point and continue prediction with new trajectory
                 points.append((next_x + self.ball.rect.width/2, next_y + self.ball.rect.height/2))
