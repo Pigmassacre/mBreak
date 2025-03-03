@@ -43,6 +43,8 @@ def get_music_files(subdir):
 	try:
 		# Try to list directory contents (works in development)
 		files = os.listdir(os.path.join(root, subdir))
+		for path in files:
+			print(path)
 		return [os.path.join(root, subdir, path) for path in files]
 	except (OSError, IOError):
 		# Fallback for compiled version - hardcoded paths

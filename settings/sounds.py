@@ -1,5 +1,6 @@
 import pygame
 import os
+import settings
 
 """
 Sound manager that handles loading sound effects in both development and compiled environments.

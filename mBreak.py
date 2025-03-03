@@ -1,3 +1,34 @@
+# nuitka-project: --msvc=latest
+# nuitka-project: --mode=standalone
+# nuitka-project: --include-module=pygame.display
+# nuitka-project: --include-module=pygame.event
+# nuitka-project: --include-module=pygame.joystick
+# nuitka-project: --include-module=pygame.sprite
+# nuitka-project: --include-module=pygame.font
+# nuitka-project: --include-module=pygame.image
+# nuitka-project: --include-module=pygame.mixer
+# nuitka-project: --include-module=pygame.transform
+# nuitka-project: --include-module=pygame.surface
+# nuitka-project: --include-module=pygame.draw
+# nuitka-project: --include-module=pygame.math
+# nuitka-project: --include-module=pygame.time
+# nuitka-project: --include-module=pygame.locals
+# nuitka-project: --include-package-data=pygame
+# nuitka-project: --include-data-files={MAIN_DIRECTORY}/settings.txt=settings.txt
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libjpeg-62.dll=libjpeg-62.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libogg-0.dll=libogg-0.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libopus-0.dll=libopus-0.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libopusfile-0.dll=libopusfile-0.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libpng16-16.dll=libpng16-16.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libtiff-5.dll=libtiff-5.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libwavpack-1.dll=libwavpack-1.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libwebp-7.dll=libwebp-7.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libwebpdemux-2.dll=libwebpdemux-2.dll
+# nuitka-project: --include-data-files=C:/Users/Olof/AppData/Local/Programs/Python/Python313/Lib/site-packages/pygame/libxmp.dll=libxmp.dll
+# nuitka-project: --include-data-dir=res=res
+# nuitka-project: --include-data-dir=fonts=fonts
+# nuitka-project: --output-dir=build 
+
 __author__ = "Olof Karlsson"
 __version__ = "0.2"
 __license__ = "All Rights Reserved"
