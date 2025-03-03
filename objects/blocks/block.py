@@ -76,7 +76,7 @@ class Block(pygame.sprite.Sprite):
 		self.effect_group = pygame.sprite.Group()
 
 		# Create the image attribute that is drawn to the surface.
-		self.image = Block.image.copy()
+		self.image = self.__class__.image.copy()
 
 		# Colorize the block.
 		self.color = self.owner.color
