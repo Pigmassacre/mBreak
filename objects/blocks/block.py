@@ -11,6 +11,7 @@ import objects.particle as particle
 import objects.effects.flash as flash
 import settings.settings as settings
 from settings.sounds import EXPLOSION_SOUND, play_sound
+import other.useful as useful
 
 """
 
@@ -22,7 +23,6 @@ class Block(pygame.sprite.Sprite):
 
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/block/block.png")
-	half_health_image = pygame.image.load("res/block/block.png")
 
 	# Initialize the sound effect.
 	sound_effect = EXPLOSION_SOUND
@@ -32,7 +32,6 @@ class Block(pygame.sprite.Sprite):
 	height = image.get_height()
 	particle_spawn_amount = 4
 	particle_size = 0.75
-	half_health_blend_color = pygame.Color(128, 128, 128)
 
 	# Death particle values
 	death_particle_spawn_amount = 15
@@ -48,7 +47,6 @@ class Block(pygame.sprite.Sprite):
 
 	# Scale image.
 	image = pygame.transform.scale(image, (width, height))
-	half_health_image = pygame.transform.scale(image, (width, height))
 
 	def __init__(self, owner, x, y, width, height, health):
 		# We start by calling the superconstructor.
@@ -77,13 +75,38 @@ class Block(pygame.sprite.Sprite):
 		# Create an effect group to handle effects on this block.
 		self.effect_group = pygame.sprite.Group()
 
+		# Create the image attribute that is drawn to the surface.
+		self.image = Block.image.copy()
+
+		# Colorize the block.
+		self.color = self.owner.color
+		useful.colorize_image(self.image, self.color)
+
+	def update_tint(self):
+		# Calculate health percentage
+		health_percentage = self.health / float(self.max_health)
+		
+		# Create a darker version of the block's color based on health percentage
+		# At 100% health, use full color. At 0% health, use a very dark version
+		darkness = 0.3 + (0.7 * health_percentage)  # Range from 0.3 to 1.0
+		
+		# Calculate and clamp RGB values to ensure they're between 0 and 255
+		r = max(0, min(255, int(self.color.r * darkness)))
+		g = max(0, min(255, int(self.color.g * darkness)))
+		b = max(0, min(255, int(self.color.b * darkness)))
+		
+		tinted_color = pygame.Color(r, g, b)
+		
+		# Update the block's image with the new tint
+		self.image = Block.image.copy()
+		useful.colorize_image(self.image, tinted_color)
+
 	def hurt(self, damage):
 		# Reduce the health.
 		self.health = self.health - damage
-
-		# Change the image to the half health image if health is under half.
-		if self.health <= self.max_health / 2:
-			self.image = self.half_health_image
+		
+		# Update the block's tint based on new health
+		self.update_tint()
 
 	def on_hit(self, damage):
 		# Damage self.
