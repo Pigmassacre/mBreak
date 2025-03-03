@@ -111,7 +111,7 @@ class Game(scene.Scene):
 		self.player_two = player_two
 
 		# Create and store the level.
-		self.game_level = level.Level(self.player_one, self.player_two, 1, 1, 1)
+		self.game_level = level.Level(self.player_one, self.player_two, 2, 1, 1)
 
 		# Setup the powerup list.
 		self.powerup_list = [multiball.Multiball, speedboost.SpeedBoost, fire.Fire, frost.Frost, electricity.Electricity, rocket.Rocket, enlarger.Enlarger, reducer.Reducer]

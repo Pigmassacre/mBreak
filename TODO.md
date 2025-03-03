@@ -1,11 +1,5 @@
 # TODOs
 
-## Block changes
-
-- Each player currently has 3 columns of blocks. This should be changed to 4 columns of blocks.
-- Each players paddle should be moved one blocks width closer to the center to accomodate for this change.
-- The last two columns of blocks for each player (the columns farthest away from the center) should be strong blocks (@strong.py)
-
 ## Fix the fireworks effect in gameover.py
 
 - The fireworks explode way before they reach their intended position near the middle / top middle of the screen.
