@@ -1,6 +1,6 @@
 ---
 description: Do not use error handling in gameplay code.
-globs: 
+globs: **/*.py
 alwaysApply: false
 ---
 # Error handling

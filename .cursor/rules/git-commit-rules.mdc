@@ -1,7 +1,7 @@
 ---
-description: Always write detailed commit messages. Never prompt a commit without asking the user.
+description: Always write detailed commit messages.
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # Write detailed git commit messages
 
