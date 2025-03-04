@@ -825,8 +825,8 @@ class Paddle(pygame.sprite.Sprite):
 		Makes intelligent decisions about when to use energy attacks.
 		Returns True if should attack, False otherwise.
 		"""
-		# Base chance on energy level
-		if self.owner.energy < 20:
+		# Base chance on energy level - increased minimum energy requirement
+		if self.owner.energy < 40:  # Increased from 20 to 40
 			return False
 			
 		# Count enemy blocks and blocks in potential laser path
@@ -858,35 +858,35 @@ class Paddle(pygame.sprite.Sprite):
 						blocks_in_path += 1
 				max_blocks_in_path += 1
 		
-		# Adjust base chance based on enemy block count
+		# Adjust base chance based on enemy block count - more conservative scaling
 		if enemy_block_count <= 3:
 			# Very aggressive when enemy has few blocks - use energy whenever possible
-			base_chance = self.owner.energy / 100.0  # 0.2 at 20 energy, 1.0 at full energy
+			base_chance = (self.owner.energy - 40) / 100.0  # Scales from 0.0 at 40 energy to 0.6 at full energy
 			# Even more aggressive if we can hit multiple of the remaining blocks
 			if blocks_in_path > 0 and blocks_in_path >= enemy_block_count * 0.5:
-				base_chance *= 2.0
+				base_chance *= 1.5  # Reduced multiplier from 2.0
 		elif enemy_block_count <= 6:
 			# Moderately aggressive
-			base_chance = self.owner.energy / 150.0  # 0.13 at 20 energy, 0.67 at full energy
+			base_chance = (self.owner.energy - 40) / 200.0  # Scales from 0.0 at 40 energy to 0.3 at full energy
 		else:
-			# Conservative when enemy has many blocks - gather more energy
-			base_chance = self.owner.energy / 200.0  # 0.1 at 20 energy, 0.5 at full energy
+			# Very conservative when enemy has many blocks - gather more energy
+			base_chance = (self.owner.energy - 40) / 300.0  # Scales from 0.0 at 40 energy to 0.2 at full energy
 			# Save up energy unless we can hit multiple blocks
 			if blocks_in_path <= 1:
-				base_chance *= 0.5
+				base_chance *= 0.3  # More aggressive reduction from 0.5
 		
-		# Significant boost if we can hit multiple blocks
+		# Significant boost if we can hit multiple blocks - adjusted scaling
 		if blocks_in_path > 0:
 			# Scale multiplier based on how many enemy blocks remain
 			if enemy_block_count <= 3:
-				# Very high multiplier when few blocks remain
-				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 3.0)
+				# High multiplier when few blocks remain
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 2.0)  # Reduced from 3.0
 			elif enemy_block_count <= 6:
-				# High multiplier for moderate block count
-				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 2.5)
+				# Moderate multiplier for moderate block count
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 1.5)  # Reduced from 2.5
 			else:
-				# Normal multiplier for many blocks
-				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 2.0)
+				# Lower multiplier for many blocks
+				base_chance *= (1.0 + (blocks_in_path / max(1, enemy_block_count)) * 1.0)  # Reduced from 2.0
 		
 		# Check if enemy paddle is vulnerable (far from balls)
 		enemy_vulnerable = False
@@ -899,15 +899,15 @@ class Paddle(pygame.sprite.Sprite):
 							break
 		
 		if enemy_vulnerable:
-			# Scale vulnerability bonus based on remaining blocks
+			# Scale vulnerability bonus based on remaining blocks - reduced bonuses
 			if enemy_block_count <= 3:
-				base_chance *= 2.0  # Very aggressive when few blocks remain
+				base_chance *= 1.5  # Reduced from 2.0
 			elif enemy_block_count <= 6:
-				base_chance *= 1.5  # Moderately aggressive
+				base_chance *= 1.25  # Reduced from 1.5
 			else:
-				base_chance *= 1.25  # Less aggressive when many blocks remain
+				base_chance *= 1.1  # Reduced from 1.25
 			
-		# Increase chance if we're losing
+		# Increase chance if we're losing - reduced bonuses
 		if hasattr(self.owner, "lives") and self.owner.lives is not None and hasattr(self.owner, "score") and self.owner.score is not None:
 			for player in groups.Groups.player_group:
 				if player != self.owner:
@@ -915,31 +915,31 @@ class Paddle(pygame.sprite.Sprite):
 					   (hasattr(player, "score") and player.score > self.owner.score):
 						# Scale losing bonus based on remaining blocks
 						if enemy_block_count <= 3:
-							base_chance *= 1.5  # More aggressive when close to winning
+							base_chance *= 1.3  # Reduced from 1.5
 						else:
-							base_chance *= 1.25
+							base_chance *= 1.15  # Reduced from 1.25
 						break
 		
-		# Higher chance to use laser if we have more energy (exponential scaling)
+		# Higher chance to use laser if we have more energy (exponential scaling) - more conservative
 		# Scale energy factor based on enemy block count
 		if enemy_block_count <= 3:
 			# More aggressive energy usage when few blocks remain
-			energy_factor = math.pow(self.owner.energy / 100.0, 1.2)
+			energy_factor = math.pow(self.owner.energy / 100.0, 1.5)  # Increased exponent from 1.2
 		elif enemy_block_count <= 6:
-			energy_factor = math.pow(self.owner.energy / 100.0, 1.5)
+			energy_factor = math.pow(self.owner.energy / 100.0, 1.8)  # Increased exponent from 1.5
 		else:
 			# Save energy when many blocks remain
-			energy_factor = math.pow(self.owner.energy / 100.0, 1.8)
+			energy_factor = math.pow(self.owner.energy / 100.0, 2.2)  # Increased exponent from 1.8
 		
 		base_chance *= (1.0 + energy_factor)
 		
-		# Adjust max chance based on enemy block count
+		# Adjust max chance based on enemy block count - more conservative
 		if enemy_block_count <= 3:
-			max_chance = 1.0  # Allow 100% chance when few blocks remain
+			max_chance = 0.9  # Reduced from 1.0
 		elif enemy_block_count <= 6:
-			max_chance = 0.95  # High max chance for moderate block count
+			max_chance = 0.8  # Reduced from 0.95
 		else:
-			max_chance = 0.9   # Normal max chance when many blocks remain
+			max_chance = 0.7  # Reduced from 0.9
 			
 		base_chance = min(base_chance, max_chance)
 		
