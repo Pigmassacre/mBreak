@@ -11,7 +11,6 @@ typedef struct SplashState {
 
 // Static splash state
 static SplashState splashState;
-static Screen ScreenSplash;
 
 // Function declarations
 static void InitSplash(void);
@@ -49,6 +48,7 @@ static void UpdateSplash(float deltaTime) {
         
         // Move to next screen when fade out is complete
         if (splashState.alpha <= 0.0f) {
+            extern Screen ScreenSplash;
             ScreenSplash.finishScreen = true;
         }
     }
@@ -59,6 +59,7 @@ static void UpdateSplash(float deltaTime) {
     
     // Skip splash screen if any key or mouse button is pressed
     if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        extern Screen ScreenSplash;
         ScreenSplash.finishScreen = true;
     }
 }
@@ -102,7 +103,8 @@ static GameScreen GetNextSplashScreen(void) {
 
 // Screen initializer called by the screen management system
 Screen InitSplashScreen(void) {
-    ScreenSplash = (Screen){
+    // Create a local Screen structure and return it
+    Screen screen = {
         .init = InitSplash,
         .update = UpdateSplash,
         .draw = DrawSplash,
@@ -112,5 +114,5 @@ Screen InitSplashScreen(void) {
         .nextScreen = MAIN_MENU
     };
     
-    return ScreenSplash;
+    return screen;
 } 

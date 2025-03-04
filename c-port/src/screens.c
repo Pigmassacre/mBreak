@@ -1,6 +1,21 @@
 #include "../include/screens.h"
 #include <stdlib.h>
 
+// Global screen variable definitions
+Screen ScreenLogo;
+Screen ScreenSplash;
+Screen ScreenMainMenu;
+Screen ScreenPrepareMenu;
+Screen ScreenGameplay;
+Screen ScreenGameOver;
+Screen ScreenOptions;
+
+// External declarations for initialization functions implemented in other files
+// These functions are defined in their respective module files
+extern Screen InitSplashScreen(void);
+extern Screen InitMainMenuScreen(void);
+extern Screen InitGameplayScreen(void);
+
 // Generic screen function implementations
 
 void InitScreen(Screen *screen) {
@@ -56,6 +71,7 @@ static void LogoUpdate(float deltaTime) {
     
     // Transition after 2 seconds
     if (logoTimer > 2.0f) {
+        // Use the global ScreenLogo variable
         ScreenLogo.finishScreen = true;
     }
 }
@@ -74,117 +90,60 @@ static GameScreen LogoGetNextScreen(void) {
     return SPLASH;
 }
 
-// Global screen instances
-static Screen ScreenLogo;
-static Screen ScreenSplash;
-static Screen ScreenMainMenu;
-static Screen ScreenPrepareMenu;
-static Screen ScreenGameplay;
-static Screen ScreenGameOver;
-static Screen ScreenOptions;
-
-// Screen initialization functions
-
+// Only define the Logo screen initialization here (others are in their own files)
 Screen InitLogoScreen(void) {
-    ScreenLogo = (Screen){
-        .init = LogoInit,
-        .update = LogoUpdate,
-        .draw = LogoDraw,
-        .unload = LogoUnload,
-        .getNextScreen = LogoGetNextScreen,
-        .finishScreen = false,
-        .nextScreen = SPLASH
-    };
-    
-    return ScreenLogo;
+    Screen screen = {0};
+    screen.init = LogoInit;
+    screen.update = LogoUpdate;
+    screen.draw = LogoDraw;
+    screen.unload = LogoUnload;
+    screen.getNextScreen = LogoGetNextScreen;
+    screen.finishScreen = false;
+    screen.nextScreen = LOGO;
+    return screen;
 }
 
-Screen InitSplashScreen(void) {
-    // TODO: Implement splash screen
-    ScreenSplash = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = MAIN_MENU
-    };
-    
-    return ScreenSplash;
-}
+// Shim implementations for screens not yet implemented
+// These are temporary implementations to satisfy the linker
 
-Screen InitMainMenuScreen(void) {
-    // TODO: Implement main menu screen
-    ScreenMainMenu = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = GAMEPLAY
-    };
-    
-    return ScreenMainMenu;
-}
-
+// Prepare Menu Screen shim
 Screen InitPrepareMenuScreen(void) {
-    // TODO: Implement prepare menu screen
-    ScreenPrepareMenu = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = GAMEPLAY
-    };
-    
-    return ScreenPrepareMenu;
+    Screen screen = {0};
+    screen.init = NULL;
+    screen.update = NULL;
+    screen.draw = NULL;
+    screen.unload = NULL;
+    screen.getNextScreen = NULL;
+    screen.finishScreen = false;
+    screen.nextScreen = GAMEPLAY;
+    return screen;
 }
 
-Screen InitGameplayScreen(void) {
-    // TODO: Implement gameplay screen
-    ScreenGameplay = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = GAME_OVER
-    };
-    
-    return ScreenGameplay;
-}
-
+// Game Over Screen shim
 Screen InitGameOverScreen(void) {
-    // TODO: Implement game over screen
-    ScreenGameOver = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = MAIN_MENU
-    };
-    
-    return ScreenGameOver;
+    Screen screen = {0};
+    screen.init = NULL;
+    screen.update = NULL;
+    screen.draw = NULL;
+    screen.unload = NULL;
+    screen.getNextScreen = NULL;
+    screen.finishScreen = false;
+    screen.nextScreen = MAIN_MENU;
+    return screen;
 }
 
+// Options Screen shim
 Screen InitOptionsScreen(void) {
-    // TODO: Implement options screen
-    ScreenOptions = (Screen){
-        .init = NULL,
-        .update = NULL,
-        .draw = NULL,
-        .unload = NULL,
-        .getNextScreen = NULL,
-        .finishScreen = false,
-        .nextScreen = MAIN_MENU
-    };
-    
-    return ScreenOptions;
-} 
+    Screen screen = {0};
+    screen.init = NULL;
+    screen.update = NULL;
+    screen.draw = NULL;
+    screen.unload = NULL;
+    screen.getNextScreen = NULL;
+    screen.finishScreen = false;
+    screen.nextScreen = MAIN_MENU;
+    return screen;
+}
+
+// The rest of the initialization functions are defined in their respective files
+// and should NOT be defined here to avoid duplicate definition errors 

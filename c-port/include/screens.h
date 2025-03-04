@@ -25,6 +25,15 @@ typedef struct Screen {
     GameScreen nextScreen;             // Next screen to transition to
 } Screen;
 
+// Global screen variables (extern declarations)
+extern Screen ScreenLogo;
+extern Screen ScreenSplash;
+extern Screen ScreenMainMenu;
+extern Screen ScreenPrepareMenu;
+extern Screen ScreenGameplay;
+extern Screen ScreenGameOver;
+extern Screen ScreenOptions;
+
 // Screen function prototypes
 void InitScreen(Screen *screen);
 void UpdateScreen(Screen *screen, float deltaTime);

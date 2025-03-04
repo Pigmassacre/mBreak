@@ -22,10 +22,19 @@ int main(void) {
     double currentTime = 0;
     float deltaTime = 0;
     
+    // Initialize global screen variables
+    ScreenLogo = InitLogoScreen();
+    ScreenSplash = InitSplashScreen();
+    ScreenMainMenu = InitMainMenuScreen();
+    ScreenPrepareMenu = InitPrepareMenuScreen();
+    ScreenGameplay = InitGameplayScreen();
+    ScreenGameOver = InitGameOverScreen();
+    ScreenOptions = InitOptionsScreen();
+    
     // Initialize current screen
     GameScreen currentScreenType = LOGO;
-    Screen currentScreen = InitLogoScreen();
-    InitScreen(&currentScreen);
+    Screen *currentScreen = &ScreenLogo;
+    InitScreen(currentScreen);
     
     // Main game loop
     while (!WindowShouldClose()) {
@@ -35,51 +44,52 @@ int main(void) {
         previousTime = currentTime;
         
         // Update current screen
-        UpdateScreen(&currentScreen, deltaTime);
+        UpdateScreen(currentScreen, deltaTime);
         
         // Check if screen should change
-        if (currentScreen.finishScreen) {
-            // Unload current screen
-            UnloadScreen(&currentScreen);
+        if (currentScreen->finishScreen) {
+            // Get next screen
+            currentScreenType = GetNextScreen(currentScreen);
             
-            // Load next screen
-            currentScreenType = GetNextScreen(&currentScreen);
+            // Reset finish flag
+            currentScreen->finishScreen = false;
             
+            // Switch to next screen
             switch (currentScreenType) {
                 case LOGO:
-                    currentScreen = InitLogoScreen();
+                    currentScreen = &ScreenLogo;
                     break;
                 case SPLASH:
-                    currentScreen = InitSplashScreen();
+                    currentScreen = &ScreenSplash;
                     break;
                 case MAIN_MENU:
-                    currentScreen = InitMainMenuScreen();
+                    currentScreen = &ScreenMainMenu;
                     break;
                 case PREPARE_MENU:
-                    currentScreen = InitPrepareMenuScreen();
+                    currentScreen = &ScreenPrepareMenu;
                     break;
                 case GAMEPLAY:
-                    currentScreen = InitGameplayScreen();
+                    currentScreen = &ScreenGameplay;
                     break;
                 case GAME_OVER:
-                    currentScreen = InitGameOverScreen();
+                    currentScreen = &ScreenGameOver;
                     break;
                 case OPTIONS:
-                    currentScreen = InitOptionsScreen();
+                    currentScreen = &ScreenOptions;
                     break;
                 default:
                     break;
             }
             
             // Initialize new screen
-            InitScreen(&currentScreen);
+            InitScreen(currentScreen);
         }
         
         // Draw current screen
         BeginDrawing();
             ClearBackground(BLACK);
             
-            DrawScreen(&currentScreen);
+            DrawScreen(currentScreen);
             
             // Display FPS for debugging (will be configurable later)
             DrawFPS(10, 10);
@@ -87,8 +97,14 @@ int main(void) {
         EndDrawing();
     }
     
-    // Unload current screen before closing
-    UnloadScreen(&currentScreen);
+    // Unload all screens before closing
+    UnloadScreen(&ScreenLogo);
+    UnloadScreen(&ScreenSplash);
+    UnloadScreen(&ScreenMainMenu);
+    UnloadScreen(&ScreenPrepareMenu);
+    UnloadScreen(&ScreenGameplay);
+    UnloadScreen(&ScreenGameOver);
+    UnloadScreen(&ScreenOptions);
     
     // Cleanup and close resources
     CloseAudioDevice();

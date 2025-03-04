@@ -317,9 +317,10 @@ static void HandleInput(float deltaTime) {
 
 // Screen initializer called by the screen management system
 Screen InitGameplayScreen(void) {
-    static Screen ScreenGameplay;
+    // No need for static Screen ScreenGameplay as we use the global one defined in screens.c
     
-    ScreenGameplay = (Screen){
+    // Create a local Screen structure and return it
+    Screen screen = {
         .init = InitGameplay,
         .update = UpdateGameplay,
         .draw = DrawGameplay,
@@ -329,5 +330,5 @@ Screen InitGameplayScreen(void) {
         .nextScreen = GAME_OVER
     };
     
-    return ScreenGameplay;
+    return screen;
 } 

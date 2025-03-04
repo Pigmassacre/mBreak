@@ -1,6 +1,7 @@
 #include "../include/screens.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 // Menu states
 typedef enum MenuOption {
@@ -207,9 +208,10 @@ static Rectangle GetMenuOptionBounds(const char* text, float y, float fontSize) 
 
 // Screen initializer called by the screen management system
 Screen InitMainMenuScreen(void) {
-    static Screen ScreenMainMenu;
+    // No need for static Screen ScreenMainMenu as we use the global one defined in screens.c
     
-    ScreenMainMenu = (Screen){
+    // Create a local Screen structure and return it
+    Screen screen = {
         .init = InitMainMenu,
         .update = UpdateMainMenu,
         .draw = DrawMainMenu,
@@ -219,5 +221,5 @@ Screen InitMainMenuScreen(void) {
         .nextScreen = GAMEPLAY
     };
     
-    return ScreenMainMenu;
+    return screen;
 } 
