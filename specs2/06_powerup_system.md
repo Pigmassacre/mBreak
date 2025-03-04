@@ -8,17 +8,14 @@ This document details the power-up system for the mBreak game, based on the curr
 typedef enum PowerupType {
     POWERUP_NONE,
     POWERUP_MULTIBALL,
-    POWERUP_FIREBALL,
-    POWERUP_FREEZE,
+    POWERUP_FIRE,
+    POWERUP_FROST,
     POWERUP_GRAVITY,
-    POWERUP_LASER,
-    POWERUP_ENLARGE,
-    POWERUP_SHRINK,
-    POWERUP_SLOW,
-    POWERUP_FAST,
-    POWERUP_ENERGY,
-    POWERUP_HEALTH,
-    POWERUP_CHARGED,
+    POWERUP_ROCKET,
+    POWERUP_ENLARGER,
+    POWERUP_REDUCER,
+    POWERUP_SPEEDBOOST,
+    POWERUP_ELECTRICITY,
     POWERUP_COUNT  // Used to get the total number of powerup types
 } PowerupType;
 ```
@@ -40,6 +37,14 @@ typedef struct Powerup {
     float scale;             // Size scale (1.0 = normal)
     Shadow* shadow;          // Shadow effect
     
+    // Bob effect properties
+    float center_y;          // Original Y position for bob effect
+    float bob_factor;        // How noticeable the bob effect should be
+    
+    // Particle effects
+    float particle_spawn_rate;  // How often particles spawn
+    int particle_spawn_amount;  // How many particles spawn at once
+    
     // Movement properties
     Vector2 velocity;        // Current movement velocity
     float gravity;           // Gravity effect on powerup
@@ -53,6 +58,7 @@ typedef struct Powerup {
     // State
     bool is_hit;             // Whether powerup has been hit
     bool is_destroyed;       // Whether powerup is marked for destruction
+    bool is_display;         // Whether this is a display-only powerup
 } Powerup;
 ```
 
@@ -65,6 +71,9 @@ Powerup* CreatePowerup(float x, float y, PowerupType type) {
     // Set position
     powerup->position.x = x;
     powerup->position.y = y;
+    
+    // Set center_y for bob effect
+    powerup->center_y = y;
     
     // Create rect
     powerup->rect = (Rectangle){ 
@@ -90,6 +99,10 @@ Powerup* CreatePowerup(float x, float y, PowerupType type) {
         powerup->rotation_speed *= -1; // Randomly reverse direction
     }
     powerup->scale = 1.0f;
+    powerup->bob_factor = POWERUP_BOB_FACTOR;
+    
+    // Set particle properties based on type
+    SetPowerupParticleProperties(powerup);
     
     // Set movement properties
     powerup->velocity = (Vector2){ 0, 0 };
@@ -104,6 +117,7 @@ Powerup* CreatePowerup(float x, float y, PowerupType type) {
     // Set state
     powerup->is_hit = false;
     powerup->is_destroyed = false;
+    powerup->is_display = false;
     
     // Create shadow
     powerup->shadow = CreateShadow(powerup);
@@ -141,28 +155,22 @@ Color GetPowerupColor(PowerupType type) {
     switch (type) {
         case POWERUP_MULTIBALL:
             return SKYBLUE;
-        case POWERUP_FIREBALL:
+        case POWERUP_FIRE:
             return RED;
-        case POWERUP_FREEZE:
+        case POWERUP_FROST:
             return BLUE;
         case POWERUP_GRAVITY:
             return PURPLE;
-        case POWERUP_LASER:
+        case POWERUP_ROCKET:
             return YELLOW;
-        case POWERUP_ENLARGE:
+        case POWERUP_ENLARGER:
             return GREEN;
-        case POWERUP_SHRINK:
+        case POWERUP_REDUCER:
             return PINK;
-        case POWERUP_SLOW:
+        case POWERUP_SPEEDBOOST:
             return BROWN;
-        case POWERUP_FAST:
+        case POWERUP_ELECTRICITY:
             return ORANGE;
-        case POWERUP_ENERGY:
-            return BLUE;
-        case POWERUP_HEALTH:
-            return GREEN;
-        case POWERUP_CHARGED:
-            return GOLD;
         default:
             return WHITE;
     }
@@ -203,15 +211,25 @@ void UpdatePowerup(Powerup* powerup, GameClock* clock) {
         }
     }
     
+    // Apply bob effect
+    if (!powerup->is_display) {
+        powerup->position.y = powerup->center_y + sinf(powerup->lifetime * 2) * powerup->bob_factor;
+    }
+    
     // Update rotation
     powerup->rotation += powerup->rotation_speed * delta * 60.0f;
     
-    // Apply gravity
-    powerup->velocity.y += powerup->gravity * delta;
+    // Apply gravity if not a display powerup
+    if (!powerup->is_display) {
+        powerup->velocity.y += powerup->gravity * delta;
+    }
     
     // Update position
     powerup->position.x += powerup->velocity.x * delta;
     powerup->position.y += powerup->velocity.y * delta;
+    
+    // Update particle effects
+    UpdatePowerupParticles(powerup, delta);
     
     // Bounce off walls
     if (powerup->position.x - POWERUP_WIDTH/2 < 0) {
@@ -278,38 +296,29 @@ void ActivatePowerup(Powerup* powerup, Player* player) {
         case POWERUP_MULTIBALL:
             ActivateMultiball(player);
             break;
-        case POWERUP_FIREBALL:
-            ActivateFireball(player);
+        case POWERUP_FIRE:
+            ActivateFire(player);
             break;
-        case POWERUP_FREEZE:
-            ActivateFreeze(player);
+        case POWERUP_FROST:
+            ActivateFrost(player);
             break;
         case POWERUP_GRAVITY:
             ActivateGravity(player);
             break;
-        case POWERUP_LASER:
-            ActivateLaser(player);
+        case POWERUP_ROCKET:
+            ActivateRocket(player);
             break;
-        case POWERUP_ENLARGE:
-            ActivateEnlarge(player);
+        case POWERUP_ENLARGER:
+            ActivateEnlarger(player);
             break;
-        case POWERUP_SHRINK:
-            ActivateShrink(player);
+        case POWERUP_REDUCER:
+            ActivateReducer(player);
             break;
-        case POWERUP_SLOW:
-            ActivateSlow(player);
+        case POWERUP_SPEEDBOOST:
+            ActivateSpeedboost(player);
             break;
-        case POWERUP_FAST:
-            ActivateFast(player);
-            break;
-        case POWERUP_ENERGY:
-            ActivateEnergy(player);
-            break;
-        case POWERUP_HEALTH:
-            ActivateHealth(player);
-            break;
-        case POWERUP_CHARGED:
-            ActivateCharged(player);
+        case POWERUP_ELECTRICITY:
+            ActivateElectricity(player);
             break;
         default:
             break;
@@ -356,7 +365,7 @@ void ActivateMultiball(Player* player) {
         // Copy speed from original
         newBall->speed = originalBall->speed;
         
-        // Copy effects from original (except Charged)
+        // Copy effects from original
         CopyBallEffects(originalBall, newBall);
         
         // Add timeout effect to new ball
@@ -385,21 +394,17 @@ void CopyBallEffects(Ball* source, Ball* target) {
         }
     }
 }
-```
 
-### Fireball
-
-```c
-void ActivateFireball(Player* player) {
+void ActivateFire(Player* player) {
     // Get all balls owned by this player
     int ballCount = GetPlayerBallCount(player);
     
-    // Apply fireball effect to each ball
+    // Apply fire effect to each ball
     for (int i = 0; i < ballCount; i++) {
         Ball* ball = GetPlayerBallAt(player, i);
         if (ball != NULL) {
             // Add burning effect to ball
-            Burning* burning = CreateBurningEffect(ball, FIREBALL_DURATION);
+            Burning* burning = CreateBurningEffect(ball, FIRE_DURATION);
             AddToSpriteList(ball->effectList, burning);
             
             // Set ball as burning
@@ -409,40 +414,36 @@ void ActivateFireball(Player* player) {
     }
     
     // Award points
-    AddPlayerPoints(player, FIREBALL_POINTS);
+    AddPlayerPoints(player, FIRE_POINTS);
 }
-```
 
-### Freeze
-
-```c
-void ActivateFreeze(Player* player) {
+void ActivateFrost(Player* player) {
     // Get opponent player
     Player* opponent = GetOpponentPlayer(player);
     
     // Get all balls owned by opponent
     int ballCount = GetPlayerBallCount(opponent);
     
-    // Apply freeze effect to each opponent ball
+    // Apply frost effect to each opponent ball
     for (int i = 0; i < ballCount; i++) {
         Ball* ball = GetPlayerBallAt(opponent, i);
         if (ball != NULL) {
             // Add freezing effect to ball
-            Freezing* freezing = CreateFreezingEffect(ball, FREEZE_DURATION);
+            Freezing* freezing = CreateFreezingEffect(ball, FROST_DURATION);
             AddToSpriteList(ball->effectList, freezing);
             
             // Set ball as frozen
             ball->is_frozen = true;
             
             // Slow down ball
-            ball->speed *= FREEZE_SPEED_MULTIPLIER;
+            ball->speed *= FROST_SPEED_MULTIPLIER;
         }
     }
     
     // Get all blocks
     int blockCount = GetBlockCount();
     
-    // Apply freeze effect to blocks on opponent's side
+    // Apply frost effect to blocks on opponent's side
     bool opponent_side_left = (opponent->side == PLAYER_SIDE_LEFT);
     
     for (int i = 0; i < blockCount; i++) {
@@ -463,13 +464,9 @@ void ActivateFreeze(Player* player) {
     }
     
     // Award points
-    AddPlayerPoints(player, FREEZE_POINTS);
+    AddPlayerPoints(player, FROST_POINTS);
 }
-```
 
-### Gravity
-
-```c
 void ActivateGravity(Player* player) {
     // Create gravitational pull effect at center of player's side
     float x = (player->side == PLAYER_SIDE_LEFT) ? 
@@ -491,56 +488,44 @@ void ActivateGravity(Player* player) {
     // Award points
     AddPlayerPoints(player, GRAVITY_POINTS);
 }
-```
 
-### Laser
-
-```c
-void ActivateLaser(Player* player) {
+void ActivateRocket(Player* player) {
     // Get player's paddle
     Paddle* paddle = GetPlayerPaddle(player);
     
-    // Create laser effect
-    Laser* laser = CreateLaserEffect(paddle, LASER_DURATION);
+    // Create rocket effect
+    Rocket* rocket = CreateRocketEffect(paddle, ROCKET_DURATION);
     
     // Add to paddle's effect list
-    AddToSpriteList(paddle->effectList, laser);
+    AddToSpriteList(paddle->effectList, rocket);
     
     // Award points
-    AddPlayerPoints(player, LASER_POINTS);
+    AddPlayerPoints(player, ROCKET_POINTS);
 }
-```
 
-### Enlarge
-
-```c
-void ActivateEnlarge(Player* player) {
+void ActivateEnlarger(Player* player) {
     // Get player's paddle
     Paddle* paddle = GetPlayerPaddle(player);
     
     // Calculate new height
-    float newHeight = paddle->actual_height * ENLARGE_MULTIPLIER;
+    float newHeight = paddle->actual_height * ENLARGER_MULTIPLIER;
     
     // Set paddle height
     SetPaddleHeight(paddle, newHeight);
     
     // Create size change effect
     SizeChange* sizeChange = CreateSizeChangeEffect(
-        paddle, paddle->actual_height, newHeight, ENLARGE_DURATION
+        paddle, paddle->actual_height, newHeight, ENLARGER_DURATION
     );
     
     // Add to paddle's effect list
     AddToSpriteList(paddle->effectList, sizeChange);
     
     // Award points
-    AddPlayerPoints(player, ENLARGE_POINTS);
+    AddPlayerPoints(player, ENLARGER_POINTS);
 }
-```
 
-### Shrink
-
-```c
-void ActivateShrink(Player* player) {
+void ActivateReducer(Player* player) {
     // Get opponent player
     Player* opponent = GetOpponentPlayer(player);
     
@@ -548,67 +533,28 @@ void ActivateShrink(Player* player) {
     Paddle* paddle = GetPlayerPaddle(opponent);
     
     // Calculate new height
-    float newHeight = paddle->actual_height * SHRINK_MULTIPLIER;
+    float newHeight = paddle->actual_height * REDUCER_MULTIPLIER;
     
     // Set paddle height
     SetPaddleHeight(paddle, newHeight);
     
     // Create size change effect
     SizeChange* sizeChange = CreateSizeChangeEffect(
-        paddle, paddle->actual_height, newHeight, SHRINK_DURATION
+        paddle, paddle->actual_height, newHeight, REDUCER_DURATION
     );
     
     // Add to paddle's effect list
     AddToSpriteList(paddle->effectList, sizeChange);
     
     // Award points
-    AddPlayerPoints(player, SHRINK_POINTS);
+    AddPlayerPoints(player, REDUCER_POINTS);
 }
-```
 
-### Slow
-
-```c
-void ActivateSlow(Player* player) {
-    // Get opponent player
-    Player* opponent = GetOpponentPlayer(player);
-    
-    // Get all balls owned by opponent
-    int ballCount = GetPlayerBallCount(opponent);
-    
-    // Apply slow effect to each opponent ball
-    for (int i = 0; i < ballCount; i++) {
-        Ball* ball = GetPlayerBallAt(opponent, i);
-        if (ball != NULL) {
-            // Store original speed
-            float originalSpeed = ball->speed;
-            
-            // Slow down ball
-            ball->speed *= SLOW_SPEED_MULTIPLIER;
-            
-            // Create speed effect
-            Speed* speed = CreateSpeedEffect(
-                ball, originalSpeed, ball->speed, SLOW_DURATION
-            );
-            
-            // Add to ball's effect list
-            AddToSpriteList(ball->effectList, speed);
-        }
-    }
-    
-    // Award points
-    AddPlayerPoints(player, SLOW_POINTS);
-}
-```
-
-### Fast
-
-```c
-void ActivateFast(Player* player) {
+void ActivateSpeedboost(Player* player) {
     // Get all balls owned by this player
     int ballCount = GetPlayerBallCount(player);
     
-    // Apply fast effect to each ball
+    // Apply speedboost effect to each ball
     for (int i = 0; i < ballCount; i++) {
         Ball* ball = GetPlayerBallAt(player, i);
         if (ball != NULL) {
@@ -616,11 +562,11 @@ void ActivateFast(Player* player) {
             float originalSpeed = ball->speed;
             
             // Speed up ball
-            ball->speed *= FAST_SPEED_MULTIPLIER;
+            ball->speed *= SPEEDBOOST_MULTIPLIER;
             
             // Create speed effect
             Speed* speed = CreateSpeedEffect(
-                ball, originalSpeed, ball->speed, FAST_DURATION
+                ball, originalSpeed, ball->speed, SPEEDBOOST_DURATION
             );
             
             // Add to ball's effect list
@@ -629,38 +575,10 @@ void ActivateFast(Player* player) {
     }
     
     // Award points
-    AddPlayerPoints(player, FAST_POINTS);
+    AddPlayerPoints(player, SPEEDBOOST_POINTS);
 }
-```
 
-### Energy
-
-```c
-void ActivateEnergy(Player* player) {
-    // Add energy to player
-    AddPlayerEnergy(player, ENERGY_POWERUP_AMOUNT);
-    
-    // Award points
-    AddPlayerPoints(player, ENERGY_POINTS);
-}
-```
-
-### Health
-
-```c
-void ActivateHealth(Player* player) {
-    // Add health to player
-    AddPlayerHealth(player, HEALTH_POWERUP_AMOUNT);
-    
-    // Award points
-    AddPlayerPoints(player, HEALTH_POINTS);
-}
-```
-
-### Charged
-
-```c
-void ActivateCharged(Player* player) {
+void ActivateElectricity(Player* player) {
     // Get all balls owned by this player
     int ballCount = GetPlayerBallCount(player);
     
@@ -669,17 +587,17 @@ void ActivateCharged(Player* player) {
         Ball* ball = GetPlayerBallAt(player, i);
         if (ball != NULL) {
             // Add charged effect to ball
-            Charged* charged = CreateChargedEffect(ball, CHARGED_DURATION);
+            Charged* charged = CreateChargedEffect(ball, ELECTRICITY_DURATION);
             AddToSpriteList(ball->effectList, charged);
             
             // Set ball as charged
             ball->is_charged = true;
-            ball->charge_damage = CHARGED_DAMAGE_MULTIPLIER;
+            ball->charge_damage = ELECTRICITY_DAMAGE_MULTIPLIER;
         }
     }
     
     // Award points
-    AddPlayerPoints(player, CHARGED_POINTS);
+    AddPlayerPoints(player, ELECTRICITY_POINTS);
 }
 ```
 
@@ -697,6 +615,9 @@ void DrawPowerup(Powerup* powerup) {
     
     // Draw shadow
     DrawShadow(powerup->shadow);
+    
+    // Draw particles
+    DrawPowerupParticles(powerup);
     
     // Calculate color with alpha
     Color drawColor = powerup->color;
@@ -754,13 +675,14 @@ void DrawPowerup(Powerup* powerup) {
 
 ```c
 // Powerup dimensions
-#define POWERUP_WIDTH 20.0f
-#define POWERUP_HEIGHT 20.0f
+#define POWERUP_WIDTH 8.0f
+#define POWERUP_HEIGHT 8.0f
 
 // Physics
 #define POWERUP_GRAVITY 9.8f
 #define POWERUP_INITIAL_VELOCITY 2.0f
 #define POWERUP_BOUNCE_DAMPING 0.7f
+#define POWERUP_BOB_FACTOR 0.5f
 
 // Lifetime
 #define POWERUP_MAX_LIFETIME 10.0f
@@ -768,41 +690,34 @@ void DrawPowerup(Powerup* powerup) {
 
 // Points awarded
 #define MULTIBALL_POINTS 50
-#define FIREBALL_POINTS 50
-#define FREEZE_POINTS 50
+#define FIRE_POINTS 50
+#define FROST_POINTS 50
 #define GRAVITY_POINTS 50
-#define LASER_POINTS 50
-#define ENLARGE_POINTS 50
-#define SHRINK_POINTS 50
-#define SLOW_POINTS 50
-#define FAST_POINTS 50
-#define ENERGY_POINTS 30
-#define HEALTH_POINTS 30
-#define CHARGED_POINTS 50
+#define ROCKET_POINTS 50
+#define ENLARGER_POINTS 50
+#define REDUCER_POINTS 50
+#define SPEEDBOOST_POINTS 50
+#define ELECTRICITY_POINTS 50
 
 // Effect durations
 #define MULTIBALL_DURATION 15.0f
-#define FIREBALL_DURATION 10.0f
-#define FREEZE_DURATION 5.0f
+#define FIRE_DURATION 10.0f
+#define FROST_DURATION 5.0f
 #define GRAVITY_DURATION 8.0f
-#define LASER_DURATION 5.0f
-#define ENLARGE_DURATION 10.0f
-#define SHRINK_DURATION 10.0f
-#define SLOW_DURATION 7.0f
-#define FAST_DURATION 7.0f
-#define CHARGED_DURATION 12.0f
+#define ROCKET_DURATION 5.0f
+#define ENLARGER_DURATION 10.0f
+#define REDUCER_DURATION 10.0f
+#define SPEEDBOOST_DURATION 7.0f
+#define ELECTRICITY_DURATION 12.0f
 
 // Effect strengths
-#define FREEZE_SPEED_MULTIPLIER 0.5f
+#define FROST_SPEED_MULTIPLIER 0.5f
 #define GRAVITY_RADIUS 150.0f
 #define GRAVITY_STRENGTH 50.0f
-#define ENLARGE_MULTIPLIER 1.5f
-#define SHRINK_MULTIPLIER 0.7f
-#define SLOW_SPEED_MULTIPLIER 0.6f
-#define FAST_SPEED_MULTIPLIER 1.4f
-#define ENERGY_POWERUP_AMOUNT 25
-#define HEALTH_POWERUP_AMOUNT 15
-#define CHARGED_DAMAGE_MULTIPLIER 2.0f
+#define ENLARGER_MULTIPLIER 1.5f
+#define REDUCER_MULTIPLIER 0.7f
+#define SPEEDBOOST_MULTIPLIER 1.4f
+#define ELECTRICITY_DAMAGE_MULTIPLIER 2.0f
 ```
 
 ## Memory Management
@@ -814,6 +729,11 @@ void DestroyPowerup(Powerup* powerup) {
     
     // Remove from powerup group
     RemovePowerupFromGroup(powerup, mainPowerupGroup);
+    
+    // Play sound if needed
+    if (!powerup->is_hit) {
+        PlaySound(powerupDestroySound);
+    }
     
     // Destroy shadow
     DestroyShadow(powerup->shadow);

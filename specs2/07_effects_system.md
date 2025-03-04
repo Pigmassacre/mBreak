@@ -1,5 +1,17 @@
 # Effects System Specification
 
+## Implementation Notes
+
+> **IMPORTANT**: This specification represents a proposed implementation of the Effects System for C using Raylib, based on the existing Python/Pygame implementation. The following notes clarify the relationship between this specification and the original code:
+>
+> 1. **Direct Ports**: Core functionality, effect types, and basic mechanics are directly ported from the Python implementation.
+> 
+> 2. **C Adaptations**: Structure and syntax have been adapted to C-style (using structs, function pointers, etc.) from Python's class-based approach.
+> 
+> 3. **Optimizations**: Some sections marked with 🔄 represent optimizations and performance considerations specific to the C implementation that don't exist in the Python code.
+> 
+> 4. **Extensions**: Some sections marked with ➕ represent extended functionality that builds upon but goes beyond the current Python implementation.
+
 ## Overview
 
 The Effects System provides a flexible framework for applying temporary visual, gameplay, and state modifications to game entities such as balls, blocks, and paddles. Effects are duration-based, parent-bound objects that encapsulate both visual feedback and gameplay mechanics changes.
@@ -495,9 +507,11 @@ void PowerupShareEffect(Powerup* powerup, GameObject* entity, EffectType effectT
 }
 ```
 
-## Performance Considerations
+## Performance Considerations 🔄
 
-### Memory Management
+> **Note**: The following sections represent optimizations for the C implementation that weren't present in the original Python code.
+
+### Memory Management 🔄
 
 ```c
 // Efficient memory pool for effects
@@ -518,7 +532,7 @@ Effect* EffectPoolGet(EffectPool* pool);
 void EffectPoolReturn(EffectPool* pool, Effect* effect);
 ```
 
-### Rendering Optimization
+### Rendering Optimization 🔄
 
 ```c
 // Batch rendering for effects
@@ -559,7 +573,7 @@ void EffectGroupBatchDraw(EffectGroup* group) {
 }
 ```
 
-## Sound System Integration
+## Sound System Integration 🔄
 
 ```c
 // Play effect sound with positional audio
@@ -579,9 +593,9 @@ void EffectPlaySound(Effect* effect, Sound sound) {
 }
 ```
 
-## Event System
+## Event System ➕
 
-The effects system implements event listeners that respond to gameplay events:
+> **Note**: This represents a more formalized event system than what exists in the Python implementation.
 
 ```c
 // Register event handlers for an effect
@@ -640,7 +654,7 @@ void EffectSpawnParticles(Effect* effect, int count, Color color, float speed, f
 }
 ```
 
-## Camera System Integration
+## Camera System Integration 🔄
 
 ```c
 // Convert world position to screen position
@@ -659,4 +673,6 @@ Vector2 EffectScreenToWorld(Vector2 screenPos) {
 
 ## Conclusion
 
-The Effects System is a core gameplay mechanic that provides dynamic visual feedback and gameplay alterations. Through its modular design, it allows for easy addition of new effect types while maintaining consistent behavior through the base Effect class. The integration with other game systems such as particles, sound, and collision detection creates a cohesive and engaging player experience. 
+The Effects System is a core gameplay mechanic that provides dynamic visual feedback and gameplay alterations. Through its modular design, it allows for easy addition of new effect types while maintaining consistent behavior through the base Effect class. The integration with other game systems such as particles, sound, and collision detection creates a cohesive and engaging player experience.
+
+> **Implementation Note**: This specification provides a blueprint for implementing the Effects System in C with Raylib, adapting from the original Python/Pygame codebase. While the core functionality remains the same, certain optimizations and structural changes have been incorporated to better suit the C language and Raylib framework. 
