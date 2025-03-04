@@ -1,9 +1,5 @@
 # TODOs
 
-## Fix the fireworks effect in gameover.py
-
-- The fireworks explode way before they reach their intended position near the middle / top middle of the screen.
-
 ## AI improvements
 
 - The AI is too aggressive with using the laser at low energy levels.

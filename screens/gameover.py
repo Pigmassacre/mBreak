@@ -141,7 +141,10 @@ class GameOver(scene.Scene):
 			x = random.uniform(settings.SCREEN_WIDTH / 10.0, settings.SCREEN_WIDTH - settings.SCREEN_WIDTH / 10.0)
 			y = settings.SCREEN_HEIGHT
 			angle = 3 * math.pi / 2.0
-			duration = random.uniform((settings.SCREEN_HEIGHT / 4.0) * firework.Firework.speed, (settings.SCREEN_HEIGHT - (settings.SCREEN_HEIGHT / 2.0)) * firework.Firework.speed)
+			# Calculate duration based on desired travel distance and initial speed
+			# We want it to travel about 40-80% of screen height
+			desired_distance = random.uniform(settings.SCREEN_HEIGHT * 0.4, settings.SCREEN_HEIGHT * 0.8)
+			duration = (desired_distance / firework.Firework.speed) * 15  # Multiply by 15 to compensate for delta_time and acceleration
 			firework.Firework(x, y, angle, duration)
 			self.time_passed = 0
 
