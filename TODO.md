@@ -1,9 +1,10 @@
 # TODOs
 
-## AI fixes
+## Rework color picking menu
 
-- The AI sometimes misses incredibly obvious balls - often not moving the paddle at all. This only happens when there's only one ball in play.
-- The AI doesnt get out of the way of balls that are behind it (for player 1 left of the paddle, for player 2 right of the paddle).
+- Currently it is a very cool but not-gamepad-friendly color wheel.
+- In previous versions the user picked between 6 colors using a gridmenu (2 rows 3 columns).
+- I would like to restore the grid menu.
 
 ## Create a detailed specification of the entire project
 

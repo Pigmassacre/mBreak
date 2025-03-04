@@ -107,6 +107,9 @@ class Paddle(pygame.sprite.Sprite):
 		self.min_x_distance = 99999
 		self.min_y_distance = 99999
 		self.min_distance = 99999
+		self.missed_balls = 0  # Counter for missed balls
+		self.direction_change_cooldown = 0.1  # Minimum time between direction changes
+		self.last_direction_change = 0
         
 		# New AI variables for smoother movement
 		self.target_y = None
@@ -115,10 +118,6 @@ class Paddle(pygame.sprite.Sprite):
 		self.movement_buffer = 3  # Smaller buffer for more precise positioning
 		self.current_prediction = None
 		self.prediction_confidence = 0
-		self.last_direction_change = 0
-		self.direction_change_cooldown = 0.12  # Slightly faster direction changes
-		self.missed_balls = 0  # Track missed balls to adjust strategy
-		self.last_hit_time = 0  # Track when we last hit a ball
 
 		# Set the size of the paddle. This takes care of storing the image attribute and coloring it.
 		self.set_size(Paddle.width, Paddle.height)
@@ -279,39 +278,75 @@ class Paddle(pygame.sprite.Sprite):
 	def predict_trajectory(self, item):
 		"""
 		Predicts where the item will be when it reaches the paddle's x position.
-		Returns (x, y) coordinates or None if item won't reach paddle.
+		Returns (predicted_x, predicted_y, confidence, time_to_reach) or None if item won't reach paddle.
 		"""
 		# Determine if we're the left or right paddle
 		paddle_side_left = self.x < settings.SCREEN_WIDTH / 2
 		
+		# Check if ball is behind paddle and moving away
+		ball_behind = False
+		if paddle_side_left:
+			if item.x < self.x + self.rect.width:
+				ball_behind = True
+				# For left paddle: check if ball is moving right (angle between -π/2 and π/2)
+				angle = item.angle
+				if angle > math.pi:
+					angle -= 2 * math.pi  # Normalize angle to [-π, π] range
+				if angle > -math.pi/2 and angle < math.pi/2:
+					# Ball is behind and moving away - move opposite to ball's vertical direction
+					speed_y = item.speed * math.sin(item.angle)
+					target_y = item.y + item.rect.height/2.0
+					if speed_y > 0:
+						# Ball moving down, move up
+						target_y = settings.LEVEL_Y + self.rect.height
+					else:
+						# Ball moving up, move down
+						target_y = settings.LEVEL_MAX_Y - self.rect.height
+					return (self.x, target_y, 0.95, 1)
+		else:
+			if item.x > self.x - item.rect.width:
+				ball_behind = True
+				# For right paddle: check if ball is moving left (angle between π/2 and 3π/2)
+				if item.angle > math.pi/2 and item.angle < 3*math.pi/2:
+					# Ball is behind and moving away - move opposite to ball's vertical direction
+					speed_y = item.speed * math.sin(item.angle)
+					target_y = item.y + item.rect.height/2.0
+					if speed_y > 0:
+						# Ball moving down, move up
+						target_y = settings.LEVEL_Y + self.rect.height
+					else:
+						# Ball moving up, move down
+						target_y = settings.LEVEL_MAX_Y - self.rect.height
+					return (self.x + self.rect.width, target_y, 0.95, 1)
+		
+		# If ball is behind but not moving away, ignore it
+		if ball_behind:
+			return None
+			
 		# Check if item is moving toward this paddle
 		if paddle_side_left:
 			# Left paddle: item must be moving left (angle between π/2 and 3π/2)
 			if not (item.angle >= math.pi / 2.0 and item.angle <= 3 * math.pi / 2.0):
 				return None
-			# Item must be to the right of paddle or very close
-			if item.x + item.rect.width < self.x:
-				return None
 		else:
-			# Right paddle: item must be moving right (angle between -π/2 and π/2 or between 3π/2 and 5π/2)
-			if not ((item.angle <= math.pi / 2.0 and item.angle >= -math.pi / 2.0) or 
-					(item.angle >= 3 * math.pi / 2.0 and item.angle <= 2 * math.pi + math.pi / 2.0)):
-				return None
-			# Item must be to the left of paddle or very close
-			if item.x > self.x + self.rect.width:
+			# Right paddle: item must be moving right (angle between -π/2 and π/2)
+			# Fix: Properly handle angle range for right paddle
+			angle = item.angle
+			if angle > math.pi:
+				angle -= 2 * math.pi  # Normalize angle to [-π, π] range
+			if not (angle >= -math.pi / 2.0 and angle <= math.pi / 2.0):
 				return None
 				
-		# Calculate time to reach paddle's x position
+		# Calculate time to reach paddle
 		speed_x = item.speed * math.cos(item.angle)
 		
 		# If speed_x is too small, item is moving almost vertically
-		# For very slow balls, we still want to track them if they're close
 		if abs(speed_x) < 0.1:
 			# Check if the ball is very close to the paddle
-			if (paddle_side_left and item.x > self.x and item.x < self.x + 50) or \
-			   (not paddle_side_left and item.x < self.x + self.rect.width and item.x > self.x - 50):
-				# For very close balls, just use current y position
-				return (self.x if paddle_side_left else self.x, item.y + item.rect.height / 2.0, 0.9, 1)
+			if (paddle_side_left and item.x > self.x - 50 and item.x < self.x + 50) or \
+			   (not paddle_side_left and item.x < self.x + self.rect.width + 50 and item.x > self.x - 50):
+				# For very close balls, just use current y position with high confidence
+				return (self.x if paddle_side_left else self.x + self.rect.width, item.y + item.rect.height / 2.0, 0.95, 1)
 			return None
 			
 		# Calculate time to reach paddle
@@ -322,6 +357,10 @@ class Paddle(pygame.sprite.Sprite):
 			
 		# If time is negative, item is moving away from paddle
 		if time_to_reach <= 0:
+			# Special case: if ball is very close and behind paddle, still track it
+			if (paddle_side_left and item.x < self.x + 100) or \
+			   (not paddle_side_left and item.x > self.x - 100):
+				return (self.x if paddle_side_left else self.x + self.rect.width, item.y + item.rect.height / 2.0, 0.9, 1)
 			return None
 			
 		# Calculate y position when item reaches paddle
@@ -370,7 +409,7 @@ class Paddle(pygame.sprite.Sprite):
 			confidence += 0.3
 		
 		# Increase confidence for slow balls that are close
-		if time_to_reach < 20 and item.speed is not None and item.speed < 5:
+		if time_to_reach < 20 and item.speed < 5:
 			confidence += 0.4
 			
 		# Increase confidence for balls that are moving directly toward paddle
@@ -382,8 +421,8 @@ class Paddle(pygame.sprite.Sprite):
 		confidence = max(0.1, min(1.0, confidence))
 		
 		# Return the predicted position - this is the center of the item
-		# Add half the item's height to get the center of the item
-		return (self.x if paddle_side_left else self.x, predicted_y + item.rect.height / 2.0, confidence, time_to_reach)
+		# Fix: Return correct x position for right paddle
+		return (self.x if paddle_side_left else self.x + self.rect.width, predicted_y + item.rect.height / 2.0, confidence, time_to_reach)
 		
 	def adjust_distance_by_priority(self, item, distance):
 		"""
@@ -447,114 +486,87 @@ class Paddle(pygame.sprite.Sprite):
 				break
 				
 		if active_laser:
-			# Count enemy blocks for aggressive positioning
-			enemy_block_count = 0
-			for block in groups.Groups.block_group:
-				if block.owner != self.owner:
-					enemy_block_count += 1
-					
-			# When laser is active, try to position for maximum block coverage
-			best_position = None
-			max_blocks_hit = 0
-			best_score = float('-inf')
+			# Get current paddle position as starting point
+			current_y = self.rect.y + self.rect.height / 2.0
 			paddle_side_left = self.x < settings.SCREEN_WIDTH / 2.0
 			
-			# Try different vertical positions
-			test_positions = []
-			screen_height = settings.LEVEL_MAX_Y - settings.LEVEL_Y
+			# Find all enemy blocks and their positions
+			enemy_blocks = []
+			for block in groups.Groups.block_group:
+				if block.owner != self.owner:
+					enemy_blocks.append(block)
 			
-			# Adjust number of test positions based on enemy block count and laser power
-			# More precise positioning when few blocks remain or laser is powerful
-			num_positions = 10
-			if enemy_block_count <= 3 or laser_power >= 4.0:
-				num_positions = 20  # More precise positioning
-			elif enemy_block_count <= 6 or laser_power >= 3.0:
-				num_positions = 15  # Moderately precise positioning
-			
-			step = screen_height / num_positions
-			
-			# Add center position first (often optimal)
-			test_positions.append(settings.LEVEL_Y + screen_height / 2.0)
-			
-			# Add other test positions
-			for i in range(1, num_positions):
-				pos = settings.LEVEL_Y + (i * step)
-				if pos not in test_positions:
-					test_positions.append(pos)
-					
-			# Test each position
-			for test_y in test_positions:
-				blocks_hit = 0
-				position_score = 0
-				weak_blocks_hit = 0
-				normal_blocks_hit = 0
-				strong_blocks_hit = 0
+			if not enemy_blocks:
+				return current_y
 				
-				for block in groups.Groups.block_group:
-					if block.owner != self.owner:
-						block_center_y = block.rect.y + block.rect.height / 2.0
-						# Check if block is in laser's vertical range
-						if abs(block_center_y - test_y) <= laser_height / 2.0:
-							# Check if block is in laser's horizontal path
-							if (paddle_side_left and block.rect.x > self.rect.x) or \
-							   (not paddle_side_left and block.rect.x < self.rect.x):
-								blocks_hit += 1
-								
-								# Score based on block type and health
-								if hasattr(block, "health") and block.health is not None:
-									# Prioritize blocks with lower health
-									health_factor = 1.0 - (block.health / 100.0)
-									
-									# Identify block type and assign score
-									if block.__class__.__name__ == "WeakBlock":
-										weak_blocks_hit += 1
-										position_score += 3.0 * (1.0 + health_factor)
-									elif block.__class__.__name__ == "NormalBlock":
-										normal_blocks_hit += 1
-										position_score += 2.0 * (1.0 + health_factor)
-									else:  # StrongBlock
-										strong_blocks_hit += 1
-										position_score += 1.0 * (1.0 + health_factor)
+			# Group blocks by vertical position to find clusters
+			block_clusters = []
+			current_cluster = []
+			sorted_blocks = sorted(enemy_blocks, key=lambda b: b.rect.y)
+			
+			for block in sorted_blocks:
+				if not current_cluster:
+					current_cluster.append(block)
+				else:
+					# If block is within laser height of cluster, add to cluster
+					cluster_center = sum(b.rect.y + b.rect.height/2.0 for b in current_cluster) / len(current_cluster)
+					block_center = block.rect.y + block.rect.height/2.0
+					if abs(block_center - cluster_center) <= laser_height:
+						current_cluster.append(block)
+					else:
+						block_clusters.append(current_cluster)
+						current_cluster = [block]
+			
+			if current_cluster:
+				block_clusters.append(current_cluster)
 				
-				# Calculate final score for this position
-				if blocks_hit > 0:
-					# Base score from blocks hit
-					final_score = position_score
-					
-					# Bonus for hitting multiple blocks
-					if blocks_hit > 1:
-						final_score *= (1.0 + (blocks_hit / enemy_block_count))
-					
-					# Extra bonus for hitting weak blocks when few blocks remain
-					if enemy_block_count <= 3 and weak_blocks_hit > 0:
-						final_score *= 1.5
-					
-					# Bonus for powerful laser
-					final_score *= math.pow(laser_power, 1.5)
-					
-					# Small penalty for extreme positions (prefer more central positions)
-					# Reduce this penalty when few blocks remain or laser is powerful
-					position_penalty = abs(test_y - (settings.LEVEL_Y + screen_height/2.0)) / screen_height
-					if enemy_block_count <= 3 or laser_power >= 4.0:
-						position_penalty *= 0.3  # Much smaller penalty
-					elif enemy_block_count <= 6 or laser_power >= 3.0:
-						position_penalty *= 0.6  # Smaller penalty
-					final_score -= position_penalty * 10
-					
-					# Update best position if this is the highest scoring position
-					if final_score > best_score:
-						best_score = final_score
-						best_position = test_y
-						max_blocks_hit = blocks_hit
-					# If scores are very close, prefer the more central position
-					elif abs(final_score - best_score) < 0.1 and best_position is not None:
-						if abs(test_y - (settings.LEVEL_Y + screen_height/2.0)) < \
-						   abs(best_position - (settings.LEVEL_Y + screen_height/2.0)):
-							best_position = test_y
-							max_blocks_hit = blocks_hit
-					
-			if best_position is not None:
-				return best_position
+			# Score each cluster
+			best_score = -1
+			best_position = current_y
+			
+			for cluster in block_clusters:
+				# Calculate cluster center
+				cluster_center = sum(b.rect.y + b.rect.height/2.0 for b in cluster) / len(cluster)
+				
+				# Calculate score based on several factors
+				score = 0
+				
+				# Base score from number of blocks that would be hit
+				blocks_hit = len(cluster)
+				score += blocks_hit * 10
+				
+				# Bonus for weak/damaged blocks
+				for block in cluster:
+					if hasattr(block, "health"):
+						# More points for lower health blocks
+						health_factor = 1.0 - (block.health / 100.0)
+						if block.__class__.__name__ == "WeakBlock":
+							score += 5 * (1.0 + health_factor)
+						elif block.__class__.__name__ == "NormalBlock":
+							score += 3 * (1.0 + health_factor)
+						else:  # StrongBlock
+							score += 2 * (1.0 + health_factor)
+				
+				# Bonus if cluster is on same side of screen as paddle
+				cluster_x = sum(b.rect.x for b in cluster) / len(cluster)
+				if (paddle_side_left and cluster_x > self.rect.x) or \
+				   (not paddle_side_left and cluster_x < self.rect.x):
+					score *= 1.2
+				
+				# Small penalty for distance from current position
+				distance_penalty = abs(cluster_center - current_y) / (settings.LEVEL_MAX_Y - settings.LEVEL_Y)
+				score *= (1.0 - distance_penalty * 0.3)  # Reduced penalty to allow more movement
+				
+				# Bonus for powerful laser (can hit more blocks reliably)
+				score *= math.sqrt(laser_power)
+				
+				if score > best_score:
+					best_score = score
+					best_position = cluster_center
+			
+			# If we found a good position, move toward it
+			# But maintain some inertia to prevent constant jumping
+			return (best_position * 0.7 + current_y * 0.3)
 		
 		# If no laser is active or no good position found, use normal strategic positioning
 		# Default to center position
@@ -563,17 +575,30 @@ class Paddle(pygame.sprite.Sprite):
 		# If there are balls in play, try to position based on their general position
 		ball_count = 0
 		ball_y_sum = 0
+		closest_ball_y = None
+		closest_ball_distance = float('inf')
+		paddle_side_left = self.x < settings.SCREEN_WIDTH / 2
 		
 		for ball in groups.Groups.ball_group:
 			ball_count += 1
-			ball_y_sum += ball.y + ball.rect.height / 2.0
+			ball_center_y = ball.y + ball.rect.height / 2.0
+			ball_y_sum += ball_center_y
+			
+			# Track the closest ball's position
+			ball_x = ball.x + ball.rect.width / 2.0
+			distance = abs(ball_x - (self.x + self.rect.width/2.0))
+			if distance < closest_ball_distance:
+				closest_ball_distance = distance
+				closest_ball_y = ball_center_y
 			
 		if ball_count > 0:
-			# Position slightly toward the average ball position
+			# Use weighted average of ball positions, with more weight on closest ball
 			avg_ball_y = ball_y_sum / ball_count
-			# Position the center of the paddle at the average ball position
-			# FIXED: Don't subtract half the paddle height - this was causing the offset
-			target_y = (target_y * 0.7 + avg_ball_y * 0.3)
+			if closest_ball_y is not None:
+				# Weight the closest ball more heavily
+				target_y = (avg_ball_y * 0.3 + closest_ball_y * 0.4 + target_y * 0.3)
+			else:
+				target_y = (avg_ball_y * 0.3 + target_y * 0.7)
 			
 		# Try to aim at opponent blocks if we have a high enough AI difficulty
 		if self.owner.ai_difficulty >= 2 and ball_count > 0:
@@ -586,8 +611,17 @@ class Paddle(pygame.sprite.Sprite):
 				else:
 					target_y = (target_y * 0.6 + aim_position * 0.4)
 			
-		return target_y
+		# Add a slight bias toward the center when no immediate threats
+		screen_center_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
+		target_y = (target_y * 0.7 + screen_center_y * 0.3)
 		
+		# Ensure we stay within screen bounds
+		min_y = settings.LEVEL_Y + self.rect.height / 2.0
+		max_y = settings.LEVEL_MAX_Y - self.rect.height / 2.0
+		target_y = max(min_y, min(max_y, target_y))
+		
+		return target_y
+
 	def calculate_aim_position(self):
 		"""
 		Calculates the optimal paddle position to aim at opponent blocks.
@@ -964,16 +998,8 @@ class Paddle(pygame.sprite.Sprite):
 			if self.target_y is None:
 				should_recalculate = True
 				
-			# Check if we have an active laser - recalculate more frequently to track moving blocks
-			has_active_laser = False
-			for effect in groups.Groups.effect_group:
-				if effect.__class__.__name__ == "Laserbeam" and effect.owner == self.owner:
-					has_active_laser = True
-					should_recalculate = should_recalculate or (current_time - self.last_decision_time) >= (self.decision_cooldown * 0.5)
-					break
-				
 			# Recalculate more frequently if we've been missing balls
-			if self.missed_balls > 2:
+			if self.missed_balls > 0:
 				should_recalculate = should_recalculate or (current_time - self.last_decision_time) >= (self.decision_cooldown * 0.5)
 				
 			# Decide whether to use energy attack (less frequently than movement decisions)
@@ -1009,79 +1035,59 @@ class Paddle(pygame.sprite.Sprite):
 					is_our_ball = hasattr(self.focused_item, "owner") and self.focused_item.owner is not None and self.focused_item.owner == self.owner
 					ball_approaching = False
 					
-					if hasattr(self.focused_item, "x") and self.focused_item.x is not None and hasattr(self.focused_item, "rect") and self.focused_item.rect is not None:
+					if hasattr(self.focused_item, "x") and self.focused_item.x is not None:
 						ball_x = self.focused_item.x + self.focused_item.rect.width / 2.0
 						ball_distance = math.fabs(ball_x - (self.x + self.rect.width/2.0))
 						
-						if (paddle_side_left and ball_x > self.x and ball_x < self.x + 200) or \
-						   (not paddle_side_left and ball_x < self.x + self.rect.width and ball_x > self.x - 200):
+						# Consider balls behind the paddle if they're close
+						if (paddle_side_left and ball_x < self.x + self.rect.width + 100) or \
+						   (not paddle_side_left and ball_x > self.x - 100):
 							ball_approaching = True
 					
 					# If this is our ball and it's approaching, try to aim it at opponent blocks
 					if is_our_ball and ball_approaching and self.owner.ai_difficulty >= 2:
 						aim_position = self.calculate_aim_position()
 						if aim_position is not None:
-							# For higher difficulties, prioritize aiming more but stay closer to center
+							# For higher difficulties, prioritize aiming more
 							if self.owner.ai_difficulty >= 3:
-								self.target_y = (self.target_y * 0.5 + aim_position * 0.5)
+								self.target_y = (self.predicted_y * 0.6 + aim_position * 0.4)
 							else:
-								self.target_y = (self.target_y * 0.6 + aim_position * 0.4)
+								self.target_y = (self.predicted_y * 0.7 + aim_position * 0.3)
 					else:
 						# Different behavior based on AI difficulty
 						if self.owner.ai_difficulty >= 3:
 							# Expert AI: Good positioning with minimal error
 							self.target_y = self.predicted_y
 							
-							# Add small random offset for realism, but only when changing targets
+							# Add very small random offset for realism, but only when changing targets
 							if self.focused_item != old_focused_item:
-								offset_amount = self.rect.height * 0.05
-								# If we've been missing, reduce randomness
-								if self.missed_balls > 2:
-									offset_amount = self.rect.height * 0.02
+								offset_amount = self.rect.height * 0.03
 								self.target_y += random.uniform(-offset_amount, offset_amount)
 						
 						elif self.owner.ai_difficulty == 2:
-							# Medium AI: Good positioning with moderate error
+							# Medium AI: Good positioning with small error
+							self.target_y = self.predicted_y
+							
+							# Add small random offset, but only when changing targets
+							if self.focused_item != old_focused_item:
+								offset_amount = self.rect.height * 0.08
+								self.target_y += random.uniform(-offset_amount, offset_amount)
+						
+						else:
+							# Easy AI: Basic positioning with moderate error
 							self.target_y = self.predicted_y
 							
 							# Add moderate random offset, but only when changing targets
 							if self.focused_item != old_focused_item:
-								offset_amount = self.rect.height * 0.15
-								# If we've been missing, reduce randomness
-								if self.missed_balls > 2:
-									offset_amount = self.rect.height * 0.08
-								self.target_y += random.uniform(-offset_amount, offset_amount)
-						
-						else:
-							# Easy AI: Basic positioning with significant error
-							self.target_y = self.predicted_y
-							
-							# Add large random offset, but only when changing targets
-							if self.focused_item != old_focused_item or random.random() < 0.1:
-								offset_amount = self.rect.height * 0.4
-								# If we've been missing a lot, reduce randomness
-								if self.missed_balls > 3:
-									offset_amount = self.rect.height * 0.25
+								offset_amount = self.rect.height * 0.2
 								self.target_y += random.uniform(-offset_amount, offset_amount)
 				else:
 					# No immediate threats, use strategic positioning
 					self.target_y = self.strategic_positioning()
 					
-					# For higher difficulty AIs, occasionally try to aim at opponent blocks
-					# even when there's no immediate threat
-					if self.owner.ai_difficulty >= 2 and self.focused_item is not None and hasattr(self.focused_item, "owner") and self.focused_item.owner is not None and self.focused_item.owner == self.owner:
-						# We have a ball that we own, try to aim it at opponent blocks
-						aim_position = self.calculate_aim_position()
-						if aim_position is not None:
-							# For expert AI, prioritize aiming more but stay closer to center
-							if self.owner.ai_difficulty >= 3:
-								self.target_y = (self.target_y * 0.5 + aim_position * 0.5)
-							else:
-								self.target_y = (self.target_y * 0.6 + aim_position * 0.4)
-
 					# Add a slight bias toward the center when no immediate threats
 					screen_center_y = settings.LEVEL_Y + (settings.LEVEL_MAX_Y - settings.LEVEL_Y) / 2.0
-					self.target_y = (self.target_y * 0.8 + screen_center_y * 0.2)
+					self.target_y = (self.target_y * 0.7 + screen_center_y * 0.3)
 
 			# If we have a target position, move toward it
 			if self.target_y is not None:
@@ -1089,7 +1095,6 @@ class Paddle(pygame.sprite.Sprite):
 				paddle_center_y = self.y + self.rect.height / 2.0
 				
 				# Calculate distance to target
-				# FIXED: The target_y is now the desired center position of the paddle
 				distance_to_target = self.target_y - paddle_center_y
 				
 				# Adjust buffer based on difficulty and missed balls
@@ -1099,25 +1104,19 @@ class Paddle(pygame.sprite.Sprite):
 				elif self.owner.ai_difficulty == 2:
 					effective_buffer = max(2, self.movement_buffer - (self.missed_balls // 2))
 				
-				# Only move if we're outside the buffer zone to prevent oscillation
+				# Only move if we're outside the buffer zone
 				if abs(distance_to_target) > effective_buffer:
 					# Check if we need to change direction
 					changing_direction = (distance_to_target > 0 and self.velocity_y < 0) or (distance_to_target < 0 and self.velocity_y > 0)
 					
-					# Only allow direction changes after cooldown to prevent jerky movement
+					# Only allow direction changes after cooldown
 					if changing_direction:
-						# Adjust cooldown based on missed balls - change direction faster if missing
+						# Adjust cooldown based on missed balls
 						effective_cooldown = self.direction_change_cooldown
-						if self.missed_balls > 2:
-							effective_cooldown *= 0.7
+						if self.missed_balls > 0:
+							effective_cooldown *= 0.5
 							
-						if current_time - self.last_direction_change < effective_cooldown:
-							# Don't change direction yet, just slow down
-							if self.velocity_y > 0:
-								self.key_up_pressed = True
-							else:
-								self.key_down_pressed = True
-						else:
+						if current_time - self.last_direction_change >= effective_cooldown:
 							# Change direction and record the time
 							self.last_direction_change = current_time
 							if distance_to_target > 0:
@@ -1134,27 +1133,17 @@ class Paddle(pygame.sprite.Sprite):
 					# Adjust movement based on AI difficulty
 					if self.owner.ai_difficulty < 2:
 						# Easy AI occasionally hesitates
-						hesitation_chance = 0.15
-						# Reduce hesitation if missing balls
-						if self.missed_balls > 2:
-							hesitation_chance = 0.08
+						hesitation_chance = 0.1
 						if random.random() < hesitation_chance:
 							self.key_up_pressed = False
 							self.key_down_pressed = False
 					elif self.owner.ai_difficulty == 2:
-						# Medium AI occasionally hesitates
-						hesitation_chance = 0.05
-						# Reduce hesitation if missing balls
-						if self.missed_balls > 2:
-							hesitation_chance = 0.02
+						# Medium AI rarely hesitates
+						hesitation_chance = 0.03
 						if random.random() < hesitation_chance:
 							self.key_up_pressed = False
 							self.key_down_pressed = False
-				else:
-					# We're close enough to the target, stop moving
-					# This prevents oscillation around the target
-					pass
-					
+			
 			# Check if we might have missed a ball
 			for ball in groups.Groups.ball_group:
 				self.check_if_missed_ball(ball, paddle_side_left)
