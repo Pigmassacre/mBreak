@@ -1,0 +1,10 @@
+---
+description: Always remove finished tasks from TODO.md
+globs: 
+alwaysApply: true
+---
+
+# When done with a task, remove it from [TODO.md](mdc:TODO.md)
+
+- The user wants this file to be clean - it should only contain tasks that have not yet been performed.
+- Do NOT remove other tasks than the one(s) you actually finished.
