@@ -1,13 +1,5 @@
 # TODOs
 
-## Powerup spawn changes
-
-- Powerups should spawn at 3 predetermined locations:
-    - Right in the center of the field
-    - In the top third
-    - In the bottom third
-- Powerups should only spawn at a location if there is no powerup at that location.
-
 ## Collision fixes
 
 The revamped ball collision handling is way better, but it has some insane bugs:

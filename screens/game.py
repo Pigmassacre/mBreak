@@ -228,30 +228,57 @@ class Game(scene.Scene):
 				self.powerup_spawn_time = 0
 
 	def create_powerup(self):
-		# Pick a random position in the middle of the level.
-		x = random.uniform(settings.LEVEL_X + (settings.LEVEL_WIDTH / 4), settings.LEVEL_X + (3 * (settings.LEVEL_WIDTH / 4)))
-		y = random.uniform(settings.LEVEL_Y, settings.LEVEL_MAX_Y - powerup.Powerup.height)
+		# Define the three predetermined spawn locations
+		spawn_locations = [
+			# Center of the field
+			(settings.LEVEL_X + (settings.LEVEL_WIDTH / 2), settings.LEVEL_Y + (settings.LEVEL_HEIGHT / 2)),
+			# Top third
+			(settings.LEVEL_X + (settings.LEVEL_WIDTH / 2), settings.LEVEL_Y + (settings.LEVEL_HEIGHT / 3)),
+			# Bottom third
+			(settings.LEVEL_X + (settings.LEVEL_WIDTH / 2), settings.LEVEL_Y + (2 * settings.LEVEL_HEIGHT / 3))
+		]
 
-		# Store what should spawn temporarily.
+		# Filter out locations that already have powerups
+		available_locations = []
+		for spawn_x, spawn_y in spawn_locations:
+			location_available = True
+			for existing_powerup in groups.Groups.powerup_group:
+				if not existing_powerup.is_display:  # Only check actual powerups, not display ones
+					# Check if there's a powerup within a small radius of this location
+					distance = math.sqrt((existing_powerup.x - spawn_x) ** 2 + (existing_powerup.y - spawn_y) ** 2)
+					if distance < powerup.Powerup.width * 2:  # Use powerup width as a minimum distance
+						location_available = False
+						break
+			if location_available:
+				available_locations.append((spawn_x, spawn_y))
+
+		# If no locations are available, return None
+		if not available_locations:
+			return None
+
+		# Choose a random available location
+		spawn_x, spawn_y = random.choice(available_locations)
+
+		# Store what should spawn temporarily
 		powerup_to_spawn = random.choice(self.powerup_list)
 
-		# If what should've spawned is speedboost, check if we're allowed to spawn that.
+		# If what should've spawned is speedboost, check if we're allowed to spawn that
 		if powerup_to_spawn == speedboost.SpeedBoost:
 			# Go through all the powerups in the level and...
 			for a_powerup in groups.Groups.powerup_group:
-				# Check if there is already a speed powerup on the field.
+				# Check if there is already a speed powerup on the field
 				if a_powerup.__class__ == speedboost.SpeedBoost:
-					# If there is, check if we should allow it to spawn.
+					# If there is, check if we should allow it to spawn
 					if random.uniform(0, 1) <= self.powerup_second_speed_spawn_chance:
-						# Ok, it should spawn, so spawn it.
-						return powerup_to_spawn(x, y)
+						# Ok, it should spawn, so spawn it
+						return powerup_to_spawn(spawn_x - powerup.Powerup.width / 2, spawn_y - powerup.Powerup.height / 2)
 					else:
-						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't speedboost and then break the loop.
+						# It shouldn't spawn, so let's generate another powerup_to_spawn that isn't speedboost and then break the loop
 						powerup_to_spawn = random.choice([x for x in self.powerup_list if x != speedboost.SpeedBoost])
 						break
 		
-		# If we got this far, we just spawn that powerup.
-		return powerup_to_spawn(x, y)
+		# If we got this far, we just spawn that powerup
+		return powerup_to_spawn(spawn_x - powerup.Powerup.width / 2, spawn_y - powerup.Powerup.height / 2)
 
 	def start_game(self):
 		# When the game starts, create a ball using the stored initial angle
