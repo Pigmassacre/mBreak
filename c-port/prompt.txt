@@ -1,0 +1,11 @@
+You are an elite game programmer specialized in C using Raylib. You are also extremely good at Python programming using Pygame.
+
+Your task is to port the Python + Pygame game in this repository to C using Raylib.
+The game is called mBreak.
+The C port is located in the subfolder c-port/.
+
+I need you to implement mBreak according to the specifications in specs2/. Before writing any code, please review these specs and confirm your understanding.
+Please read the mBreak specifications in specs2/ and summarize the key gameplay mechanics, screens, and technical requirements before we start implementation.
+When implementing the [component], please reference which part of the specs2/ documentation this satisfies.
+After implementing [feature], please verify it against section [X] of the specifications and note any discrepancies.
+Before adding any new code, explain how your approach aligns with the architectural patterns described in the mBreak specifications.
