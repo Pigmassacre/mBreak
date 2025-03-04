@@ -44,6 +44,8 @@ import screens.pausemenu as pausemenu
 
 import objects.effects.transition as transition
 
+import os
+
 """
 
 This is the screen where the actual gameplay takes place. It uses the background module to draw the background, and the
@@ -59,9 +61,15 @@ For each player, a list of all their currently active powerups are displayed in 
 
 class Game(scene.Scene):
 
+	# Class variable to store the current game instance
+	current_instance = None
+
 	def __init__(self, window_surface, main_clock, player_one, player_two, number_of_rounds, score, number_of_rounds_done = 0):
 		# Call the superconstructor.
 		scene.Scene.__init__(self, window_surface, main_clock)
+
+		# Store this instance as the current game
+		Game.current_instance = self
 
 		# Create the screen transition effect
 		self.screen_transition = transition.ScreenTransition(window_surface)

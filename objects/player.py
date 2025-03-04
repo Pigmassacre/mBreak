@@ -13,6 +13,7 @@ import objects.powerups.powerup as powerup
 import objects.attacks.missilestorm as missilestorm
 import objects.attacks.laser as laser
 import settings.settings as settings
+import os
 
 """
 
@@ -28,6 +29,11 @@ class Player(pygame.sprite.Sprite):
 	energy_image_middle_left = pygame.image.load("res/player/energy/energy_middle_4.png")
 	energy_image_middle_right = pygame.image.load("res/player/energy/energy_middle_right_4.png")
 	energy_image_bottom_left = pygame.image.load("res/player/energy/energy_bottom_left_2.png")
+
+	# Character sprite rendering constants
+	JERK_MAX_DURATION = 0.5  # 500ms
+	JERK_MAX_OFFSET = 10  # Maximum pixel offset for jerk animation
+	CHARACTER_SIZE = 64  # Size of character sprites
 
 	energy_image_top_left_width = energy_image_top_left.get_width()
 	energy_image_top_left_height = energy_image_top_left.get_height()
@@ -54,6 +60,32 @@ class Player(pygame.sprite.Sprite):
 
 		# The name is dislayed at the end of each match/game.
 		self.name = name
+
+		# Store the character name from the color name
+		self.character = None
+		for char_name, char_color in {
+			"red": pygame.Color(255, 0, 0),
+			"green": pygame.Color(0, 255, 0),
+			"blue": pygame.Color(0, 0, 255),
+			"yellow": pygame.Color(255, 255, 0),
+			"magenta": pygame.Color(255, 0, 255),
+			"cyan": pygame.Color(0, 255, 255)
+		}.items():
+			if char_color == color:
+				self.character = char_name
+				break
+
+		# Load character sprite
+		self.sprite = None
+		sprite_path = os.path.join("res", "character", f"{self.character}.png")
+		if os.path.exists(sprite_path):
+			self.sprite = pygame.image.load(sprite_path)
+			self.sprite = pygame.transform.scale(self.sprite, (self.CHARACTER_SIZE, self.CHARACTER_SIZE))
+
+		# Character jerk animation state
+		self.jerk_duration = 0
+		self.jerk_offset_x = 0
+		self.jerk_offset_y = 0
 
 		# Store the selected color, used to colorize objects that belong to the player.
 		self.color = color
@@ -213,6 +245,12 @@ class Player(pygame.sprite.Sprite):
 		self.spent_energy_fade = 1.0
 		self.spent_energy_delay = 0  # Reset delay timer
 
+		# Find opponent and make them react to our attack
+		for player in groups.Groups.player_group:
+			if player != self:  # Find the opponent
+				player.on_enemy_attacks()
+				break
+
 	def event(self, event):
 		if self.ai_difficulty == 0:
 			if ((event.type == KEYDOWN and event.key == self.key_unleash_energy) or 
@@ -294,7 +332,34 @@ class Player(pygame.sprite.Sprite):
 			# Finally, change the last_powerup_group_size to match the current size.
 			self.last_powerup_group_size = len(self.powerup_group)		
 
+		# Update character jerk animation
+		dt = main_clock.get_time() / 1000.0  # Convert to seconds
+		if self.jerk_duration > 0:
+			self.jerk_duration = max(0, self.jerk_duration - dt)
+			# Update jerk offsets
+			jerk_progress = self.jerk_duration / self.JERK_MAX_DURATION
+			self.jerk_offset_x = random.uniform(-self.JERK_MAX_OFFSET, self.JERK_MAX_OFFSET) * jerk_progress
+			self.jerk_offset_y = random.uniform(-self.JERK_MAX_OFFSET, self.JERK_MAX_OFFSET) * jerk_progress
+
 	def draw(self, surface):
+		# Draw character sprite with jerk animation if we have one
+		if self.sprite:
+			# Calculate base position (left or right of stage)
+			if self.x <= settings.SCREEN_WIDTH / 2:
+				# Left side
+				base_x = settings.LEVEL_X - self.CHARACTER_SIZE - 5
+			else:
+				# Right side
+				base_x = settings.LEVEL_MAX_X + 5
+			# Center vertically
+			base_y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT - self.CHARACTER_SIZE) / 2
+
+			# Apply jerk offset and camera position
+			sprite_x = base_x + self.jerk_offset_x - camera.CAMERA.x
+			sprite_y = base_y + self.jerk_offset_y - camera.CAMERA.y
+
+			surface.blit(self.sprite, (sprite_x, sprite_y))
+
 		# Draw the energy images.
 		surface.blit(self.energy_image_top, (self.energy_top_x - camera.CAMERA.x, self.energy_top_y - camera.CAMERA.y))
 		surface.blit(self.energy_image_middle, (self.energy_middle_x - camera.CAMERA.x, self.energy_middle_y - camera.CAMERA.y))
@@ -318,3 +383,11 @@ class Player(pygame.sprite.Sprite):
 	def handle_events(self, event):
 		# Work on this later...
 		pass
+
+	def on_enemy_attacks(self):
+		"""Called when the enemy performs an attack"""
+		self.jerk_duration = self.JERK_MAX_DURATION
+
+	def on_enemy_hit_block(self):
+		"""Called when the enemy hits one of our blocks"""
+		self.jerk_duration = self.JERK_MAX_DURATION

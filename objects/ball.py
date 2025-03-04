@@ -18,6 +18,12 @@ import settings.settings as settings
 import settings.graphics as graphics
 import objects.trajectory as trajectory
 from settings.sounds import BALL_SOUND, play_sound
+import pygame.locals
+import objects.camera as camera
+import objects.effects.explosion as explosion
+import objects.effects.speed as speed
+import objects.blocks.block as block
+import settings.sounds as sounds
 
 """
 
@@ -724,12 +730,17 @@ class Ball(pygame.sprite.Sprite):
 		# Reset paddle hit counter since we hit a block
 		self.paddle_hit_counter = 0
 
+		# If we hit an enemy block, make them react
+		if block.owner != self.owner:
+			block.owner.on_enemy_hit_block()
+
 		# Damage is increased the higher the speed is over the standard speed.
 		damage_dealt = Ball.damage * (self.speed / Ball.speed) * Ball.smash_damage_factor
 
-		# If the block owner and the ball owner is the same, we deal a reduced amount of damage (for balance purposes).
+		# If we hit our own block, we deal less damage.
 		if block.owner == self.owner:
-			block.on_hit(damage_dealt * Ball.damage_percentage_dealt_to_own_blocks)
+			damage_dealt = damage_dealt * Ball.damage_percentage_dealt_to_own_blocks
+			block.on_hit(damage_dealt)
 		else:
 			block.on_hit(damage_dealt)
 
