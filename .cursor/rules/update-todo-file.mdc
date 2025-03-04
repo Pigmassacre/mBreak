@@ -1,5 +1,5 @@
 ---
-description: Always remove finished tasks from TODO.md
+description: How to handle finishing a task
 globs: 
 alwaysApply: true
 ---
@@ -8,3 +8,4 @@ alwaysApply: true
 
 - The user wants this file to be clean - it should only contain tasks that have not yet been performed.
 - Do NOT remove other tasks than the one(s) you actually finished.
+- Afterwards, commit and push your changes.
