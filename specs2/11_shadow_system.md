@@ -37,6 +37,7 @@ typedef struct Shadow {
     // Rendering method
     bool use_fill;               // Whether to use fill method (true) or texture (false)
     Texture2D* texture;          // Texture to use if not using fill method
+    Texture2D* original_texture; // Original texture copy (used for rotation)
     
     // Active state
     bool active;                 // Whether the shadow is active
@@ -90,7 +91,7 @@ void DestroyShadow(ShadowManager* manager, int index);
 
 ## Shadow Types and Variations
 
-The Shadow System will support different types of shadows to accommodate various game objects:
+The Shadow System supports different types of shadows to accommodate various game objects:
 
 ### Standard Shadow
 
@@ -100,6 +101,8 @@ Simple shadow for most game objects, positioned with a slight offset from the pa
 Shadow* CreateStandardShadow(ShadowManager* manager, void* parent, Rectangle* parent_rect);
 ```
 
+This is the most common shadow type used by most game objects including balls, paddles, blocks, and powerups.
+
 ### Particle Shadow
 
 Smaller, more transparent shadow for particles, designed to fade away:
@@ -108,6 +111,8 @@ Smaller, more transparent shadow for particles, designed to fade away:
 Shadow* CreateParticleShadow(ShadowManager* manager, void* parent, Rectangle* parent_rect, Color color);
 ```
 
+Particle shadows have custom colors and are set to linger and fade out when the particle is destroyed.
+
 ### Trace Shadow
 
 Shadow for trace effects, which may linger after the trace is gone:
@@ -115,6 +120,8 @@ Shadow for trace effects, which may linger after the trace is gone:
 ```c
 Shadow* CreateTraceShadow(ShadowManager* manager, void* parent, Rectangle* parent_rect, Color color);
 ```
+
+Trace shadows are attached to trace objects and have custom colors to match the trace effect.
 
 ### Dynamic Shadow
 
@@ -127,7 +134,7 @@ void UpdateDynamicShadow(Shadow* shadow, Vector2 light_source);
 
 ## Rendering Techniques
 
-The Shadow System will support multiple rendering techniques:
+The Shadow System supports multiple rendering techniques as implemented in the original codebase:
 
 ### Basic Fill Method
 
@@ -137,6 +144,8 @@ The simplest and most efficient rendering method, using a colored rectangle:
 void DrawShadowFill(Shadow* shadow, Camera2D camera);
 ```
 
+When `use_fill` is set to true, the shadow is rendered as a solid colored rectangle with the specified alpha value.
+
 ### Texture-Based Method
 
 Using a texture derived from the parent object for more detailed shadows:
@@ -145,14 +154,45 @@ Using a texture derived from the parent object for more detailed shadows:
 void DrawShadowTexture(Shadow* shadow, Camera2D camera);
 ```
 
-### Shader-Based Method
+When `use_fill` is set to false, the shadow uses a copy of the parent's texture, colorized to the shadow color.
 
-Using a shader for advanced effects like soft shadows or multiple light sources:
+### Colorization Process
 
 ```c
-void InitShadowShader(ShadowManager* manager);
-void DrawShadowShader(Shadow* shadow, Camera2D camera);
+// Function to colorize an image to create shadow effect
+void ColorizeTexture(Texture2D* texture, Color color, bool blend_alpha);
 ```
+
+This process handles different types of textures, with or without alpha channels.
+
+## Shadow Lifecycle Management
+
+### Creation and Initialization
+
+```c
+Shadow* CreateShadow(ShadowManager* manager, void* parent, Rectangle* parent_rect, Color color, bool linger, bool use_fill);
+```
+
+This function creates a new shadow and initializes all its properties based on the parent object.
+
+### Update Logic
+
+```c
+void UpdateShadow(Shadow* shadow, float delta_time);
+```
+
+The update function handles:
+1. Lingering behavior and alpha fading
+2. Position updates based on parent movement
+3. Checks for shadow visibility
+
+### Destruction
+
+```c
+void DestroyShadow(ShadowManager* manager, int index);
+```
+
+Properly removes and cleans up shadow resources.
 
 ## Performance Optimization
 
@@ -206,6 +246,19 @@ void AddShadowToBlock(ShadowManager* manager, Block* block);
 void AddShadowToBall(ShadowManager* manager, Ball* ball);
 void AddShadowToPaddle(ShadowManager* manager, Paddle* paddle);
 void AddShadowToPowerup(ShadowManager* manager, Powerup* powerup);
+void AddShadowToParticle(ShadowManager* manager, Particle* particle);
+void AddShadowToMissile(ShadowManager* manager, Missile* missile);
+void AddShadowToTrace(ShadowManager* manager, Trace* trace);
+void AddShadowToArrowIndicator(ShadowManager* manager, ArrowIndicator* arrow);
+```
+
+## Camera Integration
+
+The Shadow System interacts with the camera system to properly position shadows relative to the camera view:
+
+```c
+// Apply camera offset to shadow position when rendering
+void ApplyCameraOffset(Shadow* shadow, Camera2D camera, Vector2* result_position);
 ```
 
 ## Advanced Features
@@ -249,31 +302,36 @@ void LogShadowSystemMetrics(ShadowManager* manager);
 
 ## Implementation Notes
 
-1. **Rendering Approach**: The shadow system will primarily use the basic fill method for efficiency, with options for texture-based or shader-based rendering for higher quality.
+1. The Shadow System is primarily visual and does not affect game physics.
+2. Shadows should be updated after their parent objects have been updated.
+3. The system should be optimized to handle many shadows simultaneously.
+4. Shadow alpha fading should be framerate-independent, using delta time for consistent results.
+5. Texture-based shadows might be more resource-intensive but provide better visual fidelity.
+6. Fill-based shadows are more efficient and suitable for lower-end systems.
+7. The shadow's position is determined by the parent's position plus an offset, which can be adjusted for different visual effects.
+8. The lingering behavior allows for shadows to persist and fade out after their parent object is destroyed, useful for effects like explosions or disappearing objects.
 
-2. **Memory Management**: Shadows will be managed in pre-allocated arrays to minimize memory allocation during gameplay.
-
-3. **Parent Object Tracking**: Shadows will be automatically positioned based on their parent object's position, with configurable offsets.
-
-4. **Integration with Graphics Settings**: The shadow system will respect the user's graphics settings, adjusting quality or disabling shadows entirely based on preferences.
-
-5. **Effect on Performance**: The shadow system is designed to have minimal impact on performance, with batch rendering and culling optimizations.
-
-6. **Flexibility**: The system allows for various shadow types and effects, catering to different game objects and situations.
-
-## Global Shadow Settings
-
-Default values for shadow properties:
+## Integration with Game Loop
 
 ```c
-// Default shadow properties
-static const float DEFAULT_SHADOW_OFFSET_X = 1.0f;
-static const float DEFAULT_SHADOW_OFFSET_Y = 2.0f;
-static const float DEFAULT_LINGER_TIME = 1.5f;        // In seconds
-static const float DEFAULT_ALPHA_STEP = 3.0f;         // Alpha reduction per second
-static const Color DEFAULT_SHADOW_COLOR = { 0, 0, 0, 128 }; // Black with 50% transparency
-```
-
-## Conclusion
-
-The Shadow System specification for the C/Raylib port builds upon the existing Python/Pygame implementation while enhancing it with additional features and optimizations. The design provides a flexible, efficient way to add visual depth to the game through shadows, with options for different rendering techniques and special effects. The integration with the Settings System ensures that players can adjust shadow quality based on their preferences and hardware capabilities. 
+// In the main game loop:
+void GameLoop() {
+    // Update game objects
+    UpdateGameObjects(delta_time);
+    
+    // Update shadows after game objects
+    UpdateShadows(shadow_manager, delta_time);
+    
+    // Draw game scene
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+    
+    // Draw shadows first (under game objects)
+    DrawShadows(shadow_manager, camera);
+    
+    // Draw game objects
+    DrawGameObjects(camera);
+    
+    EndDrawing();
+}
+``` 

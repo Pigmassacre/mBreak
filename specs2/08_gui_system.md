@@ -336,6 +336,431 @@ Color ColorWheelGetColor(GUIItem* item);
 void ColorWheelHandleInput(GUIItem* item, Vector2 mousePosition, bool isMouseDown);
 ```
 
+## Arrow Indicator
+
+The Arrow Indicator provides a directional visual cue for the initial angle of ball movement during the countdown phase.
+
+```c
+typedef struct ArrowIndicator {
+    // Visual properties
+    Vector2 position;           // Center position of the arrow
+    float angle;                // Current angle in radians
+    Color color;                // Arrow color (with alpha)
+    Shadow* shadow;             // Associated shadow
+    
+    // Dimensions
+    float width;                // Width of the arrow
+    float height;               // Height of the arrow
+    
+    // Rendering
+    Texture2D texture;          // Arrow texture
+    Rectangle sourceRect;       // Source rectangle for texture
+    Rectangle destRect;         // Destination rectangle for drawing
+    float rotation;             // Rotation in degrees (derived from angle)
+} ArrowIndicator;
+```
+
+### Arrow Indicator Functions
+
+```c
+// Create a new arrow indicator at the specified position and angle
+ArrowIndicator* CreateArrowIndicator(Vector2 position, float angle) {
+    ArrowIndicator* arrow = MemAlloc(sizeof(ArrowIndicator));
+    
+    // Set initial properties
+    arrow->position = position;
+    arrow->angle = angle;
+    arrow->color = (Color){ 255, 255, 255, 180 }; // White with transparency
+    arrow->width = 15;
+    arrow->height = 6;
+    
+    // Set up rendering rectangles
+    arrow->sourceRect = (Rectangle){ 0, 0, arrow->width, arrow->height };
+    arrow->destRect = (Rectangle){ position.x, position.y - arrow->height/2, arrow->width, arrow->height };
+    arrow->rotation = -angle * RAD2DEG; // Convert to degrees and adjust for drawing
+    
+    // Create shadow
+    arrow->shadow = CreateShadow((Rectangle){ position.x, position.y, arrow->width, arrow->height });
+    
+    // Load or create texture
+    arrow->texture = CreateArrowTexture(arrow->width, arrow->height);
+    
+    return arrow;
+}
+
+// Create the arrow texture with an arrow shape
+Texture2D CreateArrowTexture(float width, float height) {
+    // Create an image for the arrow
+    Image arrowImage = GenImageColor(width, height, BLANK);
+    
+    // Draw arrow body (line)
+    ImageDrawLine(&arrowImage, 0, height/2, width-6, height/2, WHITE);
+    
+    // Draw arrow head (triangle)
+    Vector2 points[3] = {
+        { width-6, height/2-3 },  // Top point
+        { width, height/2 },      // Tip
+        { width-6, height/2+3 }   // Bottom point
+    };
+    ImageDrawTriangle(&arrowImage, points[0], points[1], points[2], WHITE);
+    
+    // Create texture from image
+    Texture2D texture = LoadTextureFromImage(arrowImage);
+    UnloadImage(arrowImage);
+    
+    return texture;
+}
+
+// Update arrow position and angle
+void UpdateArrowIndicator(ArrowIndicator* arrow, Vector2 position, float angle) {
+    arrow->position = position;
+    
+    // Only update rotation if angle has changed
+    if (arrow->angle != angle) {
+        arrow->angle = angle;
+        arrow->rotation = -angle * RAD2DEG;
+    }
+    
+    // Update rectangle positions based on rotation
+    float cosAngle = cosf(angle);
+    float sinAngle = sinf(angle);
+    
+    // Adjust position based on direction to maintain correct starting point
+    if (cosAngle < 0) {
+        // Pointing left - adjust to keep starting point
+        arrow->destRect.x = position.x - arrow->destRect.width;
+    } else {
+        // Pointing right
+        arrow->destRect.x = position.x;
+    }
+    
+    arrow->destRect.y = position.y - arrow->destRect.height/2;
+    
+    // Update shadow position
+    UpdateShadow(arrow->shadow, (Rectangle){ arrow->destRect.x, arrow->destRect.y, arrow->width, arrow->height });
+}
+
+// Draw the arrow indicator
+void DrawArrowIndicator(ArrowIndicator* arrow) {
+    // Draw shadow first
+    DrawShadow(arrow->shadow);
+    
+    // Draw the arrow with rotation around its center
+    DrawTexturePro(
+        arrow->texture, 
+        arrow->sourceRect,
+        arrow->destRect,
+        (Vector2){ 0, arrow->destRect.height/2 },
+        arrow->rotation,
+        arrow->color
+    );
+}
+
+// Free arrow indicator resources
+void FreeArrowIndicator(ArrowIndicator* arrow) {
+    if (arrow) {
+        FreeShadow(arrow->shadow);
+        UnloadTexture(arrow->texture);
+        MemFree(arrow);
+    }
+}
+```
+
+### Integration with Countdown System
+
+The Arrow Indicator is primarily used in the game's countdown phase to show the initial direction of ball movement:
+
+```c
+// Example integration with countdown system
+void InitializeCountdown(Game* game, float initialAngle) {
+    // Create countdown
+    game->countdown = CreateCountdown();
+    
+    // Create arrow indicator at ball starting position
+    Vector2 ballPosition = { 
+        LEVEL_X + (LEVEL_WIDTH + BALL_WIDTH)/2,
+        LEVEL_Y + (LEVEL_HEIGHT + BALL_HEIGHT)/2
+    };
+    game->arrowIndicator = CreateArrowIndicator(ballPosition, initialAngle);
+    
+    // Setup countdown timers and state
+    // ...
+}
+
+// Update countdown and arrow
+void UpdateCountdown(Game* game) {
+    // Update countdown logic
+    // ...
+    
+    // Draw arrow during countdown
+    if (!game->countdown->done) {
+        DrawArrowIndicator(game->arrowIndicator);
+    } else {
+        // Cleanup when countdown is done
+        FreeArrowIndicator(game->arrowIndicator);
+        game->arrowIndicator = NULL;
+    }
+}
+```
+
+## Toast Notification System
+
+The Toast Notification System provides temporary modal message dialogs that overlay the current screen to provide important information or feedback to the player. Toasts are typically used for warnings, errors, or critical information that requires acknowledgment before proceeding.
+
+```c
+typedef struct Toast {
+    // Content
+    char* message;              // Message to display
+    TextItem** textLines;       // Array of text lines (for wrapped text)
+    int lineCount;              // Number of text lines
+    
+    // Visual properties
+    Color textColor;            // Primary text color
+    Color alternateTextColor;   // Secondary text color for alternating lines
+    Color backgroundColor;      // Background color with alpha for dimming
+    float backgroundAlpha;      // Alpha value for background dimming
+    
+    // Menu
+    Menu* menu;                 // Menu containing "OK" button
+    
+    // Positioning
+    int screenPadding;          // Padding from screen edges
+    
+    // Animation
+    Transition* transition;     // Transition for animating in/out
+    
+    // State
+    bool active;                // Whether toast is currently showing
+} Toast;
+```
+
+### Toast Notification Functions
+
+```c
+// Create a new toast notification with the specified message
+Toast* CreateToast(const char* message, Color textColor, Color alternateTextColor) {
+    Toast* toast = MemAlloc(sizeof(Toast));
+    
+    // Set default colors if not specified
+    if (textColor.r == 0 && textColor.g == 0 && textColor.b == 0 && textColor.a == 0) {
+        textColor = RED;  // Default to red for warnings
+    }
+    
+    if (alternateTextColor.r == 0 && alternateTextColor.g == 0 && 
+        alternateTextColor.b == 0 && alternateTextColor.a == 0) {
+        alternateTextColor = (Color){ 255, 20, 20, 255 };  // Slightly lighter red
+    }
+    
+    // Copy message
+    toast->message = TextCopy(message);
+    toast->textColor = textColor;
+    toast->alternateTextColor = alternateTextColor;
+    toast->backgroundAlpha = 0.88f;  // Slight transparency
+    toast->active = false;
+    toast->screenPadding = 6;
+    
+    // Wrap text to fit screen width
+    WrapTextIntoLines(toast);
+    
+    // Create OK button menu
+    CreateToastMenu(toast);
+    
+    // Create transition for animation
+    toast->transition = CreateTransition(0.5f);  // Fast transition
+    SetupToastTransition(toast);
+    
+    return toast;
+}
+
+// Split message into multiple lines that fit within screen width
+void WrapTextIntoLines(Toast* toast) {
+    // Calculate maximum width for text
+    int maxWidth = GetScreenWidth() - (toast->screenPadding * 2);
+    
+    // Count how many lines we need
+    int numLines = MeasureTextWrapped(toast->message, maxWidth);
+    toast->lineCount = numLines;
+    
+    // Allocate text lines
+    toast->textLines = MemAlloc(sizeof(TextItem*) * numLines);
+    
+    // Split text into lines
+    char** wrappedLines = WrapText(toast->message, maxWidth);
+    
+    // Create text items for each line with alternating colors
+    bool useAlternateColor = false;
+    for (int i = 0; i < numLines; i++) {
+        Color lineColor = useAlternateColor ? toast->alternateTextColor : toast->textColor;
+        toast->textLines[i] = TextItemInit(wrappedLines[i], (Vector2){0, 0}, lineColor);
+        useAlternateColor = !useAlternateColor;
+        
+        // Free the wrapped line
+        MemFree(wrappedLines[i]);
+    }
+    
+    // Free the wrapped lines array
+    MemFree(wrappedLines);
+    
+    // Position text lines vertically centered
+    PositionToastLines(toast);
+}
+
+// Position text lines in the center of the screen
+void PositionToastLines(Toast* toast) {
+    float totalHeight = 0;
+    
+    // Calculate total height of all lines
+    for (int i = 0; i < toast->lineCount; i++) {
+        totalHeight += toast->textLines[i]->getHeight(toast->textLines[i]);
+    }
+    
+    // Calculate starting Y position (centered)
+    float startY = (GetScreenHeight() - totalHeight) / 2.0f;
+    
+    // Position each line
+    for (int i = 0; i < toast->lineCount; i++) {
+        // Center horizontally
+        float lineWidth = toast->textLines[i]->getWidth(toast->textLines[i]);
+        toast->textLines[i]->setPosition(toast->textLines[i], 
+            (Vector2){
+                (GetScreenWidth() - lineWidth) / 2.0f,
+                startY
+            });
+        
+        // Move startY for next line
+        startY += toast->textLines[i]->getHeight(toast->textLines[i]);
+    }
+}
+
+// Create the OK button menu for the toast
+void CreateToastMenu(Toast* toast) {
+    toast->menu = MenuInit((Vector2){GetScreenWidth() / 2, 0});
+    
+    // Create OK button
+    GUIItem* okButton = TextItemInit("OK", (Vector2){0, 0}, WHITE);
+    MenuAddItem(toast->menu, okButton, DismissToast);
+    
+    // Position menu below text
+    if (toast->lineCount > 0) {
+        TextItem* lastLine = toast->textLines[toast->lineCount - 1];
+        float menuY = lastLine->position.y + lastLine->getHeight(lastLine) + 20;
+        toast->menu->position.y = menuY;
+    } else {
+        toast->menu->position.y = GetScreenHeight() / 2 + 20;
+    }
+    
+    // Cleanup and select the OK button
+    MenuCleanup(toast->menu);
+    toast->menu->items[0]->selected = true;
+}
+
+// Setup transition for toast animation
+void SetupToastTransition(Toast* toast) {
+    // Set transition speed
+    toast->transition->speed *= 1.5f;
+    
+    // Setup transition for text lines
+    for (int i = 0; i < toast->lineCount; i++) {
+        // First line slides in from all sides except bottom
+        if (i == 0) {
+            TransitionSetupSingle(toast->transition, toast->textLines[i], true, true, true, false);
+        } else {
+            // Other lines slide in from left and right only
+            TransitionSetupSingle(toast->transition, toast->textLines[i], true, true, false, false);
+        }
+    }
+    
+    // OK button slides in from bottom
+    TransitionSetupSingle(toast->transition, toast->menu->items[0], true, true, false, true);
+}
+
+// Show the toast notification
+void ShowToast(Toast* toast) {
+    toast->active = true;
+}
+
+// Dismiss the toast notification (callback for OK button)
+void DismissToast(GUIItem* item) {
+    // Get toast from item's parent menu
+    Toast* toast = GetToastFromMenuItem(item);
+    if (toast != NULL) {
+        toast->active = false;
+    }
+}
+
+// Update toast state
+void UpdateToast(Toast* toast, float deltaTime) {
+    if (!toast->active) {
+        return;
+    }
+    
+    // Update transition
+    TransitionUpdate(toast->transition, deltaTime);
+    
+    // Update menu
+    MenuUpdate(toast->menu, deltaTime);
+    
+    // Handle input for OK button
+    // In real implementation, this would use the input system
+}
+
+// Draw the toast notification
+void DrawToast(Toast* toast) {
+    if (!toast->active) {
+        return;
+    }
+    
+    // Draw dimmed background
+    DrawRectangle(
+        0, 0,
+        GetScreenWidth(), GetScreenHeight(),
+        ColorAlpha(BLACK, toast->backgroundAlpha)
+    );
+    
+    // Draw text lines
+    for (int i = 0; i < toast->lineCount; i++) {
+        toast->textLines[i]->draw(toast->textLines[i]);
+    }
+    
+    // Draw menu with OK button
+    MenuDraw(toast->menu);
+}
+
+// Free toast resources
+void FreeToast(Toast* toast) {
+    if (toast == NULL) {
+        return;
+    }
+    
+    // Free message
+    if (toast->message != NULL) {
+        MemFree(toast->message);
+    }
+    
+    // Free text lines
+    for (int i = 0; i < toast->lineCount; i++) {
+        if (toast->textLines[i] != NULL) {
+            GUIItemDestroy(toast->textLines[i]);
+        }
+    }
+    if (toast->textLines != NULL) {
+        MemFree(toast->textLines);
+    }
+    
+    // Free menu
+    if (toast->menu != NULL) {
+        MenuDestroy(toast->menu);
+    }
+    
+    // Free transition
+    if (toast->transition != NULL) {
+        FreeTransition(toast->transition);
+    }
+    
+    // Free toast
+    MemFree(toast);
+}
+
 ## Menu Traversal System
 
 The Traversal system provides keyboard, gamepad, and mouse navigation for menus.
