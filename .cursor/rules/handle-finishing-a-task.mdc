@@ -10,3 +10,6 @@ alwaysApply: true
 - Do NOT remove other tasks than the one(s) you actually finished.
 
 # After removing it from [TODO.md](mdc:TODO.md), commit and push your changes.
+
+- Do not forget to read the [git-commit-rules.mdc](mdc:.cursor/rules/git-commit-rules.mdc) and the [git-no-pager.mdc](mdc:.cursor/rules/git-no-pager.mdc) and the [git-safety-rules.mdc](mdc:.cursor/rules/git-safety-rules.mdc).
+- Your shell is PowerShell - read the rules [use-powershell-syntax.mdc](mdc:.cursor/rules/use-powershell-syntax.mdc).
