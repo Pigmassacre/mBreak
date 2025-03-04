@@ -101,16 +101,24 @@ class Block(pygame.sprite.Sprite):
 		self.image = Block.image.copy()
 		useful.colorize_image(self.image, tinted_color)
 
-	def hurt(self, damage):
+	def hurt(self, damage, source_owner=None):
 		# Reduce the health.
 		self.health = self.health - damage
 		
 		# Update the block's tint based on new health
 		self.update_tint()
 
-	def on_hit(self, damage):
+		# Notify the block owner about the damage
+		if source_owner == self.owner:
+			# We damaged our own block
+			self.owner.on_hit_own_block()
+		else:
+			# Enemy damaged our block (including when source_owner is None)
+			self.owner.on_enemy_hit_block()
+
+	def on_hit(self, damage, source_owner=None):
 		# Damage self.
-		self.hurt(damage)
+		self.hurt(damage, source_owner)
 
 		# Create a new on hit effect.
 		self.effect_group.add(flash.Flash(self, copy.copy(Block.hit_effect_start_color), copy.copy(Block.hit_effect_final_color), Block.hit_effect_tick_amount))

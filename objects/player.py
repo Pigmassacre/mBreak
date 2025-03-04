@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
 
 	# Character sprite rendering constants
 	JERK_MAX_DURATION = 0.5  # 500ms
-	JERK_MAX_OFFSET = 10  # Maximum pixel offset for jerk animation
+	JERK_MAX_OFFSET = 4  # Maximum pixel offset for jerk animation
 	CHARACTER_SIZE = 64  # Size of character sprites
 
 	energy_image_top_left_width = energy_image_top_left.get_width()
@@ -248,12 +248,6 @@ class Player(pygame.sprite.Sprite):
 		self.spent_energy_fade = 1.0
 		self.spent_energy_delay = 0  # Reset delay timer
 
-		# Find opponent and make them react to our attack
-		for player in groups.Groups.player_group:
-			if player != self:  # Find the opponent
-				player.on_enemy_attacks()
-				break
-
 	def event(self, event):
 		if self.ai_difficulty == 0:
 			if ((event.type == KEYDOWN and event.key == self.key_unleash_energy) or 
@@ -350,10 +344,10 @@ class Player(pygame.sprite.Sprite):
 			# Calculate base position (left or right of stage)
 			if self.x <= settings.SCREEN_WIDTH / 2:
 				# Left side
-				base_x = settings.LEVEL_X - self.CHARACTER_SIZE - 5
+				base_x = settings.LEVEL_X - self.CHARACTER_SIZE
 			else:
 				# Right side
-				base_x = settings.LEVEL_MAX_X + 5
+				base_x = settings.LEVEL_MAX_X
 			# Center vertically
 			base_y = settings.LEVEL_Y + (settings.LEVEL_HEIGHT - self.CHARACTER_SIZE) / 2
 
@@ -387,10 +381,10 @@ class Player(pygame.sprite.Sprite):
 		# Work on this later...
 		pass
 
-	def on_enemy_attacks(self):
-		"""Called when the enemy performs an attack"""
-		self.jerk_duration = self.JERK_MAX_DURATION
-
 	def on_enemy_hit_block(self):
 		"""Called when the enemy hits one of our blocks"""
 		self.jerk_duration = self.JERK_MAX_DURATION
+
+	def on_hit_own_block(self):
+		"""Called when we hit one of our own blocks"""
+		self.jerk_duration = self.JERK_MAX_DURATION * 0.5  # Half the duration for own blocks

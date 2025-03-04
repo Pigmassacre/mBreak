@@ -730,19 +730,15 @@ class Ball(pygame.sprite.Sprite):
 		# Reset paddle hit counter since we hit a block
 		self.paddle_hit_counter = 0
 
-		# If we hit an enemy block, make them react
-		if block.owner != self.owner:
-			block.owner.on_enemy_hit_block()
-
 		# Damage is increased the higher the speed is over the standard speed.
 		damage_dealt = Ball.damage * (self.speed / Ball.speed) * Ball.smash_damage_factor
 
 		# If we hit our own block, we deal less damage.
 		if block.owner == self.owner:
 			damage_dealt = damage_dealt * Ball.damage_percentage_dealt_to_own_blocks
-			block.on_hit(damage_dealt)
+			block.on_hit(damage_dealt, self.owner)
 		else:
-			block.on_hit(damage_dealt)
+			block.on_hit(damage_dealt, self.owner)
 
 		# Tell all the effects that we've just hit a block.
 		for effect in self.effect_group:
