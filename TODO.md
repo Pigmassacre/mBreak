@@ -1,11 +1,5 @@
 # TODOs
 
-## Move score counter in game.py
-
-- The score counters should be positioned at the top of the screen instead, above the stage but centered horizontally with some padding in the center.
-- The score counter text should be much smaller.
-- Between the score counters the "-" text should be rendered to signify that it is a score counter.
-
 ## Create a detailed specification of the entire project
 
 - Create a new folder called specs/
