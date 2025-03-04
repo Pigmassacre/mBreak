@@ -1,10 +1,10 @@
 # TODOs
 
-## Rework color picking menu
+## Rework preparemenu.py
 
-- Currently it is a very cool but not-gamepad-friendly color wheel.
-- In previous versions the user picked between 6 colors using a gridmenu (2 rows 3 columns).
-- I would like to restore the grid menu.
+I want the preparemenu COMPLETELY reworked. The functionality should stay the same, and the Back and Start buttons should stay the same, however:
+
+- I want the each player to be able to select between 6 different characters instead of selecting a color.
 
 ## Create a detailed specification of the entire project
 
