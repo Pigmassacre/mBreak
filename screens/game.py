@@ -152,12 +152,12 @@ class Game(scene.Scene):
 		self.player_one_score_text = textitem.TextItem(str(self.score[self.player_one]), pygame.Color(255, 255, 255))
 		self.player_one_score_text.set_size(27)
 		self.player_one_score_text.x = item_side_padding - (self.player_one_score_text.get_width() / 2.0) + font_dead_space
-		self.player_one_score_text.y = (settings.SCREEN_HEIGHT - self.player_one_score_text.get_height()) / 2
+		self.player_one_score_text.y = settings.SCREEN_HEIGHT - self.player_one_score_text.get_height() - 8
 		
 		self.player_two_score_text = textitem.TextItem(str(self.score[self.player_two]), pygame.Color(255, 255, 255))
 		self.player_two_score_text.set_size(27)
 		self.player_two_score_text.x = settings.SCREEN_WIDTH - item_side_padding - (self.player_two_score_text.get_width() / 2.0) + font_dead_space
-		self.player_two_score_text.y = (settings.SCREEN_HEIGHT - self.player_two_score_text.get_height()) / 2
+		self.player_two_score_text.y = settings.SCREEN_HEIGHT - self.player_two_score_text.get_height() - 8
 		
 		# We setup and play music.
 		self.setup_music()
