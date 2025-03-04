@@ -81,6 +81,9 @@ class Player(pygame.sprite.Sprite):
 		if os.path.exists(sprite_path):
 			self.sprite = pygame.image.load(sprite_path)
 			self.sprite = pygame.transform.scale(self.sprite, (self.CHARACTER_SIZE, self.CHARACTER_SIZE))
+			# Flip sprite horizontally if this is player two (right side)
+			if self.x > settings.SCREEN_WIDTH / 2:
+				self.sprite = pygame.transform.flip(self.sprite, True, False)
 
 		# Character jerk animation state
 		self.jerk_duration = 0

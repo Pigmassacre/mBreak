@@ -88,7 +88,7 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_text.y = self.number_of_rounds_menu.y - (self.number_of_rounds_text.get_height() * 2)
 
 		# The character menu for player one.
-		self.character_menu_one = self.setup_character_menu(self.character_one)
+		self.character_menu_one = self.setup_character_menu(self.character_one, False)
 		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
 
 		ai_menu_offset = 20
@@ -103,7 +103,7 @@ class PrepareMenu(scene.Scene):
 		self.menu_list.append(self.ai_menu_one)
 
 		# The character menu for player two.
-		self.character_menu_two = self.setup_character_menu(self.character_two)
+		self.character_menu_two = self.setup_character_menu(self.character_two, True)
 		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
 
 		self.character_menu_two.x = settings.SCREEN_WIDTH - ((settings.SCREEN_WIDTH - self.character_menu_two.get_width() - self.ai_menu_two.get_width() - ai_menu_offset) / 5.0) - self.character_menu_two.get_width()
@@ -149,13 +149,13 @@ class PrepareMenu(scene.Scene):
 		# And finally, we start the gameloop!
 		self.gameloop()
 
-	def setup_character_menu(self, function):
+	def setup_character_menu(self, function, is_player_two=False):
 		# Creates a grid menu for character selection (2 rows x 3 columns)
 		character_menu = gridmenu.GridMenu(3)  # 3 columns
-		self.setup_character_items(character_menu, function)
+		self.setup_character_items(character_menu, function, is_player_two)
 		return character_menu
 
-	def setup_character_items(self, grid_menu, function):
+	def setup_character_items(self, grid_menu, function, is_player_two):
 		# Add 6 different character items to the grid menu
 		characters = ["red", "green", "blue", "yellow", "magenta", "cyan"]
 		
@@ -166,6 +166,11 @@ class PrepareMenu(scene.Scene):
 			if not os.path.exists(thumbnail_path):
 				thumbnail_path = os.path.join("res", "character", f"{character}.png")
 			character_item = imageitem.ImageItem(thumbnail_path)
+			
+			# Flip the sprite if this is player two's menu
+			if is_player_two:
+				character_item.image = pygame.transform.flip(character_item.image, True, False)
+			
 			character_item.character = character
 			character_item.color = self.character_colors[character]
 			grid_menu.add(character_item, function)
@@ -370,6 +375,8 @@ class PrepareMenu(scene.Scene):
 			if os.path.exists(sprite_path):
 				sprite = pygame.image.load(sprite_path)
 				sprite = pygame.transform.scale(sprite, (64, 64))
+				# Flip sprite horizontally for player two
+				sprite = pygame.transform.flip(sprite, True, False)
 				
 				# Create a copy for alpha
 				sprite_alpha = sprite.copy()
