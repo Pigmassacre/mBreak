@@ -8,10 +8,12 @@ Blocks are destroyed by damaging them. Blocks can be damaged by many things, by 
 Everytime a ball hits a paddle it changes ownership so the ball is "owned" by that paddle.
 
 The C port is located in the subfolder c-port/.
-There has already been work done on the C port. It is however incorrect as it implements a Breakout-style game - which is not what mBreak really is. mBreak
+There has already been work done on the C port. It is however incorrect as it implements a Breakout-style game - which is not what mBreak really is.
 
 I need you to implement mBreak according to the Python source code. Before writing any code, please review the source code and confirm your understanding.
 Please read the mBreak source code in the python/ folder and summarize the key gameplay mechanics, screens, and technical requirements before we start implementation.
 When implementing the [component], please reference which part of the source code this satisfies.
 After implementing [feature], please verify it against the source code and note any discrepancies.
 Before adding any new code, explain how your approach aligns with the architectural patterns described in the source code.
+
+Please use the font used in the python version of the game.

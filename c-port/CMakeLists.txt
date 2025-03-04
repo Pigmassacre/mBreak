@@ -48,12 +48,22 @@ endif()
 # Install rule
 install(TARGETS mbreak DESTINATION bin)
 
-# Copy resources to build directory
-# file(COPY resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
 # Custom targets
 add_custom_target(run
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mbreak
     DEPENDS mbreak
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-) 
+)
+
+# Copy resources to build directory
+if(MSVC)
+    # For multi-configuration generators like Visual Studio, we need to copy to both Debug and Release directories
+    add_custom_command(TARGET mbreak POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources
+        $<TARGET_FILE_DIR:mbreak>/resources
+        COMMENT "Copying resources to output directory")
+else()
+    # For single-configuration generators
+    file(COPY resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+endif() 
