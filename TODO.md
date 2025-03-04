@@ -1,11 +1,5 @@
 # TODOs
 
-## AI improvements
-
-- The AI is too aggressive with using the laser at low energy levels.
-- It should save up more energy before using the laser, especially at the start of the game when there are many blocks left.
-- The AI should be more aggressive at targeting enemy blocks when firing the laser.
-
 ## Powerup spawn changes
 
 - Powerups should spawn at 3 predetermined locations:
@@ -13,6 +7,18 @@
     - In the top third
     - In the bottom third
 - Powerups should only spawn at a location if there is no powerup at that location.
+
+## Collision fixes
+
+The revamped ball collision handling is way better, but it has some insane bugs:
+
+- Balls can sometimes get into a weird state where they stick to a vertical wall, continuously reporting collisions and spawning particles but not moving away from the wall.
+- Very rarely if a ball collides with a corner of the stage it can get stuck in a collision loop and slowly work its way out of the arena.
+
+## AI fixes
+
+- The AI sometimes misses incredibly obvious balls - often not moving the paddle at all.
+- The AI doesnt get out of the way of balls that are behind it (for player 1 left of the paddle, for player 2 right of the paddle).
 
 ## Dummy TODO because Cursor fails to remove the last TODO for some reason
 
