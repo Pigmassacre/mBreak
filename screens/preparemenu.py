@@ -16,16 +16,15 @@ import settings.settings as settings
 import screens.scene as scene
 import screens.game as game
 import screens
+import os
 
 """
-
 This class is the preparation screen that the players encounter before the game can start. Here they must choose their
-respective colors, and they can also pick the number of rounds they want to play. Two players cannot pick the same color,
+respective characters, and they can also pick the number of rounds they want to play. Two players cannot pick the same character,
 and this class handles this.
 
 This class is also responsible for creating the two player objects that are then passed around (until the game returns
 to the main menu).
-
 """
 
 class PrepareMenu(scene.Scene):
@@ -39,10 +38,29 @@ class PrepareMenu(scene.Scene):
 
 		# The next screen to be started when the gameloop ends.
 		self.next_screen = game.Game
-		self.player_one_color = None
-		self.player_two_color = None
+		self.player_one_character = None
+		self.player_two_character = None
 		self.player_one_ai = None
 		self.player_two_ai = None
+
+		# Animation state for preview images
+		self.animation_duration = 0.15  # Animation duration in seconds
+		self.p1_preview_alpha = 0
+		self.p2_preview_alpha = 0
+		self.p1_preview_offset = 30  # Small offset to the left
+		self.p2_preview_offset = -30  # Small offset to the right
+		self.p1_animation_time = 0
+		self.p2_animation_time = 0
+
+		# Character color mappings
+		self.character_colors = {
+			"red": pygame.Color(255, 0, 0),
+			"green": pygame.Color(0, 255, 0),
+			"blue": pygame.Color(0, 0, 255),
+			"yellow": pygame.Color(255, 255, 0),
+			"magenta": pygame.Color(255, 0, 255),
+			"cyan": pygame.Color(0, 255, 255)
+		}
 
 		# Configure the GUI.
 		distance_from_screen_edge = 9
@@ -69,45 +87,33 @@ class PrepareMenu(scene.Scene):
 		self.number_of_rounds_text.x = (settings.SCREEN_WIDTH - self.number_of_rounds_text.get_width()) / 2.0
 		self.number_of_rounds_text.y = self.number_of_rounds_menu.y - (self.number_of_rounds_text.get_height() * 2)
 
-		# The color menu for player one.
-		self.color_menu_one = self.setup_color_menu(self.color_one)
+		# The character menu for player one.
+		self.character_menu_one = self.setup_character_menu(self.character_one)
 		self.ai_menu_one = self.setup_ai_menu(self.ai_one)
 
 		ai_menu_offset = 20
 
-		self.color_menu_one.x = (settings.SCREEN_WIDTH - self.color_menu_one.get_width() - self.ai_menu_one.get_width() - ai_menu_offset) / 5.0
-		self.color_menu_one.y = settings.SCREEN_HEIGHT / 2.0
+		self.character_menu_one.x = (settings.SCREEN_WIDTH - self.character_menu_one.get_width() - self.ai_menu_one.get_width() - ai_menu_offset) / 5.0
+		self.character_menu_one.y = settings.SCREEN_HEIGHT / 2.0
 
-		self.ai_menu_one.x = self.color_menu_one.x + self.color_menu_one.get_width() + ai_menu_offset
-		self.ai_menu_one.y = self.color_menu_one.y
+		self.ai_menu_one.x = self.character_menu_one.x + self.character_menu_one.get_width() + ai_menu_offset
+		self.ai_menu_one.y = self.character_menu_one.y
 
-		self.menu_list.append(self.color_menu_one)
+		self.menu_list.append(self.character_menu_one)
 		self.menu_list.append(self.ai_menu_one)
 
-		# The text above the color menu for player one.
-		self.player_one_text = textitem.TextItem(settings.PLAYER_ONE_NAME, pygame.Color(255, 255, 255))
-		self.player_one_text.x = self.color_menu_one.x + (((self.color_menu_one.get_width() + self.ai_menu_one.get_width() + ai_menu_offset) - self.player_one_text.get_width()) / 2.0)
-		self.player_one_text.y = self.color_menu_one.y - (self.player_one_text.get_height() * 2)
-
-		# The color menu for player two.
-		self.color_menu_two = self.setup_color_menu(self.color_two)
+		# The character menu for player two.
+		self.character_menu_two = self.setup_character_menu(self.character_two)
 		self.ai_menu_two = self.setup_ai_menu(self.ai_two)
 
-		ai_menu_offset = 20
+		self.character_menu_two.x = settings.SCREEN_WIDTH - ((settings.SCREEN_WIDTH - self.character_menu_two.get_width() - self.ai_menu_two.get_width() - ai_menu_offset) / 5.0) - self.character_menu_two.get_width()
+		self.character_menu_two.y = settings.SCREEN_HEIGHT / 2.0
 
-		self.color_menu_two.x = settings.SCREEN_WIDTH - ((settings.SCREEN_WIDTH - self.color_menu_two.get_width() - self.ai_menu_two.get_width() - ai_menu_offset) / 5.0) - self.color_menu_two.get_width()
-		self.color_menu_two.y = settings.SCREEN_HEIGHT / 2.0
+		self.ai_menu_two.x = self.character_menu_two.x - self.ai_menu_two.get_width() - ai_menu_offset
+		self.ai_menu_two.y = self.character_menu_two.y
 
-		self.ai_menu_two.x = self.color_menu_two.x - self.ai_menu_two.get_width() - ai_menu_offset
-		self.ai_menu_two.y = self.color_menu_two.y
-
-		self.menu_list.append(self.color_menu_two)
+		self.menu_list.append(self.character_menu_two)
 		self.menu_list.append(self.ai_menu_two)
-
-		# The text above the color menu for player two.
-		self.player_two_text = textitem.TextItem(settings.PLAYER_TWO_NAME, pygame.Color(255, 255, 255))
-		self.player_two_text.x = self.ai_menu_two.x + (((self.color_menu_two.get_width() + self.ai_menu_two.get_width() + ai_menu_offset) - self.player_two_text.get_width()) / 2.0)
-		self.player_two_text.y = self.color_menu_two.y - (self.player_two_text.get_height() * 2)
 
 		# The back button, displayed in the bottom-left corner of the screen.
 		back_button = textitem.TextItem("Back")
@@ -133,80 +139,75 @@ class PrepareMenu(scene.Scene):
 		# We setup all menu transition.
 		self.transition.setup_transition(self.number_of_rounds_menu, True, True, False, False)
 		self.transition.setup_single_item_transition(self.number_of_rounds_text, True, True, True, False)
-		self.transition.setup_transition(self.color_menu_one, True, False, False, True)
+		self.transition.setup_transition(self.character_menu_one, True, False, False, True)
 		self.transition.setup_transition(self.ai_menu_one, True, False, False, True)
-		self.transition.setup_single_item_transition(self.player_one_text, True, False, True, False)
-		self.transition.setup_transition(self.color_menu_two, False, True, False, True)
+		self.transition.setup_transition(self.character_menu_two, False, True, False, True)
 		self.transition.setup_transition(self.ai_menu_two, True, False, False, True)
-		self.transition.setup_single_item_transition(self.player_two_text, False, True, True, False)
 		self.transition.setup_transition(self.back_menu, True, False, False, True)
 		self.transition.setup_transition(self.start_menu, False, True, False, True)
 
 		# And finally, we start the gameloop!
 		self.gameloop()
 
-	def setup_color_menu(self, function):
-		# Creates a grid menu for color selection (2 rows x 3 columns)
-		color_menu = gridmenu.GridMenu(3)  # 3 columns
-		self.setup_color_items(color_menu, function)
-		return color_menu
+	def setup_character_menu(self, function):
+		# Creates a grid menu for character selection (2 rows x 3 columns)
+		character_menu = gridmenu.GridMenu(3)  # 3 columns
+		self.setup_character_items(character_menu, function)
+		return character_menu
 
-	def setup_color_items(self, grid_menu, function):
-		# Add 6 different colored items to the grid menu
-		colors = [
-			pygame.Color(255, 0, 0),      # Red
-			pygame.Color(0, 255, 0),      # Green
-			pygame.Color(0, 0, 255),      # Blue
-			pygame.Color(255, 255, 0),    # Yellow
-			pygame.Color(255, 0, 255),    # Magenta
-			pygame.Color(0, 255, 255)     # Cyan
-		]
+	def setup_character_items(self, grid_menu, function):
+		# Add 6 different character items to the grid menu
+		characters = ["red", "green", "blue", "yellow", "magenta", "cyan"]
 		
-		for color in colors:
-			color_item = item.Item(color)
-			grid_menu.add(color_item, function)
+		for character in characters:
+			# Use thumbnail for menu item
+			thumbnail_path = os.path.join("res", "character", "thumbnail", f"{character}.png")
+			# If thumbnail doesn't exist, fall back to regular image
+			if not os.path.exists(thumbnail_path):
+				thumbnail_path = os.path.join("res", "character", f"{character}.png")
+			character_item = imageitem.ImageItem(thumbnail_path)
+			character_item.character = character
+			character_item.color = self.character_colors[character]
+			grid_menu.add(character_item, function)
 
-	def color_one(self, item):
-		# Set player one's color to the selected color
-		self.player_one_color = item.color
-		# Disable the same color in player two's color menu
-		if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
-			self.player_two_color = None
-			for menu_item in self.color_menu_two.items:
-				if menu_item.chosen:
-					menu_item.chosen = False
+	def character_one(self, item):
+		# Check if this character is already selected by player two
+		if self.player_two_character == item.character:
+			return  # Cannot select a character that's already chosen
+		
+		# Set player one's character to the selected character
+		self.player_one_character = item.character
+		# Reset animation values when character changes
+		self.p1_preview_alpha = 0
+		self.p1_preview_offset = 30  # Reset to initial offset
+		self.p1_animation_time = 0  # Reset animation time
+		
+		# Update disabled states in player two's menu
+		self.update_character_menu_states()
 
-	def color_two(self, item):
-		# Set player two's color to the selected color
-		self.player_two_color = item.color
-		# Disable the same color in player one's color menu
-		if self.player_one_color and self.player_two_color and self.player_one_color == self.player_two_color:
-			self.player_one_color = None
-			for menu_item in self.color_menu_one.items:
-				if menu_item.chosen:
-					menu_item.chosen = False
+	def character_two(self, item):
+		# Check if this character is already selected by player one
+		if self.player_one_character == item.character:
+			return  # Cannot select a character that's already chosen
+		
+		# Set player two's character to the selected character
+		self.player_two_character = item.character
+		# Reset animation values when character changes
+		self.p2_preview_alpha = 0
+		self.p2_preview_offset = -30  # Reset to initial offset
+		self.p2_animation_time = 0  # Reset animation time
+		
+		# Update disabled states in player one's menu
+		self.update_character_menu_states()
 
-	def toggle_color(self, item, primary_menu, secondary_menu):
-		# This method is used to handle color selection and prevent duplicate colors
-		chosen_item = None
-		for menu_item in primary_menu.items:
-			if menu_item.chosen:
-				chosen_item = menu_item
-				break
+	def update_character_menu_states(self):
+		# Update player one's menu
+		for item in self.character_menu_one.items:
+			item.disabled = (self.player_two_character == item.character)
 
-		if chosen_item is None:
-			# If there isn't a chosen item, set the selected item as the chosen item
-			item.chosen = True
-			return item.color
-		elif chosen_item is item:
-			# If the chosen item is clicked again, unselect it
-			chosen_item.chosen = False
-			return None
-		else:
-			# If a different item is chosen, unselect the old one and select the new one
-			chosen_item.chosen = False
-			item.chosen = True
-			return item.color
+		# Update player two's menu
+		for item in self.character_menu_two.items:
+			item.disabled = (self.player_one_character == item.character)
 
 	def setup_ai_menu(self, function):
 		ai_menu = gridmenu.GridMenu(1)
@@ -248,34 +249,38 @@ class PrepareMenu(scene.Scene):
 				break
 
 		if chosen_item is None:
-			# If there isn't a chosen item, set the selected item as the chosen item
+			# If there isn't a chosen item, set the selected item as the chosen item.
 			item.chosen = True
-		elif chosen_item is item and can_unchoose:
-			# Unchose the chosen item.
-			chosen_item.chosen = False
-			return 0 # There is no value to be returned, so we simply return 0.
-		elif not chosen_item is item:
-			# If the chosen item and the selected item doesn't match, unchose the old chosen item and set the selected 
-			# item as chosen instead.
+			if hasattr(item, "value"):
+				return item.value
+			elif hasattr(item, "character"):
+				return item.character
+			return None
+		elif chosen_item is item:
+			# If the chosen item is clicked again, unselect it.
+			if can_unchoose:
+				chosen_item.chosen = False
+				return None
+			return chosen_item.value if hasattr(chosen_item, "value") else chosen_item.character
+		else:
+			# If a different item is chosen, unselect the old one and select the new one.
 			chosen_item.chosen = False
 			item.chosen = True
-
-		# At last, return the value of the selected item.
-		return item.value
+			if hasattr(item, "value"):
+				return item.value
+			elif hasattr(item, "character"):
+				return item.character
+			return None
 
 	def start(self, item = None):
-		if self.player_one_color and self.player_two_color:
-			if self.player_one_ai is None:
-				self.player_one_ai = 0
-			if self.player_two_ai is None:
-				self.player_two_ai = 0
+		# We need both players to have selected a character.
+		if self.player_one_character is None or self.player_two_character is None:
+			toast.Toast(self.window_surface, self.main_clock, "Both players must select a character!")
+			return
 
-			# The game can only be started if both players have picked a color.
-			pygame.mixer.music.stop()
-			self.done = True
-		else:
-			# If a player hasn't picked his or hers color, we show a toast that informs the players of this.
-			toast.Toast(self.window_surface, self.main_clock, "Both players need to pick a color before the game can begin.")
+		# Set the next screen and exit
+		self.next_screen = game.Game
+		self.done = True
 
 	def back(self, item = None):
 		# Simply moves back to the main menu.
@@ -284,56 +289,102 @@ class PrepareMenu(scene.Scene):
 
 	def event(self, event):
 		if (event.type == KEYDOWN and event.key == K_ESCAPE) or (event.type == JOYBUTTONDOWN and event.button in settings.JOY_BUTTON_BACK):
-			# If the escape key is pressed, we go back to the main menu.
+			# If the escape key or back button on gamepad is pressed, we go back to the main menu.
 			self.back()
-		elif event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-			# Get the mouse position
-			mouse_pos = pygame.mouse.get_pos()
-			
-			# Check if the click is on player one's color menu
-			for item in self.color_menu_one.items:
-				if self.color_menu_one.is_mouse_over_item(item, mouse_pos):
-					self.player_one_color = self.toggle_color(item, self.color_menu_one, self.color_menu_two)
-					return
-					
-			# Check if the click is on player two's color menu
-			for item in self.color_menu_two.items:
-				if self.color_menu_two.is_mouse_over_item(item, mouse_pos):
-					self.player_two_color = self.toggle_color(item, self.color_menu_two, self.color_menu_one)
-					return
 
 	def update(self):
 		# Handle all transition.
 		self.transition.update(self.main_clock)
 
-		# Update all menus and items.
+		# Update all menus.
 		self.number_of_rounds_menu.update(self.main_clock)
-		self.color_menu_one.update(self.main_clock)
-		self.color_menu_two.update(self.main_clock)
+		self.character_menu_one.update(self.main_clock)
+		self.character_menu_two.update(self.main_clock)
 		self.ai_menu_one.update(self.main_clock)
 		self.ai_menu_two.update(self.main_clock)
 		self.back_menu.update(self.main_clock)
 		self.start_menu.update(self.main_clock)
 
+		# Get delta time in seconds
+		dt = self.main_clock.get_time() / 1000.0
+
+		# Update preview animations
+		if self.player_one_character:
+			# Update animation time
+			self.p1_animation_time = min(self.animation_duration, self.p1_animation_time + dt)
+			# Calculate progress (0 to 1)
+			progress = self.p1_animation_time / self.animation_duration
+			# Apply to both alpha and position
+			self.p1_preview_alpha = int(255 * progress)
+			self.p1_preview_offset = max(0, 30 * (1 - progress))
+
+		if self.player_two_character:
+			# Update animation time
+			self.p2_animation_time = min(self.animation_duration, self.p2_animation_time + dt)
+			# Calculate progress (0 to 1)
+			progress = self.p2_animation_time / self.animation_duration
+			# Apply to both alpha and position
+			self.p2_preview_alpha = int(255 * progress)
+			self.p2_preview_offset = min(0, -30 * (1 - progress))
+
 	def draw(self):
 		# Every frame begins by filling the whole screen with the background color.
 		self.window_surface.fill(settings.BACKGROUND_COLOR)
 
-		# Draw the number of rounds menu.
-		self.number_of_rounds_menu.draw(self.window_surface)
+		# Draw the rounds menu at the top
 		self.number_of_rounds_text.draw(self.window_surface)
-		
-		# Draw the menus for player one.
-		self.color_menu_one.draw(self.window_surface)
-		self.player_one_text.draw(self.window_surface)
+		self.number_of_rounds_menu.draw(self.window_surface)
+
+		# Draw player one's menus on the left
+		self.character_menu_one.draw(self.window_surface)
 		self.ai_menu_one.draw(self.window_surface)
 
-		# Draw the menus for player two.
-		self.color_menu_two.draw(self.window_surface)
-		self.player_two_text.draw(self.window_surface)
+		# Draw player two's menus on the right
+		self.character_menu_two.draw(self.window_surface)
 		self.ai_menu_two.draw(self.window_surface)
 
-		# Draw the back and start menus.
+		# Draw the currently selected character sprites above the menus with animation
+		if self.player_one_character:
+			# Use full size character image for selected character display
+			sprite_path = os.path.join("res", "character", f"{self.player_one_character}.png")
+			if os.path.exists(sprite_path):
+				sprite = pygame.image.load(sprite_path)
+				sprite = pygame.transform.scale(sprite, (64, 64))
+				
+				# Create a copy for alpha
+				sprite_alpha = sprite.copy()
+				sprite_alpha.set_alpha(self.p1_preview_alpha)
+				
+				# Calculate base position (center above menu)
+				base_x = self.character_menu_one.x + (self.character_menu_one.get_width() - 64) / 2
+				y_pos = self.character_menu_one.y - 80
+				
+				# Apply offset for animation
+				x_pos = base_x - self.p1_preview_offset  # Subtract offset to move from left
+				
+				self.window_surface.blit(sprite_alpha, (x_pos, y_pos))
+
+		if self.player_two_character:
+			# Use full size character image for selected character display
+			sprite_path = os.path.join("res", "character", f"{self.player_two_character}.png")
+			if os.path.exists(sprite_path):
+				sprite = pygame.image.load(sprite_path)
+				sprite = pygame.transform.scale(sprite, (64, 64))
+				
+				# Create a copy for alpha
+				sprite_alpha = sprite.copy()
+				sprite_alpha.set_alpha(self.p2_preview_alpha)
+				
+				# Calculate base position (center above menu)
+				base_x = self.character_menu_two.x + (self.character_menu_two.get_width() - 64) / 2
+				y_pos = self.character_menu_two.y - 80
+				
+				# Apply offset for animation
+				x_pos = base_x - self.p2_preview_offset  # Subtract offset to move from right
+				
+				self.window_surface.blit(sprite_alpha, (x_pos, y_pos))
+
+		# Draw the back and start buttons at the bottom
 		self.back_menu.draw(self.window_surface)
 		self.start_menu.draw(self.window_surface)
 
@@ -342,27 +393,21 @@ class PrepareMenu(scene.Scene):
 			# If we're going to start the game, we first create both players.
 			joystick_count = pygame.joystick.get_count()
 			if joystick_count == 0:
-				player_one = self.create_player_one(self.player_one_color)
-				player_two = self.create_player_two(self.player_two_color)
+				player_one = self.create_player_one(self.character_colors[self.player_one_character])
+				player_two = self.create_player_two(self.character_colors[self.player_two_character])
 			elif joystick_count == 1:
-				player_one = self.create_player_one(self.player_one_color, gamepad_id = 0)
-				player_two = self.create_player_two(self.player_two_color)
+				player_one = self.create_player_one(self.character_colors[self.player_one_character], gamepad_id=0)
+				player_two = self.create_player_two(self.character_colors[self.player_two_character])
 			elif joystick_count == 2:
-				player_one = self.create_player_one(self.player_one_color, gamepad_id = 0)
-				player_two = self.create_player_two(self.player_two_color, gamepad_id = 1)
+				player_one = self.create_player_one(self.character_colors[self.player_one_character], gamepad_id=0)
+				player_two = self.create_player_two(self.character_colors[self.player_two_character], gamepad_id=1)
 
-			# We also create and setup the score.
-			score = {}
-			score[player_one] = 0
-			score[player_two] = 0
-
-			# And finally, we start the game!
-			self.next_screen(self.window_surface, self.main_clock, player_one, player_two, self.number_of_rounds, score)
+			# Create the game instance with initial score dictionary mapping players to 0
+			score = {player_one: 0, player_two: 0}
+			self.next = self.next_screen(self.window_surface, self.main_clock, player_one, player_two, self.number_of_rounds, score)
 		elif not self.next_screen is None:
 			# For any other screen we just call it using the normal variables.
-			self.next_screen(self.window_surface, self.main_clock)
-
-		# Otherwise, we just let this scene end.
+			self.next = self.next_screen(self.window_surface, self.main_clock)
 
 	def create_player_one(self, color, **kwargs):
 		# Creates player one, and sets the position of the player to the top-left corner of the screen.
@@ -374,7 +419,10 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_ONE_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_ONE_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_ONE_JOY_UNLEASH_ENERGY
-		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_one_ai)
+		gamepad_id = kwargs.get("gamepad_id", None)
+		# Set AI difficulty to 0 if no AI is selected
+		ai_difficulty = self.player_one_ai if self.player_one_ai is not None else 0
+		player_one = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, gamepad_id, color, ai_difficulty)
 		return player_one
 
 	def create_player_two(self, color, **kwargs):
@@ -387,5 +435,8 @@ class PrepareMenu(scene.Scene):
 		key_down = settings.PLAYER_TWO_KEY_DOWN
 		key_unleash_energy = settings.PLAYER_TWO_KEY_UNLEASH_ENERGY
 		joy_unleash_energy = settings.PLAYER_TWO_JOY_UNLEASH_ENERGY
-		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, kwargs.get("gamepad_id", None), color, self.player_two_ai)
+		gamepad_id = kwargs.get("gamepad_id", None)
+		# Set AI difficulty to 0 if no AI is selected
+		ai_difficulty = self.player_two_ai if self.player_two_ai is not None else 0
+		player_two = player.Player(x, y, name, key_up, key_down, key_unleash_energy, joy_unleash_energy, gamepad_id, color, ai_difficulty)
 		return player_two

@@ -32,5 +32,8 @@ class ImageItem(item.Item):
 	def draw(self, surface):
 		super(ImageItem, self).draw(surface)
 
+		# Set image alpha based on disabled state
+		self.image.set_alpha(128 if self.disabled else 255)
+
 		# Finally, blit the image to the given surface (on top of everything else drawn in here).
 		surface.blit(self.image, ((self.rect.x + (self.rect.width - self.image.get_width()) / 2), self.rect.y + (self.rect.height - self.image.get_height()) / 2))
