@@ -44,6 +44,12 @@ class Ball(pygame.sprite.Sprite):
 	# Load the image file here, so any new instance of this class doesn't have to reload it every time, they can just copy the surface.
 	image = pygame.image.load("res/ball/ball.png")
 
+	# Constants for collision handling
+	MIN_BOUNCE_ANGLE = math.pi / 10  # About 18 degrees minimum bounce angle
+	STUCK_DETECTION_TIME = 500  # Time in milliseconds to detect if ball is stuck
+	STUCK_DETECTION_DISTANCE = 5  # Minimum distance the ball should move in STUCK_DETECTION_TIME
+	RANDOM_BOUNCE_VARIATION = 0.1  # Maximum random angle variation on bounce (in radians)
+
 	# Initialize the sound effect.
 	sound_effect = BALL_SOUND
 
@@ -158,6 +164,11 @@ class Ball(pygame.sprite.Sprite):
 		# Create a trajectory visualization
 		self.trajectory = trajectory.Trajectory(self)
 
+		# Initialize stuck detection variables
+		self.last_position = (x, y)
+		self.last_position_time = pygame.time.get_ticks()
+		self.stuck_count = 0
+
 	def destroy(self):
 		# This should be called when the ball is to be destroyed. It will take care of killing itself and anything affecting it completely.
 		self.kill()
@@ -178,6 +189,9 @@ class Ball(pygame.sprite.Sprite):
 			self.color = self.owner.color
 
 	def update(self, main_clock):
+		# Check for stuck condition
+		self.check_if_stuck()
+
 		# We assume we haven't collided with anything yet.
 		self.collided = False
 
@@ -273,6 +287,12 @@ class Ball(pygame.sprite.Sprite):
 				self.trace_spawn_time = 0
 
 	def hit_wall(self):
+		# Add random variation to bounce angle
+		self.angle += random.uniform(-self.RANDOM_BOUNCE_VARIATION, self.RANDOM_BOUNCE_VARIATION)
+		
+		# Ensure minimum bounce angle
+		self.ensure_minimum_angle()
+		
 		# Spawn some particles.
 		self.spawn_particles()
 
@@ -641,29 +661,58 @@ class Ball(pygame.sprite.Sprite):
 			self.ensure_minimum_angle()
 
 	def ensure_minimum_angle(self):
-		"""Ensures the ball's angle isn't too horizontal or vertical to prevent getting stuck."""
+		"""Ensures the ball's angle isn't too shallow relative to horizontal or vertical"""
 		# Normalize angle to 0-2π range
 		normalized_angle = self.angle % (2 * math.pi)
 		
-		# Minimum angles (in radians)
-		min_vertical_angle = math.pi / 10  # ~18 degrees from horizontal
-		min_horizontal_angle = math.pi / 10  # ~18 degrees from vertical
+		# Check horizontal angles (near 0 or π)
+		if normalized_angle < self.MIN_BOUNCE_ANGLE:
+			self.angle = self.MIN_BOUNCE_ANGLE
+		elif normalized_angle < math.pi and normalized_angle > math.pi - self.MIN_BOUNCE_ANGLE:
+			self.angle = math.pi - self.MIN_BOUNCE_ANGLE
+		elif normalized_angle > math.pi and normalized_angle < math.pi + self.MIN_BOUNCE_ANGLE:
+			self.angle = math.pi + self.MIN_BOUNCE_ANGLE
+		elif normalized_angle > 2 * math.pi - self.MIN_BOUNCE_ANGLE:
+			self.angle = 2 * math.pi - self.MIN_BOUNCE_ANGLE
+			
+		# Check vertical angles (near π/2 or 3π/2)
+		if abs(normalized_angle - math.pi/2) < self.MIN_BOUNCE_ANGLE:
+			self.angle = math.pi/2 + (self.MIN_BOUNCE_ANGLE if normalized_angle > math.pi/2 else -self.MIN_BOUNCE_ANGLE)
+		elif abs(normalized_angle - 3*math.pi/2) < self.MIN_BOUNCE_ANGLE:
+			self.angle = 3*math.pi/2 + (self.MIN_BOUNCE_ANGLE if normalized_angle > 3*math.pi/2 else -self.MIN_BOUNCE_ANGLE)
+
+	def check_if_stuck(self):
+		"""Checks if the ball appears to be stuck and tries to resolve it"""
+		current_time = pygame.time.get_ticks()
+		current_pos = (self.x, self.y)
 		
-		# Check if angle is too close to horizontal
-		if abs(math.sin(normalized_angle)) < math.sin(min_vertical_angle):
-			# Adjust angle to maintain direction but increase vertical component
-			if normalized_angle < math.pi:
-				self.angle = min_vertical_angle if normalized_angle < math.pi/2 else math.pi - min_vertical_angle
+		# Check if enough time has passed to do a stuck check
+		if current_time - self.last_position_time >= self.STUCK_DETECTION_TIME:
+			# Calculate distance moved
+			dx = current_pos[0] - self.last_position[0]
+			dy = current_pos[1] - self.last_position[1]
+			distance_moved = math.sqrt(dx*dx + dy*dy)
+			
+			# If we haven't moved much, we might be stuck
+			if distance_moved < self.STUCK_DETECTION_DISTANCE:
+				self.stuck_count += 1
+				if self.stuck_count >= 2:  # If stuck for multiple checks
+					# Add a significant random angle change to escape
+					self.angle += random.uniform(-math.pi/4, math.pi/4)
+					# Ensure we're not still at a problematic angle
+					self.ensure_minimum_angle()
+					# Move the ball slightly away from where it's stuck
+					self.x += math.cos(self.angle) * 2
+					self.y += math.sin(self.angle) * 2
+					self.rect.x = self.x
+					self.rect.y = self.y
+					self.stuck_count = 0
 			else:
-				self.angle = -min_vertical_angle if normalized_angle < 3*math.pi/2 else 2*math.pi - min_vertical_angle
-		
-		# Check if angle is too close to vertical
-		elif abs(math.cos(normalized_angle)) < math.cos(min_horizontal_angle):
-			# Adjust angle to maintain direction but increase horizontal component
-			if normalized_angle < math.pi/2 or normalized_angle > 3*math.pi/2:
-				self.angle = min_horizontal_angle if normalized_angle < math.pi/2 else 2*math.pi - min_horizontal_angle
-			else:
-				self.angle = math.pi - min_horizontal_angle if normalized_angle < math.pi else math.pi + min_horizontal_angle
+				self.stuck_count = 0
+				
+			# Update last position and time
+			self.last_position = current_pos
+			self.last_position_time = current_time
 
 	def hit_block(self, block):
 		# We've hit a block, so we do a bunch of things. First, spawn a few particles.
