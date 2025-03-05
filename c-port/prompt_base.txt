@@ -8,4 +8,3 @@ Blocks are destroyed by damaging them. Blocks can be damaged by many things, by 
 Everytime a ball hits a paddle it changes ownership so the ball is "owned" by that paddle.
 
 The C port is located in the subfolder c-port/.
-

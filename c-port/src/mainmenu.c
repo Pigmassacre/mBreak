@@ -101,19 +101,30 @@ static void InitMainMenu(void) {
     // Menu is initially hidden
     menuState.menuVisible = false;
     
+    // Setup menu item positions
+    SetupMenuTransition();
+    
     printf("Main menu initialized\n");
 }
 
 // Set up menu item positions and transitions
 static void SetupMenuTransition(void) {
-    // Calculate menu positions
-    float menuStartY = GAME_HEIGHT / 2;
+    // Calculate menu center position (matches Python implementation)
+    float menuCenterX = GAME_WIDTH / 2;
+    float menuCenterY = GAME_HEIGHT / 2;
     float menuSpacing = 40;
+    
+    // Calculate the total menu height to properly center the menu
+    float totalMenuHeight = (MENU_COUNT - 1) * menuSpacing;
+    float menuStartY = menuCenterY - totalMenuHeight / 2;
+    
+    printf("Setting up menu transition. Center: (%f, %f), Start Y: %f\n", 
+           menuCenterX, menuCenterY, menuStartY);
     
     // Set target positions
     for (int i = 0; i < MENU_COUNT; i++) {
         menuState.menuItemDesiredPositions[i] = (Vector2){
-            GAME_WIDTH / 2,
+            menuCenterX,
             menuStartY + i * menuSpacing
         };
         
@@ -122,6 +133,10 @@ static void SetupMenuTransition(void) {
             GAME_WIDTH + 100,
             menuState.menuItemDesiredPositions[i].y
         };
+        
+        printf("Menu item %d position: desired (%f, %f), current (%f, %f)\n", 
+               i, menuState.menuItemDesiredPositions[i].x, menuState.menuItemDesiredPositions[i].y,
+               menuState.menuItemPositions[i].x, menuState.menuItemPositions[i].y);
     }
     
     // Make menu visible
@@ -153,6 +168,8 @@ static void UpdateMainMenu(float deltaTime) {
     if (!menuState.menuVisible) {
         if (menuState.logoPosition.x == menuState.logoDesiredPosition.x && 
             menuState.logoPosition.y == menuState.logoDesiredPosition.y) {
+            // Setup menu transition when logo reaches its position
+            SetupMenuTransition();
             menuState.menuVisible = true;
         }
     }
@@ -322,40 +339,39 @@ static void DrawMainMenu(void) {
                 default: optionText = ""; break;
             }
             
-            float fontSize = 20; // Smaller font size for smaller screen resolution
+            float fontSize = 9;
             Vector2 position = menuState.menuItemPositions[i];
+            Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
             
             // Draw selected option with highlight effect
             if (i == menuState.selectedOption) {
                 Color highlightColor = ColorAlpha(WHITE, menuState.textBlink);
                 
-                // Calculate bounds using MeasureTextEx for custom font
-                Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
+                // Calculate bounds for highlight (centered text)
                 Rectangle bounds = (Rectangle){
                     position.x - textSize.x/2 - 10,
-                    position.y - 10,
+                    position.y - textSize.y/2 - 5,
                     textSize.x + 20,
-                    fontSize + 20
+                    textSize.y + 10
                 };
-                
-                // Draw shadow (offset slightly down)
-                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y + 1}, fontSize, 1, DARKGRAY);
                 
                 // Draw item highlight
                 DrawRectangleRec(bounds, ColorAlpha(GRAY, 0.3f));
-                DrawRectangleLinesEx(bounds, 2, highlightColor);
                 
-                // Draw text
-                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y}, fontSize, 1, WHITE);
+                // Draw shadow (offset slightly down and right)
+                DrawTextEx(gameFont, optionText, 
+                          (Vector2){position.x - textSize.x/2 + 1, position.y - textSize.y/2 + 1}, 
+                          fontSize, 1, DARKGRAY);
+                
+                // Draw selected text (centered)
+                DrawTextEx(gameFont, optionText, 
+                          (Vector2){position.x - textSize.x/2, position.y - textSize.y/2}, 
+                          fontSize, 1, WHITE);
             } else {
-                // Calculate text size for centering
-                Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
-                
-                // Draw shadow
-                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y + 1}, fontSize, 1, DARKGRAY);
-                
-                // Draw text
-                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y}, fontSize, 1, LIGHTGRAY);
+                // Draw unselected text (centered)
+                DrawTextEx(gameFont, optionText, 
+                          (Vector2){position.x - textSize.x/2, position.y - textSize.y/2}, 
+                          fontSize, 1, LIGHTGRAY);
             }
         }
     }
