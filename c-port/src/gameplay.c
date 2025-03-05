@@ -1,9 +1,9 @@
-#include "../include/screens.h"
-#include "../include/entity.h"
-#include "../include/paddle.h"
-#include "../include/ball.h"
-#include "../include/block.h"
-#include "../include/font.h"
+#include "screens.h"
+#include "entity.h"
+#include "paddle.h"
+#include "ball.h"
+#include "block.h"
+#include "font.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

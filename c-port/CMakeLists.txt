@@ -10,15 +10,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# Add source files
-file(GLOB_RECURSE SOURCES "src/*.c")
-file(GLOB_RECURSE HEADERS "include/*.h")
+# Add source files - get both .c and .h files from src
+file(GLOB_RECURSE SOURCES "src/*.c" "src/*.h")
 
 # Create executable
-add_executable(mbreak ${SOURCES} ${HEADERS})
+add_executable(mbreak ${SOURCES})
 
-# Include directories
-target_include_directories(mbreak PRIVATE include)
+# Include src directory for all header files
+target_include_directories(mbreak PRIVATE src)
 
 # Find and link Raylib
 # Option 1: Using find_package if you have Raylib installed system-wide or with a proper CMake config

@@ -1,14 +1,14 @@
-#include "../include/screens.h"
-#include "../include/font.h"
+#include "screens.h"
+#include "font.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
-// Logo animation frames structure
-typedef struct {
-    Texture2D texture;
-    float duration;
-} LogoFrame;
+// Include UI components
+#include "ui/logo.h"
+#include "ui/listmenu.h"
+#include "ui/textitem.h"
+#include "ui/transition.h"
 
 // Menu states
 typedef enum MenuOption {
@@ -21,27 +21,23 @@ typedef enum MenuOption {
 
 // Menu state
 typedef struct MainMenuState {
-    int selectedOption;
-    bool optionSelected;
     GameScreen nextScreen;
-    float frameCounter;
-    float textBlink;
+    bool done;
     
-    // Logo animation
-    LogoFrame logoFrames[7];
-    int currentLogoFrame;
-    float logoFrameTime;
-    bool logoAnimPlaying;
-    
-    // Logo position and transition
-    Vector2 logoPosition;
+    // Logo
+    Logo logo;
     Vector2 logoDesiredPosition;
-    float logoTransitionSpeed;
+    Transition logoTransition;
     
-    // Menu transition
-    bool menuVisible;
-    Vector2 menuItemPositions[MENU_COUNT];
-    Vector2 menuItemDesiredPositions[MENU_COUNT];
+    // Menu
+    ListMenu mainMenu;
+    Transition menuTransition;
+    
+    // Menu items
+    TextItem playItem;
+    TextItem optionsItem;
+    TextItem helpItem;
+    TextItem quitItem;
 } MainMenuState;
 
 // Static menu state
@@ -53,264 +49,147 @@ static void UpdateMainMenu(float deltaTime);
 static void DrawMainMenu(void);
 static void UnloadMainMenu(void);
 static GameScreen GetNextMainMenuScreen(void);
-static Rectangle GetMenuOptionBounds(const char* text, float y, float fontSize);
-static void MoveItemToPosition(Vector2* itemPos, Vector2 desiredPos, float speed, float deltaTime);
-static void SetupMenuTransition(void);
+
+// Menu callback functions
+static void StartGame(void* data);
+static void OpenOptions(void* data);
+static void OpenHelp(void* data);
+static void QuitGame(void* data);
 
 // Initialize main menu
 static void InitMainMenu(void) {
-    menuState.selectedOption = MENU_PLAY;
-    menuState.optionSelected = false;
+    // Initialize state
     menuState.nextScreen = MAIN_MENU;
-    menuState.frameCounter = 0;
-    menuState.textBlink = 0;
+    menuState.done = false;
     
-    // Load logo frames
-    char frameFileName[64];
-    for (int i = 0; i < 7; i++) {
-        sprintf(frameFileName, "resources/logo/mBreakTitle_0%d.png", i+1);
-        menuState.logoFrames[i].texture = LoadTexture(frameFileName);
-        
-        // Set durations matching the Python implementation
-        if (i == 0 || i == 7) {
-            menuState.logoFrames[i].duration = 1.55f; // 1550ms
-        } else {
-            menuState.logoFrames[i].duration = 0.075f; // 75ms
-        }
-    }
-    
-    // Initialize logo animation
-    menuState.currentLogoFrame = 0;
-    menuState.logoFrameTime = 0;
-    menuState.logoAnimPlaying = true;
-    
-    // Set initial logo position (off-screen top)
-    int logoWidth = menuState.logoFrames[0].texture.width;
-    int logoHeight = menuState.logoFrames[0].texture.height;
-    menuState.logoPosition = (Vector2){ (GAME_WIDTH - logoWidth * 2) / 2, -logoHeight * 2 };
+    // Initialize logo
+    menuState.logo = InitLogo();
     
     // Set desired logo position (top quarter of screen)
-    menuState.logoDesiredPosition = (Vector2){ 
-        (GAME_WIDTH - logoWidth * 2) / 2,
-        (GAME_HEIGHT - logoHeight * 2) / 4
+    float logoWidth = GetLogoWidth(&menuState.logo);
+    float logoHeight = GetLogoHeight(&menuState.logo);
+    menuState.logoDesiredPosition = (Vector2){
+        (GAME_WIDTH - logoWidth) / 2.0f,
+        (GAME_HEIGHT - logoHeight) / 4.0f
     };
     
-    // Set logo transition speed
-    menuState.logoTransitionSpeed = 120 * 60 / 1000.0f; // Convert from pixels/second to pixels/frame at 60fps
+    // Initialize logo transition
+    menuState.logoTransition = InitTransition();
+    menuState.logoTransition.speed = 120.0f;
     
-    // Menu is initially hidden
-    menuState.menuVisible = false;
+    // Start logo animation
+    PlayLogo(&menuState.logo);
     
-    // Setup menu item positions
-    SetupMenuTransition();
+    // Initialize main menu at center of screen
+    menuState.mainMenu = InitListMenu(GAME_WIDTH / 2.0f, GAME_HEIGHT / 2.0f, 0);
+    
+    // Initialize menu items
+    menuState.playItem = InitTextItem("Start", WHITE, 255, 20);
+    menuState.optionsItem = InitTextItem("Options", WHITE, 255, 20);
+    menuState.helpItem = InitTextItem("Help", WHITE, 255, 20);
+    menuState.quitItem = InitTextItem("Quit", WHITE, 255, 20);
+    
+    // Set up text item surfaces (needed for rendering)
+    SetupTextItemSurfaces(&menuState.playItem);
+    SetupTextItemSurfaces(&menuState.optionsItem);
+    SetupTextItemSurfaces(&menuState.helpItem);
+    SetupTextItemSurfaces(&menuState.quitItem);
+    
+    // Add items to the menu with their callback functions
+    AddListMenuItem(&menuState.mainMenu, (Item*)&menuState.playItem, StartGame, NULL);
+    AddListMenuItem(&menuState.mainMenu, (Item*)&menuState.optionsItem, OpenOptions, NULL);
+    AddListMenuItem(&menuState.mainMenu, (Item*)&menuState.helpItem, OpenHelp, NULL);
+    AddListMenuItem(&menuState.mainMenu, (Item*)&menuState.quitItem, QuitGame, NULL);
+    
+    // Select the first item by default
+    menuState.mainMenu.base.items[0]->selected = true;
+    
+    // Initialize menu transition
+    menuState.menuTransition = InitTransition();
+    
+    // Set up odd-even transition for the main menu (items come in from alternating sides)
+    SetupOddEvenTransition(&menuState.menuTransition, &menuState.mainMenu.base, true, true, false, false);
     
     printf("Main menu initialized\n");
 }
 
-// Set up menu item positions and transitions
-static void SetupMenuTransition(void) {
-    // Calculate menu center position (matches Python implementation)
-    float menuCenterX = GAME_WIDTH / 2;
-    float menuCenterY = GAME_HEIGHT / 2;
-    float menuSpacing = 40;
-    
-    // Calculate the total menu height to properly center the menu
-    float totalMenuHeight = (MENU_COUNT - 1) * menuSpacing;
-    float menuStartY = menuCenterY - totalMenuHeight / 2;
-    
-    printf("Setting up menu transition. Center: (%f, %f), Start Y: %f\n", 
-           menuCenterX, menuCenterY, menuStartY);
-    
-    // Set target positions
-    for (int i = 0; i < MENU_COUNT; i++) {
-        menuState.menuItemDesiredPositions[i] = (Vector2){
-            menuCenterX,
-            menuStartY + i * menuSpacing
-        };
-        
-        // Start positions (off-screen to the right)
-        menuState.menuItemPositions[i] = (Vector2){
-            GAME_WIDTH + 100,
-            menuState.menuItemDesiredPositions[i].y
-        };
-        
-        printf("Menu item %d position: desired (%f, %f), current (%f, %f)\n", 
-               i, menuState.menuItemDesiredPositions[i].x, menuState.menuItemDesiredPositions[i].y,
-               menuState.menuItemPositions[i].x, menuState.menuItemPositions[i].y);
-    }
-    
-    // Make menu visible
-    menuState.menuVisible = true;
+// Menu callbacks
+static void StartGame(void* data) {
+    menuState.done = true;
+    menuState.nextScreen = PREPARE_MENU;
+    ScreenMainMenu.finishScreen = true;
+}
+
+static void OpenOptions(void* data) {
+    menuState.nextScreen = OPTIONS;
+    ScreenMainMenu.finishScreen = true;
+}
+
+static void OpenHelp(void* data) {
+    // For now, just stay in main menu
+    // Later we'll implement the help screen
+    menuState.nextScreen = MAIN_MENU;
+}
+
+static void QuitGame(void* data) {
+    // Signal that we want to quit the game
+    menuState.done = true;
+    menuState.nextScreen = -1; // Special value to indicate exit
+    CloseWindow();
 }
 
 // Update main menu logic
 static void UpdateMainMenu(float deltaTime) {
-    // Update timers
-    menuState.frameCounter += deltaTime;
-    menuState.textBlink = sinf(menuState.frameCounter * 4) * 0.5f + 0.5f;
-    
     // Update logo animation
-    if (menuState.logoAnimPlaying) {
-        menuState.logoFrameTime += deltaTime;
-        
-        // Check if it's time to advance to the next frame
-        if (menuState.logoFrameTime >= menuState.logoFrames[menuState.currentLogoFrame].duration) {
-            menuState.logoFrameTime = 0;
-            menuState.currentLogoFrame = (menuState.currentLogoFrame + 1) % 7;
-        }
-    }
+    UpdateLogo(&menuState.logo, deltaTime);
     
-    // Move logo to its desired position
-    MoveItemToPosition(&menuState.logoPosition, menuState.logoDesiredPosition, 
-                       menuState.logoTransitionSpeed, deltaTime);
+    // Move logo to its desired position using the transition
+    Vector2 currentPos = { menuState.logo.x, menuState.logo.y };
+    float speed = menuState.logoTransition.speed * deltaTime;
     
-    // Check if logo is in position to show menu
-    if (!menuState.menuVisible) {
-        if (menuState.logoPosition.x == menuState.logoDesiredPosition.x && 
-            menuState.logoPosition.y == menuState.logoDesiredPosition.y) {
-            // Setup menu transition when logo reaches its position
-            SetupMenuTransition();
-            menuState.menuVisible = true;
-        }
-    }
-    
-    // If menu is visible, handle menu navigation and update menu item positions
-    if (menuState.menuVisible) {
-        // Update menu item positions
-        for (int i = 0; i < MENU_COUNT; i++) {
-            MoveItemToPosition(&menuState.menuItemPositions[i], 
-                              menuState.menuItemDesiredPositions[i],
-                              menuState.logoTransitionSpeed, deltaTime);
-        }
-        
-        // Navigate menu options using up/down keys
-        if (IsKeyPressed(KEY_UP)) {
-            menuState.selectedOption--;
-            if (menuState.selectedOption < 0) {
-                menuState.selectedOption = MENU_COUNT - 1;
-            }
-        } else if (IsKeyPressed(KEY_DOWN)) {
-            menuState.selectedOption++;
-            if (menuState.selectedOption >= MENU_COUNT) {
-                menuState.selectedOption = 0;
-            }
-        }
-        
-        // Select current option with enter/space
-        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-            menuState.optionSelected = true;
-            
-            // Determine next screen based on selection
-            switch (menuState.selectedOption) {
-                case MENU_PLAY:
-                    menuState.nextScreen = PREPARE_MENU;
-                    ScreenMainMenu.finishScreen = true;
-                    break;
-                case MENU_OPTIONS:
-                    menuState.nextScreen = OPTIONS;
-                    ScreenMainMenu.finishScreen = true;
-                    break;
-                case MENU_HELP:
-                    // Just stay in main menu for now, will implement later
-                    menuState.nextScreen = MAIN_MENU;
-                    break;
-                case MENU_EXIT:
-                    // Signal that the window should close
-                    CloseWindow();
-                    break;
-                default:
-                    menuState.nextScreen = MAIN_MENU;
-                    break;
-            }
-        }
-        
-        // Handle gamepad back button or escape key to exit
-        if (IsKeyPressed(KEY_ESCAPE)) {
-            menuState.selectedOption = MENU_EXIT;
-        }
-        
-        // Alternative navigation with mouse
-        Vector2 mousePoint = GetMousePosition();
-        
-        // Check if mouse is over menu options
-        for (int i = 0; i < MENU_COUNT; i++) {
-            const char* optionText;
-            switch (i) {
-                case MENU_PLAY: optionText = "Start"; break;
-                case MENU_OPTIONS: optionText = "Options"; break;
-                case MENU_HELP: optionText = "Help"; break;
-                case MENU_EXIT: optionText = "Quit"; break;
-                default: optionText = ""; break;
-            }
-            
-            float fontSize = 20; // Smaller font size for smaller screen resolution
-            Vector2 position = menuState.menuItemPositions[i];
-            Rectangle bounds = (Rectangle){
-                position.x - 10,
-                position.y - 10,
-                MeasureTextEx(gameFont, optionText, fontSize, 1).x + 20,
-                fontSize + 20
-            };
-            
-            // If mouse is over option, select it
-            if (CheckCollisionPointRec(mousePoint, bounds)) {
-                menuState.selectedOption = i;
-                
-                // If mouse is clicked, select the option
-                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                    menuState.optionSelected = true;
-                    
-                    // Same logic as above for determining next screen
-                    switch (menuState.selectedOption) {
-                        case MENU_PLAY:
-                            menuState.nextScreen = PREPARE_MENU;
-                            ScreenMainMenu.finishScreen = true;
-                            break;
-                        case MENU_OPTIONS:
-                            menuState.nextScreen = OPTIONS;
-                            ScreenMainMenu.finishScreen = true;
-                            break;
-                        case MENU_HELP:
-                            menuState.nextScreen = MAIN_MENU;
-                            break;
-                        case MENU_EXIT:
-                            CloseWindow();
-                            break;
-                        default:
-                            menuState.nextScreen = MAIN_MENU;
-                            break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Move an item toward its desired position
-static void MoveItemToPosition(Vector2* itemPos, Vector2 desiredPos, float speed, float deltaTime) {
     // X-axis movement
-    if (desiredPos.x < itemPos->x) {
-        itemPos->x -= speed * deltaTime * 60.0f; // Scale by 60fps
-        if (itemPos->x < desiredPos.x) {
-            itemPos->x = desiredPos.x;
+    if (menuState.logoDesiredPosition.x < currentPos.x) {
+        menuState.logo.x -= speed;
+        if (menuState.logo.x < menuState.logoDesiredPosition.x) {
+            menuState.logo.x = menuState.logoDesiredPosition.x;
         }
-    } else if (desiredPos.x > itemPos->x) {
-        itemPos->x += speed * deltaTime * 60.0f; // Scale by 60fps
-        if (itemPos->x > desiredPos.x) {
-            itemPos->x = desiredPos.x;
+    } else if (menuState.logoDesiredPosition.x > currentPos.x) {
+        menuState.logo.x += speed;
+        if (menuState.logo.x > menuState.logoDesiredPosition.x) {
+            menuState.logo.x = menuState.logoDesiredPosition.x;
         }
     }
     
     // Y-axis movement
-    if (desiredPos.y < itemPos->y) {
-        itemPos->y -= speed * deltaTime * 60.0f; // Scale by 60fps
-        if (itemPos->y < desiredPos.y) {
-            itemPos->y = desiredPos.y;
+    if (menuState.logoDesiredPosition.y < currentPos.y) {
+        menuState.logo.y -= speed;
+        if (menuState.logo.y < menuState.logoDesiredPosition.y) {
+            menuState.logo.y = menuState.logoDesiredPosition.y;
         }
-    } else if (desiredPos.y > itemPos->y) {
-        itemPos->y += speed * deltaTime * 60.0f; // Scale by 60fps
-        if (itemPos->y > desiredPos.y) {
-            itemPos->y = desiredPos.y;
+    } else if (menuState.logoDesiredPosition.y > currentPos.y) {
+        menuState.logo.y += speed;
+        if (menuState.logo.y > menuState.logoDesiredPosition.y) {
+            menuState.logo.y = menuState.logoDesiredPosition.y;
+        }
+    }
+    
+    // If the logo is in place, update the menu
+    if (menuState.logo.x == menuState.logoDesiredPosition.x && 
+        menuState.logo.y == menuState.logoDesiredPosition.y) {
+        // Update the menu transitions
+        UpdateTransition(&menuState.menuTransition, deltaTime);
+        
+        // Update the menu
+        UpdateListMenu(&menuState.mainMenu, deltaTime);
+        
+        // Handle escape key to select quit option
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            // Deselect all items
+            for (int i = 0; i < menuState.mainMenu.base.item_count; i++) {
+                menuState.mainMenu.base.items[i]->selected = false;
+            }
+            // Select the quit item
+            menuState.mainMenu.base.items[MENU_EXIT]->selected = true;
         }
     }
 }
@@ -320,86 +199,45 @@ static void DrawMainMenu(void) {
     // Draw background
     DrawRectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, BLACK);
     
-    // Draw the animated logo (scaled 2x like in Python)
-    int logoWidth = menuState.logoFrames[menuState.currentLogoFrame].texture.width;
-    int logoHeight = menuState.logoFrames[menuState.currentLogoFrame].texture.height;
-    DrawTextureEx(menuState.logoFrames[menuState.currentLogoFrame].texture, 
-                 menuState.logoPosition, 0.0f, 2.0f, WHITE);
+    // Draw the logo
+    DrawLogo(&menuState.logo);
     
-    // Only draw menu if it's visible (logo is in position)
-    if (menuState.menuVisible) {
-        // Draw menu options
-        for (int i = 0; i < MENU_COUNT; i++) {
-            const char* optionText;
-            switch (i) {
-                case MENU_PLAY: optionText = "Start"; break;
-                case MENU_OPTIONS: optionText = "Options"; break;
-                case MENU_HELP: optionText = "Help"; break;
-                case MENU_EXIT: optionText = "Quit"; break;
-                default: optionText = ""; break;
-            }
-            
-            float fontSize = 9;
-            Vector2 position = menuState.menuItemPositions[i];
-            Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
-            
-            // Draw selected option with highlight effect
-            if (i == menuState.selectedOption) {
-                Color highlightColor = ColorAlpha(WHITE, menuState.textBlink);
-                
-                // Calculate bounds for highlight (centered text)
-                Rectangle bounds = (Rectangle){
-                    position.x - textSize.x/2 - 10,
-                    position.y - textSize.y/2 - 5,
-                    textSize.x + 20,
-                    textSize.y + 10
-                };
-                
-                // Draw item highlight
-                DrawRectangleRec(bounds, ColorAlpha(GRAY, 0.3f));
-                
-                // Draw shadow (offset slightly down and right)
-                DrawTextEx(gameFont, optionText, 
-                          (Vector2){position.x - textSize.x/2 + 1, position.y - textSize.y/2 + 1}, 
-                          fontSize, 1, DARKGRAY);
-                
-                // Draw selected text (centered)
-                DrawTextEx(gameFont, optionText, 
-                          (Vector2){position.x - textSize.x/2, position.y - textSize.y/2}, 
-                          fontSize, 1, WHITE);
-            } else {
-                // Draw unselected text (centered)
-                DrawTextEx(gameFont, optionText, 
-                          (Vector2){position.x - textSize.x/2, position.y - textSize.y/2}, 
-                          fontSize, 1, LIGHTGRAY);
-            }
-        }
+    // If the logo is in place, draw the menu
+    if (menuState.logo.x == menuState.logoDesiredPosition.x && 
+        menuState.logo.y == menuState.logoDesiredPosition.y) {
+        // Draw the menu
+        DrawListMenu(&menuState.mainMenu);
     }
 }
 
 // Unload main menu resources
 static void UnloadMainMenu(void) {
-    // Unload logo textures
-    for (int i = 0; i < 7; i++) {
-        UnloadTexture(menuState.logoFrames[i].texture);
-    }
+    // Unload logo
+    UnloadLogo(&menuState.logo);
+    
+    // Unload transitions
+    UnloadTransition(&menuState.logoTransition);
+    UnloadTransition(&menuState.menuTransition);
+    
+    // Unload menu items
+    UnloadTextItem(&menuState.playItem);
+    UnloadTextItem(&menuState.optionsItem);
+    UnloadTextItem(&menuState.helpItem);
+    UnloadTextItem(&menuState.quitItem);
+    
+    // Unload menu
+    UnloadListMenu(&menuState.mainMenu);
     
     printf("Main menu unloaded\n");
 }
 
 // Get next screen after main menu
 static GameScreen GetNextMainMenuScreen(void) {
+    if (menuState.nextScreen == -1) {
+        // Special value to indicate exit
+        return -1;
+    }
     return menuState.nextScreen;
-}
-
-// Calculate bounds for menu options (for mouse interaction)
-static Rectangle GetMenuOptionBounds(const char* text, float y, float fontSize) {
-    Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
-    float width = textSize.x + 40;
-    float height = fontSize + 20;
-    float x = GAME_WIDTH/2 - width/2;
-    
-    return (Rectangle){ x, y - 10, width, height };
 }
 
 // Screen initializer called by the screen management system
@@ -412,7 +250,7 @@ Screen InitMainMenuScreen(void) {
         .unload = UnloadMainMenu,
         .getNextScreen = GetNextMainMenuScreen,
         .finishScreen = false,
-        .nextScreen = PREPARE_MENU // Changed from GAMEPLAY to PREPARE_MENU
+        .nextScreen = PREPARE_MENU
     };
     
     return screen;

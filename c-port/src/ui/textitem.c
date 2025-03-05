@@ -4,8 +4,10 @@
  */
 
 #include "ui/textitem.h"
+#include "ui/utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 // Default font values
 #define TEXT_ITEM_FONT_PATH "resources/fonts/ADDLG___.TTF"

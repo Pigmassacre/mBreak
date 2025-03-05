@@ -5,6 +5,7 @@
 
 #include "ui/traversal.h"
 #include "ui/item.h"
+#include "ui/utils.h"
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>

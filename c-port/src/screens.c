@@ -1,5 +1,5 @@
-#include "../include/screens.h"
-#include "../include/font.h"
+#include "screens.h"
+#include "font.h"
 #include <stdlib.h>
 
 // Global screen variable definitions

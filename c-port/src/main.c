@@ -1,7 +1,7 @@
-#include "raylib.h"
-#include "../include/screens.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include "screens.h"
+#include "raylib.h"
+#include <stdlib.h>
 
 // Game internal resolution (from Python version)
 #define GAME_WIDTH 285

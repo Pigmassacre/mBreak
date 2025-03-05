@@ -1,5 +1,5 @@
-#include "../include/ball.h"
-#include "../include/block.h"
+#include "ball.h"
+#include "block.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>

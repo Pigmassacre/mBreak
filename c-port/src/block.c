@@ -1,6 +1,6 @@
-#include "../include/block.h"
-#include "../include/ball.h"
-#include "../include/font.h"
+#include "block.h"
+#include "ball.h"
+#include "font.h"
 #include <stdlib.h>
 #include <stdio.h>
 

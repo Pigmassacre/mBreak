@@ -1,5 +1,5 @@
-#include "../include/paddle.h"
-#include "../include/screens.h"
+#include "paddle.h"
+#include "screens.h"
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -7,12 +7,13 @@
 #include "ui/item.h"
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 // Default color for the color display when no color is selected
-#define DEFAULT_COLOR GRAY
+#define DEFAULT_COLOR RAYWHITE
 
 // Size of the color display item
-#define COLOR_DISPLAY_SIZE 20.0f
+#define COLOR_DISPLAY_SIZE 40
 
 // Size of the selection indicator
 #define SELECTION_INDICATOR_SIZE 8
@@ -21,16 +22,16 @@
 #define HOVER_INDICATOR_SIZE 5
 
 // Function to handle dummy menu item selection
-static void DummyFunction(Item* item) {
+static void DummyFunction(void* data) {
     // This function does nothing, it's just to satisfy the menu system
-    (void)item; // Avoid unused parameter warning
+    (void)data; // Avoid unused parameter warning
 }
 
 ColorWheelMenu InitColorWheelMenu(float radius, float center_x, float center_y) {
     ColorWheelMenu colorwheel;
     
-    // Initialize the base menu
-    colorwheel.base = InitMenu();
+    // Initialize the base menu with proper parameters
+    colorwheel.base = InitMenu(center_x, center_y, 0);
     
     // Store the radius and center position
     colorwheel.radius = radius;
@@ -44,8 +45,8 @@ ColorWheelMenu InitColorWheelMenu(float radius, float center_x, float center_y) 
     colorwheel.has_selection = false;
     colorwheel.has_hover = false;
     
-    // Initialize the color display item
-    colorwheel.color_display = InitItem();
+    // Initialize the color display item with proper color parameter
+    colorwheel.color_display = InitItem(DEFAULT_COLOR);
     colorwheel.color_display.width = COLOR_DISPLAY_SIZE;
     colorwheel.color_display.height = COLOR_DISPLAY_SIZE;
     colorwheel.color_display.color = DEFAULT_COLOR;
@@ -57,10 +58,11 @@ ColorWheelMenu InitColorWheelMenu(float radius, float center_x, float center_y) 
     GenerateColorWheel(&colorwheel);
     
     // Add a dummy item to make this menu compatible with the game's menu navigation system
-    Item dummy_item = InitItem();
+    Item dummy_item = InitItem(WHITE);
     dummy_item.width = 0;
     dummy_item.height = 0;
-    AddMenuItem(&colorwheel.base, &dummy_item, DummyFunction);
+    // Fix the AddMenuItem call to include the data parameter
+    AddMenuItem(&colorwheel.base, &dummy_item, DummyFunction, NULL);
     
     return colorwheel;
 }
@@ -232,8 +234,8 @@ void SetColorDisplayPosition(ColorWheelMenu* colorwheel, float x, float y) {
 }
 
 void UpdateColorWheelMenu(ColorWheelMenu* colorwheel) {
-    // Update the base menu
-    UpdateMenu(&colorwheel->base);
+    // Update the base menu with delta time
+    UpdateMenu(&colorwheel->base, GetFrameTime());
     
     // Update the color display position if auto-positioning is enabled
     if (colorwheel->auto_position_color_display) {
@@ -269,7 +271,7 @@ void UpdateColorWheelMenu(ColorWheelMenu* colorwheel) {
     }
     
     // Update the color display item
-    UpdateItem(&colorwheel->color_display);
+    UpdateItem(&colorwheel->color_display, GetFrameTime());
 }
 
 void DrawColorWheelMenu(const ColorWheelMenu* colorwheel) {
