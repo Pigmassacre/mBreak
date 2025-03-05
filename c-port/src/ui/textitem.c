@@ -35,7 +35,6 @@ TextItem InitTextItem(const char* string, Color color, int alpha_value, int size
     // Initialize text properties
     item.string = CopyString(string);
     item.off_string = CopyString(string);
-    item.font_path = NULL;  // Not needed since we'll use gameFont
     item.font_size = (size > 0) ? size : TEXT_ITEM_FONT_SIZE;
     item.font_color = color;
     item.selected_font_color = item.base.selected_color;
@@ -73,10 +72,6 @@ void UnloadTextItem(TextItem* item) {
         free(item->off_string);
     }
     
-    if (item->font_path) {
-        free(item->font_path);
-    }
-    
     // Note: We don't unload the font as it's managed globally
 }
 
@@ -112,24 +107,6 @@ void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state) {
     item->off_string = CopyString(off_string);
     
     // No need to create any textures, we're using direct rendering
-}
-
-void SetTextItemFont(TextItem* item, const char* font_path) {
-    // We're using the global gameFont, so this function doesn't need to do anything special
-    // We'll just update the stored path for compatibility
-    if (item->font_path) {
-        free(item->font_path);
-    }
-    item->font_path = CopyString(font_path);
-    
-    // We don't need to load a new font, just use the global one
-    item->font = gameFont;
-    
-    // Regenerate all surfaces
-    SetupTextItemSurfaces(item);
-    if (item->is_on_off) {
-        SetupTextItemIsOnOff(item, item->off_string, item->on);
-    }
 }
 
 void SetTextItemSize(TextItem* item, int font_size) {

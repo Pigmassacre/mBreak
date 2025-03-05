@@ -24,7 +24,6 @@ typedef struct TextItem {
     char* off_string;
     Font font;
     int font_size;
-    char* font_path;
     Color font_color;
     Color selected_font_color;
     Color on_font_color;
@@ -76,14 +75,6 @@ void SetupTextItemSurfaces(TextItem* item);
  * @param state The initial state (true = on, false = off).
  */
 void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state);
-
-/**
- * @brief Change the font of the TextItem.
- * 
- * @param item Pointer to the TextItem.
- * @param font_path Path to the font file.
- */
-void SetTextItemFont(TextItem* item, const char* font_path);
 
 /**
  * @brief Change the font size of the TextItem.
