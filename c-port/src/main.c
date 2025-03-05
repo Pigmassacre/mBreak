@@ -33,6 +33,7 @@ int main(void) {
     
     // Load the game font
     gameFont = LoadFont("resources/fonts/ADDLG___.TTF");
+    SetTextureFilter(gameFont.texture, TEXTURE_FILTER_POINT);  // For crisp pixel scaling
     
     // Create virtual screen (render texture) for fixed resolution gameplay
     virtualScreen = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);

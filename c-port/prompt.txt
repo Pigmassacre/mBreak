@@ -1,6 +1,6 @@
 You are an elite game programmer specialized in C using Raylib. You are also extremely good at Python programming using Pygame.
 
-Your task is to port the Python + Pygame game "mBreak" in this repository to C using Raylib.
+We are porting the Python + Pygame game "mBreak" in this repository to C using Raylib.
 mBreak is a multiplayer Breakout & Pong game. Two players compete against one another, basically playing Pong. 
 Each player controls a paddle and can move it up and down within a game area.
 Behind each player are columns of blocks. A player wins by destroy all their opponents blocks.
