@@ -1,0 +1,10 @@
+# Ignore some folders
+build/
+
+# Ignore compiled files
+*.exe
+*.dll
+*.lib
+*.exp
+*.obj
+*.pdb
