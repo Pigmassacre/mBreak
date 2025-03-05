@@ -5,12 +5,12 @@
 
 #include "ui/textitem.h"
 #include "ui/utils.h"
+#include "font.h"  // Include the font.h header for access to gameFont
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
 // Default font values
-#define TEXT_ITEM_FONT_PATH "resources/fonts/ADDLG___.TTF"
 #define TEXT_ITEM_FONT_SIZE 9
 #define TEXT_ITEM_BLINK_RATE 750.0f
 
@@ -22,7 +22,6 @@ static const Color TEXT_ITEM_SELECTED_OFF_COLOR = { 255, 0, 0, 255 };
 
 // Forward declaration of helper functions
 static char* CopyString(const char* source);
-static void RenderTextToTexture(TextItem* item, Texture2D* texture, const char* text, Color color);
 
 TextItem InitTextItem(const char* string, Color color, int alpha_value, int size) {
     TextItem item;
@@ -30,10 +29,13 @@ TextItem InitTextItem(const char* string, Color color, int alpha_value, int size
     // Initialize base item
     item.base = InitItem(color);
     
+    // Override the draw function to use DrawTextItem
+    item.base.draw = (DrawItemFunc)DrawTextItem;
+    
     // Initialize text properties
     item.string = CopyString(string);
     item.off_string = CopyString(string);
-    item.font_path = CopyString(TEXT_ITEM_FONT_PATH);
+    item.font_path = NULL;  // Not needed since we'll use gameFont
     item.font_size = (size > 0) ? size : TEXT_ITEM_FONT_SIZE;
     item.font_color = color;
     item.selected_font_color = item.base.selected_color;
@@ -52,76 +54,35 @@ TextItem InitTextItem(const char* string, Color color, int alpha_value, int size
     item.blink_rate = TEXT_ITEM_BLINK_RATE;
     item.blink_time_passed = 0.0f;
     
-    // Initialize font
-    item.font = LoadFont(item.font_path);
+    // Use the global gameFont
+    item.font = gameFont;
     
-    // Mark textures as not initialized yet
-    item.textures_initialized = false;
-    
-    // Setup the surfaces/textures for rendering
+    // Setup item dimensions based on text size
     SetupTextItemSurfaces(&item);
     
     return item;
 }
 
 void UnloadTextItem(TextItem* item) {
-    // Free allocated strings
+    // Free strings
     if (item->string) {
         free(item->string);
-        item->string = NULL;
     }
     
     if (item->off_string) {
         free(item->off_string);
-        item->off_string = NULL;
     }
     
     if (item->font_path) {
         free(item->font_path);
-        item->font_path = NULL;
     }
     
-    // Unload font
-    UnloadFont(item->font);
-    
-    // Unload textures if they were initialized
-    if (item->textures_initialized) {
-        UnloadTexture(item->surface);
-        UnloadTexture(item->selected_surface);
-        UnloadTexture(item->shadow_surface);
-        
-        if (item->is_on_off) {
-            UnloadTexture(item->on_surface);
-            UnloadTexture(item->off_surface);
-            UnloadTexture(item->selected_on_surface);
-            UnloadTexture(item->selected_off_surface);
-            UnloadTexture(item->shadow_off_surface);
-        }
-    }
+    // Note: We don't unload the font as it's managed globally
 }
 
 void SetupTextItemSurfaces(TextItem* item) {
-    // If textures were already initialized, unload them first
-    if (item->textures_initialized) {
-        UnloadTexture(item->surface);
-        UnloadTexture(item->selected_surface);
-        UnloadTexture(item->shadow_surface);
-    }
-    
-    // Render the regular text texture
-    RenderTextToTexture(item, &item->surface, item->string, item->font_color);
-    
-    // Render the selected text texture
-    RenderTextToTexture(item, &item->selected_surface, item->string, item->selected_font_color);
-    
-    // Render the shadow text texture
-    RenderTextToTexture(item, &item->shadow_surface, item->string, item->base.shadow_color);
-    
-    // Set the alpha for all textures
-    // Note: In Raylib, we would handle alpha at draw time since textures don't have alpha property
-    
-    // Mark textures as initialized
-    item->textures_initialized = true;
+    // We're not using textures anymore with our direct rendering approach
+    // Just calculate the dimensions based on the text
     
     // Update the item's width and height based on the text size
     Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
@@ -140,15 +101,6 @@ void SetupTextItemSurfaces(TextItem* item) {
 }
 
 void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state) {
-    // If textures were already initialized for on/off state, unload them first
-    if (item->textures_initialized && item->is_on_off) {
-        UnloadTexture(item->on_surface);
-        UnloadTexture(item->off_surface);
-        UnloadTexture(item->selected_on_surface);
-        UnloadTexture(item->selected_off_surface);
-        UnloadTexture(item->shadow_off_surface);
-    }
-    
     // Set the textitem to be on/off toggle
     item->is_on_off = true;
     item->on = state;
@@ -159,41 +111,24 @@ void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state) {
     }
     item->off_string = CopyString(off_string);
     
-    // Render the on text texture
-    RenderTextToTexture(item, &item->on_surface, item->string, item->on_font_color);
-    
-    // Render the off text texture
-    RenderTextToTexture(item, &item->off_surface, item->off_string, item->off_font_color);
-    
-    // Render the selected and on texture
-    RenderTextToTexture(item, &item->selected_on_surface, item->string, item->selected_on_font_color);
-    
-    // Render the selected and off texture
-    RenderTextToTexture(item, &item->selected_off_surface, item->off_string, item->selected_off_font_color);
-    
-    // Render the shadow off texture
-    RenderTextToTexture(item, &item->shadow_off_surface, item->off_string, item->base.shadow_color);
+    // No need to create any textures, we're using direct rendering
 }
 
 void SetTextItemFont(TextItem* item, const char* font_path) {
-    if (strcmp(item->font_path, font_path) != 0) {
-        // Unload the old font
-        UnloadFont(item->font);
-        
-        // Update font path
-        if (item->font_path) {
-            free(item->font_path);
-        }
-        item->font_path = CopyString(font_path);
-        
-        // Load the new font
-        item->font = LoadFont(item->font_path);
-        
-        // Regenerate all surfaces
-        SetupTextItemSurfaces(item);
-        if (item->is_on_off) {
-            SetupTextItemIsOnOff(item, item->off_string, item->on);
-        }
+    // We're using the global gameFont, so this function doesn't need to do anything special
+    // We'll just update the stored path for compatibility
+    if (item->font_path) {
+        free(item->font_path);
+    }
+    item->font_path = CopyString(font_path);
+    
+    // We don't need to load a new font, just use the global one
+    item->font = gameFont;
+    
+    // Regenerate all surfaces
+    SetupTextItemSurfaces(item);
+    if (item->is_on_off) {
+        SetupTextItemIsOnOff(item, item->off_string, item->on);
     }
 }
 
@@ -202,13 +137,8 @@ void SetTextItemSize(TextItem* item, int font_size) {
         // Update font size
         item->font_size = font_size;
         
-        // Unload the old font
-        UnloadFont(item->font);
-        
-        // Load the new font with updated size
-        item->font = LoadFont(item->font_path);
-        
-        // Regenerate all surfaces
+        // No need to reload the font, we're using the global gameFont
+        // Just update dimensions
         SetupTextItemSurfaces(item);
         if (item->is_on_off) {
             SetupTextItemIsOnOff(item, item->off_string, item->on);
@@ -292,6 +222,9 @@ void DrawTextItem(const TextItem* item) {
         return;
     }
     
+    // Calculate the position for the text to be centered on the item's position
+    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
+    
     // Alpha to use for drawing
     float alpha_ratio = (float)item->alpha_value / 255.0f;
     
@@ -301,23 +234,24 @@ void DrawTextItem(const TextItem* item) {
             // Draw shadow for "on" state
             Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                                 item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                      (Vector2){ item->base.x - text_size.x/2 + item->base.shadow_offset_x, 
+                                 item->base.y - text_size.y/2 + item->base.shadow_offset_y + item->base.y_nudge },
                       item->font_size, 1.0f, shadow_color);
         } else {
             // Draw shadow for "off" state
             Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
+            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
             DrawTextEx(item->font, item->off_string, 
-                      (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                                 item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                      (Vector2){ item->base.x - off_text_size.x/2 + item->base.shadow_offset_x, 
+                                 item->base.y - off_text_size.y/2 + item->base.shadow_offset_y + item->base.y_nudge },
                       item->font_size, 1.0f, shadow_color);
         }
     } else {
         // Draw shadow for normal state
         Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
         DrawTextEx(item->font, item->string, 
-                  (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                             item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                  (Vector2){ item->base.x - text_size.x/2 + item->base.shadow_offset_x, 
+                             item->base.y - text_size.y/2 + item->base.shadow_offset_y + item->base.y_nudge },
                   item->font_size, 1.0f, shadow_color);
     }
     
@@ -328,20 +262,21 @@ void DrawTextItem(const TextItem* item) {
                 // Draw selected "on" text
                 Color text_color = ColorAlpha(item->selected_on_font_color, alpha_ratio);
                 DrawTextEx(item->font, item->string, 
-                          (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                          (Vector2){ item->base.x - text_size.x/2, item->base.y - text_size.y/2 + item->base.y_nudge },
                           item->font_size, 1.0f, text_color);
             } else {
                 // Draw selected "off" text
                 Color text_color = ColorAlpha(item->selected_off_font_color, alpha_ratio);
+                Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
                 DrawTextEx(item->font, item->off_string, 
-                          (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                          (Vector2){ item->base.x - off_text_size.x/2, item->base.y - off_text_size.y/2 + item->base.y_nudge },
                           item->font_size, 1.0f, text_color);
             }
         } else {
             // Draw selected text
             Color text_color = ColorAlpha(item->selected_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ item->base.x - text_size.x/2, item->base.y - text_size.y/2 + item->base.y_nudge },
                       item->font_size, 1.0f, text_color);
         }
     } else if (item->is_on_off) {
@@ -349,20 +284,21 @@ void DrawTextItem(const TextItem* item) {
             // Draw "on" text
             Color text_color = ColorAlpha(item->on_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ item->base.x - text_size.x/2, item->base.y - text_size.y/2 + item->base.y_nudge },
                       item->font_size, 1.0f, text_color);
         } else {
             // Draw "off" text
             Color text_color = ColorAlpha(item->off_font_color, alpha_ratio);
+            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
             DrawTextEx(item->font, item->off_string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ item->base.x - off_text_size.x/2, item->base.y - off_text_size.y/2 + item->base.y_nudge },
                       item->font_size, 1.0f, text_color);
         }
     } else {
         // Draw normal text
         Color text_color = ColorAlpha(item->font_color, alpha_ratio);
         DrawTextEx(item->font, item->string, 
-                  (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                  (Vector2){ item->base.x - text_size.x/2, item->base.y - text_size.y/2 + item->base.y_nudge },
                   item->font_size, 1.0f, text_color);
     }
 }
@@ -425,17 +361,4 @@ static char* CopyString(const char* source) {
     }
     
     return dest;
-}
-
-// Helper function to render text to a texture
-static void RenderTextToTexture(TextItem* item, Texture2D* texture, const char* text, Color color) {
-    // In Raylib, we don't pre-render text to textures for simple cases
-    // We'll just create a placeholder texture and render the text directly in the draw function
-    // This is more efficient for text that changes frequently
-    
-    // For compatibility with the Python API, we'll create a small 1x1 texture
-    // The actual rendering will happen in the DrawTextItem function
-    Image img = GenImageColor(1, 1, color);
-    *texture = LoadTextureFromImage(img);
-    UnloadImage(img);
 } 

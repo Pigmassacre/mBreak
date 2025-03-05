@@ -8,6 +8,14 @@
 
 #include "raylib.h"
 
+// Forward declaration to resolve circular dependency
+struct Item;
+
+/**
+ * @brief Function pointer type for drawing items
+ */
+typedef void (*DrawItemFunc)(const struct Item* item);
+
 /**
  * @brief Item structure representing a basic UI element.
  * 
@@ -55,6 +63,9 @@ typedef struct Item {
     Rectangle selected_rect;
     Rectangle chosen_rect;
     Rectangle shadow_rect;
+    
+    // Function pointer for drawing - enables polymorphism
+    DrawItemFunc draw;
 } Item;
 
 /**
@@ -95,6 +106,13 @@ void UpdateItem(Item* item, float delta_time);
  * @param item Pointer to the item to draw.
  */
 void DrawItem(const Item* item);
+
+/**
+ * @brief Default drawing implementation for base items.
+ * 
+ * @param item Pointer to the item to draw.
+ */
+void DrawDefaultItem(const Item* item);
 
 /**
  * @brief Called before drawing the disabled state.

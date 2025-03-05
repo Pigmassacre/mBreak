@@ -17,7 +17,7 @@
 #define ITEM_MAX_Y_NUDGE 2
 
 Item InitItem(Color color) {
-    Item item;
+    Item item = {0};
     
     // Initialize position and size
     item.x = 0;
@@ -70,10 +70,13 @@ Item InitItem(Color color) {
     };
     item.shadow_rect = (Rectangle){ 
         item.x + item.shadow_offset_x, 
-        item.y + item.shadow_offset_y, 
+        item.y + item.shadow_offset_y,
         item.width, 
         item.height 
     };
+    
+    // Set the draw function to the default implementation
+    item.draw = DrawDefaultItem;
     
     return item;
 }
@@ -137,6 +140,15 @@ void UpdateItem(Item* item, float delta_time) {
 }
 
 void DrawItem(const Item* item) {
+    // Use the item's draw function if it has one, otherwise use default
+    if (item->draw) {
+        item->draw(item);
+    } else {
+        DrawDefaultItem(item);
+    }
+}
+
+void DrawDefaultItem(const Item* item) {
     // Draw the shadow
     DrawRectangleRec(item->shadow_rect, item->shadow_color);
     

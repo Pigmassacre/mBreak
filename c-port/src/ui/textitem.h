@@ -41,19 +41,6 @@ typedef struct TextItem {
     bool blink;
     float blink_rate;
     float blink_time_passed;
-    
-    // Surfaces (textures in Raylib)
-    Texture2D surface;
-    Texture2D selected_surface;
-    Texture2D shadow_surface;
-    Texture2D on_surface;
-    Texture2D off_surface;
-    Texture2D selected_on_surface;
-    Texture2D selected_off_surface;
-    Texture2D shadow_off_surface;
-    
-    // We need to track if textures have been initialized
-    bool textures_initialized;
 } TextItem;
 
 /**
