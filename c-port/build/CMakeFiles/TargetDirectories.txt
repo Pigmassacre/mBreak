@@ -1,5 +1,0 @@
-C:/dev/mBreak/c-port/build/CMakeFiles/mbreak.dir
-C:/dev/mBreak/c-port/build/CMakeFiles/run.dir
-C:/dev/mBreak/c-port/build/CMakeFiles/INSTALL.dir
-C:/dev/mBreak/c-port/build/CMakeFiles/ALL_BUILD.dir
-C:/dev/mBreak/c-port/build/CMakeFiles/ZERO_CHECK.dir
