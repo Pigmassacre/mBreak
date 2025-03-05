@@ -11,6 +11,9 @@ Screen ScreenGameplay;
 Screen ScreenGameOver;
 Screen ScreenOptions;
 
+// External reference to virtualScreen created in main.c
+extern RenderTexture2D virtualScreen;
+
 // External declarations for initialization functions implemented in other files
 // These functions are defined in their respective module files
 extern Screen InitSplashScreen(void);
@@ -83,7 +86,7 @@ static void LogoDraw(void) {
     const char* poweredText = "POWERED BY RAYLIB";
     Vector2 textSize = MeasureTextEx(gameFont, poweredText, 20, 1);
     DrawTextEx(gameFont, poweredText, 
-              (Vector2){GetScreenWidth()/2 - textSize.x/2, GetScreenHeight()/2}, 
+              (Vector2){GAME_WIDTH/2 - textSize.x/2, GAME_HEIGHT/2}, 
               20, 1, GRAY);
 }
 

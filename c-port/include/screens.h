@@ -3,6 +3,18 @@
 
 #include "raylib.h"
 
+// Game dimensions (fixed internal resolution)
+#define GAME_WIDTH 285
+#define GAME_HEIGHT 160
+
+// Level dimensions (from Python version)
+#define LEVEL_WIDTH 176
+#define LEVEL_HEIGHT 120
+#define LEVEL_X ((GAME_WIDTH - LEVEL_WIDTH) / 2)
+#define LEVEL_Y ((GAME_HEIGHT - LEVEL_HEIGHT) / 2)
+#define LEVEL_MAX_X (LEVEL_X + LEVEL_WIDTH)
+#define LEVEL_MAX_Y (LEVEL_Y + LEVEL_HEIGHT)
+
 // Screen type enumeration
 typedef enum GameScreen {
     LOGO = 0,
@@ -33,6 +45,9 @@ extern Screen ScreenPrepareMenu;
 extern Screen ScreenGameplay;
 extern Screen ScreenGameOver;
 extern Screen ScreenOptions;
+
+// Render texture for virtual screen (game canvas)
+extern RenderTexture2D virtualScreen;
 
 // Screen function prototypes
 void InitScreen(Screen *screen);

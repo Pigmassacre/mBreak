@@ -1,14 +1,11 @@
 #include "../include/paddle.h"
+#include "../include/screens.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 // Paddle constants
 #define PADDLE_HEIGHT 33
 #define DEFAULT_PADDLE_SPEED 350.0f
-#define GAME_AREA_TOP 50
-#define GAME_AREA_BOTTOM 550
-#define GAME_AREA_LEFT 0
-#define GAME_AREA_RIGHT 800
 
 // Create a new paddle entity
 Entity* CreatePaddle(int playerID, float x, float y, int width, float speed, Color color) {
@@ -83,12 +80,12 @@ void UpdatePaddle(Entity* entity, float deltaTime) {
         }
         
         // Keep paddle within vertical game bounds
-        if (entity->rect.y < GAME_AREA_TOP) {
-            entity->rect.y = GAME_AREA_TOP;
+        if (entity->rect.y < LEVEL_Y) {
+            entity->rect.y = LEVEL_Y;
         }
         
-        if (entity->rect.y + entity->rect.height > GAME_AREA_BOTTOM) {
-            entity->rect.y = GAME_AREA_BOTTOM - entity->rect.height;
+        if (entity->rect.y + entity->rect.height > LEVEL_MAX_Y) {
+            entity->rect.y = LEVEL_MAX_Y - entity->rect.height;
         }
     } else {
         // Horizontal movement (original Breakout style)
@@ -101,12 +98,12 @@ void UpdatePaddle(Entity* entity, float deltaTime) {
         }
         
         // Keep paddle within horizontal game bounds
-        if (entity->rect.x < GAME_AREA_LEFT) {
-            entity->rect.x = GAME_AREA_LEFT;
+        if (entity->rect.x < LEVEL_X) {
+            entity->rect.x = LEVEL_X;
         }
         
-        if (entity->rect.x + entity->rect.width > GAME_AREA_RIGHT) {
-            entity->rect.x = GAME_AREA_RIGHT - entity->rect.width;
+        if (entity->rect.x + entity->rect.width > LEVEL_MAX_X) {
+            entity->rect.x = LEVEL_MAX_X - entity->rect.width;
         }
     }
 }

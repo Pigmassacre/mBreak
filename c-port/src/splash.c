@@ -68,27 +68,27 @@ static void UpdateSplash(float deltaTime) {
 // Draw splash screen elements
 static void DrawSplash(void) {
     // Draw background
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
+    DrawRectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, BLACK);
     
     // Draw logo with fade effect
-    int fontSize = 60;
+    int fontSize = 40; // Smaller font for the smaller render target
     const char* text = "mBREAK";
     
     Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
     DrawTextEx(gameFont, text, 
-             (Vector2){GetScreenWidth()/2 - textSize.x/2, 
-             GetScreenHeight()/2 - fontSize/2}, 
+             (Vector2){GAME_WIDTH/2 - textSize.x/2, 
+             GAME_HEIGHT/2 - fontSize/2}, 
              fontSize, 
              1,
              ColorAlpha(BLUE, splashState.alpha));
     
     // Draw raylib logo
     const char* raylibText = "Powered by raylib";
-    fontSize = 20;
+    fontSize = 14; // Smaller font for the smaller render target
     textSize = MeasureTextEx(gameFont, raylibText, fontSize, 1);
     DrawTextEx(gameFont, raylibText, 
-             (Vector2){GetScreenWidth()/2 - textSize.x/2, 
-             GetScreenHeight()/2 + 60}, 
+             (Vector2){GAME_WIDTH/2 - textSize.x/2, 
+             GAME_HEIGHT/2 + 40}, 
              fontSize, 
              1,
              ColorAlpha(GRAY, splashState.alpha));

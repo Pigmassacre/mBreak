@@ -17,16 +17,10 @@
 #define BLOCK_WIDTH 32
 #define BLOCK_HEIGHT 32
 #define BLOCK_PADDING 0
-#define GAME_AREA_TOP 50
-#define GAME_AREA_BOTTOM 550
-#define GAME_AREA_LEFT 0
-#define GAME_AREA_RIGHT 800
-
-// Game area constants
-#define LEVEL_WIDTH 800
-#define LEVEL_HEIGHT 500
-#define LEVEL_X 0
-#define LEVEL_Y 50
+#define GAME_AREA_TOP LEVEL_Y
+#define GAME_AREA_BOTTOM LEVEL_MAX_Y
+#define GAME_AREA_LEFT LEVEL_X
+#define GAME_AREA_RIGHT LEVEL_MAX_X
 
 // Gameplay screen state
 typedef struct GameplayState {
@@ -88,55 +82,35 @@ static void InitGameplay(void) {
     
     // Create paddles for both players
     // Player 1 paddle on the left side
-    float leftPaddleX = BLOCK_WIDTH * BLOCKS_COLUMNS + PADDLE_WIDTH * 3;
+    float leftPaddleX = LEVEL_X + BLOCK_WIDTH * BLOCKS_COLUMNS + PADDLE_WIDTH * 3;
     float leftPaddleY = LEVEL_Y + (LEVEL_HEIGHT - PADDLE_HEIGHT) / 2.0f;
     gameState.player1Paddle = CreatePaddle(1, leftPaddleX, leftPaddleY, PADDLE_WIDTH, PADDLE_SPEED, BLUE);
     
     // Player 2 paddle on the right side
-    float rightPaddleX = LEVEL_WIDTH - (BLOCK_WIDTH * BLOCKS_COLUMNS) - PADDLE_WIDTH * 4;
+    float rightPaddleX = LEVEL_MAX_X - (BLOCK_WIDTH * BLOCKS_COLUMNS) - PADDLE_WIDTH * 4;
     float rightPaddleY = LEVEL_Y + (LEVEL_HEIGHT - PADDLE_HEIGHT) / 2.0f;
     gameState.player2Paddle = CreatePaddle(2, rightPaddleX, rightPaddleY, PADDLE_WIDTH, PADDLE_SPEED, RED);
     
     // Update paddle controls for vertical movement (overriding left/right keys)
     PaddleData* p1Data = (PaddleData*)gameState.player1Paddle->data;
-    if (p1Data) {
-        p1Data->upKey = KEY_W;
-        p1Data->downKey = KEY_S;
-    }
+    p1Data->upKey = KEY_W;
+    p1Data->downKey = KEY_S;
+    p1Data->moveVertical = true;
     
     PaddleData* p2Data = (PaddleData*)gameState.player2Paddle->data;
-    if (p2Data) {
-        p2Data->upKey = KEY_UP;
-        p2Data->downKey = KEY_DOWN;
-    }
+    p2Data->upKey = KEY_UP;
+    p2Data->downKey = KEY_DOWN;
+    p2Data->moveVertical = true;
     
     // Add paddles to group
     AddEntityToGroup(&gameState.paddleGroup, gameState.player1Paddle);
     AddEntityToGroup(&gameState.paddleGroup, gameState.player2Paddle);
     
-    // Create ball
-    float ballX = LEVEL_WIDTH / 2.0f;
-    float ballY = LEVEL_Y + LEVEL_HEIGHT / 2.0f;
-    gameState.mainBall = CreateBall(ballX, ballY, 8, 300, WHITE);
-    AddEntityToGroup(&gameState.ballGroup, gameState.mainBall);
-    
-    // Randomly determine initial direction
-    float initialAngle;
-    if (GetRandomValue(0, 1) == 0) {
-        // Right direction with small variation
-        initialAngle = GetRandomValue(-15, 15) * DEG2RAD;
-    } else {
-        // Left direction with small variation
-        initialAngle = PI + GetRandomValue(-15, 15) * DEG2RAD;
-    }
-    
-    // Launch the ball in the initial direction
-    LaunchBall(gameState.mainBall, initialAngle);
-    
-    // Create blocks for both players
+    // Create the blocks
     CreateBlocks();
     
-    printf("Gameplay screen initialized with mBreak two-player layout\n");
+    // Create the initial ball
+    ResetBall();
 }
 
 // Update gameplay logic
@@ -213,24 +187,24 @@ static void DrawGameplay(void) {
     
     // Draw additional messages based on game state
     if (gameState.paused) {
-        DrawTextEx(gameFont, "PAUSED", (Vector2){GetScreenWidth()/2 - 70, GetScreenHeight()/2}, 40, 1, WHITE);
-        DrawTextEx(gameFont, "Press P to resume", (Vector2){GetScreenWidth()/2 - 120, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
+        DrawTextEx(gameFont, "PAUSED", (Vector2){GAME_WIDTH/2 - 50, GAME_HEIGHT/2}, 30, 1, WHITE);
+        DrawTextEx(gameFont, "Press P to resume", (Vector2){GAME_WIDTH/2 - 120, GAME_HEIGHT/2 + 50}, 20, 1, GRAY);
     }
     
     if (gameState.gameOver) {
-        DrawTextEx(gameFont, "GAME OVER", (Vector2){GetScreenWidth()/2 - 100, GetScreenHeight()/2 - 40}, 40, 1, YELLOW);
+        DrawTextEx(gameFont, "GAME OVER", (Vector2){GAME_WIDTH/2 - 100, GAME_HEIGHT/2 - 40}, 40, 1, YELLOW);
         DrawTextEx(gameFont, TextFormat("PLAYER %d WINS!", gameState.winner), 
-                (Vector2){GetScreenWidth()/2 - 120, GetScreenHeight()/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
+                (Vector2){GAME_WIDTH/2 - 120, GAME_HEIGHT/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
         DrawTextEx(gameFont, "Press ENTER to return to menu", 
-                (Vector2){GetScreenWidth()/2 - 180, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
+                (Vector2){GAME_WIDTH/2 - 180, GAME_HEIGHT/2 + 50}, 20, 1, GRAY);
     }
     
     if (gameState.roundComplete) {
-        DrawTextEx(gameFont, "ROUND COMPLETE!", (Vector2){GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 40}, 40, 1, GREEN);
+        DrawTextEx(gameFont, "ROUND COMPLETE!", (Vector2){GAME_WIDTH/2 - 150, GAME_HEIGHT/2 - 40}, 40, 1, GREEN);
         DrawTextEx(gameFont, TextFormat("PLAYER %d WINS THIS ROUND", gameState.winner), 
-                (Vector2){GetScreenWidth()/2 - 180, GetScreenHeight()/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
+                (Vector2){GAME_WIDTH/2 - 180, GAME_HEIGHT/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
         DrawTextEx(gameFont, "Press ENTER to continue", 
-                (Vector2){GetScreenWidth()/2 - 150, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
+                (Vector2){GAME_WIDTH/2 - 150, GAME_HEIGHT/2 + 50}, 20, 1, GRAY);
     }
 }
 
@@ -261,29 +235,32 @@ static GameScreen GetNextGameplayScreen(void) {
     return MAIN_MENU;  // Default fallback
 }
 
-// Reset the ball position
+// Reset the ball to the center and give it a random direction
 static void ResetBall(void) {
-    if (!gameState.mainBall) return;
-    
-    // Reset ball position to the center
-    BallData* ballData = (BallData*)gameState.mainBall->data;
-    if (ballData) {
-        ballData->position.x = LEVEL_WIDTH / 2.0f;
-        ballData->position.y = LEVEL_Y + LEVEL_HEIGHT / 2.0f;
-        gameState.mainBall->rect.x = ballData->position.x - ballData->radius;
-        gameState.mainBall->rect.y = ballData->position.y - ballData->radius;
-        
-        // Random initial direction
-        float initialAngle;
-        if (GetRandomValue(0, 1) == 0) {
-            initialAngle = GetRandomValue(-15, 15) * DEG2RAD;
-        } else {
-            initialAngle = PI + GetRandomValue(-15, 15) * DEG2RAD;
-        }
-        
-        // Launch the ball
-        LaunchBall(gameState.mainBall, initialAngle);
+    // If a ball already exists, remove it
+    if (gameState.mainBall) {
+        RemoveEntityFromGroup(&gameState.ballGroup, gameState.mainBall);
+        DestroyEntity(gameState.mainBall);
     }
+    
+    // Create a new ball in the center of the level
+    float ballX = LEVEL_X + LEVEL_WIDTH / 2.0f;
+    float ballY = LEVEL_Y + LEVEL_HEIGHT / 2.0f;
+    gameState.mainBall = CreateBall(ballX, ballY, 8, 300, WHITE);
+    AddEntityToGroup(&gameState.ballGroup, gameState.mainBall);
+    
+    // Randomly determine initial direction
+    float initialAngle;
+    if (GetRandomValue(0, 1) == 0) {
+        // Right direction with small variation
+        initialAngle = GetRandomValue(-15, 15) * DEG2RAD;
+    } else {
+        // Left direction with small variation
+        initialAngle = PI + GetRandomValue(-15, 15) * DEG2RAD;
+    }
+    
+    // Launch the ball in the initial direction
+    LaunchBall(gameState.mainBall, initialAngle);
 }
 
 // Create the blocks for both players
@@ -342,7 +319,7 @@ static void CreateBlocks(void) {
                 blockType = BLOCK_NORMAL; // Using normal instead of weak for now
             }
             
-            float x = LEVEL_WIDTH - (BLOCK_WIDTH * (column + 1));
+            float x = LEVEL_MAX_X - (BLOCK_WIDTH * (column + 1));
             float y = LEVEL_Y + (BLOCK_HEIGHT * row);
             
             Entity* block = CreateBlock(x, y, BLOCK_WIDTH, BLOCK_HEIGHT, blockType, player2Color);

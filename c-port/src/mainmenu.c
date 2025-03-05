@@ -87,58 +87,45 @@ static void InitMainMenu(void) {
     // Set initial logo position (off-screen top)
     int logoWidth = menuState.logoFrames[0].texture.width;
     int logoHeight = menuState.logoFrames[0].texture.height;
-    menuState.logoPosition = (Vector2){ (GetScreenWidth() - logoWidth * 2) / 2, -logoHeight * 2 };
+    menuState.logoPosition = (Vector2){ (GAME_WIDTH - logoWidth * 2) / 2, -logoHeight * 2 };
     
     // Set desired logo position (top quarter of screen)
     menuState.logoDesiredPosition = (Vector2){ 
-        (GetScreenWidth() - logoWidth * 2) / 2,
-        (GetScreenHeight() - logoHeight * 2) / 4
+        (GAME_WIDTH - logoWidth * 2) / 2,
+        (GAME_HEIGHT - logoHeight * 2) / 4
     };
     
     // Set logo transition speed
     menuState.logoTransitionSpeed = 120 * 60 / 1000.0f; // Convert from pixels/second to pixels/frame at 60fps
     
-    // Initialize menu visibility (hidden until logo is in position)
+    // Menu is initially hidden
     menuState.menuVisible = false;
-    
-    // Set up menu positions
-    SetupMenuTransition();
     
     printf("Main menu initialized\n");
 }
 
 // Set up menu item positions and transitions
 static void SetupMenuTransition(void) {
-    float menuCenterX = GetScreenWidth() / 2.0f;
-    float menuCenterY = GetScreenHeight() / 2.0f;
+    // Calculate menu positions
+    float menuStartY = GAME_HEIGHT / 2;
+    float menuSpacing = 40;
     
-    // Set desired positions (centered)
+    // Set target positions
     for (int i = 0; i < MENU_COUNT; i++) {
-        const char* optionText;
-        switch (i) {
-            case MENU_PLAY: optionText = "Start"; break;
-            case MENU_OPTIONS: optionText = "Options"; break;
-            case MENU_HELP: optionText = "Help"; break;
-            case MENU_EXIT: optionText = "Quit"; break;
-            default: optionText = ""; break;
-        }
-        
-        float fontSize = 30;
-        float itemHeight = fontSize + 20;
-        float textWidth = MeasureTextEx(gameFont, optionText, fontSize, 1).x;
-        
-        // Position items in a vertical list centered on screen
         menuState.menuItemDesiredPositions[i] = (Vector2){
-            menuCenterX - textWidth / 2,
-            menuCenterY + (itemHeight * 2.0f) * i - ((MENU_COUNT-1) * itemHeight)
+            GAME_WIDTH / 2,
+            menuStartY + i * menuSpacing
         };
         
-        // Set initial positions (off screen to the right)
+        // Start positions (off-screen to the right)
         menuState.menuItemPositions[i] = (Vector2){
-            GetScreenWidth(),
+            GAME_WIDTH + 100,
             menuState.menuItemDesiredPositions[i].y
         };
     }
+    
+    // Make menu visible
+    menuState.menuVisible = true;
 }
 
 // Update main menu logic
@@ -239,7 +226,7 @@ static void UpdateMainMenu(float deltaTime) {
                 default: optionText = ""; break;
             }
             
-            float fontSize = 30;
+            float fontSize = 20; // Smaller font size for smaller screen resolution
             Vector2 position = menuState.menuItemPositions[i];
             Rectangle bounds = (Rectangle){
                 position.x - 10,
@@ -314,7 +301,7 @@ static void MoveItemToPosition(Vector2* itemPos, Vector2 desiredPos, float speed
 // Draw main menu elements
 static void DrawMainMenu(void) {
     // Draw background
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
+    DrawRectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, BLACK);
     
     // Draw the animated logo (scaled 2x like in Python)
     int logoWidth = menuState.logoFrames[menuState.currentLogoFrame].texture.width;
@@ -335,7 +322,7 @@ static void DrawMainMenu(void) {
                 default: optionText = ""; break;
             }
             
-            float fontSize = 30;
+            float fontSize = 20; // Smaller font size for smaller screen resolution
             Vector2 position = menuState.menuItemPositions[i];
             
             // Draw selected option with highlight effect
@@ -345,27 +332,30 @@ static void DrawMainMenu(void) {
                 // Calculate bounds using MeasureTextEx for custom font
                 Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
                 Rectangle bounds = (Rectangle){
-                    position.x - 10,
+                    position.x - textSize.x/2 - 10,
                     position.y - 10,
                     textSize.x + 20,
                     fontSize + 20
                 };
                 
                 // Draw shadow (offset slightly down)
-                DrawTextEx(gameFont, optionText, (Vector2){position.x, position.y + 1}, fontSize, 1, DARKGRAY);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y + 1}, fontSize, 1, DARKGRAY);
                 
                 // Draw item highlight
                 DrawRectangleRec(bounds, ColorAlpha(GRAY, 0.3f));
                 DrawRectangleLinesEx(bounds, 2, highlightColor);
                 
                 // Draw text
-                DrawTextEx(gameFont, optionText, position, fontSize, 1, WHITE);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y}, fontSize, 1, WHITE);
             } else {
+                // Calculate text size for centering
+                Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
+                
                 // Draw shadow
-                DrawTextEx(gameFont, optionText, (Vector2){position.x, position.y + 1}, fontSize, 1, DARKGRAY);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y + 1}, fontSize, 1, DARKGRAY);
                 
                 // Draw text
-                DrawTextEx(gameFont, optionText, position, fontSize, 1, LIGHTGRAY);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x - textSize.x/2, position.y}, fontSize, 1, LIGHTGRAY);
             }
         }
     }
@@ -391,7 +381,7 @@ static Rectangle GetMenuOptionBounds(const char* text, float y, float fontSize) 
     Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
     float width = textSize.x + 40;
     float height = fontSize + 20;
-    float x = GetScreenWidth()/2 - width/2;
+    float x = GAME_WIDTH/2 - width/2;
     
     return (Rectangle){ x, y - 10, width, height };
 }

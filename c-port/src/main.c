@@ -3,25 +3,40 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// Default window dimensions (will be configurable later)
-#define DEFAULT_SCREEN_WIDTH 285
-#define DEFAULT_SCREEN_HEIGHT 160
+// Game internal resolution (from Python version)
+#define GAME_WIDTH 285
+#define GAME_HEIGHT 160
+
+// Default window dimensions (can be changed by user)
+#define DEFAULT_SCREEN_WIDTH 855
+#define DEFAULT_SCREEN_HEIGHT 480
 #define GAME_TITLE "mBreak"
 
-// Global font variables
+// Global font variable
 Font gameFont;
+
+// Global virtual screen (render texture)
+RenderTexture2D virtualScreen;
 
 // Main entry point
 int main(void) {
-    // Initialize window and core systems
+    // Initialize window with resizing support
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, GAME_TITLE);
     InitAudioDevice();
+    
+    // Set minimum window size
+    SetWindowMinSize(GAME_WIDTH, GAME_HEIGHT);
     
     // Set target FPS (60 by default)
     SetTargetFPS(60);
     
     // Load the game font
     gameFont = LoadFont("resources/fonts/ADDLG___.TTF");
+    
+    // Create virtual screen (render texture) for fixed resolution gameplay
+    virtualScreen = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
+    SetTextureFilter(virtualScreen.texture, TEXTURE_FILTER_POINT);  // For crisp pixel scaling
     
     // Initialize timing variables for delta time calculation
     double previousTime = GetTime();
@@ -91,11 +106,37 @@ int main(void) {
             InitScreen(currentScreen);
         }
         
-        // Draw current screen
+        // Draw to virtual screen (fixed game resolution)
+        BeginTextureMode(virtualScreen);
+            ClearBackground(BLACK);
+            DrawScreen(currentScreen);
+        EndTextureMode();
+        
+        // Draw actual window (scaled)
         BeginDrawing();
             ClearBackground(BLACK);
             
-            DrawScreen(currentScreen);
+            // Calculate scaling to maintain aspect ratio
+            float scale = min(
+                (float)GetScreenWidth() / GAME_WIDTH,
+                (float)GetScreenHeight() / GAME_HEIGHT
+            );
+            
+            // Calculate centered position
+            int scaledWidth = (int)(GAME_WIDTH * scale);
+            int scaledHeight = (int)(GAME_HEIGHT * scale);
+            int posX = (GetScreenWidth() - scaledWidth) / 2;
+            int posY = (GetScreenHeight() - scaledHeight) / 2;
+            
+            // Draw the scaled texture
+            DrawTexturePro(
+                virtualScreen.texture,
+                (Rectangle){ 0, 0, (float)GAME_WIDTH, (float)-GAME_HEIGHT },
+                (Rectangle){ (float)posX, (float)posY, (float)scaledWidth, (float)scaledHeight },
+                (Vector2){ 0, 0 },
+                0.0f,
+                WHITE
+            );
             
             // Display FPS for debugging (will be configurable later)
             DrawFPS(10, 10);
@@ -112,7 +153,8 @@ int main(void) {
     UnloadScreen(&ScreenGameOver);
     UnloadScreen(&ScreenOptions);
     
-    // Unload the font
+    // Unload the virtual screen and font
+    UnloadRenderTexture(virtualScreen);
     UnloadFont(gameFont);
     
     // Cleanup and close resources
