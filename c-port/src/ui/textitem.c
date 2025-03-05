@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 // Default font values
 #define TEXT_ITEM_FONT_SIZE 9
@@ -192,7 +193,6 @@ bool ToggleTextItemOnOff(TextItem* item) {
     item->on = !item->on;
     return item->on;
 }
-
 void DrawTextItem(const TextItem* item) {
     // Skip drawing if alpha is 0
     if (item->alpha_value == 0) {
@@ -211,24 +211,24 @@ void DrawTextItem(const TextItem* item) {
             // Draw shadow for "on" state
             Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                                 item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                      (Vector2){ floorf(item->base.x + item->base.shadow_offset_x), 
+                                floorf(item->base.y + item->base.shadow_offset_y + item->base.y_nudge) },
                       item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
         } else {
             // Draw shadow for "off" state
             Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
             Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);  // 0 spacing for bitmap font
             DrawTextEx(item->font, item->off_string, 
-                      (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                                 item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                      (Vector2){ floorf(item->base.x + item->base.shadow_offset_x), 
+                                floorf(item->base.y + item->base.shadow_offset_y + item->base.y_nudge) },
                       item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
         }
     } else {
         // Draw shadow for normal state
         Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
         DrawTextEx(item->font, item->string, 
-                  (Vector2){ item->base.x + item->base.shadow_offset_x, 
-                             item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
+                  (Vector2){ floorf(item->base.x + item->base.shadow_offset_x), 
+                            floorf(item->base.y + item->base.shadow_offset_y + item->base.y_nudge) },
                   item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
     }
     
@@ -239,21 +239,21 @@ void DrawTextItem(const TextItem* item) {
                 // Draw selected "on" text
                 Color text_color = ColorAlpha(item->selected_on_font_color, alpha_ratio);
                 DrawTextEx(item->font, item->string, 
-                          (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                          (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                           item->font_size, 0.0f, text_color);
             } else {
                 // Draw selected "off" text
                 Color text_color = ColorAlpha(item->selected_off_font_color, alpha_ratio);
                 Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);
                 DrawTextEx(item->font, item->off_string, 
-                          (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                          (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                           item->font_size, 0.0f, text_color);
             }
         } else {
             // Draw selected text
             Color text_color = ColorAlpha(item->selected_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                       item->font_size, 0.0f, text_color);
         }
     } else if (item->is_on_off) {
@@ -261,21 +261,21 @@ void DrawTextItem(const TextItem* item) {
             // Draw "on" text
             Color text_color = ColorAlpha(item->on_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                       item->font_size, 0.0f, text_color);
         } else {
             // Draw "off" text
             Color text_color = ColorAlpha(item->off_font_color, alpha_ratio);
             Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);
             DrawTextEx(item->font, item->off_string, 
-                      (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                      (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                       item->font_size, 0.0f, text_color);
         }
     } else {
         // Draw normal text
         Color text_color = ColorAlpha(item->font_color, alpha_ratio);
         DrawTextEx(item->font, item->string, 
-                  (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
+                  (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                   item->font_size, 0.0f, text_color);
     }
 }

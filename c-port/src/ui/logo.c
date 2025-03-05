@@ -5,6 +5,7 @@
 
 #include "ui/logo.h"
 #include <stdlib.h>
+#include <math.h>  // For floorf
 
 // Default scale for the logo
 #define LOGO_DEFAULT_SCALE 2.0f
@@ -64,6 +65,9 @@ Logo InitLogo(void) {
     for (int i = 0; i < logo.frame_count; i++) {
         logo.frames[i].texture = LoadTexture(LOGO_FRAMES[i].path);
         logo.frames[i].duration = LOGO_FRAMES[i].duration;
+        
+        // Set texture filter to point (nearest-neighbor) for pixel-perfect rendering
+        SetTextureFilter(logo.frames[i].texture, TEXTURE_FILTER_POINT);
         
         // Update maximum dimensions
         if (logo.frames[i].texture.width > logo.max_width) {
@@ -134,12 +138,22 @@ void DrawLogo(const Logo* logo) {
     // Get the current frame texture
     Texture2D texture = logo->frames[logo->current_frame].texture;
     
-    // Calculate the scaled dimensions
-    float width = (float)texture.width * logo->scale;
-    float height = (float)texture.height * logo->scale;
+    // Define source and destination rectangles for pixel-perfect rendering
+    Rectangle source = { 
+        0.0f, 
+        0.0f, 
+        (float)texture.width, 
+        (float)texture.height 
+    };
     
-    // Draw the texture with scaling
-    Rectangle source = { 0, 0, (float)texture.width, (float)texture.height };
-    Rectangle dest = { logo->x, logo->y, width, height };
+    // Ensure we're drawing at integer pixel positions to avoid sub-pixel rendering issues
+    Rectangle dest = { 
+        floorf(logo->x), 
+        floorf(logo->y), 
+        (float)texture.width * logo->scale, 
+        (float)texture.height * logo->scale
+    };
+    
+    // Draw using DrawTexturePro for more precise rendering control
     DrawTexturePro(texture, source, dest, (Vector2){ 0, 0 }, 0, WHITE);
 } 
