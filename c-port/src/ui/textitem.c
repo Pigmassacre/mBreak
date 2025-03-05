@@ -80,7 +80,7 @@ void SetupTextItemSurfaces(TextItem* item) {
     // Just calculate the dimensions based on the text
     
     // Update the item's width and height based on the text size
-    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 0.0f);  // 0 spacing for bitmap font
     item->base.width = text_size.x;
     item->base.height = text_size.y;
     
@@ -156,12 +156,12 @@ void SetTextItemColor(TextItem* item, Color color) {
 }
 
 float GetTextItemWidth(const TextItem* item) {
-    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 0.0f);  // 0 spacing for bitmap font
     return text_size.x;
 }
 
 float GetTextItemHeight(const TextItem* item) {
-    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 0.0f);  // 0 spacing for bitmap font
     return text_size.y;
 }
 
@@ -200,7 +200,7 @@ void DrawTextItem(const TextItem* item) {
     }
     
     // Calculate the position for the text to be centered on the item's position
-    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(item->font, item->string, item->font_size, 0.0f);  // 0 spacing for bitmap font
     
     // Alpha to use for drawing
     float alpha_ratio = (float)item->alpha_value / 255.0f;
@@ -213,15 +213,15 @@ void DrawTextItem(const TextItem* item) {
             DrawTextEx(item->font, item->string, 
                       (Vector2){ item->base.x + item->base.shadow_offset_x, 
                                  item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
-                      item->font_size, 1.0f, shadow_color);
+                      item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
         } else {
             // Draw shadow for "off" state
             Color shadow_color = ColorAlpha(item->base.shadow_color, alpha_ratio);
-            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
+            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);  // 0 spacing for bitmap font
             DrawTextEx(item->font, item->off_string, 
                       (Vector2){ item->base.x + item->base.shadow_offset_x, 
                                  item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
-                      item->font_size, 1.0f, shadow_color);
+                      item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
         }
     } else {
         // Draw shadow for normal state
@@ -229,7 +229,7 @@ void DrawTextItem(const TextItem* item) {
         DrawTextEx(item->font, item->string, 
                   (Vector2){ item->base.x + item->base.shadow_offset_x, 
                              item->base.y + item->base.shadow_offset_y + item->base.y_nudge },
-                  item->font_size, 1.0f, shadow_color);
+                  item->font_size, 0.0f, shadow_color);  // 0 spacing for bitmap font
     }
     
     // Then draw the text
@@ -240,21 +240,21 @@ void DrawTextItem(const TextItem* item) {
                 Color text_color = ColorAlpha(item->selected_on_font_color, alpha_ratio);
                 DrawTextEx(item->font, item->string, 
                           (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                          item->font_size, 1.0f, text_color);
+                          item->font_size, 0.0f, text_color);
             } else {
                 // Draw selected "off" text
                 Color text_color = ColorAlpha(item->selected_off_font_color, alpha_ratio);
-                Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
+                Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);
                 DrawTextEx(item->font, item->off_string, 
                           (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                          item->font_size, 1.0f, text_color);
+                          item->font_size, 0.0f, text_color);
             }
         } else {
             // Draw selected text
             Color text_color = ColorAlpha(item->selected_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
                       (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                      item->font_size, 1.0f, text_color);
+                      item->font_size, 0.0f, text_color);
         }
     } else if (item->is_on_off) {
         if (item->on) {
@@ -262,21 +262,21 @@ void DrawTextItem(const TextItem* item) {
             Color text_color = ColorAlpha(item->on_font_color, alpha_ratio);
             DrawTextEx(item->font, item->string, 
                       (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                      item->font_size, 1.0f, text_color);
+                      item->font_size, 0.0f, text_color);
         } else {
             // Draw "off" text
             Color text_color = ColorAlpha(item->off_font_color, alpha_ratio);
-            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 1.0f);
+            Vector2 off_text_size = MeasureTextEx(item->font, item->off_string, item->font_size, 0.0f);
             DrawTextEx(item->font, item->off_string, 
                       (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                      item->font_size, 1.0f, text_color);
+                      item->font_size, 0.0f, text_color);
         }
     } else {
         // Draw normal text
         Color text_color = ColorAlpha(item->font_color, alpha_ratio);
         DrawTextEx(item->font, item->string, 
                   (Vector2){ item->base.x, item->base.y + item->base.y_nudge },
-                  item->font_size, 1.0f, text_color);
+                  item->font_size, 0.0f, text_color);
     }
 }
 

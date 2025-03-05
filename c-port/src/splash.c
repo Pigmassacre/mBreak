@@ -74,23 +74,23 @@ static void DrawSplash(void) {
     int fontSize = 40; // Smaller font for the smaller render target
     const char* text = "mBREAK";
     
-    Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
+    Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 0);  // 0 spacing for bitmap font
     DrawTextEx(gameFont, text, 
              (Vector2){GAME_WIDTH/2 - textSize.x/2, 
              GAME_HEIGHT/2 - fontSize/2}, 
              fontSize, 
-             1,
+             0,  // 0 spacing for bitmap font
              ColorAlpha(BLUE, splashState.alpha));
     
     // Draw raylib logo
     const char* raylibText = "Powered by raylib";
     fontSize = 14; // Smaller font for the smaller render target
-    textSize = MeasureTextEx(gameFont, raylibText, fontSize, 1);
+    textSize = MeasureTextEx(gameFont, raylibText, fontSize, 0);  // 0 spacing for bitmap font
     DrawTextEx(gameFont, raylibText, 
              (Vector2){GAME_WIDTH/2 - textSize.x/2, 
              GAME_HEIGHT/2 + 40}, 
              fontSize, 
-             1,
+             0,  // 0 spacing for bitmap font
              ColorAlpha(GRAY, splashState.alpha));
 }
 
