@@ -8,7 +8,7 @@
 #include <math.h>  // For floorf
 
 // Default scale for the logo
-#define LOGO_DEFAULT_SCALE 2.0f
+#define LOGO_DEFAULT_SCALE 3.0f
 
 // Animation frame definitions
 typedef struct {

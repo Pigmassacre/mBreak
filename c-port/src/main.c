@@ -3,10 +3,6 @@
 #include "raylib.h"
 #include <stdlib.h>
 
-// Game internal resolution (from Python version)
-#define GAME_WIDTH 285
-#define GAME_HEIGHT 160
-
 // Default window dimensions (can be changed by user)
 #define DEFAULT_SCREEN_WIDTH 855
 #define DEFAULT_SCREEN_HEIGHT 480

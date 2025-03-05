@@ -4,8 +4,8 @@
 #include "raylib.h"
 
 // Game dimensions (fixed internal resolution)
-#define GAME_WIDTH 285
-#define GAME_HEIGHT 160
+#define GAME_WIDTH 570
+#define GAME_HEIGHT 320
 
 // Level dimensions (from Python version)
 #define LEVEL_WIDTH 176

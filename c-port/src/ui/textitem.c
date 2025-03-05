@@ -12,7 +12,7 @@
 #include <math.h>
 
 // Default font values
-#define TEXT_ITEM_FONT_SIZE 9
+#define TEXT_ITEM_FONT_SIZE 16
 #define TEXT_ITEM_BLINK_RATE 750.0f
 
 // Default colors
@@ -278,6 +278,8 @@ void DrawTextItem(const TextItem* item) {
                   (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                   item->font_size, 0.0f, text_color);
     }
+
+    DrawTextEx(item->font, item->string, (Vector2){ floorf(item->base.x + item->base.shadow_offset_x), floorf(item->base.y + item->base.shadow_offset_y + item->base.y_nudge) }, 32, 0.0f, WHITE);
 }
 
 TextItem** GenerateListFromString(const char* string, int* count) {
