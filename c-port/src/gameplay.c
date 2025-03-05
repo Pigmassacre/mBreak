@@ -3,19 +3,30 @@
 #include "../include/paddle.h"
 #include "../include/ball.h"
 #include "../include/block.h"
+#include "../include/font.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 // Game constants
-#define PLAYER_PADDLE_WIDTH 120
-#define PLAYER_PADDLE_SPEED 400.0f
-#define BLOCKS_ROWS 5
-#define BLOCKS_COLUMNS 10
-#define BLOCK_WIDTH 70
-#define BLOCK_HEIGHT 30
-#define BLOCK_PADDING 5
+#define PADDLE_WIDTH 22
+#define PADDLE_HEIGHT 33
+#define PADDLE_SPEED 350.0f
+#define BLOCKS_ROWS 7
+#define BLOCKS_COLUMNS 3
+#define BLOCK_WIDTH 32
+#define BLOCK_HEIGHT 32
+#define BLOCK_PADDING 0
 #define GAME_AREA_TOP 50
-#define DEFAULT_LIVES 3
+#define GAME_AREA_BOTTOM 550
+#define GAME_AREA_LEFT 0
+#define GAME_AREA_RIGHT 800
+
+// Game area constants
+#define LEVEL_WIDTH 800
+#define LEVEL_HEIGHT 500
+#define LEVEL_X 0
+#define LEVEL_Y 50
 
 // Gameplay screen state
 typedef struct GameplayState {
@@ -23,17 +34,22 @@ typedef struct GameplayState {
     EntityGroup paddleGroup;    // Group for paddle entities
     EntityGroup ballGroup;      // Group for ball entities
     EntityGroup blockGroup;     // Group for block entities
+    EntityGroup player1BlockGroup; // Group for player 1's blocks
+    EntityGroup player2BlockGroup; // Group for player 2's blocks
     
-    Entity* playerPaddle;       // Player paddle reference
+    Entity* player1Paddle;      // Player 1 paddle reference
+    Entity* player2Paddle;      // Player 2 paddle reference
     Entity* mainBall;           // Main ball reference
     
-    int score;                  // Current score
-    int lives;                  // Remaining lives
-    int blockCount;             // Number of blocks remaining
+    int player1Score;           // Player 1 score
+    int player2Score;           // Player 2 score
+    int player1BlockCount;      // Number of player 1's blocks remaining
+    int player2BlockCount;      // Number of player 2's blocks remaining
     
     bool gameOver;              // Whether game is over
-    bool levelComplete;         // Whether level is complete
+    bool roundComplete;         // Whether round is complete
     bool paused;                // Whether game is paused
+    int winner;                 // Winner of the round (1 or 2)
 } GameplayState;
 
 // Static game state
@@ -56,42 +72,77 @@ static void InitGameplay(void) {
     InitEntityPool(&gameState.entityPool);
     InitEntityGroup(&gameState.paddleGroup, 5);
     InitEntityGroup(&gameState.ballGroup, 10);
-    InitEntityGroup(&gameState.blockGroup, BLOCKS_ROWS * BLOCKS_COLUMNS);
+    InitEntityGroup(&gameState.blockGroup, BLOCKS_ROWS * BLOCKS_COLUMNS * 2);
+    InitEntityGroup(&gameState.player1BlockGroup, BLOCKS_ROWS * BLOCKS_COLUMNS);
+    InitEntityGroup(&gameState.player2BlockGroup, BLOCKS_ROWS * BLOCKS_COLUMNS);
     
     // Initialize game state
-    gameState.score = 0;
-    gameState.lives = DEFAULT_LIVES;
-    gameState.blockCount = 0;
+    gameState.player1Score = 0;
+    gameState.player2Score = 0;
+    gameState.player1BlockCount = 0;
+    gameState.player2BlockCount = 0;
     gameState.gameOver = false;
-    gameState.levelComplete = false;
+    gameState.roundComplete = false;
     gameState.paused = false;
+    gameState.winner = 0;
     
-    // Create player paddle at bottom of screen
-    float paddleX = GetScreenWidth()/2 - PLAYER_PADDLE_WIDTH/2;
-    float paddleY = GetScreenHeight() - 40;
-    gameState.playerPaddle = CreatePaddle(1, paddleX, paddleY, PLAYER_PADDLE_WIDTH, 
-                                         PLAYER_PADDLE_SPEED, BLUE);
-    AddEntityToGroup(&gameState.paddleGroup, gameState.playerPaddle);
+    // Create paddles for both players
+    // Player 1 paddle on the left side
+    float leftPaddleX = BLOCK_WIDTH * BLOCKS_COLUMNS + PADDLE_WIDTH * 3;
+    float leftPaddleY = LEVEL_Y + (LEVEL_HEIGHT - PADDLE_HEIGHT) / 2.0f;
+    gameState.player1Paddle = CreatePaddle(1, leftPaddleX, leftPaddleY, PADDLE_WIDTH, PADDLE_SPEED, BLUE);
+    
+    // Player 2 paddle on the right side
+    float rightPaddleX = LEVEL_WIDTH - (BLOCK_WIDTH * BLOCKS_COLUMNS) - PADDLE_WIDTH * 4;
+    float rightPaddleY = LEVEL_Y + (LEVEL_HEIGHT - PADDLE_HEIGHT) / 2.0f;
+    gameState.player2Paddle = CreatePaddle(2, rightPaddleX, rightPaddleY, PADDLE_WIDTH, PADDLE_SPEED, RED);
+    
+    // Update paddle controls for vertical movement (overriding left/right keys)
+    PaddleData* p1Data = (PaddleData*)gameState.player1Paddle->data;
+    if (p1Data) {
+        p1Data->upKey = KEY_W;
+        p1Data->downKey = KEY_S;
+    }
+    
+    PaddleData* p2Data = (PaddleData*)gameState.player2Paddle->data;
+    if (p2Data) {
+        p2Data->upKey = KEY_UP;
+        p2Data->downKey = KEY_DOWN;
+    }
+    
+    // Add paddles to group
+    AddEntityToGroup(&gameState.paddleGroup, gameState.player1Paddle);
+    AddEntityToGroup(&gameState.paddleGroup, gameState.player2Paddle);
     
     // Create ball
-    float ballX = paddleX + PLAYER_PADDLE_WIDTH/2;
-    float ballY = paddleY - 15;
-    gameState.mainBall = CreateBall(ballX, ballY, 10, 300, WHITE);
+    float ballX = LEVEL_WIDTH / 2.0f;
+    float ballY = LEVEL_Y + LEVEL_HEIGHT / 2.0f;
+    gameState.mainBall = CreateBall(ballX, ballY, 8, 300, WHITE);
     AddEntityToGroup(&gameState.ballGroup, gameState.mainBall);
     
-    // Stick ball to paddle initially
-    StickBallToPaddle(gameState.mainBall, gameState.playerPaddle);
+    // Randomly determine initial direction
+    float initialAngle;
+    if (GetRandomValue(0, 1) == 0) {
+        // Right direction with small variation
+        initialAngle = GetRandomValue(-15, 15) * DEG2RAD;
+    } else {
+        // Left direction with small variation
+        initialAngle = PI + GetRandomValue(-15, 15) * DEG2RAD;
+    }
     
-    // Create blocks
+    // Launch the ball in the initial direction
+    LaunchBall(gameState.mainBall, initialAngle);
+    
+    // Create blocks for both players
     CreateBlocks();
     
-    printf("Gameplay screen initialized\n");
+    printf("Gameplay screen initialized with mBreak two-player layout\n");
 }
 
 // Update gameplay logic
 static void UpdateGameplay(float deltaTime) {
-    // If game is over or level complete, wait for key press to continue
-    if (gameState.gameOver || gameState.levelComplete) {
+    // If game is over or round complete, wait for key press to continue
+    if (gameState.gameOver || gameState.roundComplete) {
         if (IsKeyPressed(KEY_ENTER)) {
             ScreenGameplay.finishScreen = true;
         }
@@ -118,15 +169,23 @@ static void UpdateGameplay(float deltaTime) {
     CheckCollisionsInGroup(&gameState.ballGroup, &gameState.paddleGroup);
     CheckCollisionsInGroup(&gameState.ballGroup, &gameState.blockGroup);
     
-    // Check if ball is out of bounds (bottom of screen)
-    BallData* ballData = (BallData*)gameState.mainBall->data;
-    if (ballData && !ballData->stuck) {
-        if (ballData->position.y > GetScreenHeight()) {
-            gameState.lives--;
-            if (gameState.lives <= 0) {
-                gameState.gameOver = true;
-            } else {
-                ResetBall();
+    // Check if ball is out of bounds (left or right side of game area)
+    if (gameState.mainBall) {
+        BallData* ballData = (BallData*)gameState.mainBall->data;
+        if (ballData) {
+            // Check left boundary
+            if (ballData->position.x - ballData->radius < 0) {
+                // Ball went out on the left side, player 2 scores
+                gameState.player2Score++;
+                gameState.winner = 2;
+                gameState.roundComplete = true;
+            }
+            // Check right boundary
+            else if (ballData->position.x + ballData->radius > LEVEL_WIDTH) {
+                // Ball went out on the right side, player 1 scores
+                gameState.player1Score++;
+                gameState.winner = 1;
+                gameState.roundComplete = true;
             }
         }
     }
@@ -141,47 +200,37 @@ static void DrawGameplay(void) {
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
     
     // Draw game area borders
-    DrawRectangleLinesEx((Rectangle){0, GAME_AREA_TOP, GetScreenWidth(), GetScreenHeight() - GAME_AREA_TOP}, 
-                        2, GRAY);
+    DrawRectangleLinesEx((Rectangle){LEVEL_X, LEVEL_Y, LEVEL_WIDTH, LEVEL_HEIGHT}, 2, GRAY);
     
     // Draw all entities
     DrawEntityGroup(&gameState.blockGroup);
     DrawEntityGroup(&gameState.paddleGroup);
     DrawEntityGroup(&gameState.ballGroup);
     
-    // Draw UI elements
-    DrawText(TextFormat("SCORE: %d", gameState.score), 10, 10, 20, WHITE);
-    DrawText(TextFormat("LIVES: %d", gameState.lives), GetScreenWidth() - 150, 10, 20, WHITE);
+    // Draw UI elements with custom font
+    DrawTextEx(gameFont, TextFormat("PLAYER 1: %d", gameState.player1Score), (Vector2){10, 10}, 20, 1, BLUE);
+    DrawTextEx(gameFont, TextFormat("PLAYER 2: %d", gameState.player2Score), (Vector2){GetScreenWidth() - 150, 10}, 20, 1, RED);
     
     // Draw additional messages based on game state
     if (gameState.paused) {
-        DrawText("PAUSED", GetScreenWidth()/2 - 70, GetScreenHeight()/2, 40, WHITE);
-        DrawText("Press P to resume", GetScreenWidth()/2 - 120, GetScreenHeight()/2 + 50, 20, GRAY);
+        DrawTextEx(gameFont, "PAUSED", (Vector2){GetScreenWidth()/2 - 70, GetScreenHeight()/2}, 40, 1, WHITE);
+        DrawTextEx(gameFont, "Press P to resume", (Vector2){GetScreenWidth()/2 - 120, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
     }
     
     if (gameState.gameOver) {
-        DrawText("GAME OVER", GetScreenWidth()/2 - 100, GetScreenHeight()/2 - 40, 40, RED);
-        DrawText(TextFormat("FINAL SCORE: %d", gameState.score), GetScreenWidth()/2 - 120, 
-                GetScreenHeight()/2, 30, WHITE);
-        DrawText("Press ENTER to return to menu", GetScreenWidth()/2 - 180, 
-                GetScreenHeight()/2 + 50, 20, GRAY);
+        DrawTextEx(gameFont, "GAME OVER", (Vector2){GetScreenWidth()/2 - 100, GetScreenHeight()/2 - 40}, 40, 1, YELLOW);
+        DrawTextEx(gameFont, TextFormat("PLAYER %d WINS!", gameState.winner), 
+                (Vector2){GetScreenWidth()/2 - 120, GetScreenHeight()/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
+        DrawTextEx(gameFont, "Press ENTER to return to menu", 
+                (Vector2){GetScreenWidth()/2 - 180, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
     }
     
-    if (gameState.levelComplete) {
-        DrawText("LEVEL COMPLETE!", GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 40, 40, GREEN);
-        DrawText(TextFormat("SCORE: %d", gameState.score), GetScreenWidth()/2 - 80, 
-                GetScreenHeight()/2, 30, WHITE);
-        DrawText("Press ENTER to continue", GetScreenWidth()/2 - 150, 
-                GetScreenHeight()/2 + 50, 20, GRAY);
-    }
-    
-    // Draw help text for new players
-    if (!gameState.gameOver && !gameState.levelComplete && !gameState.paused) {
-        BallData* ballData = (BallData*)gameState.mainBall->data;
-        if (ballData && ballData->stuck) {
-            DrawText("Press SPACE to launch the ball", GetScreenWidth()/2 - 180, 
-                    GetScreenHeight() - 80, 20, LIGHTGRAY);
-        }
+    if (gameState.roundComplete) {
+        DrawTextEx(gameFont, "ROUND COMPLETE!", (Vector2){GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 40}, 40, 1, GREEN);
+        DrawTextEx(gameFont, TextFormat("PLAYER %d WINS THIS ROUND", gameState.winner), 
+                (Vector2){GetScreenWidth()/2 - 180, GetScreenHeight()/2}, 30, 1, (gameState.winner == 1) ? BLUE : RED);
+        DrawTextEx(gameFont, "Press ENTER to continue", 
+                (Vector2){GetScreenWidth()/2 - 150, GetScreenHeight()/2 + 50}, 20, 1, GRAY);
     }
 }
 
@@ -191,6 +240,8 @@ static void UnloadGameplay(void) {
     ClearEntityGroup(&gameState.paddleGroup);
     ClearEntityGroup(&gameState.ballGroup);
     ClearEntityGroup(&gameState.blockGroup);
+    ClearEntityGroup(&gameState.player1BlockGroup);
+    ClearEntityGroup(&gameState.player2BlockGroup);
     
     // Clean up entity pool
     ClearEntityPool(&gameState.entityPool);
@@ -202,133 +253,152 @@ static void UnloadGameplay(void) {
 static GameScreen GetNextGameplayScreen(void) {
     if (gameState.gameOver) {
         return GAME_OVER;
-    } else if (gameState.levelComplete) {
-        // Normally would go to next level, but for now return to main menu
+    } else if (gameState.roundComplete) {
+        // Normally would go to next level or match over screen, but for now return to main menu
         return MAIN_MENU;
     }
     
     return MAIN_MENU;  // Default fallback
 }
 
-// Reset the ball position and attach to paddle
+// Reset the ball position
 static void ResetBall(void) {
-    if (!gameState.mainBall || !gameState.playerPaddle) return;
+    if (!gameState.mainBall) return;
     
-    // Reset ball position and state
+    // Reset ball position to the center
     BallData* ballData = (BallData*)gameState.mainBall->data;
     if (ballData) {
-        // Stick ball to paddle
-        StickBallToPaddle(gameState.mainBall, gameState.playerPaddle);
+        ballData->position.x = LEVEL_WIDTH / 2.0f;
+        ballData->position.y = LEVEL_Y + LEVEL_HEIGHT / 2.0f;
+        gameState.mainBall->rect.x = ballData->position.x - ballData->radius;
+        gameState.mainBall->rect.y = ballData->position.y - ballData->radius;
+        
+        // Random initial direction
+        float initialAngle;
+        if (GetRandomValue(0, 1) == 0) {
+            initialAngle = GetRandomValue(-15, 15) * DEG2RAD;
+        } else {
+            initialAngle = PI + GetRandomValue(-15, 15) * DEG2RAD;
+        }
+        
+        // Launch the ball
+        LaunchBall(gameState.mainBall, initialAngle);
     }
 }
 
-// Create the blocks for the level
+// Create the blocks for both players
 static void CreateBlocks(void) {
-    float startX = (GetScreenWidth() - (BLOCKS_COLUMNS * (BLOCK_WIDTH + BLOCK_PADDING))) / 2;
-    float startY = GAME_AREA_TOP + 50;
+    // Constants for block creation
+    int strongRows = 1;
+    int normalRows = 1;
+    int weakRows = 1;
+    int totalRows = BLOCKS_ROWS;
     
-    gameState.blockCount = 0;
+    gameState.player1BlockCount = 0;
+    gameState.player2BlockCount = 0;
     
-    for (int row = 0; row < BLOCKS_ROWS; row++) {
-        for (int col = 0; col < BLOCKS_COLUMNS; col++) {
-            float x = startX + col * (BLOCK_WIDTH + BLOCK_PADDING);
-            float y = startY + row * (BLOCK_HEIGHT + BLOCK_PADDING);
+    // Colors for each player's blocks
+    Color player1Color = BLUE;
+    Color player2Color = RED;
+    
+    // Create blocks for player 1 (left side)
+    for (int column = 0; column < BLOCKS_COLUMNS; column++) {
+        // Strong blocks
+        for (int row = 0; row < totalRows; row++) {
+            BlockType blockType;
             
-            // Determine block type and color based on row
-            BlockType type = BLOCK_NORMAL;
-            Color color = LIME;
-            
-            if (row == 0) {
-                // Top row has some hard blocks
-                if (col % 3 == 0) {
-                    type = BLOCK_HARD;
-                    color = ORANGE;
-                }
-            } else if (row == 1) {
-                // Second row has some power-up blocks
-                if (col % 5 == 0) {
-                    type = BLOCK_POWERUP;
-                    color = PURPLE;
-                }
-            } else if (row == 2) {
-                // Middle row has different color
-                color = YELLOW;
-                
-                // Add an explosive block in the middle
-                if (col == BLOCKS_COLUMNS / 2) {
-                    type = BLOCK_EXPLOSIVE;
-                    color = RED;
-                }
-            } else if (row == BLOCKS_ROWS - 1) {
-                // Bottom row has different color
-                color = BLUE;
-                
-                // Add an invincible block on the edges
-                if (col == 0 || col == BLOCKS_COLUMNS - 1) {
-                    type = BLOCK_INVINCIBLE;
-                    color = GRAY;
-                }
+            // Determine block type based on position
+            if (column < strongRows) {
+                blockType = BLOCK_HARD;
+            } else if (column < strongRows + normalRows) {
+                blockType = BLOCK_NORMAL;
+            } else {
+                blockType = BLOCK_NORMAL; // Using normal instead of weak for now
             }
             
-            // Create the block
-            Entity* block = CreateBlock(x, y, BLOCK_WIDTH, BLOCK_HEIGHT, type, color);
+            float x = LEVEL_X + (BLOCK_WIDTH * column);
+            float y = LEVEL_Y + (BLOCK_HEIGHT * row);
+            
+            Entity* block = CreateBlock(x, y, BLOCK_WIDTH, BLOCK_HEIGHT, blockType, player1Color);
             if (block) {
                 AddEntityToGroup(&gameState.blockGroup, block);
+                AddEntityToGroup(&gameState.player1BlockGroup, block);
+                gameState.player1BlockCount++;
+            }
+        }
+    }
+    
+    // Create blocks for player 2 (right side)
+    for (int column = 0; column < BLOCKS_COLUMNS; column++) {
+        for (int row = 0; row < totalRows; row++) {
+            BlockType blockType;
+            
+            // Determine block type based on position
+            if (column < strongRows) {
+                blockType = BLOCK_HARD;
+            } else if (column < strongRows + normalRows) {
+                blockType = BLOCK_NORMAL;
+            } else {
+                blockType = BLOCK_NORMAL; // Using normal instead of weak for now
+            }
+            
+            float x = LEVEL_WIDTH - (BLOCK_WIDTH * (column + 1));
+            float y = LEVEL_Y + (BLOCK_HEIGHT * row);
+            
+            Entity* block = CreateBlock(x, y, BLOCK_WIDTH, BLOCK_HEIGHT, blockType, player2Color);
+            if (block) {
+                AddEntityToGroup(&gameState.blockGroup, block);
+                AddEntityToGroup(&gameState.player2BlockGroup, block);
+                gameState.player2BlockCount++;
                 
-                // Don't count invincible blocks towards total
-                if (type != BLOCK_INVINCIBLE) {
-                    gameState.blockCount++;
+                // Flip the block texture horizontally (will be implemented in draw function)
+                BlockData* blockData = (BlockData*)block->data;
+                if (blockData) {
+                    blockData->flipped = true;
                 }
             }
         }
     }
     
-    printf("Created %d blocks\n", gameState.blockCount);
+    printf("Created %d blocks for Player 1\n", gameState.player1BlockCount);
+    printf("Created %d blocks for Player 2\n", gameState.player2BlockCount);
 }
 
-// Check game conditions (win/lose)
+// Check for game conditions
 static void CheckGameConditions(void) {
-    // Count active non-invincible blocks
-    int activeBlocks = 0;
-    for (int i = 0; i < gameState.blockGroup.count; i++) {
-        Entity* block = gameState.blockGroup.entities[i];
-        if (block && block->active) {
-            BlockData* blockData = (BlockData*)block->data;
-            if (blockData && blockData->type != BLOCK_INVINCIBLE) {
-                activeBlocks++;
-            }
-        }
-    }
+    // Update block counts
+    gameState.player1BlockCount = gameState.player1BlockGroup.count;
+    gameState.player2BlockCount = gameState.player2BlockGroup.count;
     
-    // Level complete if all breakable blocks are gone
-    if (activeBlocks == 0) {
-        gameState.levelComplete = true;
+    // Check if any player's blocks are all destroyed
+    if (gameState.player1BlockCount <= 0) {
+        // Player 2 wins
+        gameState.player2Score++;
+        gameState.winner = 2;
+        gameState.roundComplete = true;
+    } else if (gameState.player2BlockCount <= 0) {
+        // Player 1 wins
+        gameState.player1Score++;
+        gameState.winner = 1;
+        gameState.roundComplete = true;
     }
 }
 
-// Handle input during gameplay
+// Handle player input
 static void HandleInput(float deltaTime) {
-    // Handle ball launch with spacebar
-    BallData* ballData = (BallData*)gameState.mainBall->data;
-    if (ballData && ballData->stuck && IsKeyPressed(KEY_SPACE)) {
-        ReleaseBallFromPaddle(gameState.mainBall);
-    }
+    // Ball mechanics handled in ball.c
 }
 
-// Screen initializer called by the screen management system
+// Initialize the gameplay screen
 Screen InitGameplayScreen(void) {
-    // No need for static Screen ScreenGameplay as we use the global one defined in screens.c
-    
-    // Create a local Screen structure and return it
-    Screen screen = {
-        .init = InitGameplay,
-        .update = UpdateGameplay,
-        .draw = DrawGameplay,
-        .unload = UnloadGameplay,
-        .getNextScreen = GetNextGameplayScreen,
-        .finishScreen = false,
-        .nextScreen = GAME_OVER
-    };
+    Screen screen = {0};
+    screen.init = InitGameplay;
+    screen.update = UpdateGameplay;
+    screen.draw = DrawGameplay;
+    screen.unload = UnloadGameplay;
+    screen.getNextScreen = GetNextGameplayScreen;
+    screen.finishScreen = false;
+    screen.nextScreen = GAME_OVER;
     
     return screen;
 } 

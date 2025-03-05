@@ -26,6 +26,7 @@ typedef struct BlockData {
     int currentFrame;      // Current animation frame
     float frameTime;       // Time for each animation frame
     float animationTimer;  // Timer for animation
+    bool flipped;          // Whether block is flipped horizontally (for player 2)
 } BlockData;
 
 // Block functions

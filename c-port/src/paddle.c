@@ -3,8 +3,12 @@
 #include <stdio.h>
 
 // Paddle constants
-#define PADDLE_HEIGHT 20
-#define DEFAULT_PADDLE_SPEED 400.0f
+#define PADDLE_HEIGHT 33
+#define DEFAULT_PADDLE_SPEED 350.0f
+#define GAME_AREA_TOP 50
+#define GAME_AREA_BOTTOM 550
+#define GAME_AREA_LEFT 0
+#define GAME_AREA_RIGHT 800
 
 // Create a new paddle entity
 Entity* CreatePaddle(int playerID, float x, float y, int width, float speed, Color color) {
@@ -30,14 +34,19 @@ Entity* CreatePaddle(int playerID, float x, float y, int width, float speed, Col
     data->baseSpeed = data->speed;
     data->sticky = false;
     data->powerUpTimer = 0.0f;
+    data->moveVertical = true; // Default to vertical movement for mBreak
     
     // Set default controls based on player ID
     if (playerID == 1) {
         data->leftKey = KEY_A;
         data->rightKey = KEY_D;
+        data->upKey = KEY_W;
+        data->downKey = KEY_S;
     } else {
         data->leftKey = KEY_LEFT;
         data->rightKey = KEY_RIGHT;
+        data->upKey = KEY_UP;
+        data->downKey = KEY_DOWN;
     }
     
     // Set entity data
@@ -62,22 +71,43 @@ void UpdatePaddle(Entity* entity, float deltaTime) {
     // Update power-up timers
     UpdatePaddlePowerUps(entity, deltaTime);
     
-    // Handle input
-    if (IsKeyDown(data->leftKey)) {
-        MovePaddleLeft(entity, deltaTime);
-    }
-    
-    if (IsKeyDown(data->rightKey)) {
-        MovePaddleRight(entity, deltaTime);
-    }
-    
-    // Keep paddle within screen bounds
-    if (entity->rect.x < 0) {
-        entity->rect.x = 0;
-    }
-    
-    if (entity->rect.x + entity->rect.width > GetScreenWidth()) {
-        entity->rect.x = GetScreenWidth() - entity->rect.width;
+    // Handle input based on movement direction
+    if (data->moveVertical) {
+        // Vertical movement (for mBreak)
+        if (IsKeyDown(data->upKey)) {
+            MovePaddleUp(entity, deltaTime);
+        }
+        
+        if (IsKeyDown(data->downKey)) {
+            MovePaddleDown(entity, deltaTime);
+        }
+        
+        // Keep paddle within vertical game bounds
+        if (entity->rect.y < GAME_AREA_TOP) {
+            entity->rect.y = GAME_AREA_TOP;
+        }
+        
+        if (entity->rect.y + entity->rect.height > GAME_AREA_BOTTOM) {
+            entity->rect.y = GAME_AREA_BOTTOM - entity->rect.height;
+        }
+    } else {
+        // Horizontal movement (original Breakout style)
+        if (IsKeyDown(data->leftKey)) {
+            MovePaddleLeft(entity, deltaTime);
+        }
+        
+        if (IsKeyDown(data->rightKey)) {
+            MovePaddleRight(entity, deltaTime);
+        }
+        
+        // Keep paddle within horizontal game bounds
+        if (entity->rect.x < GAME_AREA_LEFT) {
+            entity->rect.x = GAME_AREA_LEFT;
+        }
+        
+        if (entity->rect.x + entity->rect.width > GAME_AREA_RIGHT) {
+            entity->rect.x = GAME_AREA_RIGHT - entity->rect.width;
+        }
     }
 }
 
@@ -90,6 +120,9 @@ void DrawPaddle(Entity* entity) {
     
     // Draw the paddle rectangle
     DrawRectangleRec(entity->rect, entity->color);
+    
+    // Draw border around paddle
+    DrawRectangleLinesEx(entity->rect, 1, ColorBrightness(entity->color, 0.5f));
     
     // Draw special effects for power-ups if active
     if (data->sticky) {
@@ -147,6 +180,26 @@ void MovePaddleRight(Entity* paddle, float deltaTime) {
     if (!data) return;
     
     paddle->rect.x += data->speed * deltaTime;
+}
+
+// Move paddle up
+void MovePaddleUp(Entity* paddle, float deltaTime) {
+    if (!paddle || !paddle->active || paddle->type != ENTITY_PADDLE) return;
+    
+    PaddleData* data = (PaddleData*)paddle->data;
+    if (!data) return;
+    
+    paddle->rect.y -= data->speed * deltaTime;
+}
+
+// Move paddle down
+void MovePaddleDown(Entity* paddle, float deltaTime) {
+    if (!paddle || !paddle->active || paddle->type != ENTITY_PADDLE) return;
+    
+    PaddleData* data = (PaddleData*)paddle->data;
+    if (!data) return;
+    
+    paddle->rect.y += data->speed * deltaTime;
 }
 
 // Resize paddle (for power-ups)

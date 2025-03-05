@@ -1,4 +1,5 @@
 #include "../include/ball.h"
+#include "../include/block.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -34,8 +35,10 @@ Entity* CreateBall(float x, float y, float radius, float speed, Color color) {
     data->baseSpeed = speed > 0 ? speed : DEFAULT_BALL_SPEED;
     data->speedMultiplier = 1.0f;
     data->damage = 1.0f;
-    data->stuck = true;  // Ball starts stuck to paddle
+    data->stuck = false;  // Ball starts unstuck for mBreak
     data->attachedPaddle = NULL;
+    data->owner = NULL;  // No owner initially
+    data->ownerID = 0;   // 0 means no owner
     data->offsetX = 0.0f;
     data->stuckTimer = 0.0f;
     data->smash = false;
@@ -128,14 +131,22 @@ void DrawBall(Entity* entity) {
     BallData* data = (BallData*)entity->data;
     if (!data) return;
     
-    // Draw the ball
-    DrawCircleV(data->position, data->radius, entity->color);
+    // Determine ball color based on owner
+    Color ballColor = entity->color;
+    if (data->ownerID == 1) {
+        ballColor = BLUE;
+    } else if (data->ownerID == 2) {
+        ballColor = RED;
+    }
     
-    // Draw effects for powerups if active
+    // Draw the ball
+    DrawCircleV(data->position, data->radius, ballColor);
+    
+    // Draw special effects for power-ups if active
     if (data->smash) {
-        // Draw a red glow for smash
-        Color glowColor = ColorAlpha(RED, 0.5f);
-        DrawCircleV(data->position, data->radius + 5, glowColor);
+        // Draw a glow effect for smash mode
+        Color glowColor = ColorAlpha(WHITE, 0.5f);
+        DrawCircleLines(data->position.x, data->position.y, data->radius + 2, glowColor);
     }
 }
 
@@ -144,40 +155,69 @@ void OnBallCollision(Entity* ball, Entity* other) {
     if (!ball || !other || !ball->active || !other->active) return;
     if (ball->type != ENTITY_BALL) return;
     
-    BallData* data = (BallData*)ball->data;
-    if (!data || data->stuck) return;
+    BallData* ballData = (BallData*)ball->data;
+    if (!ballData) return;
     
     // Handle collision with paddle
     if (other->type == ENTITY_PADDLE) {
         PaddleData* paddleData = (PaddleData*)other->data;
-        if (paddleData) {
-            // If paddle is sticky, attach ball
-            if (paddleData->sticky) {
-                StickBallToPaddle(ball, other);
-                return;
-            }
-            
-            // Calculate bounce angle based on where the ball hit the paddle
-            float paddleCenter = other->rect.x + other->rect.width / 2.0f;
-            float hitPosition = data->position.x;
-            float relativePosition = (hitPosition - paddleCenter) / (other->rect.width / 2.0f);
-            
-            // Maximum angle is 75 degrees (5*PI/12 radians)
-            float bounceAngle = relativePosition * (5.0f * PI / 12.0f);
-            
-            // Ensure minimum bounce angle to prevent horizontal bounces
-            if (fabsf(bounceAngle) < MINIMUM_BOUNCE_ANGLE) {
-                bounceAngle = MINIMUM_BOUNCE_ANGLE * (bounceAngle >= 0 ? 1 : -1);
-            }
-            
-            // Calculate new velocity
-            float speed = sqrtf(pow(ball->velocity.x, 2) + pow(ball->velocity.y, 2));
-            ball->velocity.x = speed * sinf(bounceAngle);
-            ball->velocity.y = -speed * cosf(bounceAngle);  // Negative because the paddle is below
+        if (!paddleData) return;
+        
+        // Change ownership when a paddle is hit
+        ChangeBallOwner(ball, other);
+        
+        // Bounce the ball
+        BounceBall(ball, other);
+        
+        // Apply additional effects
+        if (paddleData->sticky) {
+            // Stick ball to paddle
+            StickBallToPaddle(ball, other);
         }
     }
-    // Handle collision with blocks
-    else if (other->type == ENTITY_BLOCK) {
+    
+    // Handle collision with block
+    if (other->type == ENTITY_BLOCK) {
+        // Bounce the ball
+        BounceBall(ball, other);
+        
+        // Deal damage to the block based on ball properties
+        BlockData* blockData = (BlockData*)other->data;
+        if (blockData) {
+            // Deal different damage based on ball ownership and block ownership
+            if (ballData->ownerID != 0) {
+                // Get player ID associated with the block
+                int blockPlayerID = 0;
+                
+                // Determine block owner based on position or flipped property
+                if (blockData->flipped) {
+                    blockPlayerID = 2; // Player 2's block
+                } else {
+                    blockPlayerID = 1; // Player 1's block
+                }
+                
+                // Calculate damage based on ownership
+                int damage = 1;
+                
+                // Apply full damage if ball is owned by opponent
+                if (ballData->ownerID != blockPlayerID) {
+                    damage = ballData->smash ? 2 : 1; // Double damage if smash is active
+                } else {
+                    // Reduced damage if hitting own blocks
+                    damage = 0; // No damage to own blocks for now
+                }
+                
+                // Apply damage
+                if (damage > 0) {
+                    DamageBlock(other, damage);
+                }
+            }
+        }
+    }
+    
+    // Handle collision with other balls
+    if (other->type == ENTITY_BALL) {
+        // Bounce the balls off each other
         BounceBall(ball, other);
     }
 }
@@ -247,53 +287,245 @@ void ReleaseBallFromPaddle(Entity* ball) {
     LaunchBall(ball, angle);
 }
 
-// Bounce ball based on collision
+// Bounce the ball off another entity
 void BounceBall(Entity* ball, Entity* other) {
-    if (!ball || !other || !ball->active || !other->active) return;
-    if (ball->type != ENTITY_BALL) return;
+    if (!ball || !other || !ball->active || !other->active || ball->type != ENTITY_BALL) return;
     
     BallData* data = (BallData*)ball->data;
     if (!data) return;
     
-    // Calculate the ball center
-    Vector2 ballCenter = data->position;
+    // Calculate current ball speed
+    float speed = sqrtf(powf(ball->velocity.x, 2) + powf(ball->velocity.y, 2));
     
-    // Calculate the collision side
-    Rectangle otherRect = other->rect;
-    
-    // Find the closest point on the rectangle to the circle center
-    float closestX = fmaxf(otherRect.x, fminf(ballCenter.x, otherRect.x + otherRect.width));
-    float closestY = fmaxf(otherRect.y, fminf(ballCenter.y, otherRect.y + otherRect.height));
-    
-    // Determine collision side by comparing distances
-    float deltaX = closestX - ballCenter.x;
-    float deltaY = closestY - ballCenter.y;
-    
-    // Check if we're colliding horizontally or vertically
-    if (fabsf(deltaX) > fabsf(deltaY)) {
-        // Horizontal collision
-        ball->velocity.x = -ball->velocity.x;
+    // Handle bounce differently based on the type of entity we hit
+    if (other->type == ENTITY_PADDLE) {
+        PaddleData* paddleData = (PaddleData*)other->data;
+        if (!paddleData) return;
         
-        // Add a slight random angle variation
-        ball->velocity.y += ((rand() % 100) / 500.0f - 0.1f) * data->baseSpeed;
-    } else {
-        // Vertical collision
-        ball->velocity.y = -ball->velocity.y;
+        if (paddleData->moveVertical) {
+            // For vertical paddles (mBreak style)
+            // Calculate bounce angle based on where the ball hit the paddle
+            float paddleCenter = other->rect.y + other->rect.height / 2.0f;
+            float hitPosition = data->position.y;
+            float relativePosition = (hitPosition - paddleCenter) / (other->rect.height / 2.0f);
+            
+            // Determine if the ball hit the left paddle (player 1) or right paddle (player 2)
+            bool hitLeftPaddle = (paddleData->playerID == 1);
+            
+            // Maximum angle is 75 degrees (5*PI/12 radians)
+            float bounceAngle = relativePosition * (5.0f * PI / 12.0f);
+            
+            // Ensure minimum bounce angle to prevent vertical bounces
+            if (fabsf(bounceAngle) < MINIMUM_BOUNCE_ANGLE) {
+                bounceAngle = MINIMUM_BOUNCE_ANGLE * (bounceAngle >= 0 ? 1 : -1);
+            }
+            
+            // Add a small random variation to prevent predictable patterns
+            bounceAngle += ((float)GetRandomValue(-5, 5) / 100.0f);
+            
+            // Calculate new velocity - reverse X direction based on which paddle was hit
+            if (hitLeftPaddle) {
+                // Ball hit left paddle, should bounce to the right
+                ball->velocity.x = speed * cosf(bounceAngle);
+                ball->velocity.y = speed * sinf(bounceAngle);
+            } else {
+                // Ball hit right paddle, should bounce to the left
+                ball->velocity.x = -speed * cosf(bounceAngle);
+                ball->velocity.y = speed * sinf(bounceAngle);
+            }
+        } else {
+            // For horizontal paddles (original Breakout style)
+            // Calculate bounce angle based on where the ball hit the paddle
+            float paddleCenter = other->rect.x + other->rect.width / 2.0f;
+            float hitPosition = data->position.x;
+            float relativePosition = (hitPosition - paddleCenter) / (other->rect.width / 2.0f);
+            
+            // Maximum angle is 75 degrees (5*PI/12 radians)
+            float bounceAngle = relativePosition * (5.0f * PI / 12.0f);
+            
+            // Ensure minimum bounce angle to prevent horizontal bounces
+            if (fabsf(bounceAngle) < MINIMUM_BOUNCE_ANGLE) {
+                bounceAngle = MINIMUM_BOUNCE_ANGLE * (bounceAngle >= 0 ? 1 : -1);
+            }
+            
+            // Calculate new velocity
+            ball->velocity.x = speed * sinf(bounceAngle);
+            ball->velocity.y = -speed * cosf(bounceAngle);  // Negative because the paddle is below
+        }
+    } 
+    else if (other->type == ENTITY_BLOCK) {
+        // Determine which side of the block was hit
+        float overlapLeft = (data->position.x + data->radius) - other->rect.x;
+        float overlapRight = (other->rect.x + other->rect.width) - (data->position.x - data->radius);
+        float overlapTop = (data->position.y + data->radius) - other->rect.y;
+        float overlapBottom = (other->rect.y + other->rect.height) - (data->position.y - data->radius);
         
-        // Add a slight random angle variation
-        ball->velocity.x += ((rand() % 100) / 500.0f - 0.1f) * data->baseSpeed;
+        // Find the smallest overlap
+        float minOverlap = overlapLeft;
+        char side = 'L';
+        
+        if (overlapRight < minOverlap) {
+            minOverlap = overlapRight;
+            side = 'R';
+        }
+        
+        if (overlapTop < minOverlap) {
+            minOverlap = overlapTop;
+            side = 'T';
+        }
+        
+        if (overlapBottom < minOverlap) {
+            minOverlap = overlapBottom;
+            side = 'B';
+        }
+        
+        // Bounce based on the side hit
+        if (side == 'L' || side == 'R') {
+            ball->velocity.x *= -1;
+        } else {
+            ball->velocity.y *= -1;
+        }
+        
+        // Add a tiny random variation to prevent getting stuck
+        ball->velocity.x += ((float)GetRandomValue(-5, 5) / 100.0f) * speed;
+        ball->velocity.y += ((float)GetRandomValue(-5, 5) / 100.0f) * speed;
+    }
+    else if (other->type == ENTITY_BALL) {
+        // For ball-to-ball collisions, use elastic collision physics
+        BallData* otherBallData = (BallData*)other->data;
+        if (!otherBallData) return;
+        
+        // Calculate normal vector
+        Vector2 normal = {
+            data->position.x - otherBallData->position.x,
+            data->position.y - otherBallData->position.y
+        };
+        
+        // Normalize
+        float distance = sqrtf(normal.x * normal.x + normal.y * normal.y);
+        normal.x /= distance;
+        normal.y /= distance;
+        
+        // Calculate relative velocity
+        Vector2 relativeVelocity = {
+            ball->velocity.x - other->velocity.x,
+            ball->velocity.y - other->velocity.y
+        };
+        
+        // Calculate dot product
+        float dotProduct = relativeVelocity.x * normal.x + relativeVelocity.y * normal.y;
+        
+        // Apply impulse
+        float impulseFactor = 2.0f * dotProduct;
+        ball->velocity.x -= impulseFactor * normal.x;
+        ball->velocity.y -= impulseFactor * normal.y;
+        
+        // Ensure balls don't get stuck together by pushing slightly apart
+        data->position.x += normal.x * 1.0f;
+        data->position.y += normal.y * 1.0f;
     }
     
-    // Ensure minimum bounce angle to prevent horizontal/vertical bounces
-    float speed = sqrtf(pow(ball->velocity.x, 2) + pow(ball->velocity.y, 2));
-    float angle = atan2f(ball->velocity.x, ball->velocity.y);
+    // Normalize velocity to ensure consistent speed
+    float newSpeed = sqrtf(powf(ball->velocity.x, 2) + powf(ball->velocity.y, 2));
+    if (newSpeed > 0) {
+        ball->velocity.x = (ball->velocity.x / newSpeed) * speed;
+        ball->velocity.y = (ball->velocity.y / newSpeed) * speed;
+    }
+}
+
+// Check for collision with walls and handle bounces
+void CheckWallCollision(Entity* ball) {
+    if (!ball || !ball->active || ball->type != ENTITY_BALL) return;
     
-    // Check if angle is too horizontal/vertical
-    if (fabsf(fmodf(angle, PI / 2)) < MINIMUM_BOUNCE_ANGLE) {
-        // Adjust the angle to ensure minimum bounce
-        angle += MINIMUM_BOUNCE_ANGLE * (rand() % 2 == 0 ? 1 : -1);
-        ball->velocity.x = speed * sinf(angle);
-        ball->velocity.y = speed * cosf(angle);
+    BallData* data = (BallData*)ball->data;
+    if (!data) return;
+    
+    // Game area boundaries (mBreak style)
+    int gameAreaLeft = 0;
+    int gameAreaRight = 800;
+    int gameAreaTop = 50;
+    int gameAreaBottom = 550;
+    
+    // Check top and bottom walls
+    if (data->position.y - data->radius <= gameAreaTop) {
+        // Top wall collision
+        data->position.y = gameAreaTop + data->radius;
+        ball->velocity.y *= -1;
+        
+        // Add small random variation to prevent getting stuck
+        float speed = sqrtf(powf(ball->velocity.x, 2) + powf(ball->velocity.y, 2));
+        ball->velocity.x += ((float)GetRandomValue(-5, 5) / 100.0f) * speed;
+    }
+    else if (data->position.y + data->radius >= gameAreaBottom) {
+        // Bottom wall collision
+        data->position.y = gameAreaBottom - data->radius;
+        ball->velocity.y *= -1;
+        
+        // Add small random variation to prevent getting stuck
+        float speed = sqrtf(powf(ball->velocity.x, 2) + powf(ball->velocity.y, 2));
+        ball->velocity.x += ((float)GetRandomValue(-5, 5) / 100.0f) * speed;
+    }
+    
+    // For horizontal walls, we don't bounce - ball goes out of bounds and resets
+    // This is handled in the gameplay loop rather than here
+    // In mBreak, if a ball goes out on the left or right side, the other player scores
+}
+
+// Check if ball is stuck (not moving much)
+void CheckStuckDetection(Entity* ball, float deltaTime) {
+    if (!ball || !ball->active || ball->type != ENTITY_BALL) return;
+    
+    BallData* data = (BallData*)ball->data;
+    if (!data || data->stuck) return;
+    
+    // Calculate movement distance in this frame
+    float movementDistance = sqrtf(pow(ball->velocity.x * deltaTime, 2) + 
+                                   pow(ball->velocity.y * deltaTime, 2));
+    
+    // If we're moving slower than the threshold
+    if (movementDistance < STUCK_DISTANCE_THRESHOLD * deltaTime) {
+        data->stuckTimer += deltaTime;
+        
+        // If stuck for too long, reset with a random angle
+        if (data->stuckTimer >= STUCK_DETECTION_TIME) {
+            printf("Ball appears stuck, adjusting trajectory\n");
+            
+            // Set a random angle
+            float angle = (rand() % 360) * DEG2RAD;
+            float speed = data->baseSpeed * data->speedMultiplier;
+            
+            ball->velocity.x = speed * sinf(angle);
+            ball->velocity.y = speed * cosf(angle);
+            
+            // Reset stuck timer
+            data->stuckTimer = 0;
+        }
+    } else {
+        // We're moving normally, reset the stuck timer
+        data->stuckTimer = 0;
+    }
+}
+
+// Change the ball's owner
+void ChangeBallOwner(Entity* ball, Entity* newOwner) {
+    if (!ball || !ball->active || ball->type != ENTITY_BALL || !newOwner) return;
+    
+    BallData* ballData = (BallData*)ball->data;
+    if (!ballData) return;
+    
+    // Only change owner if it's a paddle
+    if (newOwner->type == ENTITY_PADDLE) {
+        PaddleData* paddleData = (PaddleData*)newOwner->data;
+        if (paddleData) {
+            ballData->owner = newOwner;
+            ballData->ownerID = paddleData->playerID;
+            
+            // Slightly increase ball speed on each paddle hit
+            float newSpeed = ballData->speedMultiplier + 0.1f;
+            if (newSpeed <= 2.0f) { // Cap speed increase
+                SetBallSpeed(ball, newSpeed);
+            }
+        }
     }
 }
 
@@ -333,66 +565,5 @@ void SetBallSpeed(Entity* ball, float speedMultiplier) {
     if (len > 0) {
         ball->velocity.x = (ball->velocity.x / len) * data->baseSpeed * data->speedMultiplier;
         ball->velocity.y = (ball->velocity.y / len) * data->baseSpeed * data->speedMultiplier;
-    }
-}
-
-// Check collision with screen edges
-void CheckWallCollision(Entity* ball) {
-    if (!ball || !ball->active || ball->type != ENTITY_BALL) return;
-    
-    BallData* data = (BallData*)ball->data;
-    if (!data) return;
-    
-    // Check collision with left and right walls
-    if (data->position.x - data->radius <= 0) {
-        data->position.x = data->radius;
-        ball->velocity.x = fabs(ball->velocity.x);
-    } else if (data->position.x + data->radius >= GetScreenWidth()) {
-        data->position.x = GetScreenWidth() - data->radius;
-        ball->velocity.x = -fabs(ball->velocity.x);
-    }
-    
-    // Check collision with top wall
-    if (data->position.y - data->radius <= 0) {
-        data->position.y = data->radius;
-        ball->velocity.y = fabs(ball->velocity.y);
-    }
-    
-    // Check collision with bottom (ball out of bounds)
-    // This will be handled by the game screen to determine game over state
-}
-
-// Check if ball is stuck (not moving much)
-void CheckStuckDetection(Entity* ball, float deltaTime) {
-    if (!ball || !ball->active || ball->type != ENTITY_BALL) return;
-    
-    BallData* data = (BallData*)ball->data;
-    if (!data || data->stuck) return;
-    
-    // Calculate movement distance in this frame
-    float movementDistance = sqrtf(pow(ball->velocity.x * deltaTime, 2) + 
-                                   pow(ball->velocity.y * deltaTime, 2));
-    
-    // If we're moving slower than the threshold
-    if (movementDistance < STUCK_DISTANCE_THRESHOLD * deltaTime) {
-        data->stuckTimer += deltaTime;
-        
-        // If stuck for too long, reset with a random angle
-        if (data->stuckTimer >= STUCK_DETECTION_TIME) {
-            printf("Ball appears stuck, adjusting trajectory\n");
-            
-            // Set a random angle
-            float angle = (rand() % 360) * DEG2RAD;
-            float speed = data->baseSpeed * data->speedMultiplier;
-            
-            ball->velocity.x = speed * sinf(angle);
-            ball->velocity.y = speed * cosf(angle);
-            
-            // Reset stuck timer
-            data->stuckTimer = 0;
-        }
-    } else {
-        // We're moving normally, reset the stuck timer
-        data->stuckTimer = 0;
     }
 } 

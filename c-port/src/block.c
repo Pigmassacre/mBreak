@@ -1,5 +1,6 @@
 #include "../include/block.h"
 #include "../include/ball.h"
+#include "../include/font.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -33,6 +34,7 @@ Entity* CreateBlock(float x, float y, float width, float height, BlockType type,
     data->frameTime = 0.0f;
     data->animationTimer = 0.0f;
     data->powerUpType = -1; // No power-up by default
+    data->flipped = false;  // Not flipped by default (player 1)
     
     // Set properties based on block type
     switch (type) {
@@ -118,6 +120,19 @@ void DrawBlock(Entity* entity) {
         drawColor = WHITE;
     }
     
+    // Calculate health percentage for tinting (darker when less health)
+    float healthPercentage = (float)data->health / (float)data->maxHealth;
+    Color tintedColor = drawColor;
+    
+    // Only apply tint for non-invincible blocks
+    if (data->type != BLOCK_INVINCIBLE && data->health < data->maxHealth) {
+        // Darken the color based on health (more damage = darker)
+        tintedColor.r = (unsigned char)(drawColor.r * (0.5f + 0.5f * healthPercentage));
+        tintedColor.g = (unsigned char)(drawColor.g * (0.5f + 0.5f * healthPercentage));
+        tintedColor.b = (unsigned char)(drawColor.b * (0.5f + 0.5f * healthPercentage));
+        drawColor = tintedColor;
+    }
+    
     // Draw differently based on block type
     switch (data->type) {
         case BLOCK_NORMAL:
@@ -127,14 +142,6 @@ void DrawBlock(Entity* entity) {
             // Draw with border to indicate it's harder
             DrawRectangleRec(entity->rect, drawColor);
             DrawRectangleLinesEx(entity->rect, 2, BLACK);
-            
-            // Draw indicator for remaining health
-            if (data->health < data->maxHealth) {
-                DrawText("!", 
-                        entity->rect.x + entity->rect.width/2 - 5, 
-                        entity->rect.y + entity->rect.height/2 - 10, 
-                        20, RED);
-            }
             break;
         case BLOCK_INVINCIBLE:
             // Draw with special pattern for invincible blocks
@@ -153,22 +160,43 @@ void DrawBlock(Entity* entity) {
         case BLOCK_EXPLOSIVE:
             // Draw with explosion symbol
             DrawRectangleRec(entity->rect, drawColor);
-            DrawText("*", 
-                    entity->rect.x + entity->rect.width/2 - 5, 
-                    entity->rect.y + entity->rect.height/2 - 10, 
-                    20, RED);
+            DrawTextEx(gameFont, "*", 
+                    (Vector2){entity->rect.x + entity->rect.width/2 - 5, 
+                    entity->rect.y + entity->rect.height/2 - 10}, 
+                    20, 1, RED);
             break;
         case BLOCK_POWERUP:
             // Draw with power-up indicator
             DrawRectangleRec(entity->rect, drawColor);
-            DrawText("?", 
-                    entity->rect.x + entity->rect.width/2 - 5, 
-                    entity->rect.y + entity->rect.height/2 - 10, 
-                    20, YELLOW);
+            DrawTextEx(gameFont, "?", 
+                    (Vector2){entity->rect.x + entity->rect.width/2 - 5, 
+                    entity->rect.y + entity->rect.height/2 - 10}, 
+                    20, 1, YELLOW);
             break;
         default:
             DrawRectangleRec(entity->rect, drawColor);
             break;
+    }
+    
+    // Add visual indicator for block orientation/owner
+    if (data->flipped) {
+        // Draw a small indicator on the right side for player 2 blocks
+        DrawRectangle(
+            entity->rect.x + entity->rect.width - 4,
+            entity->rect.y + 4,
+            4,
+            entity->rect.height - 8,
+            ColorBrightness(drawColor, 1.5f)
+        );
+    } else {
+        // Draw a small indicator on the left side for player 1 blocks
+        DrawRectangle(
+            entity->rect.x,
+            entity->rect.y + 4,
+            4,
+            entity->rect.height - 8,
+            ColorBrightness(drawColor, 1.5f)
+        );
     }
 }
 

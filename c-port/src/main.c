@@ -4,9 +4,12 @@
 #include <stdio.h>
 
 // Default window dimensions (will be configurable later)
-#define DEFAULT_SCREEN_WIDTH 800
-#define DEFAULT_SCREEN_HEIGHT 600
+#define DEFAULT_SCREEN_WIDTH 285
+#define DEFAULT_SCREEN_HEIGHT 160
 #define GAME_TITLE "mBreak"
+
+// Global font variables
+Font gameFont;
 
 // Main entry point
 int main(void) {
@@ -16,6 +19,9 @@ int main(void) {
     
     // Set target FPS (60 by default)
     SetTargetFPS(60);
+    
+    // Load the game font
+    gameFont = LoadFont("resources/fonts/ADDLG___.TTF");
     
     // Initialize timing variables for delta time calculation
     double previousTime = GetTime();
@@ -105,6 +111,9 @@ int main(void) {
     UnloadScreen(&ScreenGameplay);
     UnloadScreen(&ScreenGameOver);
     UnloadScreen(&ScreenOptions);
+    
+    // Unload the font
+    UnloadFont(gameFont);
     
     // Cleanup and close resources
     CloseAudioDevice();

@@ -1,4 +1,5 @@
 #include "../include/screens.h"
+#include "../include/font.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -124,7 +125,7 @@ static void SetupMenuTransition(void) {
         
         float fontSize = 30;
         float itemHeight = fontSize + 20;
-        float textWidth = MeasureText(optionText, fontSize);
+        float textWidth = MeasureTextEx(gameFont, optionText, fontSize, 1).x;
         
         // Position items in a vertical list centered on screen
         menuState.menuItemDesiredPositions[i] = (Vector2){
@@ -243,7 +244,7 @@ static void UpdateMainMenu(float deltaTime) {
             Rectangle bounds = (Rectangle){
                 position.x - 10,
                 position.y - 10,
-                MeasureText(optionText, fontSize) + 20,
+                MeasureTextEx(gameFont, optionText, fontSize, 1).x + 20,
                 fontSize + 20
             };
             
@@ -340,28 +341,31 @@ static void DrawMainMenu(void) {
             // Draw selected option with highlight effect
             if (i == menuState.selectedOption) {
                 Color highlightColor = ColorAlpha(WHITE, menuState.textBlink);
+                
+                // Calculate bounds using MeasureTextEx for custom font
+                Vector2 textSize = MeasureTextEx(gameFont, optionText, fontSize, 1);
                 Rectangle bounds = (Rectangle){
                     position.x - 10,
                     position.y - 10,
-                    MeasureText(optionText, fontSize) + 20,
+                    textSize.x + 20,
                     fontSize + 20
                 };
                 
                 // Draw shadow (offset slightly down)
-                DrawText(optionText, position.x, position.y + 1, fontSize, DARKGRAY);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x, position.y + 1}, fontSize, 1, DARKGRAY);
                 
                 // Draw item highlight
                 DrawRectangleRec(bounds, ColorAlpha(GRAY, 0.3f));
                 DrawRectangleLinesEx(bounds, 2, highlightColor);
                 
                 // Draw text
-                DrawText(optionText, position.x, position.y, fontSize, WHITE);
+                DrawTextEx(gameFont, optionText, position, fontSize, 1, WHITE);
             } else {
                 // Draw shadow
-                DrawText(optionText, position.x, position.y + 1, fontSize, DARKGRAY);
+                DrawTextEx(gameFont, optionText, (Vector2){position.x, position.y + 1}, fontSize, 1, DARKGRAY);
                 
                 // Draw text
-                DrawText(optionText, position.x, position.y, fontSize, LIGHTGRAY);
+                DrawTextEx(gameFont, optionText, position, fontSize, 1, LIGHTGRAY);
             }
         }
     }
@@ -384,7 +388,8 @@ static GameScreen GetNextMainMenuScreen(void) {
 
 // Calculate bounds for menu options (for mouse interaction)
 static Rectangle GetMenuOptionBounds(const char* text, float y, float fontSize) {
-    float width = MeasureText(text, fontSize) + 40;
+    Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
+    float width = textSize.x + 40;
     float height = fontSize + 20;
     float x = GetScreenWidth()/2 - width/2;
     

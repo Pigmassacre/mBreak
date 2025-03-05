@@ -1,4 +1,5 @@
 #include "../include/screens.h"
+#include "../include/font.h"
 #include <stdlib.h>
 
 // Global screen variable definitions
@@ -77,9 +78,13 @@ static void LogoUpdate(float deltaTime) {
 }
 
 static void LogoDraw(void) {
-    DrawText("LOGO SCREEN", 20, 20, 30, WHITE);
-    DrawText("POWERED BY RAYLIB", GetScreenWidth()/2 - MeasureText("POWERED BY RAYLIB", 20)/2, 
-             GetScreenHeight()/2, 20, GRAY);
+    DrawTextEx(gameFont, "LOGO SCREEN", (Vector2){20, 20}, 30, 1, WHITE);
+    
+    const char* poweredText = "POWERED BY RAYLIB";
+    Vector2 textSize = MeasureTextEx(gameFont, poweredText, 20, 1);
+    DrawTextEx(gameFont, poweredText, 
+              (Vector2){GetScreenWidth()/2 - textSize.x/2, GetScreenHeight()/2}, 
+              20, 1, GRAY);
 }
 
 static void LogoUnload(void) {

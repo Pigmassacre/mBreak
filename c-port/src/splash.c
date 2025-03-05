@@ -1,4 +1,5 @@
 #include "../include/screens.h"
+#include "../include/font.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -73,21 +74,23 @@ static void DrawSplash(void) {
     int fontSize = 60;
     const char* text = "mBREAK";
     
-    Vector2 textSize = MeasureTextEx(GetFontDefault(), text, fontSize, 2);
-    DrawText(text, 
-             GetScreenWidth()/2 - textSize.x/2, 
-             GetScreenHeight()/2 - fontSize/2, 
+    Vector2 textSize = MeasureTextEx(gameFont, text, fontSize, 1);
+    DrawTextEx(gameFont, text, 
+             (Vector2){GetScreenWidth()/2 - textSize.x/2, 
+             GetScreenHeight()/2 - fontSize/2}, 
              fontSize, 
+             1,
              ColorAlpha(BLUE, splashState.alpha));
     
     // Draw raylib logo
     const char* raylibText = "Powered by raylib";
     fontSize = 20;
-    textSize = MeasureTextEx(GetFontDefault(), raylibText, fontSize, 2);
-    DrawText(raylibText, 
-             GetScreenWidth()/2 - textSize.x/2, 
-             GetScreenHeight()/2 + 60, 
+    textSize = MeasureTextEx(gameFont, raylibText, fontSize, 1);
+    DrawTextEx(gameFont, raylibText, 
+             (Vector2){GetScreenWidth()/2 - textSize.x/2, 
+             GetScreenHeight()/2 + 60}, 
              fontSize, 
+             1,
              ColorAlpha(GRAY, splashState.alpha));
 }
 

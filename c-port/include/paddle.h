@@ -14,6 +14,9 @@ typedef struct PaddleData {
     float powerUpTimer;     // Timer for power-ups
     KeyboardKey leftKey;    // Key for moving left
     KeyboardKey rightKey;   // Key for moving right
+    KeyboardKey upKey;      // Key for moving up
+    KeyboardKey downKey;    // Key for moving down
+    bool moveVertical;      // Whether paddle moves vertically (true) or horizontally (false)
 } PaddleData;
 
 // Paddle functions
@@ -26,6 +29,8 @@ void DestroyPaddle(Entity* entity);
 // Paddle action functions
 void MovePaddleLeft(Entity* paddle, float deltaTime);
 void MovePaddleRight(Entity* paddle, float deltaTime);
+void MovePaddleUp(Entity* paddle, float deltaTime);
+void MovePaddleDown(Entity* paddle, float deltaTime);
 void ResizePaddle(Entity* paddle, float widthFactor);
 void ChangeSpeed(Entity* paddle, float speedFactor);
 void MakePaddleSticky(Entity* paddle, float duration);
