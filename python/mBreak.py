@@ -38,6 +38,11 @@ from pygame.locals import *
 import os
 import sys
 
+# Change the working directory to the directory containing this script
+# This ensures that all relative paths work correctly regardless of where the script is launched from
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
 # Add the current directory to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 

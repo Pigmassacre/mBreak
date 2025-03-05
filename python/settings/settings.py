@@ -37,7 +37,9 @@ BACKGROUND_COLOR = (0, 0, 0)
 BORDER_COLOR = (200, 200, 200)
 
 # Music settings
-root = "res/music"
+# Use an absolute path based on the script directory to ensure paths work regardless of launch directory
+script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Go up one directory from settings/
+root = os.path.join(script_dir, "res/music")
 
 def get_music_files(subdir):
 	files = os.listdir(os.path.join(root, subdir))
