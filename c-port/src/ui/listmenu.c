@@ -36,6 +36,7 @@ void PositionListMenuItem(ListMenu* menu, Item* item) {
     }
     
     // Position the item in a top-to-bottom fashion
+    // Use the item's width to center it
     item->x = menu->base.x - (GetItemWidth(item) / 2.0f);
     item->y = menu->base.y + ((GetItemHeight(item) * 2.0f) * index);
 }
