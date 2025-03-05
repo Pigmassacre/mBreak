@@ -77,14 +77,6 @@ void SetupTextItemSurfaces(TextItem* item);
 void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state);
 
 /**
- * @brief Change the font size of the TextItem.
- * 
- * @param item Pointer to the TextItem.
- * @param font_size The new font size.
- */
-void SetTextItemSize(TextItem* item, int font_size);
-
-/**
  * @brief Change the displayed text.
  * 
  * @param item Pointer to the TextItem.

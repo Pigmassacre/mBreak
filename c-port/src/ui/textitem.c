@@ -110,20 +110,6 @@ void SetupTextItemIsOnOff(TextItem* item, const char* off_string, bool state) {
     // No need to create any textures, we're using direct rendering
 }
 
-void SetTextItemSize(TextItem* item, int font_size) {
-    if (item->font_size != font_size) {
-        // Update font size
-        item->font_size = font_size;
-        
-        // No need to reload the font, we're using the global gameFont
-        // Just update dimensions
-        SetupTextItemSurfaces(item);
-        if (item->is_on_off) {
-            SetupTextItemIsOnOff(item, item->off_string, item->on);
-        }
-    }
-}
-
 void SetTextItemString(TextItem* item, const char* string) {
     if (strcmp(item->string, string) != 0) {
         // Update string
@@ -278,8 +264,6 @@ void DrawTextItem(const TextItem* item) {
                   (Vector2){ floorf(item->base.x), floorf(item->base.y + item->base.y_nudge) },
                   item->font_size, 0.0f, text_color);
     }
-
-    DrawTextEx(item->font, item->string, (Vector2){ floorf(item->base.x + item->base.shadow_offset_x), floorf(item->base.y + item->base.shadow_offset_y + item->base.y_nudge) }, 32, 0.0f, WHITE);
 }
 
 TextItem** GenerateListFromString(const char* string, int* count) {

@@ -30,7 +30,7 @@ int main(void) {
     // Load the game font (bitmap font)
     // Make sure the path is relative to the executable location
     // Both the .fnt and .png files must be in the same directory
-    gameFont = LoadFont("resources/fonts/PaintBasic.fnt");
+    gameFont = LoadFont("resources/fonts/nicopaint.fnt");
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_POINT);  // For crisp pixel scaling
     
     // Create virtual screen (render texture) for fixed resolution gameplay
