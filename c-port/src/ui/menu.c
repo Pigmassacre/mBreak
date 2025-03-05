@@ -256,8 +256,8 @@ bool IsMouseOverMenuItem(const Menu* menu, const Item* item, Vector2 mouse_pos) 
 }
 
 void UpdateMenu(Menu* menu, float delta_time) {
-    // Track selected items
-    Item* selected_items[menu->item_count];
+    // Track selected items using dynamic allocation instead of VLA
+    Item** selected_items = (Item**)malloc(menu->item_count * sizeof(Item*));
     int selected_count = 0;
     
     // Update all items in the menu
@@ -283,6 +283,9 @@ void UpdateMenu(Menu* menu, float delta_time) {
     if (selected_count == 0) {
         menu->previous_selected_item = NULL;
     }
+    
+    // Free the dynamically allocated array
+    free(selected_items);
 }
 
 void DrawMenu(const Menu* menu) {
